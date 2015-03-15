@@ -50,7 +50,7 @@ exclure.
 
 ## Table des matières
 
-* [Installation du paquet `se3-clients-linux` sur le serveur](impatients.md)
+* [Pour les impatients qui veulent tester rapidement](impatients.md)
 * TODO...
 
 
