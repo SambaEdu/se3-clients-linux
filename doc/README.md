@@ -48,4 +48,9 @@ résultat final. L'apparition de régressions ici ou là par
 rapport à ce qui est annoncé dans ce document n'est pas à
 exclure.
 
+## Table des matières
+
+* [Installation du paquet `se3-clients-linux` sur le serveur](impatients.md)
+* TODO...
+
 
