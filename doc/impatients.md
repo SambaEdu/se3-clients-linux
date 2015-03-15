@@ -7,13 +7,16 @@ Internet. Pour commencer, il faut préparer votre serveur
 Samba en y installant le paquet `se3-clients-linux`. Pour ce
 faire :
 
-1. Si votre serveur est sous Lenny, il faut ouvrir une
+**Si votre serveur est sous Lenny**, il faut ouvrir une
 console en tant que `root` et lancer :
+
 ```sh
 apt-get update
 apt-get install se3-clients-linux
 ```
-2. Si votre serveur est sous Squeeze, vous pouvez :
+
+**Si votre serveur est sous Squeeze**, vous pouvez :
+
 * ou bien faire l'installation comme sur un serveur Lenny
 (en mode console donc);
 * ou bien faire l'installation en passant par l'interface
