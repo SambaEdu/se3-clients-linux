@@ -1,0 +1,146 @@
+#!/bin/bash
+
+set -e 
+
+
+# Fonction pour afficher des messages.
+function afficher ()
+{
+    echo "$@"
+}
+
+
+# Fonction qui vérifie l'existence d'un répertoire dont
+# le chemin absolu est donné en unique argument.
+function verifier_existence_repertoire ()
+{
+    if [ ! -d "$1" ]; then
+        afficher "Désolé mais le répertoire \"$1\" n'existe pas."
+        return 1
+    else
+        return 0
+    fi
+}
+
+
+# Fonction qui vérifie l'existence d'un fichier (standard)
+# dont le chemin absolu est donné en unique argument.
+function verifier_existence_fichier ()
+{
+    if [ ! -f "$1" ]; then
+        afficher "Désolé mais le fichier \"$1\" n'existe pas."
+        return 1
+    else
+        return 0
+    fi
+}
+
+
+# Fonction qui vérifie si le paquet dont le nom est donné
+# en unique argument est bien installé.
+function verifier_installation_paquet ()
+{
+    if ! dpkg --list "$1" | grep -qE "^ii[[:space:]]+$1"; then
+        afficher "Désolé mais le paquet \"$1\" n'est pas installé."
+        return 1
+    else
+        return 0
+    fi
+}
+
+
+# Fonction qui vérifie l'existence d'un motif de regex donné
+# en premier argument dans le fichier dont le nom absolu est donné
+# en deuxième argument.
+function verifier_existence_motif ()
+{
+    if [ $(grep -Ec "$1" "$2") != "1" ]; then
+        afficher "Désolé mais la regex \"$1\" n'apparaît pas exactement" \
+                 "une fois dans le fichier \"$2\"."
+        return 1
+    else
+        return 0
+    fi
+}
+
+
+# Fonction qui vérifie la présence d'un compte sur le système,
+# compte dont le login est donné en unique argument.
+function verifier_presence_compte ()
+{
+    if ! getent passwd "$1" >/dev/null 2>&1; then
+        afficher "Désolé mais le compte \"$1\" n'est pas présent sur le" \
+                 "système alors qu'il est indispensable pour le bon" \
+                 "fonction du paquet."
+        return 1
+    else
+        return 0
+    fi
+}
+
+
+# Fonction qui vérifie la présence d'un groupe sur le système,
+# groupe dont le nom est donné en unique argument.
+function verifier_presence_groupe ()
+{
+    if ! getent group "$1" >/dev/null 2>&1; then
+        afficher "Désolé mais le groupe \"$1\" n'est pas présent sur le" \
+                 "système alors qu'il est indispensable pour le bon" \
+                 "fonction du paquet."
+        return 1
+    else
+        return 0
+    fi
+}
+
+
+
+
+case "$1" in
+
+    "install"|"upgrade")
+        # Argument utilisé lors de l'installation du paquet.
+        # Il faut vérifier que le système est prêt pour l'installation
+        # du paquet.
+        
+        verifier_existence_repertoire "/home/netlogon"
+        verifier_existence_repertoire "/etc/samba"
+        
+        # On laisse tomber ces vérifications car 1) c'est le travail du
+        # fichier control du paquet et du gestionnaire de paquets et 2)
+        # lors d'une mise à jour du paquet si le paquet se3 est lui aussi
+        # mis à jour en même temps cela provoque une erreur car le test
+        # considère à ce moment là que le paquet se3 n'est plus installé.
+        # Donc ces vérifications sont inutiles et nuisibles.
+        #verifier_installation_paquet "se3"
+        #verifier_installation_paquet "se3-domain"
+
+        fichier="/etc/se3/config_m.cache.sh"
+        verifier_existence_fichier "$fichier"
+        verifier_existence_motif '^se3ip=' "$fichier" 
+
+        fichier="/etc/se3/config_l.cache.sh"
+        verifier_existence_fichier "$fichier"
+        verifier_existence_motif '^ldap_base_dn=' "$fichier"
+        
+        fichier="/etc/se3/config_c.cache.sh"
+        verifier_existence_fichier "$fichier"
+        verifier_existence_motif '^ntpserv=' "$fichier"
+
+        verifier_presence_compte "admin"
+        verifier_presence_groupe "admins"
+        
+        afficher "Le système est prêt pour l'installation du paquet."
+        exit 0
+    ;;
+
+    *)
+        # Argument non pris en charge. On ne fait rien avec 0 comme
+        # valeur de retour pour ne pas stopper les processus dpkg.
+        exit 0
+    ;;
+    
+esac
+
+
+

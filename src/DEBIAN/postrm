@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e
+
+REPERTOIRE_INSTALLATION="/home/netlogon/clients-linux"
+SMB_CIFSFS="/etc/samba/smb_CIFSFS.conf"
+LOGON="$REPERTOIRE_INSTALLATION/bin/logon"
+REPERTOIRE_DOC="$REPERTOIRE_INSTALLATION/doc"
+
+case "$1" in
+
+    "remove")
+        # Lors d'une désintallation sans purge, il y a
+        # des fichiers, qui ne font pas partie du paquet .deb et qui
+        # ont été générés par le script postinst, à supprimer 
+        # tout de même.
+        rm -f "$LOGON"
+        rm -fr "$REPERTOIRE_DOC"
+        exit 0
+    ;;
+    
+    "purge")
+        # Lors de la désinstallation via une purge, on supprime
+        # tous les fichiers du paquet, s'il y en a.
+        rm -fr "$REPERTOIRE_INSTALLATION"
+        rm -fr "$SMB_CIFSFS"
+        exit 0
+    ;;
+    
+    *)
+        # Argument non pris en charge. On ne fait rien avec 0 comme
+        # valeur de retour pour ne pas stopper les processus dpkg.
+        exit 0
+    ;;
+    
+esac

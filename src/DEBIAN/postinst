@@ -1,0 +1,344 @@
+#!/bin/bash
+
+
+set -e
+
+
+NOM_PAQUET="se3-clients-linux"
+REPERTOIRE_INSTALLATION="/home/netlogon/clients-linux"
+REPERTOIRE_DISTRIBS="$REPERTOIRE_INSTALLATION/distribs"
+REPERTOIRE_BIN="$REPERTOIRE_INSTALLATION/bin"
+REPERTOIRE_DEFAUT="$REPERTOIRE_INSTALLATION/.defaut"
+REPERTOIRE_DIVERS="$REPERTOIRE_INSTALLATION/divers"
+REPERTOIRE_DIVERS_DEFAUT="$REPERTOIRE_DEFAUT/divers"
+REPERTOIRE_UNEFOIS="$REPERTOIRE_INSTALLATION/unefois"
+REPERTOIRE_UNEFOIS_DEFAUT="$REPERTOIRE_DEFAUT/unefois"
+REPERTOIRE_SSHKEY="$REPERTOIRE_DEFAUT/install"
+LOGON="$REPERTOIRE_INSTALLATION/bin/logon"
+LOGON_DEFAUT="$REPERTOIRE_DEFAUT/logon"
+LOGON_PERSO="$REPERTOIRE_INSTALLATION/bin/logon_perso"
+LOGON_PERSO_DEFAUT="$REPERTOIRE_DEFAUT/logon_perso"
+LOGON_PARAM_FOND_ECRAN="$REPERTOIRE_INSTALLATION/bin/logon_param_fond_ecran"
+GENERE_PARAM_FOND_ECRAN="$REPERTOIRE_INSTALLATION/bin/genere_param_fonds_clients_linux.sh"
+CONNEXION_SSH_SERVEUR="$REPERTOIRE_INSTALLATION/bin/connexion_ssh_serveur.bash"
+RECONFIGURE_SSH="$REPERTOIRE_INSTALLATION/bin/reconfigure.bash"
+SMB_CIFSFS="/etc/samba/smb_CIFSFS.conf"
+VERSION_PAQUET=$(LC_ALL="C" dpkg -s "$NOM_PAQUET" | grep -i '^version:' | cut -d' ' -f 2)
+FICHIER_LISEZMOI="$REPERTOIRE_INSTALLATION/doc/LISEZMOI.TXT"
+URL_DOC_PDF="http://francois-lafont.ac-versailles.fr/sedu-linux/doc_v$VERSION_PAQUET.pdf"
+URL_DOC_ZIP="http://francois-lafont.ac-versailles.fr/sedu-linux/doc_v$VERSION_PAQUET.zip"
+
+
+# Le programme awk injectera le contenu du fichier LOGON_PERSO
+# qui devra exister en amont.
+PROG_AWK_INSERTION='{ 
+    if ($0 ~ /^### LOGON_PERSO ###/) {
+        system("cat \"'"$LOGON_PERSO"'\"")
+    }
+    else if ($0 ~ /^### LOGON_PARAM_FOND_ECRAN ###/) {
+        system("cat \"'"$LOGON_PARAM_FOND_ECRAN"'\"")
+    } else { 
+        print $0 
+    }
+}'
+
+
+
+# Pour afficher des messages.
+function afficher ()
+{
+    echo "$@"
+}
+
+
+
+# Fonction qui configure correctement les droits sur les
+# fichiers du répertoire d'installation.
+function restaurer_droits ()
+{
+    # On met en place des droits cohérents sur les répertoires
+    # et sur les fichiers.
+    chown -R "admin:admins" "$REPERTOIRE_INSTALLATION"
+    chmod -R "u=rwx,g=rx,o=rx,u-s,g-s,o-t" "$REPERTOIRE_INSTALLATION"
+    # Pour les fichiers, on enlève le droit x pour tout le monde.
+    find "$REPERTOIRE_INSTALLATION" -type f -exec chmod "a-x" "{}" \;
+    setfacl -m u:www-data:rx "$REPERTOIRE_INSTALLATION"
+    setfacl -m d:u:www-data:rx "$REPERTOIRE_INSTALLATION"
+
+
+    # Le répertoire bin/ contient des exécutables.
+    for f in "$REPERTOIRE_BIN/"*; do
+        [ "$f" = "$REPERTOIRE_BIN/*" ] && continue
+        chmod u+x "$f"
+    done
+    
+    # Pour rendre le contenu du répertoire inaccessible sur les clients
+    # sauf par admin et root.
+    chmod 750 "$REPERTOIRE_INSTALLATION"
+    
+    # Le fichier SMB_CIFSFS.
+    chown "root:root" "$SMB_CIFSFS"
+    chmod 644 "$SMB_CIFSFS"
+    
+    rm -rf /var/www/install
+    chmod 755 "$REPERTOIRE_SSHKEY"
+    chown root "$REPERTOIRE_SSHKEY"
+    ln -s "$REPERTOIRE_SSHKEY" /var/www/install
+}
+
+# Fonction qui adapte les scripts à l'environnement via des
+# substitutions de lignes.
+function adapter_scripts ()
+{
+    local fichier IP_SE3 BASE_DN SERVEUR_NTP
+    
+    afficher "Récupération de paramètres sur le serveur."
+    
+    fichier="/etc/se3/config_m.cache.sh"
+    IP_SE3=$(grep -E '^se3ip=' "$fichier" | cut -d'=' -f'2-' | tr -d '"')
+    # On vérifie que l'on a bien récupéré une IP.
+    local octet
+    octet="[0-9]{1,3}"
+    if ! echo "$IP_SE3" | grep -qE "^$octet\.$octet\.$octet\.$octet$"; then
+        afficher "Désolé, l'IP du Se3 trouvée dans le ficher \"$fichier\"" \
+                 "n'a pas une syntaxe correcte."
+        exit 1
+    else
+        # C'est bien une adresse IP.
+        if ! ping -q -c4 -W2 "$IP_SE3" > /dev/null 2>&1; then
+            afficher "Désolé, l'IP du Se3 trouvée dans le ficher \"$fichier\"" \
+                     "ne répond pas à un ping."
+            exit 1
+        fi
+    fi
+    afficher "IP du Se3 \"$IP_SE3\"."
+
+
+    fichier="/etc/se3/config_l.cache.sh"
+    BASE_DN=$(grep -E '^ldap_base_dn=' "$fichier" | cut -d'=' -f'2-' | tr -d '"')
+    if [ -z "$BASE_DN" ]; then
+        afficher "Désolé, la base DN de l'annuaire récupérée dans le fichier" \
+                 "\"$fichier\" est vide."
+        exit 1
+    else
+        # On teste le DN de base via une petite requête LDAP.
+        if ! ldapsearch -LLLx -b "$BASE_DN" -s "base" "dn" > /dev/null 2>&1; then
+            afficher "Désolé, la base DN de l'annuaire récupérée dans le" \
+                     "fichier \"$fichier\" ne fonctionne pas dans" \
+                     "une requête LDAP."
+            exit 1
+        fi
+    fi
+    afficher "Base DN LDAP \"$BASE_DN\"."
+
+
+    fichier="/etc/se3/config_c.cache.sh"
+    SERVEUR_NTP=$(grep -E '^ntpserv=' "$fichier" | cut -d'=' -f'2-' | tr -d '"')
+    if [ -z "$SERVEUR_NTP" ]; then
+        afficher "Désolé, le nom du serveur NTP récupéré dans le" \
+                 "fichier \"$fichier\" est vide."
+        exit 1
+    else
+        if ! ntpdate "$SERVEUR_NTP" > /dev/null 2>&1; then
+            echo "" # C'est juste pour mettre l'avertissement en valeur.
+            afficher "ATTENTION !!!"
+            afficher "Attention, le serveur NTP dont le nom a été récupéré" \
+                     "dans le fichier \"$fichier\" ne semble pas fonctionner." \
+                     "Il est peut-être nécessaire de modifier l'adresse de ce serveur NTP" \
+                     "puis de reconfigurer la paquet avec la commande dpkg-reconfigure."
+            echo "" # C'est juste pour mettre l'avertissement en valeur.
+            # Trop rude de sortir avec une erreur ici.
+            ###exit 1
+        fi
+    fi
+    afficher "Nom du serveur NTP \"$SERVEUR_NTP\"."
+
+
+    afficher "Adaptation des scripts à l'environnement du serveur."
+    
+    for f in "$REPERTOIRE_DISTRIBS/"*"/integration/integration_"*; do
+        [ "$f" = "$REPERTOIRE_DISTRIBS/*/integration/integration_*" ] && continue
+        sed -r -i -e "s/^SE3=\".+$/SE3=\"$IP_SE3\"/g" \
+                  -e "s/^BASE_DN=\".+$/BASE_DN=\"$BASE_DN\"/g" \
+                  -e "s/^SERVEUR_NTP=\".+$/SERVEUR_NTP=\"$SERVEUR_NTP\"/g" \
+            "$f"
+        verifier_adaptation "$f" "$IP_SE3" "$BASE_DN" "$SERVEUR_NTP"
+    done
+
+    # On adapte le fichier permettant la connexion ssh au serveur
+    # ainsi que celui permettant de restaurer les droits à distance.
+    sed -r -i -e "s/^SE3=\".+$/SE3=\"$IP_SE3\"/g" "$CONNEXION_SSH_SERVEUR"
+    sed -r -i -e "s/^SE3=\".+$/SE3=\"$IP_SE3\"/g" "$RECONFIGURE_SSH"
+    
+    # Adaptation de LOGON_DEFAUT.
+    # Seul LOGON_DEFAUT est à adapter, c'est inutile pour LOGON
+    # car il va être réécrit complètement à partir de LOGON_DEFAUT.
+    sed -r -i -e "s/^SE3=\".+$/SE3=\"$IP_SE3\"/g" \
+              -e "s/^BASE_DN=\".+$/BASE_DN=\"$BASE_DN\"/g" \
+              -e "s/^SERVEUR_NTP=\".+$/SERVEUR_NTP=\"$SERVEUR_NTP\"/g" \
+        "$LOGON_DEFAUT"
+    verifier_adaptation "$LOGON_DEFAUT" "$IP_SE3" "$BASE_DN" "$SERVEUR_NTP"
+}
+
+
+
+# Fonction qui vérifie que l'adaptation des scripts est bien effective.
+# Sa syntaxe est :
+# verifier_adaptation "le-script" "IP_SE3" "BASE_DN" "SERVEUR_NTP"
+function verifier_adaptation ()
+{
+    local script IP_SE3 BASE_DN SERVEUR_NTP fichier
+    script="$1"
+    fichier=$(basename "$1")
+    IP_SE3="$2"
+    BASE_DN="$3"
+    SERVEUR_NTP="$4"
+    
+    local n
+    
+    # Il faut que la valeur de retour soit 0 à tous les coups, sinon
+    # le script s'arrête brusquement à cause de « set -e », d'où
+    # les « || true » un peu curieux.
+    n=$(grep -c "^SE3=\"$IP_SE3\"$" "$script" || true)
+    if [ "$n" != "1" ]; then
+        afficher "Désolé, mais le script \"$fichier\" n'a pas été adapté" \
+                 "correctement, l'adresse IP du Se3 y est manquante."
+        exit 1
+    fi
+    
+    n=$(grep -c "^BASE_DN=\"$BASE_DN\"$" "$script" || true)
+    if [ "$n" != "1" ]; then
+        afficher "Désolé, mais le script \"$fichier\" n'a pas été adapté" \
+                 "correctement, la base DN de l'annuaire y est manquante."
+        exit 1
+    fi
+
+    n=$(grep -c "^SERVEUR_NTP=\"$SERVEUR_NTP\"$" "$script" || true)
+    if [ "$n" != "1" ]; then
+        afficher "Désolé, mais le script \"$fichier\" n'a pas été adapté" \
+                 "correctement, le nom du serveur NTP est y manquant."
+        exit 1
+    fi
+}
+
+
+
+# Fonction qui réécrit totalement le fichier LOGON, à partir de LOGON_DEFAUT,
+# et en y injectant la partie de LOGON_PERSO
+# et en y injectant LOGON_PARAM_FOND_ECRAN si un tel fichier peut etre généré
+# (si les fonds d'écran sont paramétrés dans l'interface SE3).
+function maj_logon ()
+{
+    if [ -e "$GENERE_PARAM_FOND_ECRAN" ]; then
+        chmod +x "$GENERE_PARAM_FOND_ECRAN"
+        $GENERE_PARAM_FOND_ECRAN
+    fi
+
+    awk "$PROG_AWK_INSERTION" "$LOGON_DEFAUT" > "$LOGON"
+}
+
+
+
+# Fonction qui génère le fichier de doc, qui n'est qu'un simple
+# fichier texte contenant un lien vers la doc sur mon site perso.
+function ecrire_doc ()
+{
+    # Création du fichier LISEZMOI.TXT dans le répertoire doc/.
+    echo "La documentation en ligne de cette version du paquet $NOM_PAQUET se trouve ici :
+
+$URL_DOC_PDF
+
+Les sources au format LaTeX (compilables avec pdflatex) sont ici :
+
+$URL_DOC_ZIP
+    " > "$FICHIER_LISEZMOI"
+}
+
+
+
+case "$1" in
+
+    "configure")
+        # Argument utilisé lors de l'installation du paquet, une
+        # fois que les fichiers sont copiés dans l'arborescence.
+
+        adapter_scripts
+
+
+
+        # En principe ce bricolage est maintenant de l'histoire ancienne,
+        # mais bon pour l'instant je le laisse au cas où (ce bricolage
+        # dans le pire des cas ne fera rien du tout)...
+        #-----------------------------------------
+        # Bricolage temporaire. 
+        # Comme le fichier smb_CIFSFS.conf est actuellement inclus 
+        # dans un autre paquet se3, l'installation du paquet ajoute 
+        # l'extension ".divert" dans le nom de ce fichier.
+        if [ -f "$SMB_CIFSFS.divert" ]; then
+            [ -e "$SMB_CIFSFS" ] && rm -rf "$SMB_CIFSFS"
+            mv "$SMB_CIFSFS.divert" "$SMB_CIFSFS"
+        fi
+        #-----------------------------------------
+        
+
+
+        
+        # Mise en place du contenu par défaut des répertoires personnalisables,
+        # si toutefois ces répertoires n'existent pas déjà.
+        
+        # Le répertoire divers/.
+        if [ ! -e "$REPERTOIRE_DIVERS" ]; then
+            afficher "Mise en place du contenu par défaut du répertoire divers/."
+            cp -r "$REPERTOIRE_DIVERS_DEFAUT" "$REPERTOIRE_INSTALLATION"
+        fi
+        
+        # Le répertoire unefois/.
+        if [ ! -e "$REPERTOIRE_UNEFOIS" ]; then
+            afficher "Mise en place du contenu par défaut du répertoire unefois/."
+            cp -r "$REPERTOIRE_UNEFOIS_DEFAUT" "$REPERTOIRE_INSTALLATION"
+        fi        
+
+        # Les profils par défaut des distributions.
+        for f in "$REPERTOIRE_DEFAUT/skel_"*; do 
+            [ "$f" = "$REPERTOIRE_DEFAUT/skel_*" ] && continue
+            n=$(basename "$f")
+            nom_de_code="${n#skel_}"
+            if [ ! -e "$REPERTOIRE_DISTRIBS/$nom_de_code/skel" ]; then
+                afficher "Mise en place du profil par défaut de la distribution $nom_de_code."
+                cp -r "$f" "$REPERTOIRE_DISTRIBS/$nom_de_code/skel"
+            fi
+        done
+
+	if [ ! -e "$REPERTOIRE_SSHKEY/id_rsa.pub" ]; then
+		cp /var/remote_adm/.ssh/id_rsa.pub $REPERTOIRE_SSHKEY
+        fi
+        
+        # Si le fichier LOGON_PERSO n'existe pas, le crée en se
+        # basant sur une copie de LOGON_PERSO_DEFAUT
+        if [ ! -f "$LOGON_PERSO" ]; then
+            afficher "Mise en place du contenu par défaut du fichier logon_perso."
+            cp "$LOGON_PERSO_DEFAUT" "$LOGON_PERSO"
+        fi
+        
+        afficher "Insertion du contenu de logon_perso dans le fichier logon."        
+        maj_logon
+
+        afficher "Écriture du fichier de documentation."
+        ecrire_doc
+        
+        afficher "Restauration des droits sur tous les fichiers du paquet."
+        restaurer_droits
+
+        afficher "La configuration du paquet $NOM_PAQUET est terminée."
+        exit 0
+    ;;
+
+    *)
+        # Argument non pris en charge. On ne fait rien avec 0 comme
+        # valeur de retour pour ne pas stopper les processus dpkg.
+        exit 0
+    ;;
+    
+esac
+
+

@@ -1,0 +1,189 @@
+La version 1.1.3 est scellée. Désormais, toute modification concernera une
+version n > 1.1.3 (avec n à définir au moment de la publication, en fonction
+de l'importance des changements).
+
+
+--------------
+    TODO
+--------------
+
+* Faire en sorte que le fichier "0.maj_logon.log" contienne plus d'information
+  quand il n'y a pas eu MAJ. Par exemple, si l'exécution du script distant
+  provoque une erreur il faudrait que ce soit indiqué dans ce fichier (il
+  me semble que ce n'est pas le cas actuellement).
+
+
+* Au niveau des scripts d'intégration, un ping sur le serveur est effectué.
+  Si ce ping échoue, le script s'arrête avant de faire quoi que ce soit sur
+  le système. Seulement, il semblerait que dans certains établissements, le
+  serveur soit configuré pour ne pas répondre aux pings. Il faudrait du coup
+  implémenter une option supplémentaire au niveau du script d'intégration qui
+  désactive ce test du ping sur le serveur.
+
+
+* Il faudra un jour rendre les scripts d'intégration plus robustes :
+
+    1. Au niveau de l'installation des paquets :
+    
+    for paquet in $PAQUETS_TOUS; do
+        if ! apt-get install "$paquet" --yes >/dev/null 2>&1; then
+            afficher "Désolé, problème lors de l'installation du paquet $paquet qui est nécessaire à l'intégration."
+            exit 1
+        fi
+    done
+    
+    2. Lors des confs de fichiers :
+    
+        a. On garde dans /etc/se3/save/ tous les fichiers de confs qui seront
+           amenés à être modifiés. On garde les fichiers de confs tels qu'ils
+           sont sur le clients et basta. Lors d'une intégration si ce dossier
+           existe déjà alors on le conserve tel quel, on passe l'étape de
+           sauvegarde des fichiers de confs et on va à l'étape b. Seule une
+           désintégration pourra supprimer ce dossier.
+
+        b. Si un fichier de conf est modifié ou créé complètement, peu importe
+           dans les deux cas, on fait un « cat » radical, certes, mais très
+           robuste au moins :
+           
+                cat > fichier.conf <<EOF
+                Le contenu complet du fichier 
+                Blabla.
+                EOF
+                
+           directement dans le script d'intégration.   
+           Fini les sed et compagnie. C'est trop fragile (dépend trop de l'état
+           du fichier de conf sur lequel il s'applique) et c'est une procédure
+           qui n'est pas idempotente contrairement à un « cat » comme ci-dessus.
+
+
+* Toujours dans les scripts d'intégration, il faut tester la présence de
+  la commande issue lsb_release issue du paquet lsb-release. En effet,
+  quelqu'un lors d'une intégration n'avait pas le paquet déjà installé et
+  ça arrêtait tout.
+
+
+* Dans les profils par défaut (en tout cas pour Squeeze, faut voir ce
+  qu'il en est de [X]Ubuntu), inutile d'aller modifier le fichier système
+  /etc/xdg/user-dirs.defaults car on peut se contenter de modifier le skel/
+  par défaut en créant le fichier .config/user-dirs.dirs et en mettant
+  dedans :
+
+  XDG_DESKTOP_DIR="$HOME/Bureau"
+  XDG_DOWNLOAD_DIR="$HOME/Bureau"
+  XDG_TEMPLATES_DIR="$HOME/Bureau"
+  XDG_PUBLICSHARE_DIR="$HOME/Bureau"
+  XDG_DOCUMENTS_DIR="$HOME/Bureau"
+  XDG_MUSIC_DIR="$HOME/Bureau"
+  XDG_PICTURES_DIR="$HOME/Bureau"
+  XDG_VIDEOS_DIR="$HOME/Bureau"
+
+  Ou bien en tout cas, au moins les deux premières lignes. Notamment avec la
+  deuxième ligne on a directement le dossier de téléchargement qui correspond
+  au bureau.
+
+  Tout cela est à tester bien sûr car une possibilité est que sans la modification
+  du fichier /etc/xdg/user-dirs.defaults plusieurs dossiers dans le home soient
+  créés.
+
+
+* S'occuper de l'intégration de Wheezy. Voici le mail de LMDS.
+
+----------------------------------------------
+Bonjour à tous,
+
+bon, à priori, l'intégration de Wheezy, ça pète.
+
+Je fais remonter les scripts sur le Subversion sous peu.
+
+Deux trucs à surveiller :
+-- Ligne 32
+# Le nom de code de la distribution (par exemple "squeeze").
+#NOM_DE_CODE=$(lsb_release --codename | cut -f 2)
+NOM_DE_CODE="wheezy"
+
+Il n'y aura pas de « codename » avant la pulication. Le seul paramètre
+utilisable est « release » mais positionné à « testing/sid ». J'ai donc préféré
+forcer la valeur pour garder la cohérence de reste du script.
+
+Les raccourcis sur le bureau ne servent à rien, le bureau n'étant pas accessible
+par défaut. Je trouve que c'est une bonne chose de casser cette détestable
+habitude windowsienne de mettre plein de bazar sur le bureau. D'ailleurs sur
+Seven c'est encore pire...
+
+Je pense proposer des paquets à installer par défaut au moment de l'intégration.
+----------------------------------------------
+
+
+* Maintenant que %m se substitue bien par le nom de la machine dans le
+  smb.conf, il faudra se lancer dans un test de connexion avec une imprimante
+  en partage sur le serveur Se3. À tester chez FX peut-être...
+
+        1. On fait la manip ci-dessous sur une imprimante réseau qui est bien
+        installée sur le Se3 et sur laquelle on peut effectivement imprimer
+        via des clients Windows (bref, une imprimante réseau dont tu es sûre).
+
+        2. Sur un client Linux qui a déjà été intégré avec l'option --is 
+        (--installer-samba), on installe le paquet smbclient :
+        
+        # apt-get install smbclient
+        
+        Une fois que c'est fait dans /usr/lib/cups/backend, on doit avoir un
+        lien symbolique vers un binaire qui s'appelle smbspool :
+        
+        # ls -l /usr/lib/cups/backend
+
+        3. Enfin, toujours sur ce client Linux, on lance en tant que root :
+        
+        # lpadmin -p NOM-IMPRIMANTE -E -v smb://SE3/NOM-IMPRIMANTE
+
+        où on remplace :
+        
+        - NOM-IMPRIMANTE par le nom de *partage* de l'imprimante tell qu'on le
+          voit affiché quand on est sur un client Windows.
+        - SE3 par l'IP du Se3.
+        
+        4. Et là on testes une impression sur le client Linux avec n'importe
+        quelle application.
+        
+        Est-ce que ça marche ? Si ça marche, l'imprimante est-elle toujours
+        disponible avec une fermeture puis réouverture de session ?
+        Et après un redémarrage ?
+
+  
+* Y a-t-il un moyen de changer les icônes sur Xfce4 en ligne de
+  commandes ? Faire un appel sur la doc (celui qui sait faire, il
+  me le dit).
+
+  
+* Comment savoir en ligne de commande le nom du gestionnaire de bureau
+  qui est utilisé ? Ça pourrait être pratique.
+
+
+* Un jour, faire en sorte que le serveur NTP ne soit plus inscrit en
+  dur sur les clients Linux et faire en sorte que la MAJ de l'heure
+  se fasse directement via le script de logon avec un simple :
+  
+  ntpdate-debian "le-serveur-NTP"
+  
+  Comme ça, avec un « dpkg-reconfigure se3-clients-linux », s'il y
+  a changement du serveur NTP ce sera directement impacté sur les
+  clients (alors qu'actuellement, le nom ou l'adresse du serveur NTP
+  est inscrit en dur dans le fichier /etc/ntp.conf du client Linux
+  intégré.
+
+
+* Un jour, restructurer le code du fichier logon en quelque chose
+  de plus simple et plus carré :
+  
+  1. Les fonctions (avec les exports de fonctions à la fin)
+  2. Les variables (avec les exports de variables à la fin)
+  3. Le code
+
+
+* Le nom de la variable (globale) SE3 est mal choisi. Un truc comme
+  SERVEUR, c'est mieux je trouve (déjà le jour où on passera à SE4,
+  on n'aura rien à changer).
+
+
+
+

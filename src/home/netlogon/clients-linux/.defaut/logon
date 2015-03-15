@@ -1,0 +1,2001 @@
+#! /bin/bash
+
+# NE PAS ÉDITER CE FICHIER !!!
+
+
+# Voici les appels qui ont un sens pour ce script :
+#   logon xxx yyy zzz
+#
+# Avec :
+#   - xxx = "initialisation" ou "ouverture" ou "fermeture"
+#   - yyy = "true" ou "false" pour indiquer s'il doit y avoir tentative
+#           de mise à jour avoir le script distant.
+#   - zzz = "true" ou "false" pour indiquer si le script s'exécute lors d'une
+#           d'une phase d'initialisation qui correspond au démarrage du
+#           système (true) ou non (false).
+
+
+
+# Le plus tôt possible dans le script, on procède aux redirections 
+# de stdout et de stderr.
+PHASE="$1" 
+
+REP_SE3_LOCAL="/etc/se3"
+REP_LOG_LOCAL="$REP_SE3_LOCAL/log"
+
+# En fonction de l'argument PHASE, on redirige différemment
+# la sortie standard et la sortie des erreurs du script.
+case "$PHASE" in
+
+    "initialisation")
+    
+        # On cherche d'abord à récupérer le nom absolu du script exécuté.
+        if echo "$0" | grep -q '^/'; then
+            # L'appel du script s'est fait via son nom absolu.
+            nom_absolu_script="$0"
+        else
+            rep=$(dirname "$0")
+            nom=$(basename "$0")
+            nom_absolu_script=$(cd "$rep"; pwd)"/$nom"
+        fi
+
+        # Ici on fait appel à un grep classique car aucune fonction
+        # n'est encore définie à ce stade du script. Mais ce n'est
+        # pas très grave car le motif ici est une chaîne de caractères
+        # sans surprise.
+        if echo "$nom_absolu_script" | grep -q -- "^$REP_SE3_LOCAL"; then
+            # Le script exécuté se trouve dans le répertoire local.
+            exec 1> "$REP_LOG_LOCAL/1.initialisation.log" 2>&1
+        else
+            # Sinon, c'est la version distante qui est exécutée
+            # et il vaut mieux rediriger la sortie dans un autre
+            # fichier, sans quoi le script distant va réécrire
+            # par dessus le log du script local.
+            exec 1> "$REP_LOG_LOCAL/1.initialisation_distant.log" 2>&1
+        fi
+        ;;
+
+    "ouverture")
+        exec 1> "$REP_LOG_LOCAL/2.ouverture.log" 2>&1
+        ;;
+
+    "fermeture")
+        exec 1> "$REP_LOG_LOCAL/3.fermeture.log" 2>&1
+        ;;
+        
+    *)
+        # L'argument PHASE est incorrect, on arrête tout.
+        exit 1
+        ;;
+
+esac
+
+unset -v nom_absolu_script rep nom
+
+
+
+
+
+
+
+### LOGON_PERSO ###
+
+
+
+
+
+
+### LOGON_PARAM_FOND_ECRAN ###
+
+
+
+
+
+
+##############################################################
+##############################################################
+###                                                        ###
+### On passe à la définition de quelques fonctions utiles. ###
+###                                                        ###
+##############################################################
+##############################################################
+
+
+
+# Fonction qui affiche la date du moment.
+function afficher_date ()
+{
+    LC_ALL="$LOCALE_FRANCAISE" date '+%Y/%m/%d %Hh%Mmn%Ss (%A %d %b)'
+}
+
+
+
+# Fonction pour afficher des messages.
+function afficher ()
+{
+    # On insère la date au niveau de chaque affichage.
+    echo "[$(afficher_date)] $@" # | fmt -w 65
+}
+
+
+
+# Cette fonction prend une chaîne en argument et teste si
+# le nom en argument correspond à un login d'utilisateur local
+# (c'est-à-dire qui se trouve dans /etc/passwd). Si c'est 
+# le cas la fonction s'exécute correctement en renvoyant 0,
+# sinon elle renvoie 1.
+function est_utilisateur_local ()
+{
+    if cat "/etc/passwd" | grep_debut_verbatim "$1:"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+
+# Donne la liste des répertoires qui sont point de montage
+# sur le système. Attention, avec cette sortie, les caractères
+# un peu spéciaux dans les noms sont exprimés sous la forme
+# \NNN avec NNN le numéro ASCII du caractère sous la forme
+# octale.
+function donner_liste_montages ()
+{
+    cat "/proc/mounts" | cut -d ' ' -f 2
+}
+
+
+
+# Fonction qui permet de savoir si un répertoire, avec son chemin absolu,
+# est bien un point de montage. Si c'est le cas la fonction s'exécute
+# correctement en renvoyant 0 sinon elle renvoie 1.
+# Le chemin absolu ne doit pas avoir de « / » à la fin.
+# Par ailleurs cette commande ne fonctionnera que pour des noms de
+# répertoires sans espace et sans caractère « spécial » au yeux du
+# fichier /proc/mounts (par exemple « \ » est un caractère spécial,
+# qui est représenté par \134 dans le fichier /proc/mounts sachant
+# que 134 est le numéro ASCII du caractère « \ »).
+# Mais en vérité je ne saurais donner une définition précise de ce qui
+# est considéré comme caractère « spécial » dans ce fichier.
+# Mais ce n'est pas grave car cette fonction devra être appelée avec 
+# en argument un nom de répertoire sans caractère « exotique »,
+# ça fait partie du contrat. Par exemple, la classe de caractères 
+# [-_a-z0-9] est constitué de caractères non spéciaux, il faudra
+# se limiter à cette classe.
+#
+# Remarque : la commande mountpoint aurait pu sembler plus naturelle
+# pour remplir cette tâche. Mais le souci, c'est que :
+#   1. Si c'est un montage réseau et si le serveur est inaccessible
+#      alors la commande peut durer un certain temps.
+#   2. On pourrait ajouter un timeout, mais dans ce cas si la commande
+#      dépasse ce timeout (parce que le serveur est inaccessible), la
+#      valeur de retour est autre que 0 et cela signifie que le
+#      répertoire n'est pas un point de montage alors que c'est
+#      en fait le cas.
+function est_point_montage ()
+{
+    # $1 est le chemin absolu du répertoire.
+    if donner_liste_montages | grep_debut_fin_verbatim "$1"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+
+# Fonction qui supprime le répertoire de montage donné
+# en argument sous la forme d'un chemin absolu.
+# Si le répertoire n'existe pas alors la fonction ne fera
+# rien, et ne provoquera pas d'erreur.
+function nettoyer_un_rep_montage ()
+{
+    local f
+    local ff
+    f="$1"
+    
+    shopt -s dotglob
+    
+    for ff in "$f/"*; do
+        [ "$ff" = "$f/*" ] && continue
+        # Si c'est un point de montage (et donc aussi un répertoire),
+        # il faut d'abord procéder au démontage.
+        if est_point_montage "$ff"; then
+            umount "$ff" && rm -rf --one-file-system "$ff"
+        else
+            # Dans tous les autres cas, on peut supprimer directement.
+            rm -rf --one-file-system "$ff"
+        fi        
+    done
+    
+    # On peut ensuite effacer "$f" qui doit être vide en principe.
+    rm -rf --one-file-system "$f"
+    
+    shopt -u dotglob
+    
+}
+
+
+
+# Fonction qui démonte tous les répertoires (qui se trouvent dans REP_MONTAGE)
+# de partages des utilisateurs non connectés au système, sans toucher 
+# à REP_NETLOGON.
+function nettoyer_rep_montage ()
+{
+    local f
+    shopt -s dotglob
+
+    for f in "$REP_MONTAGE/_"*; do
+        # On itère sur tous les fichiers de la forme "$REP_MONTAGE/_xxx".
+
+        # On passe à l'itération suivante si f est égal à REP_NETLOGON
+        # (aucune chance à cause du caractère underscore mais on ne sait
+        # jamais) ou bien si f ne correspond à aucun fichier ce qui est
+        # possible si le * n'attrape rien, ou bien si ce n'est pas un
+        # répertoire.
+        [ "$f" = "$REP_NETLOGON" ] && continue
+        [ "$f" = "$REP_MONTAGE/*" ] && continue
+        [ ! -d "$f" ] && continue
+        
+        local n
+        local nom
+        n=$(basename "$f") # "$n" sera de la forme "_xxx"
+        nom="${n#_}" # "$nom" sera de la forme "xxx"
+        
+        # Si l'utilisateur est connecté, on passe.
+        est_connecte "$nom" && continue
+        
+        # Enfin on efface le contenu du répertoire "$f".
+        nettoyer_un_rep_montage "$f"
+        
+    done
+    
+    shopt -u dotglob
+}
+
+
+
+# Fonction qui vide REP_TMP_LOCAL de son contenu.
+function nettoyer_rep_tmp_local ()
+{
+    local f
+    shopt -s dotglob
+    for f in "$REP_TMP_LOCAL/"*; do
+        [ "$f" = "$REP_TMP_LOCAL/*" ] && continue
+        rm -rf "$f"
+    done
+    shopt -u dotglob
+}
+
+
+
+# Fonction qui efface les homes des utilisateurs non locaux et qui
+# ne sont pas connectés au système.
+function nettoyer_rep_home ()
+{
+    # On efface tous les home des utilisateurs non locaux (non connectés).
+    local f
+    shopt -s dotglob
+    for f in "/home/"*; do
+        [ "$f" = "/home/*" ] && continue
+        nom=$(basename "$f")
+        if est_utilisateur_local "$nom"; then
+            # Là, on garde le répertoire car c'est un utilisateur local.
+            true
+        else
+            # Sinon on supprime le home si celui-ci ne correspond pas
+            # à un utilisateur déjà connecté. Par ailleurs, on évite
+            # la suppression de "lost+found" qui est présent quand le
+            # répertoire /home est monté sur une partition séparée. 
+            if [ "$nom" != "lost+found" ] && ! est_connecte "$nom"; then
+                # L'option --one-file-system est capitale, car sans cette
+                # option, si un lien symbolique se trouve dans le « /home »
+                # et s'il pointe vers un partage alors le contenu du
+                # partage est tout simplement effacé.
+                rm -fr --one-file-system "$f"
+            fi
+        fi    
+    done    
+    shopt -u dotglob
+}
+
+
+
+# Cette fonction va mettre à jour le profil local afin de
+# copier le profil distant dans REP_SKEL_LOCAL. A priori,
+# cette fonction sera appelée si et seulement si le profil 
+# distant a changé de version.
+function mettre_a_jour_profil ()
+{
+    local version version_local exit_code
+    version=$(cat "$VERSION_SKEL")
+    version_local=$(cat "$VERSION_SKEL_LOCAL")
+    afficher "Mise à jour du profil par défaut local." \
+             "Le contenu du fichier .VERSION du profil distant est" \
+             "<citation> $version </citation>."
+    if [ ! -d  "$REP_SKEL_LOCAL" ]; then
+        mkdir -p "$REP_SKEL_LOCAL"
+        chown "root:" "$REP_SKEL_LOCAL"
+    fi 
+
+    # On oublie cp qui, apparemment, peut planter quand il
+    # fait des copies qui passent par le réseau (ce qui est
+    # le cas ici). Et perso, j'ai constaté ce bug avec un
+    # message du genre « cp: skipping file ... as it was 
+    # replaced while being copied ». Ceci étant, je n'ai
+    # pas réussi à reproduire le bug, alors je ne sais plus.
+    #rm -fr --one-file-system "$REP_SKEL_LOCAL"
+    #cp -r "$REP_SKEL" "$REP_SE3_LOCAL"
+
+    # Pas de chose dans le genre « --modify-window=20 » car il 
+    # vaut mieux que des copies en trop soient faites plutôt 
+    # qu'il y ait certaines copies non faites.
+    # L'option --bwlimit indique une limite de téléchargement
+    # en KiloBytes/s. Ici on a 2048 KB/s soit 2 Mo/s.
+    if rsync -rtxh --links --delete --bwlimit=2048 "$REP_SKEL" "$REP_SE3_LOCAL"
+    then
+        # La commande rsync s'est bien passée.
+        exit_code=0
+    else
+        sleep 0.5
+        # La commande rsync a planté, il faut remettre le fichier
+        # .VERISON local dans son état initial.
+        exit_code=1
+        cat "$version_local" > "$VERSION_SKEL_LOCAL"
+    fi
+
+    chown -R "root:" "$REP_SKEL_LOCAL"
+    # On met des droits cohérents sur les fichiers et les répertoires.
+    find "$REP_SKEL_LOCAL" -type f -exec chmod u=rw,g=rw,o='',u-s,g-s,o-t '{}' \;
+    find "$REP_SKEL_LOCAL" -type d -exec chmod u=rwx,g=rwx,o='',u-s,g-s,o-t '{}' \;
+    sync
+
+    return "$exit_code"
+}
+
+
+
+# Met à jour le script de logon local. A priori cette fonction sera
+# appelée si et seulement le script de logon local est différent (au
+# sens de la commande diff) de la version distante sur le serveur.
+function mettre_a_jour_logon ()
+{
+    if [ ! -d  "$REP_BIN_LOCAL" ]; then
+        mkdir -p "$REP_BIN_LOCAL"
+        chown "root:" "$REP_BIN_LOCAL"
+        chmod "700" "$REP_BIN_LOCAL"
+    fi
+
+    # On met à jour le script de logon en lançant une tâche en arrière plan.
+    afficher "Le déroulement de la mise à jour du script de logon sera écrit" \
+             "dans le fichier \"0.maj_logon.log\"."
+    {
+        afficher_date
+        
+        # On attend que le script local ne soit lu par aucun processus
+        # afin qu'il soit disponible pour être réécrit.
+        local compteur
+        compteur="1"
+        while fuser "$LOGON_SCRIPT_LOCAL" >/dev/null 2>&1; do 
+            sleep 0.5
+            if [ "$compteur" -ge "40" ]; then
+                # Au bout de 40 x 0.5 = 20 secondes on abandonne la mise à jour.
+                afficher "Mise à jour du script de logon local abandonnée" \
+                         "car celui-ci semble toujours lu par un processus" \
+                         "alors que le temps d'attente maximum est dépassé."
+                return 1
+            fi
+            compteur=$((compteur+1))
+        done
+        
+        # On crée une sauvegarde de la version locale du script de logon.
+        if cp -a "$LOGON_SCRIPT_LOCAL" "$LOGON_SCRIPT_LOCAL.SAVE" && \
+           diff -q "$LOGON_SCRIPT_LOCAL" "$LOGON_SCRIPT_LOCAL.SAVE" >/dev/null 2>&1
+        then
+            # On a une sauvegarde de la version locale qui est fiable.
+            # On peut alors tenter la mise à jour du script de logon local.
+            # Une dernière fois, on vérifie que le script local est
+            # bien disponible, juste avant de le réécrire.
+            if ! fuser "$LOGON_SCRIPT_LOCAL" >/dev/null 2>&1 && \
+               cp "$LOGON_SCRIPT" "$LOGON_SCRIPT_LOCAL" && \
+               diff -q "$LOGON_SCRIPT" "$LOGON_SCRIPT_LOCAL" >/dev/null 2>&1
+            then
+                # La mise à jour a fonctionné.
+                chown "root:" "$LOGON_SCRIPT_LOCAL"
+                chmod "700" "$LOGON_SCRIPT_LOCAL"
+                afficher "Mise à jour du script de logon local réussie."
+                [ -e "$LOGON_SCRIPT_LOCAL.SAVE" ] && rm -f "$LOGON_SCRIPT_LOCAL.SAVE"
+                return 0
+            else
+                # La mise à jour n'a pas fonctionné, il faut alors
+                # restaurer la sauvegarde.
+                [ -e "$LOGON_SCRIPT_LOCAL" ] && rm -f "$LOGON_SCRIPT_LOCAL"
+                mv "$LOGON_SCRIPT_LOCAL.SAVE" "$LOGON_SCRIPT_LOCAL"
+                chown "root:" "$LOGON_SCRIPT_LOCAL"
+                chmod "700" "$LOGON_SCRIPT_LOCAL"
+                afficher "La mise à jour du script de logon local a échoué." \
+                         "La version locale actuelle a été restaurée en attendant" \
+                         "une prochaine tentative de mise à jour."
+                return 1
+            fi            
+        else
+            # Si la création de la sauvegarde de la version locale a échoué
+            # alors on supprime la sauvegarde si elle existe et on ne fait
+            # plus rien.
+            [ -e "$LOGON_SCRIPT_LOCAL.SAVE" ] && rm -f "$LOGON_SCRIPT_LOCAL.SAVE"
+            afficher "Erreur lors de sauvegarde de la version locale du" \
+                     "script de logon. Pas de mise à jour de script."
+            return 1
+        fi
+    } > "$REP_LOG_LOCAL/0.maj_logon.log" 2>&1 & 
+    # Tout ça se fait en arrière plan pour que le script continue son exécution.
+    # On ne sait pas vraiment à quel moment cette tâche en arrière
+    # plan va se lancer donc il vaut mieux rediriger la sortie
+    # standard et la sortie des erreurs vers un fichier à part.
+}
+
+
+
+# Cette fonction crée un lien symbolique "/le/lien_symb" qui pointe vers un 
+# répertoire "/le/rep" et fait de "user" le propriétaire de ce fichier lien
+# symbolique.
+# creer_lien_symb "/le/rep" "/le/lien_symb" "user"
+function creer_lien_symb () 
+{
+    # $1 est le répertoire vers lequel pointe le lien.
+    # $2 est le chemin absolu du fichier lien symbolique.
+    # $3 est le propriétaire du fichier lien symbolique.
+    ln -s "$1" "$2"
+    # L'option permet de changer les propriétaires
+    # sur le lien symbolique lui-même car par défaut
+    # sinon c'est un changement sur la cible qui s'opère.
+    chown --no-dereference "$3:" "$2"
+}
+
+
+
+# Cette fonction tente de monter REP_NETLOGON s'il ne l'est
+# pas déjà et renvoie 0 si ça marche, 1 sinon.
+function monter_netlogon ()
+{
+    local n
+    local c
+    
+    n=$(donner_liste_montages | grep -c -- "^$REP_NETLOGON$")
+    c="1"
+
+    # Si n >= 1, le montage est fait, mais ce n'est pas pour autant qu'il
+    # est valide. J'ai déjà vu des cas comme ça. On va donc vérifier
+    # que le script de logon distant (par exemple) est bien lisible.
+    if [ "$n" -ge 1  ]; then
+        if ! timeout "--signal=SIGTERM" 2s test -r "$LOGON_SCRIPT"; then
+            # Le montage est incorrect car le fichier de logon distant
+            # n'est pas accessible. Du coup, on démonte netlogon pour
+            # repartir sur de nouvelles bases et retenter un montage
+            # ci-dessous.
+            while [ ! "$n" -eq 0 ]; do
+                # Pas de timeout nécessaire car en principe un umount est
+                # instantané quel que soit l'état du serveur de partages.
+                umount "$REP_NETLOGON"
+                sleep 0.25 # On ne sait jamais.
+                n=$(donner_liste_montages | grep -c -- "^$REP_NETLOGON$")
+            done
+        fi
+    fi
+
+    while [ ! "$n" -eq 1 ] && [ "$c" -le 4 ] ; do
+        if [ "$n" -eq 0 ]; then
+            timeout "--signal=SIGTERM" 2s \
+                mount -t cifs "$CHEMIN_PARTAGE_NETLOGON" "$REP_NETLOGON" -o ro,guest,"$OPTIONS_MOUNT_CIFS_BASE"
+        else
+            # différent de 1 et de 0, ça veut dire que n > 1.
+            # Cas qui ne devrait pas se produire, mais sait-on jamais.
+            # Ici il faut démonter une fois REP_NETLOGON.
+            umount "$REP_NETLOGON"
+        fi
+        sleep 0.5
+        n=$(donner_liste_montages | grep -c -- "^$REP_NETLOGON$")
+        c=$((c+1))
+    done
+    
+    if [ "$n" -eq 1 ]; then
+        # Montage réussi.
+        return 0
+    else
+        # Montage pas réussi
+        return 1
+    fi
+}
+
+
+
+# Cette fonction tente de monter un partage CIFS (comme par exemple
+# le partage « Classes » du Se3). Le premier paramètre est le chemin
+# du partage CIFS et le deuxième paramètre est le répertoire servant
+# de point de montage. Le troisième paramètre, s'il existe, permet
+# d'ajouter des options de montage en plus de celles par défaut.
+function monter_partage_cifs ()
+{
+    # 10 secondes avant le timeout du montage, ça fait beaucoup
+    # mais pour l'instant, le Se3 n'étant pas bien adapté aux
+    # clients Linux (aux montages CIFS pour être plus précis), 
+    # lors par exemple d'un montage d'un /home via CIFS,
+    # le script connexion.sh sur le Se3 est exécuté avant que
+    # le montage ne soit accepté (preexec dans smb.conf) et
+    # il a tendance à durer un peu hélas.
+    local options
+    # Les options par défaut.
+    options="$OPTIONS_MOUNT_CIFS_BASE"
+    if [ -n "$3" ]; then
+        # Des options supplémentaires sont spécifiées, 
+        # on les ajoute à la liste.
+        options="$3,$options"
+    fi
+    timeout "--signal=SIGTERM" 10s mount -t cifs "$1" "$2" -o "$options"
+}
+
+
+
+# Affiche une petite fenêtre signalant une erreur. 
+# Le premier argument correspond au titre de la fenêtre et
+# les suivants sont concaténés (avec un espace pour faire la jointure)
+# afin de former le message d'erreur contenu dans la fenêtre.
+function afficher_fenetre_erreur ()
+{
+    local titre
+    local message
+
+    titre="$1"
+    
+    # On mange le premier argument.
+    shift 1
+    
+    # Avec les arguments restants, on forme le message.
+    local m
+    for m in "$@"; do
+        message="$message $m"
+    done
+    # On enlève l'espace au début.
+    message="${message# }"
+    
+    # Attention d'appeler zenity avec une locale adaptée.
+    LC_ALL="$LOCALE_FRANCAISE" zenity --error --title "$titre" --text "$message" 
+}
+
+
+
+# Fonction qui retourne la valeur 0 si le login donné en deuxième argument
+# appartient au groupe donné en premier argument et retourne la valeur 1 sinon.
+# Exemples d'appels : 
+#       appartient_au_groupe Eleves hugov
+#       appartient_au groupe Profs hugov
+# La recherche est insensible à la casse.
+function appartient_au_groupe ()
+{
+    # $1 = le groupe
+    # $2 = le login
+    local n
+    # On cherche à afficher la liste des DN des entrées de l'OU Groups
+    # qui possèdent un attribut memberUid égal à "$2".
+    n=$(timeout "--signal=SIGTERM" 4s ldapsearch -xLLL -h "$SE3" -b "cn=$1,ou=Groups,$BASE_DN" "(memberUid=$2)" "dn" | wc -l)
+    if [ "$n" -eq "0" ]; then
+        # n = 0 signifie que la recherche n'a donné aucun résultat et
+        # donc le compte n'appartient pas au groupe.
+        return 1
+    else
+        # Sinon, la recherche a donné un résultat et donc le compte
+        # appartient au groupe.
+        return 0
+    fi
+}
+
+
+
+# Fonction qui retourne la valeur 0 si le nom de machine donné en 
+# deuxième argument appartient au nom de parc donné en premier argument 
+# et retourne la valeur 1 sinon.
+# Exemple d'appel : 
+#       appartient_au_parc CDI S121-PC04
+# La recherche est insensible à la casse.
+function appartient_au_parc ()
+{
+    # $1 = le parc
+    # $2 = le nom de machine
+    local n
+    n=$(timeout "--signal=SIGTERM" 4s ldapsearch -xLLL -h "$SE3" -b "cn=$1,ou=Parcs,$BASE_DN" "(member=cn=$2,ou=Computers,$BASE_DN)" "dn" | wc -l)
+    if [ "$n" -eq "0" ]; then
+        # n = 0 signifie que la recherche n'a donné aucun résultat et
+        # donc la machine n'appartient pas au parc.
+        return 1
+    else
+        # Sinon, la recherche a donné un résultat et donc la machine
+        # appartient au parc.
+        return 0
+    fi
+}
+
+
+
+# Cette fonction affiche la liste des groupes qui contiennent le
+# compte dont le login est donné en paramètre. Le format d'affichage
+# est de la forme « une ligne par nom de groupe ». Un exemple
+# typique d'appel de la fonction :
+#       liste_groupes=$(afficher_liste_groupes "hugov")
+function afficher_liste_groupes ()
+{
+    # $1 = le login
+    # Recherche dans l'OU Groups de tous les dn des entrées qui
+    # possèdent un attribut memberUid égal "$1".
+    timeout "--signal=SIGTERM" 4s ldapsearch -xLLL -h "$SE3" -b "ou=Groups,$BASE_DN" "(memberUid=$1)" "dn" \
+        | awk 'BEGIN { RS="\0" } { gsub("\n ", ""); print $0 }' \
+        | awk '$0 ~ /^dn: / { print $2 }' \
+        | sed -r 's/^cn=([^,]+),.*$/\1/g'
+        # Avec le premier awk, on prend la sortie de la recherche dans son 
+        # ensemble (RS="\0") et on remplace "\n " par "" car, dans une
+        # recherche LDAP, une ligne trop longue est cassée et la suite de 
+        # la ligne est indentée sur un espace. Avec cette substitution,
+        # les lignes trop longues ne sont pas cassées.
+        #
+        # Avec le second awk, étant donné qu'on a des lignes soit vides,
+        # soit de la forme "dn: <le-dn-du-groupe>". On affiche alors seulement
+        # les lignes non vides et on affiche uniquement la partie située
+        # après l'espace.
+        #
+        # Avec sed, on récupère uniquement le nom du groupe.
+}
+
+
+
+# Cette fonction affiche la liste des parcs qui contiennent la
+# machine dont le nom est donné en paramètre. Le format d'affichage
+# est de la forme « une ligne par nom de machine ». Un exemple
+# typique d'appel de la fonction :
+#       liste_parcs=$(afficher_liste_parcs "S121-HP-04")
+function afficher_liste_parcs ()
+{
+    # $1 = le nom de machine
+    # Recherche dans l'OU Parcs de tous les dn des entrées qui
+    # possèdent un attribut member égal "cn=$1,ou=Computers,$BASE_DN".
+    timeout "--signal=SIGTERM" 4s ldapsearch -xLLL -h "$SE3" -b "ou=Parcs,$BASE_DN" "(member=cn=$1,ou=Computers,$BASE_DN)" "dn" \
+        | awk 'BEGIN { RS="\0" } { gsub("\n ", ""); print $0 }' \
+        | awk '$0 ~ /^dn: / { print $2 }' \
+        | sed -r 's/^cn=([^,]+),.*$/\1/g'
+        # Avec le premier awk, on prend la sortie de la recherche dans son 
+        # ensemble (RS="\0") et on remplace "\n " par "" car, dans une
+        # recherche LDAP, une ligne trop longue est cassée et la suite de 
+        # la ligne est indentée sur un espace. Avec cette substitution,
+        # les lignes trop longues ne sont pas cassées.
+        #
+        # Avec le second awk, étant donné qu'on a des lignes soit vides,
+        # soit de la forme "dn: <le-dn-d-un-parc>". On affiche alors seulement
+        # les lignes non vides et on affiche uniquement la partie située
+        # après l'espace.
+        #
+        # Avec sed, on récupère uniquement le nom du parc.
+}
+
+
+
+# Une liste (de la forme un item par ligne) étant donnée, la fonction
+# renvoie 0 si le paramètre est dedans, 1 sinon. La recherche est
+# sensible à la casse, c'est-à-dire que 
+# « est_dans_liste "$liste" "un_item" », et 
+# « est_dans_liste "$liste" "UN_ITEM" » ne renverront pas
+# forcément la même valeur.
+function est_dans_liste ()
+{
+    # $1 = la liste
+    # $2 = le nom à tester
+    if echo "$1" | grep_debut_fin_verbatim "$2"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+
+# Fonction qui se charge de lancer les exécutables « unefois ».
+function lancer_unefois ()
+{
+    if test -e "$REP_UNEFOIS/PAUSE"; then
+        # Si le fichier PAUSE est présent alors on ne fait rien.
+        # et on s'arrête.
+        return 0
+    fi
+    
+    if test -e "$REP_UNEFOIS/BLACKOUT"; then
+        # Si le fichier BLACKOUT est présent alors on supprime
+        # tous les exécutables dans REP_UNEFOIS_LOCAL.
+        local f
+        for f in "$REP_UNEFOIS_LOCAL/"*; do
+            [ "$f" = "$REP_UNEFOIS_LOCAL/*" ] && continue
+            rm -rf "$f"
+        done
+        # Et on arrête tout.
+        return 0
+    fi
+
+    # Dans cette situation (pas de fichier PAUSE ni de fichier
+    # BLACKOUT), il faut copier les « unefois » distants
+    # dont le nom n'existe pas en local et les exécuter.
+    
+    local d
+    local regex
+    
+    shopt -s dotglob
+    for d in "$REP_UNEFOIS/"*; do
+        [ "$d" = "$REP_UNEFOIS/*" ] && continue
+        if [ -d "$d" ]; then
+        
+         parc="$(echo ${d##*/})" 
+         if appartient_au_parc $parc $NOM_HOTE; then
+		lancer_unefois_dans_repertoire "$d"
+         fi
+               
+            regex=$(basename "$d")
+            if echo "$NOM_HOTE" | grep -Eiq -- "$regex"; then
+                lancer_unefois_dans_repertoire "$d"
+            fi
+        fi
+    done
+    shopt -u dotglob
+}
+
+
+
+# Fonction qui se charge de l'installation des pilotes d'imprimantes 
+function lancer_parc ()
+{
+ for p in "$REP_LANCEPARC/"*; do
+	[ "$p" = "$REP_LANCEPARC/*" ] && continue
+	parc="$(echo ${p##*/})"
+	echo "$p"
+	echo "$parc"
+	if [ "$parc" = "_TousLesPostes" ]; then 
+		for script in $p/*.sh; do
+			[ "$script" = "$p/*.sh" ] && continue
+			echo "on lance $script"
+			/bin/bash $script
+		done
+	fi
+	if appartient_au_parc $parc $NOM_HOTE; then
+# 		[ -e $REP_LANCEPARC/$parc.sh ] && $REP_LANCEPARC/$parc.sh
+		for script in $p/*.sh; do
+			[ "$script" = "$p/*.sh" ] && continue
+			echo "on lance $script"
+			/bin/bash $script
+		done
+	fi
+   done
+}
+
+
+
+
+# Cette fonction lance tous les scripts unefois situés dans le
+# répertoire dont le chemin absolu doit être donné en paramètre
+# (sans / à la fin).
+function lancer_unefois_dans_repertoire ()
+{
+
+    # $1 = le chemin absolu du répertoire.
+
+    local nom_local
+    local nom_distant
+    
+    for nom_distant in "$1/"*".unefois"; do
+    
+        [ "$nom_distant" = "$1/*.unefois" ] && continue
+        [ ! -f "$nom_distant" ] && continue
+        
+        nom_local="$REP_UNEFOIS_LOCAL/"$(basename "$nom_distant")
+        
+        if ! test -e "$nom_local"; then
+            # Si le « unefois » distant n'existe pas en local
+            # alors on le copie en local et on le lance.
+
+            # À ce stade, j'ai vu des plantages de la commande cp du
+            # genre « cp: ignore le fichier « /xxx/yyy » car il a été 
+            # remplacé durant la copie », alors que ce n'est pas le
+            # cas. Ça semble être plus ou moins un bug...
+            if cp "$nom_distant" "$nom_local" && \
+               diff -q "$nom_distant" "$nom_local" >/dev/null 2>&1
+            then
+                chmod u+x "$nom_local"
+                # L'exécutable « unefois » est lancé en arrière plan.
+                "$nom_local" > "$nom_local.log" 2>&1 &
+            else
+                # Si la copie en local n'a pas bien fonctionné,
+                # on ne lance pas l'exécutable et on supprime
+                # sa version locale si elle existe afin qu'il y
+                # ait tentative d'exécution la prochaine fois.
+                test -e "$nom_local" && rm -rf "$nom_local"
+                afficher "Échec de la copie de $nom_distant en local." \
+                         "L'exécutable ne sera pas lancé. Il y aura" \
+                         "tentative au prochain démarrage du système."
+            fi
+        fi
+    done
+}
+
+
+
+# Fonction qui permet d'activer le pavé numérique. Cette fonction
+# s'exécute à la fin du script et peut prendre un argument optionnel
+# qui est le délai d'attente entre la fin du script et le lancement
+# de l'activation du pavé numérique. Si l'argument est absent, par
+# défaut le délai est de 1 seconde.
+function activer_pave_numerique ()
+{
+    local commande
+
+    if [ "$ARCHITECTURE" = "x86_64" ]; then
+        # On est sur du 64 bits.
+        commande="$REP_BIN_LOCAL/activer_pave_numerique_x86_64"
+    else
+        # Sinon, on est a priori sur du 32 bits.
+        commande="$REP_BIN_LOCAL/activer_pave_numerique_i386"
+    fi
+    
+    local delai
+    
+    if echo "$1" | grep -Eq -- '^[0-9]+$'; then
+        delai="$1"
+    else
+        delai="1"
+    fi
+    
+    executer_a_la_fin "$delai" "$commande"
+}
+
+
+
+# Fonction qui renvoie 0 si l'argument correspond à un login
+# d'un compte connecté au système, et renvoie 1 sinon.
+function est_connecte ()
+{
+
+    ### ---%<------%<------%<------%<------%<------%<------%<------%<---
+    ### Sans doute depuis une mise à jour, ce problème ne semble plus
+    ### être d'actualité.
+    # Sur Precise, pour des raisons que j'ignore, la commande who ne
+    # liste aucune session graphique ouverte. Du coup, je n'ai pas
+    # trouvé mieux que de bricoler un truc basé sur la commande ps
+    # avec la recherche de la chaîne unity. C'est bien dommage,
+    # mais je n'ai pas trouvé mieux.
+    ###if [ "$NOM_DE_CODE" = "precise" ]; then
+    ###    if ps -u "$1" -U "$1" | awk '{ if (NR>0) print $4 }' | grep -q '^unity'; then
+    ###        return 0
+    ###    else
+    ###        return 1
+    ###    fi
+    ###fi
+    ### ---%<------%<------%<------%<------%<------%<------%<------%<---
+    
+    # Sinon, dans le cas général, on va utiliser la commande who.
+    # $1 est une chaîne représentant un login.
+    if who | cut -d ' ' -f 1 | grep_debut_fin_verbatim "$1"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+
+# Fonction qui affiche le nombre d'utilisateurs différents
+# sont sont connectés au système.
+function afficher_nombre_utilisateurs_connectes ()
+{
+    ### ---%<------%<------%<------%<------%<------%<------%<------%<---
+    ### Sans doute depuis une mise à jour, ce problème ne semble plus
+    ### être d'actualité.
+    # Pour les mêmes raisons que celles expliquées dans la fonction
+    # est_connecte, dans le cas de la distribution Precise, je n'ai
+    # rien trouvé de mieux que cet immonde bricolage avec ps.
+    ###if [ "$NOM_DE_CODE" = "precise" ]; then
+    ###    ps aux | awk '/ [u]nity/ { print $1, $11 }' | cut -d' ' -f'1' | sort | uniq | wc -l
+    ###    return 0
+    ###fi
+    ### ---%<------%<------%<------%<------%<------%<------%<------%<---
+    
+    # Sinon, dans le cas général, on va utiliser la commande who.
+    who | cut -d' ' -f'1' | sort | uniq | wc -l
+}
+
+
+
+# Fonction qui permet de monter le partage avec les droits de l'utilisateur
+# qui se connecte. Le premier argument est le chemin UNC du partage. Le
+# deuxième argument est le nom du répertoire qui sera créé dans
+# "$REP_MONTAGE_UTILISATEUR/" et qui sera le point de montage du partage.
+# Les arguments suivants correspondent aux chemins absolus des liens
+# symboliques qui seront créés et qui pointeront vers le point de
+# montage.
+# Le montage se fait via une authentification
+# sachant que c'est le fichier CREDENTIALS qui contient le login
+# et le mot de passe sous la forme : 
+# --%<----%<----%<----%<----%<----%<----%<--
+# username=toto
+# password=le-mot-de-passe
+# --%<----%<----%<----%<----%<----%<----%<--
+function monter_partage ()
+{
+    # Si on n'est pas pendant la phase d'ouverture, on abandonne.
+    [ "$PHASE" != "ouverture" ] && return 1
+    
+    local partage
+    local nom_repertoire
+    
+    partage="$1"
+    nom_repertoire="$2"
+
+    if [ -z "$partage" ] || [ -z "$nom_repertoire" ]; then
+        # Les arguments ne sont pas correctement renseignés.
+        afficher_fenetre_erreur "Problème" \
+            "Erreur lors de l'appel de la fonction \"monter_partage\". Au moins" \
+            "un des deux arguments est vide."
+        return 1
+    fi
+
+    if ! echo "$nom_repertoire" | grep -Eiq '^[-_a-z0-9]+$'; then
+        # Le nom du répertoire futur point de montage comporte des
+        # caractères illicites.
+        afficher_fenetre_erreur "Problème" \
+            "Erreur lors de l'appel de la fonction \"monter_partage\". Le" \
+            "nom du répertoire de montage (le deuxième argument de la fonction)" \
+            "contient des caractères illicites. Le nom de ce répertoire doit" \
+            "être constitué uniquement des caractères a-z, A-Z, du tiret (-)" \
+            "et du tiret-bas (_)."
+        return 2
+    fi
+
+    local point_de_montage
+    
+    point_de_montage="$REP_MONTAGE_UTILISATEUR/$nom_repertoire"
+    
+    if [ -e "$point_de_montage" ]; then
+        # Le répertoire de point de montage correspond à un nom
+        # de fichier déjà existant.
+        afficher_fenetre_erreur "Problème" \
+            "Erreur lors de l'appel de la fonction \"monter_partage\". Le" \
+            "répertoire de montage \"$nom_repertoire\" correspond à un nom" \
+            "de fichier déjà existant."
+        return 3
+    fi
+    
+    mkdir "$point_de_montage"
+    
+    # Par défaut, la commande mount.cifs tente d'utiliser le port 445 d'abord
+    # pour contacter le serveur. Mais dans ce cas la variable de substitution
+    # %m utilisée dans les fichiers smb*.conf du serveur et qui est censée
+    # être remplacée par le nom (netbios) du client est alors remplacée par
+    # son adresse IP. Avec l'option « port=139 », la variable %m sera bien
+    # remplacée par le nom (netbios) du client. En principe, l'option suivante
+    # « netbiosname=... », qui indique le nom (netbios) du client à envoyer au
+    # serveur, n'est pas nécessaire mais on la met quand même histoire 
+    # d'enfoncer le clou encore un peu.
+    monter_partage_cifs "$partage" "$point_de_montage" \
+        "credentials=$CREDENTIALS,uid=$LOGIN,gid=lcs-users,port=139,netbiosname=$NOM_HOTE"
+    if [ "$?" != "0" ]; then
+        # Ici, il y a un problème réseau.
+        afficher_fenetre_erreur "Problème" \
+            "Erreur lors de l'appel de la fonction \"monter_partage\"." \
+            "Impossible de monter le partage \"$partage\"."
+        return 4
+    fi
+    
+    # On « mange » les arguments $1 et $2.
+    shift 2
+    
+    # S'il n'y a pas d'autre argument...
+    if [ "$#" = "0" ]; then
+        # ... alors pas de création de lien symbolique.
+        return 0
+    fi
+    
+    # Création des liens symboliques.
+    local lien
+    for lien in "$@"; do
+        # Si le lien correspond à un fichier qui existe déjà, on passe.
+        [ -e "$lien" ] && continue
+        # Si le lien ne se trouve pas dans le home de l'utilisateur, on passe.
+        ! echo "$lien" | grep_debut_verbatim "$REP_HOME/" && continue
+        creer_lien_symb "$point_de_montage" "$lien" "$LOGIN"
+    done   
+}
+
+
+
+# Fonction qui permet de créer des liens symboliques appartenant
+# à l'utilisateur qui se connecte. Le premier argument est le
+# fichier (au sens large, ça peut être un répertoire) vers lequel
+# pointent les liens et les arguments suivants (autant qu'on veut) 
+# sont les chemins absolus des liens symboliques à créer.
+# Si jamais la cible n'est pas un chemin absolu, alors la
+# fonction considère que le chemin absolu de la cible est 
+# "$REP_MONTAGE_UTILISATEUR/$cible".
+function creer_lien ()
+{
+    # Si on n'est pas pendant la phase d'ouverture, on abandonne.
+    [ "$PHASE" != "ouverture" ] && return 1
+
+    local cible
+    cible="$1"
+
+    # On teste si la cible est un chemin absolu (ie commence par un /).
+    if ! echo "$cible" | grep -q '^/'; then
+        # La cible n'est pas un chemin absolu, on complète le chemin
+        # pour en faire un chemin absolu.
+        cible="$REP_MONTAGE_UTILISATEUR/$cible"
+    fi
+
+    # On « mange » l'argument $1.
+    shift 1
+    
+    # S'il n'y a pas d'autre argument, c'est qu'il y a une erreur...
+    if [ "$#" = "0" ]; then
+        # ... alors pas de création de lien symbolique.
+        return 1
+    fi
+    
+    # Création des liens symboliques.
+    local lien
+    for lien in "$@"; do
+        # Si le lien correspond à un fichier qui existe déjà, on passe.
+        [ -e "$lien" ] && continue
+        # Si le lien ne se trouve pas dans le home de l'utilisateur, on passe.
+        ! echo "$lien" | grep_debut_verbatim "$REP_HOME/" && continue
+        creer_lien_symb "$cible" "$lien" "$LOGIN"
+    done
+}
+
+
+
+# Fonction qui lit son entrée standard et qui attend un unique argument 
+# (une chaîne de caractères). Elle renvoie 0 si la chaîne donnée en argument 
+# se trouve en début de ligne d'au moins une ligne de l'entrée standard et 
+# renvoie 1 sinon. Attention, la chaîne donnée en argument n'est pas vue 
+# comme une regex mais comme une « chaîne brute », ie  les caractères 
+# habituellement spéciaux pour une regex ne le sont pas et représentent
+# eux-même (le point représente le point et pas un caractère quelconque).
+grep_debut_verbatim ()
+{
+    local motif n debut
+    
+    motif="$1"
+    
+    # Le nombre de caractères du motif.
+    n=${#motif};
+
+    # L'option -r est indispensable car sans elle la chaîne 'a\aa'
+    # deviendrait 'aaa' une fois passée dans le filtre read.
+    while read -r; do
+        # On coupe la ligne à n caractères maximum.
+        debut=${REPLY:0:$n}
+        
+        # On compare le début de ligne avec le motif.
+        if [ "$debut" = "$motif" ]; then
+            return 0
+        fi
+    done
+    
+    # Si on arrive ici, cela veut dire que le motif n'a jamais
+    # été trouvé en début de ligne. Du coup, on renvoie 1.
+    return 1
+}
+
+
+
+# Fonction identique à la précédente sauf qu'elle renvoie 0 uniquement
+# si la chaîne donnée en argument correspond exactement à au moins une
+# ligne complète de l'entrée standard.
+grep_debut_fin_verbatim ()
+{
+    local motif
+    
+    motif="$1"
+
+    # L'option -r est indispensable car sans elle la chaîne 'a\aa'
+    # deviendrait 'aaa' une fois passée dans le filtre read.
+    while read -r; do
+        # On compare la ligne avec le motif.
+        if [ "$REPLY" = "$motif" ]; then
+            return 0
+        fi
+    done
+    
+    # Si on arrive ici, cela veut dire que le motif n'a jamais
+    # été trouvé dans une ligne. Du coup, on renvoie 1.
+    return 1
+}
+
+
+
+# Fonction qui permet d'afficher la variable d'environnement
+# DBUS_SESSION_BUS_ADDRESS de l'utilisateur toto qui ouvre une session afin
+# de pouvoir ensuite exécuter en tant que toto certaines commandes
+# impossibles à exécuter sans cette variable d'environnement.
+# On lancera alors la commande ainsi :
+# DBUS_SESSION_BUS_ADDRESS="$(afficher_adresse_bus)" sudo -Eu "$LOGIN" commande
+# Attention, le temps pour exécuter cette fonction est indéterminé et surtout
+# la fonction ne se terminera qu'une fois l'ouverture de session achevée (car 
+# c'est apparemment seulement une fois l'ouverture de session achevée que le 
+# fichier dans lequel on récupère la variable d'environnement est créé). Donc 
+# il faudra TOUJOURS lancer la fonction dans un sous-shell ainsi « { ... } & »,
+# sans quoi on risque de bloquer le script de logon.
+function afficher_adresse_bus ()
+{
+    local n compteur
+    
+    n=$(\ls "$REP_HOME/.dbus/session-bus/" 2> /dev/null | wc -l)
+    compteur=1
+    
+    # On attend que le fichier dans "$REP_HOME/.dbus/session-bus/ soit
+    # créé lors de l'ouverture de session.
+    while [ "$n" != "1" ]; do
+        sleep 0.2
+        n=$(\ls "$REP_HOME/.dbus/session-bus/" 2> /dev/null | wc -l)
+        compteur=$((compteur+1))
+        if [ "$compteur" -ge "100" ]; then
+            # Au bout d'un certain nombre de tentatives on abandonne. 
+            # Important pour éviter une boucle infinie.
+            return 1
+        fi
+    done
+
+    # On récupère et on affiche la valeur de la variable d'environnement
+    # DBUS_SESSION_BUS_ADDRESS trouvée dans le fichier qui vient d'être créé.
+    grep "^DBUS_SESSION_BUS_ADDRESS=" "$REP_HOME/.dbus/session-bus/"* | cut -d"=" -f"2-"
+}
+
+
+
+# Fonction, utilisable uniquement lors de l'ouverture de session, qui
+# prend comme premier argument le chemin absolu d'un fichier et
+# comme deuxième argument le chemin absolu d'une image qui sera
+# l'icône associé au fichier. Le chemin du fichier dont on veut changer
+# l'icône doit forcément se trouver dans "$REP_HOME".
+#
+# Rq: bien que la commande gvfs-set-attribute existe sous XUbuntu,
+#     celle-ci semble sans effet. Apparemment, sous XUbuntu, impossible
+#     de faire de changement d'icône.
+function changer_icone ()
+{
+    # Cette partie sera lancée via un « & » et donc dans un sous-shell d'après
+    # la page man de bash.
+    {
+        # Si on n'est pas pendant la phase d'ouverture, on abandonne.
+        [ "$PHASE" != "ouverture" ] && return 1
+
+        # Si le fichier cible ne se trouve pas dans le home de l'utilisateur, 
+        # on abandonne.
+        ! echo "$1" | grep_debut_verbatim "$REP_HOME/" && return 1
+
+        # Si le fichier image n'existe pas, on abandonne.
+        [ ! -f "$2" ] && return 1
+
+        # On récupère la variable d'environnement « adresse bus ».        
+        local valeur
+        valeur=$(afficher_adresse_bus)
+        if [ "$valeur" = "" ]; then
+            # Si la valeur récupérée est vide, on abandonne.
+            exit 1
+        fi
+
+        # On change l'attribut concernant l'icône du fichier.
+        DBUS_SESSION_BUS_ADDRESS="$valeur" sudo -Eu "$LOGIN" \
+        gvfs-set-attribute -t string "$1"  "metadata::custom-icon" "file://$2"
+            
+        # Sur le bureau, pour que l'affichage se mette à jour, il faut faire
+        # un touch sur le fichier avec l'option « --no-dereference », sinon
+        # c'est la cible du lien symbolique qui est visée et non le lien
+        # symbolique lui-même.
+        touch --no-dereference "$1"
+        
+    } > "/dev/null" 2>&1 &
+    # Ce sous-processus pourra être lancé à plusieurs reprises et,
+    # sans la redirection ci-dessus, tous les sous-processus écriraient
+    # plus ou moins en même temps sur un même fichier de log ce
+    # qui pourrait donner un résultat imprévisible sur le fichier
+    # de log. Le plus sage est de rediriger les deux sorties de
+    # ce bout de code dans /dev/null. Ce n'est pas très grave, ce
+    # n'est pas une partie critique.
+}
+
+
+
+# Cette fonction change le papier peint de l'utilisateur qui se
+# connecte lors de l'ouverture de session. Elle prend 1 argument qui doit
+# être le chemin absolu du fichier image (un accès à ce fichier en lecture 
+# pour l'utilisateur suffit).
+function changer_papier_peint ()
+{
+    # Cette partie sera lancée via un « & » et donc dans un sous-shell d'après
+    # la page man de bash.
+    {
+        # Si on n'est pas pendant la phase d'ouverture, on abandonne.
+        [ "$PHASE" != "ouverture" ] && return 1
+
+        # Si le fichier image n'existe pas, on abandonne.
+        [ ! -f "$1" ] && return 1
+
+        # On récupère la variable d'environnement « adresse bus ».        
+        local valeur
+        valeur=$(afficher_adresse_bus)
+        if [ "$valeur" = "" ]; then
+            # Si la valeur récupérée est vide, on abandonne.
+            exit 1
+        fi
+
+        # La commande pour changer de papier peint dépend de l'environnement
+        # de bureau utilisé. Comment connaître l'environnement de bureau
+        # utilisé par le compte qui se connecte ? Je pensais utiliser des
+        # choses comme « if ps -u "$LOGIN" | grep -q unity; then » mais hélas
+        # pour des raisons de timing ça ne fonctionne pas. La commande ps
+        # ne renvoie pas (encore) de processus unity* alors que l'utilisateur
+        # courant se connecte pourtant avec Unity. On pourrait résoudre ce
+        # problème de timing avec la commande sleep mais ça n'est pas 100% 
+        # fiable : quel argument donner à sleep dans ce cas ? Du coup, on 
+        # va se contenter de lancer la commande pour chacun des
+        # environnements de bureau pris en charge, pour peu que la commande 
+        # en question existe sur le système. Le résultat sera garanti et je
+        # pense que la charge processeur supplémentaire due aux commandes
+        # inutiles sera négligeable.
+        
+        # Sur Unity.
+        if which gsettings > /dev/null; then
+            # Il est hautement probable que l'utilisateur soit sur Unity.
+            DBUS_SESSION_BUS_ADDRESS="$valeur" sudo -Eu "$LOGIN" \
+                gsettings set org.gnome.desktop.background picture-options stretched
+            DBUS_SESSION_BUS_ADDRESS="$valeur" sudo -Eu "$LOGIN" \
+                gsettings set org.gnome.desktop.background picture-uri "file://$1"            
+        fi
+
+        # Sur Xfce.        
+        if which xfconf-query > /dev/null; then
+            # Il est hautement probable que l'utilisateur soit sur Xfce.
+            DBUS_SESSION_BUS_ADDRESS="$valeur" sudo -Eu "$LOGIN" \
+                xfconf-query --create -c xfce4-desktop -p /backdrop/screen0/monitor0/image-style -s "3" -t int # la valeur correspond à "stretched"
+            DBUS_SESSION_BUS_ADDRESS="$valeur" sudo -Eu "$LOGIN" \
+                xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s "$1"
+        fi
+
+        # Sur Gnome.
+        if which gconftool-2 > /dev/null; then
+            DBUS_SESSION_BUS_ADDRESS="$valeur" sudo -Eu "$LOGIN" \
+                gconftool-2 --set /desktop/gnome/background/picture_options --type string stretched
+            DBUS_SESSION_BUS_ADDRESS="$valeur" sudo -Eu "$LOGIN" \
+                gconftool-2 --set /desktop/gnome/background/picture_filename --type string "$1"
+        fi    
+
+        # Sur LXDE.
+        if which pcmanfm > /dev/null; then
+            DBUS_SESSION_BUS_ADDRESS="$valeur" sudo -Eu "$LOGIN" pcmanfm --set-wallpaper="$1" --wallpaper-mode=center
+        fi
+
+    } > "/dev/null" 2>&1 &
+}
+
+
+
+# Fonction qui lance, à la fin de l'exécution du script, une commande 
+# quelconque. Le premier argument est le délai en secondes entre la fin
+# de l'exécution du script et le début du lancement de la commande.
+# Les arguments suivants correspondent à la commande à lancer avec ses
+# paramètres. Si le script est trop long à se terminer (plus précisément,
+# si la fonction executer_a_la_fin doit attendre que le script se termine
+# plus de 30 secondes) alors la commande ne sera pas lancée.
+# Attention, la sortie standard et la sortie des erreurs seront
+# redirigées vers /dev/null afin qu'il n'y ait pas d'écritures
+#  simultanées sur les fichiers de log.
+function executer_a_la_fin ()
+{
+    # Tout sera lancé dans un sous-shell à cause du « & » à la fin.
+    {
+        local compteur
+        compteur="1"
+        # Tant que le script de logon local est lu par un processus
+        # et donc qu'a priori il est en cours d'exécution, on attend.
+        while fuser "$LOGON_SCRIPT_LOCAL" >/dev/null 2>&1; do 
+            sleep 0.5
+            if [ "$compteur" -ge "60" ]; then
+                # Au bout de 30 secondes, si ce n'est toujours
+                # pas fini, on abandonne.
+                return 1
+            fi
+            compteur=$((compteur+1))
+        done
+
+        sleep "$1" # petit délai avant de commencer.
+        
+        # On « mange » $1.
+        shift 1
+        
+        # Et on lance la commande avec ses arguments.
+        "$@"
+        
+    } > "/dev/null" 2>&1 &
+}
+
+
+   
+######################################
+######################################
+###                                ###
+### Les arguments passés au script ###
+###                                ###
+######################################
+######################################
+
+# Variable déjà affectée afin de rediriger les sorties stdout stderr 
+# dans des fichiers, dès le début du script.
+#PHASE="$1" 
+
+if [ -z "$2" ]; then
+    # Si "$2" est vide alors par défaut il y a tentative de MAJ.
+    TENTATIVE_DE_MAJ="true"
+else
+    TENTATIVE_DE_MAJ="$2" # avec "$2" qui doit valoir true ou false.
+fi
+
+DEMARRAGE="$3"
+
+if [ "$DEMARRAGE" != "true" ]; then
+    # Par défaut, cette variable, qui indique si le script s'exécute
+    # lors du démarrage, est sur false. La fonction "initialisation"
+    # se chargera de mettre cette variable sur true le cas échéant (en
+    # se basant sur le montage ou non de REP_TMP_LOCAL).
+    DEMARRAGE=false
+fi
+
+
+
+# On met dès le départ et une bonne fois pour toute
+# la date du moment dans le fichier de log.
+afficher_date
+
+set -x
+
+
+
+
+
+#############################################
+#############################################
+###                                       ###
+### Réglage des variables d'environnement ###
+###                                       ###
+#############################################
+#############################################
+
+# Pour avoir des sorties les plus simples possibles, c'est-à-dire
+# en anglais avec des caractères 100% ASCII.
+export LC_ALL="C"
+
+# Du coup, on utilisera la locale française au coup par coup.
+# Celle-ci, il n'est pas nécessaire de l'exporter.
+LOCALE_FRANCAISE="fr_FR.utf8"
+
+# Réglage du PATH.
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+
+
+
+
+
+########################################################
+########################################################
+###                                                  ###
+### Définitions des variables globales et exports de ###
+### certaines variables et fonctions                 ###   
+###                                                  ###
+########################################################
+########################################################
+
+
+#############################################
+### Définitions de variables « globales » ###
+#############################################
+
+# Variables liées au Se3.
+SE3="__SE3__"
+BASE_DN="__BASE_DN__"
+SERVEUR_NTP="__SERVEUR_NTP__"
+NOM_PARTAGE_NETLOGON="netlogon-linux"
+CHEMIN_PARTAGE_NETLOGON="//$SE3/$NOM_PARTAGE_NETLOGON"
+
+# Variables liées à l'hôte.
+NOM_HOTE=$(hostname)
+NOM_DE_CODE=$(lsb_release --codename | cut -f 2)
+ARCHITECTURE=$(uname -m)
+
+MAX_UTILISATEURS_CONNECTES="4"
+
+# Apparemment, l'option serverino permet d'éviter des erreurs obscures 
+# lors de copies avec la commande cp (notamment avec les exécutables
+# *.unfois), alors qu'avec l'option noserverino j'avais rencontré
+# ces erreurs obscures.
+OPTIONS_MOUNT_CIFS_BASE="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
+
+# Noms de fichiers ou de répertoires locaux au client.
+#REP_SE3_LOCAL="/etc/se3" # Déjà affectée en début de script.
+REP_BIN_LOCAL="$REP_SE3_LOCAL/bin"
+REP_TMP_LOCAL="$REP_SE3_LOCAL/tmp"
+#REP_LOG_LOCAL="$REP_SE3_LOCAL/log" # Déjà affectée en début de script.
+REP_SKEL_LOCAL="$REP_SE3_LOCAL/skel"
+REP_UNEFOIS_LOCAL="$REP_SE3_LOCAL/unefois"
+LOGON_SCRIPT_LOCAL="$REP_BIN_LOCAL/logon"
+VERSION_SKEL_LOCAL="$REP_SKEL_LOCAL/.VERSION"
+CREDENTIALS="$REP_TMP_LOCAL/credentials"
+REP_MONTAGE="/mnt"
+
+# Noms de fichiers ou de répertoires du Se3 accessibles par le client 
+# via le montage du partage NOM_PARTAGE_NETLOGON du Se3.
+REP_NETLOGON="$REP_MONTAGE/netlogon"
+LOGON_SCRIPT="$REP_NETLOGON/bin/logon"
+REP_SKEL="$REP_NETLOGON/distribs/$NOM_DE_CODE/skel"
+VERSION_SKEL="$REP_SKEL/.VERSION"
+REP_UNEFOIS="$REP_NETLOGON/unefois"
+REP_LANCEPARC="$REP_NETLOGON/lanceparc"
+
+
+####################################################################################
+### Définitions de variables « globales » valables uniquement lors d'une session ###
+####################################################################################
+if [ "$PHASE" = "ouverture" ] || [ "$PHASE" = "fermeture" ]; then
+
+    LOGIN="$LOGNAME"
+    REP_MONTAGE_UTILISATEUR="$REP_MONTAGE/_$LOGIN"
+    REP_HOME="/home/$LOGIN"
+    NOM_COMPLET_LOGIN=$(getent passwd "$LOGIN" | cut -d':' -f5 | cut -d',' -f1)
+    
+    if [ "$PHASE" = "ouverture" ]; then
+        # La requête LDAP ne sera faite qu'au moment de l'ouverture de session.
+        if ! est_utilisateur_local "$LOGIN" ; then
+            LISTE_GROUPES_LOGIN=$(afficher_liste_groupes "$LOGIN")
+        fi
+    fi
+    
+fi
+
+
+############################################################################
+### On exporte certaines variables « globales » pour les scripts unefois ###
+############################################################################
+
+export SE3
+export BASE_DN
+export NOM_HOTE
+export NOM_DE_CODE
+export ARCHITECTURE
+export REP_BIN_LOCAL # Seulement parce que la fonction activer_pave_numerique l'utilise.
+
+# Les variables LOGIN, NOM_COMPLET_LOGIN, LISTE_GROUPES_LOGIN seront utilisables 
+# dans les fonctions ouverture_perso et fermeture_perso, mais un export 
+# ne sert à rien pour ces variables car elles n'ont pas de sens dans 
+# les scripts unefois.
+
+# Quant à la variable DEMARRAGE, pas d'export non plus car dans un script
+# unefois elle vaudra toujours true, puisque les scripts unefois ne sont
+# lancés qu'au démarrage du système.
+
+
+############################################################################
+### On exporte certaines fonctions « globales » pour les scripts unefois ###
+############################################################################
+
+export -f appartient_au_groupe
+export -f appartient_au_parc
+export -f afficher_liste_groupes
+export -f afficher_liste_parcs
+export -f est_dans_liste
+export -f activer_pave_numerique
+export -f est_utilisateur_local
+export -f est_connecte
+
+
+
+
+
+################################################################################
+################################################################################
+###                                                                          ###
+### Définitions des trois fonctions de base appelées à des instants          ###
+### différents par la machine clientes :                                     ###
+###                                                                          ###
+###    - "initialisation" qui sera appelée juste avant l'affichage de        ###
+###      la fenêtre de connexion, c'est-à-dire au moment du                  ###
+###      démarrage et après chaque fermeture de session.                     ###
+###                                                                          ###
+###    - "ouverture" qui sera appelée au moment de                           ###
+###      l'ouverture de session de l'utilisateur, juste après                ###
+###      l'authentification de celui-ci.                                     ###
+###                                                                          ###
+###    - "fermeture" qui sera appelée au moment de la fermeture              ###
+###      de session de l'utilisateur.                                        ###
+###                                                                          ###
+################################################################################
+################################################################################
+
+
+
+function initialisation ()
+{
+    nettoyer_rep_tmp_local
+    
+    # On attend un petit peu car, sur Precise par exemple, les processus de
+    # l'utilisateur qui vient de fermer sa session sont encore en vie si
+    # bien que, aux yeux du script de logon, l'utilisateur est encore
+    # connecté et le nettoyage est alors incomplet.
+    sleep 1
+    
+    nettoyer_rep_montage
+    nettoyer_rep_home
+    
+    local n
+    local message
+    n=$(afficher_nombre_utilisateurs_connectes)
+    if [ "$n" -ge "$MAX_UTILISATEURS_CONNECTES" ]; then
+        message="Trop de sessions n'ont pas été fermées. Le système va"
+        message="$message redémarrer ce qui provoquera la fermeture"
+        message="$message de toutes les sessions en suspens."
+        LC_ALL="$LOCALE_FRANCAISE" zenity \
+                            --info "Trop de sessions non fermées" \
+                            --text "$message" --timeout 10
+        reboot && exit
+    fi
+
+    if ! mountpoint -q "$REP_TMP_LOCAL"; then
+        # REP_TMP_LOCAL n'est pas monté, donc c'est le démarrage du système,
+        # il faut donc modifier la variable DEMARRAGE.
+        DEMARRAGE=true
+        mount -t tmpfs -o size=100k tmpfs "$REP_TMP_LOCAL"
+    fi
+
+    if monter_netlogon; then
+        # Montage réussi ou bien il avait été effectué auparavant.
+        # Donc le contenu n'est pas forcément lisible (le service
+        # Samba entre temps est peut être tombé en panne).
+
+        # Tentative de MAJ de LOGON_SCRIPT.       
+        if $TENTATIVE_DE_MAJ \
+          && timeout "--signal=SIGTERM" 2s test -r "$LOGON_SCRIPT" \
+          && ! diff -q "$LOGON_SCRIPT_LOCAL" "$LOGON_SCRIPT" >/dev/null 2>&1
+        then
+            # On exécute le script distant avec l'argument empêchant une MAJ
+            # et en signalant, avec la variable DEMARRAGE, si l'on est pendant
+            # le démarrage du système ou non. En effet, si c'est le script
+            # de logon distant qui est lancé, alors REP_TMP_LOCAL est
+            # sans doute déjà monté cela ne sera plus un critère pour savoir
+            # si l'on est pendant le démarrage du système.
+            "$LOGON_SCRIPT" "initialisation" false "$DEMARRAGE"
+            # Si le script distant s'est effectué sans erreur (typiquement il
+            # ne possède pas d'erreur de syntaxe), alors on lance la mise à
+            # jour.
+            if [ "$?" = "0" ]; then
+                mettre_a_jour_logon
+            else
+                afficher "Attention, a priori le script de logon distant n'est pas correct." \
+                         "Pas de mise à jour effectuée en local."
+            fi
+            # Inutile de continuer le script, on vient d'exécuter une fois 
+            # sa version à jour (celle du serveur) au complet. Alors on sort.
+            exit 0
+        fi
+        
+        # Tentative de MAJ du profil et lancements des « unefois ».
+        if timeout "--signal=SIGTERM" 2s test -r "$VERSION_SKEL"; then
+            if ! diff -q "$VERSION_SKEL_LOCAL" "$VERSION_SKEL" >/dev/null 2>&1; then
+                mettre_a_jour_profil
+            fi
+            # Puisque le serveur semble accessible, on tente d'accéder à
+            # REP_UNEFOIS, dans le cas où l'on est dans une phase d'initialisation
+            # qui correspond à un démarrage.
+            if "$DEMARRAGE" && timeout "--signal=SIGTERM" 2s test -d "$REP_UNEFOIS"; then
+                lancer_unefois
+            fi
+            
+            # Idem ci-dessus pour le répertoire lance-parc
+            
+            if timeout "--signal=SIGTERM" 2s test -d "$REP_LANCEPARC"; then
+		lancer_parc
+            fi
+        fi
+                
+    fi
+
+    # Si jamais le répertoire ".dbus" existe déjà dans le profil par défaut 
+    # local, il faut le supprimer car il devra être généré à la volée au
+    # moment de l'ouverture de session dans le home de l'utilisateur qui
+    # se connecte. En effet, ce répertoire contiendra alors un fichier
+    # qui permettra de connaître la valeur de la variable 
+    # DBUS_SESSION_BUS_ADDRESS de la session en cours. Si on ne prend pas
+    # la précaution de supprimer ce répertoire dans le profil local maintenant, 
+    # on risque de récupérer alors la valeur de cette variable pour une
+    # ancienne session, et toutes les fonctions qui dépendent de cette 
+    # variable risqueront de ne pas marcher.
+    if [ -e "$REP_SKEL_LOCAL/.dbus" ]; then
+        afficher "Suppression du répertoire .dbus/ dans le profil local."
+        rm -fr --one-file-system "$REP_SKEL_LOCAL/.dbus"
+    fi
+
+    initialisation_perso 1> "$REP_LOG_LOCAL/1.initialisation_perso.log" 2>&1
+    
+    exit 0
+}
+
+
+function ouverture ()
+{
+    # Quoi qu'il arrive, à la fin du script lors de l'ouverture, on
+    # nettoie le répertoire temporaire local.
+    trap nettoyer_rep_tmp_local EXIT
+    
+    # Dans cette fonction, on peut faire usage de $LOGIN
+    # qui est le login de l'utilisateur courant.
+
+    if est_utilisateur_local "$LOGIN" ; then
+        # On ne fait rien et on arrête le script.
+        exit 0
+    fi
+   
+    # Mise en place du home de l'utilisateur qui n'est pas un
+    # utilisateur local ici.
+    if [ -e "$REP_HOME" ]; then
+        rm -fr --one-file-system "$REP_HOME"
+    fi
+    mkdir -p "$REP_HOME/Bureau"
+    
+    # On copie tout le contenu de REP_SKEL_LOCAL dans le HOME_LOCAL.
+    shopt -s dotglob
+    local f
+    for f in "$REP_SKEL_LOCAL/"*; do
+        cp -r "$f" "$REP_HOME"
+    done
+    shopt -u dotglob
+    
+    # Ajustement des droits sur le home.
+    chown -R "$LOGIN:" "$REP_HOME"
+    # On rend les fichiers *.desktop exécutables pour l'utilisateur au cas où...
+    for f in "$REP_HOME/Bureau/"*".desktop"; do
+        [ "$f" = "$REP_HOME/Bureau/*.desktop" ] && continue
+        chmod u+x "$f"
+    done 
+    chmod 700 "$REP_HOME"
+    sync
+    
+    # Après la création du home de l'utilisateur, on attend un peu.
+    # En effet, j'ai constaté empiriquement que, sur Precise par exemple,
+    # sans ce laps de temps les réglages inscrits dans le profil
+    # (notamment dans le répertoire "~/.config/") n'étaient pas
+    # systématiquement pris en compte par l'environnement de bureau.
+    sleep 1
+
+    # Maintenant, il faut procéder aux montages des partages CIFS.
+    # Pour commencer, il faut attendre la création du fichier CREDENTIALS.
+    local c
+    c="1"
+    while ! test -r "$CREDENTIALS" && [ "$c" -le 4 ]; do
+        # Tant que le fichier n'est pas accessible en lecture, on attend un peu.
+        sleep 0.5
+        c=$((c+1)) # pour éviter une boucle infinie, après 4 tentatives, on sort de la boucle.
+    done
+
+    # Si c vaut 5, c'est qu'il a été impossible de lire le fichier CREDENTIALS
+    # et donc que les montages seront impossibles. Dans ce cas, il vaut mieux
+    # sortir et ne pas tenter les-dits montages.
+    if [ "$c" -eq "5" ]; then
+        afficher_fenetre_erreur "Problème" \
+            "Le montage des partages de l'utilisateur sont impossibles car" \
+            "le fichier \"CREDENTIALS\" est inaccessible."
+        exit 1
+    fi
+
+    if [ -e "$REP_MONTAGE_UTILISATEUR" ]; then
+        # Le répertoire existe déjà ce qui n'est pas normal.
+        # Du coup, on nettoie le répertoire de montage, étant 
+        # donné qu'il sera créé juste après.
+        nettoyer_un_rep_montage "$REP_MONTAGE_UTILISATEUR"
+    fi
+    
+    # On crée le répertoire où seul LOGIN pourra se rendre.
+    mkdir "$REP_MONTAGE_UTILISATEUR"
+    chown "$LOGIN:" "$REP_MONTAGE_UTILISATEUR"
+    chmod "700" "$REP_MONTAGE_UTILISATEUR"
+
+    # C'est dans la fonction ouverture_perso que les montages seront
+    # effectués pour que l'administrateur puisse les gérer comme
+    # bon lui semble.
+    ouverture_perso 1> "$REP_LOG_LOCAL/2.ouverture_perso.log" 2>&1
+    
+    # Surtout, on détruit immédiatement le fichier CREDENTIALS contenu
+    # dans le répertoire temporaire local. En principe, c'est fait
+    # automatiquement grâce à la fonction trap ci-dessus, mais on
+    # rajoute une couche au cas où...
+    nettoyer_rep_tmp_local
+    
+    exit 0
+}
+
+
+
+function fermeture ()
+{
+    # Dans cette fonction, on peut faire usage de $LOGIN
+    # qui est le login de l'utilisateur courant.
+
+    if est_utilisateur_local "$LOGIN" ; then
+        # On ne fait rien et on arrête le script.
+        exit 0
+    fi
+    
+    # Par mesure de sécurité, avant le nettoyage, on débarrasse le
+    # /home des liens symboliques qui pointent vers des partages.
+    # Il y en a à la racine du /home et sur le « Bureau ».
+    
+    # Le « ! -name '.gvfs' » permet d'éviter une petite erreur lors 
+    # de la commande « find » quand on est sous Ubuntu.
+    find "$REP_HOME" -maxdepth 1 ! -name '.gvfs' -type l -exec rm -f '{}' \;
+    find "$REP_HOME/Bureau" -maxdepth 1 -type l -exec rm -f '{}' \;
+    
+    fermeture_perso 1> "$REP_LOG_LOCAL/3.fermeture_perso.log" 2>&1
+    
+    exit 0
+}
+
+
+# Dans logon, les variables SE3 et BASE_DN sont definies
+function genere_fond_ecran() {
+
+    if [ -z "$LOGIN" ]
+    then
+        # La variable LOGIN n'est pas définie. On arrête là.
+        return 1
+    fi
+
+    # Quelques parametres
+    dossier_base_fond="$REP_NETLOGON/fond_ecran"
+    dossier_dest_fond=/tmp
+    ext=jpg
+
+    t=$(which convert)
+    if [ -z "$t" ]; then
+        echo "La generation de fond d'ecran necessite l'installation d'imagemagick cote client."
+    else
+        # Menage
+        if [ -e "${dossier_dest_fond}/fond_ecran_$LOGIN.$ext" ]; then
+          rm -f "${dossier_dest_fond}/fond_ecran_$LOGIN.$ext"
+        fi
+
+        # Recuperation des parametres generaux
+        parametres_generation_fonds
+
+        if [ -n "$prefixe" ]; then
+
+          if [ "$LOGIN" = "admin" ]; then
+              t=$(grep "function parametres_fond_ecran_admin()" $REP_BIN_LOCAL/logon)
+              if [ -n "$t" ]; then
+                  parametres_fond_ecran_admin
+                  if [ "$generation_fonds_ecran" = "actif" ]; then
+                      annotation_fond_ecran_admin
+
+                      temoin="admin"
+                      classe="Admins"
+                  fi
+              fi
+          else
+              if est_dans_liste "$LISTE_GROUPES_LOGIN" "overfill"; then
+                  t=$(grep "function parametres_fond_ecran_overfill()" $REP_BIN_LOCAL/logon)
+                  if [ -n "$t" ]; then
+                      parametres_fond_ecran_overfill
+                      if [ "$generation_fonds_ecran" = "actif" ]; then
+                          annotation_fond_ecran_overfill
+
+                          temoin="overfill"
+                          classe=""
+                      fi
+                  fi
+              fi
+
+              # Pour les profs on outrepasse les parametres overfill
+              if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"; then
+                  t=$(grep "function parametres_fond_ecran_Profs()" $REP_BIN_LOCAL/logon)
+                  if [ -n "$t" ]; then
+                      parametres_fond_ecran_Profs
+                      if [ "$generation_fonds_ecran" = "actif" ]; then
+                          annotation_fond_ecran_Profs
+
+                          temoin="Profs"
+                          classe="Profs"
+                      fi
+                  fi
+              fi
+
+              if [ -z "$temoin" ]; then
+                  # Utilisateur non prof... -> eleves ou administratifs?
+                  if est_dans_liste "$LISTE_GROUPES_LOGIN" "Eleves"; then
+                      # Utilisateur eleve
+                      # Dans le cas d'un eleve, le groupe Classe est prioritaire (pour l'image) sur le groupe eleves.
+                      #classe=$(ldapsearch -xLLL -h "$SE3" -b "ou=Groups,$BASE_DN" "(&(memberuid=$LOGIN)(cn=Classe*))" cn | grep "^cn: " | sed -e "s/^cn: //"|head -n1)
+                      #classe=$(echo "$LISTE_GROUPES_LOGIN" | sed -rn 's/^Classe_(.*)$/\1/p')
+                      # Les fonctions sont formatees
+                      #    en annotation_fond_ecran_admin,
+                      #    annotation_fond_ecran_<groupe>,...
+                      # mais si un admin cree une classe 'Classe_admin', et qu'on vire le prefixe 'Classe_', on va avoir une collision de noms.
+                      classe=$(echo "$LISTE_GROUPES_LOGIN" | grep "^Classe_" |head -n1)
+                      if [ ! -z "$classe" ]; then
+                          # PROBLEME AVEC CA... IL NE DOIT PAS ETRE POSSIBLE D APPELER UNE TELLE FONCTION
+                          # Il semble que si...
+                          t=$(grep "function parametres_fond_ecran_$classe()" $REP_BIN_LOCAL/logon)
+                          if [ -n "$t" ]; then
+                              parametres_fond_ecran_$classe
+                              if [ "$generation_fonds_ecran" = "actif" ]; then
+                                  annotation_fond_ecran_$classe
+
+                                  temoin="$classe"
+                                  classe="$classe"
+                              fi
+                          fi
+                      fi
+
+                      if [ -z "$temoin" ]; then
+                          t=$(grep "function parametres_fond_ecran_Eleves()" $REP_BIN_LOCAL/logon)
+                          if [ -n "$t" ]; then
+                              parametres_fond_ecran_Eleves
+                              if [ "$generation_fonds_ecran" = "actif" ]; then
+                                  annotation_fond_ecran_Eleves
+
+                                  temoin="Eleves"
+                              fi
+                          fi
+                      fi
+                  else
+
+                      if est_dans_liste "$LISTE_GROUPES_LOGIN" "Administratifs"; then
+                          # Utilisateur membre de: Administratifs
+                          t=$(grep "function parametres_fond_ecran_Administratifs()" $REP_BIN_LOCAL/logon)
+                          if [ -n "$t" ]; then
+                              parametres_fond_ecran_Administratifs
+                              if [ "$generation_fonds_ecran" = "actif" ]; then
+                                  annotation_fond_ecran_Administratifs
+
+                                  temoin="Administratifs"
+                                  classe="Administratifs"
+                              fi
+                          fi
+                      fi
+                  fi
+              fi
+          fi
+
+          if [ -n "$temoin" ]; then
+              # Generation avec les parametres...
+
+              # Passage de variable:
+              base=$temoin
+              if [ "$base" == "admin" ]; then
+                  orig="Adminse3"
+              else
+                  orig="$base"
+              fi
+
+              # Generation du fond commun s'il n'existe pas:
+              if [ ! -e "${dossier_base_fond}/$orig.jpg" ]; then
+                  convert -size ${largeur}x${hauteur} gradient:${couleur1}-${couleur2} jpeg:${dossier_dest_fond}/$orig.jpg
+              else
+                  cp ${dossier_base_fond}/$orig.jpg ${dossier_dest_fond}/
+              fi
+
+              #===============================================================
+              # Generation de la chaine des infos a afficher:
+              chaine=""
+              if [ "$annotation_nom" = "1" ]; then
+                  nom_prenom=$NOM_COMPLET_LOGIN
+                  chaine=$(echo "$nom_prenom" | tr "'ÂÄÀÁÃÄÅÇÊËÈÉÎÏÌÍÑÔÖÒÓÕ¦ÛÜÙÚÝ¾´áàâäãåçéèêëîïìíñôöðòóõ¨ûüùúýÿ¸" "_AAAAAAACEEEEIIIINOOOOOSUUUUYYZaaaaaaceeeeiiiinoooooosuuuuyyz" | sed -e "s|[^A-Za-z_ -]||g" | sed -e "s|Æ|AE|g" | sed -e "s|¼|OE|g" | sed -e "s|æ|ae|g" | sed -e "s|½|oe|g")
+              fi
+
+              if [ "$annotation_classe" = "1" ]; then
+                  if [ -z "$classe" ]; then
+                      # Cas d'un eleve dans le groupe overfill:
+                      #classe=$(ldapsearch -xLLL -h "$SE3" -b "ou=Groups,$BASE_DN" "(&(memberUid=$LOGIN)(cn=Classe_*))" cn | grep "^cn: " | sed -e "s/^cn: //"|head -n1)
+                      #classe=$(echo "$LISTE_GROUPES_LOGIN" | sed -rn 's/^Classe_(.*)$/\1/p')
+                      classe=$(echo "$LISTE_GROUPES_LOGIN" | grep "^Classe_" |head -n1)
+                  fi
+
+                  if [ -z "$classe" ]; then
+                      if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"; then
+                          classe="Profs"
+                      elif est_dans_liste "$LISTE_GROUPES_LOGIN" "Administratifs"; then
+                          classe="Administratifs"
+                      fi
+                  fi
+
+                  if [ ! -z "$classe" ]; then
+                      if [ -n "${chaine}" ]; then
+                          chaine="$chaine ($classe)"
+                      else
+                          chaine="$classe"
+                      fi
+                  fi
+              fi
+
+              # Generation de l'image:
+              if [ -n "$couleur_txt" ]; then
+                  convert -fill ${couleur_txt} -pointsize $taille_police -draw "gravity North text 0,0 '$chaine'" ${dossier_dest_fond}/$orig.jpg ${prefix}${dossier_dest_fond}/fond_ecran_$LOGIN.$ext
+              else
+                  cp ${dossier_dest_fond}/$orig.jpg ${dossier_dest_fond}/fond_ecran_$LOGIN.$ext
+              fi
+
+          fi
+        fi
+
+        if [ -e /tmp/fond_ecran_${LOGIN}.jpg ]; then
+            changer_papier_peint /tmp/fond_ecran_${LOGIN}.jpg
+        fi
+    fi
+}
+
+
+
+function supprimer_fond_ecran() {
+
+    if [ -z "$LOGIN" ]
+    then
+        # La variable LOGIN n'est pas définie. On arrête là.
+        return 1
+    fi
+
+    if [ -e /tmp/fond_ecran_${LOGIN}.jpg ]; then
+        rm -f /tmp/fond_ecran_${LOGIN}.jpg
+    fi
+}
+
+
+
+
+################################################################################
+################################################################################
+###                                                                          ###
+### Fin des définitions de fonctions et autres variables.                    ###
+### Suivant le paramètre $1 (qui s'appelle $PHASE dans le script) qui est    ###
+### passé à ce script, c'est une des quatre fonctions de base qui sera       ###
+### appelée.                                                                 ###
+###                                                                          ###
+################################################################################
+################################################################################
+
+
+
+case "$PHASE" in
+
+    "initialisation")
+        initialisation
+        ;;
+
+    "ouverture")
+        ouverture
+        ;;
+
+    "fermeture")
+        fermeture
+        ;;
+        
+    *)
+        # On ne fait rien de spécial
+        true
+        ;;
+
+esac
+
+
+
+exit 0
+# Fin du script
+################################################################################
+
+
+

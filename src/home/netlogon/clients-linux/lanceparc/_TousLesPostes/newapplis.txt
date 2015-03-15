@@ -1,0 +1,3 @@
+# Listez les paquets debian ci-dessous que vous souhaitez installer
+# le fait de modifier le contenu du fichier lancera une nouvelle tentative d'installation
+

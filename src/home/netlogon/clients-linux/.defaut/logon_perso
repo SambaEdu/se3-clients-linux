@@ -1,0 +1,62 @@
+#!/bin/bash
+
+
+function initialisation_perso ()
+{
+    # Vous ne pouvez pas laisser le corps de cette fonction complètement
+    # vide. Si vous n'avez rien à mettre dedans, laissez simplement
+    # la commande « true » toute seule.
+    true
+}
+
+function ouverture_perso ()
+{
+    # Au moment de l'appel de cette fonction, le home de l'utilisateur
+    # est déjà créé et il correspond au répertoire local "$REP_HOME".
+    # Cette fonction est l'endroit où les montages de partages réseau
+    # (en fonction du compte utilisé, du poste client utilisé, en
+    # fonction de l'appartenance à un groupe etc.) sont effectués.
+    
+    # Évidemment, vous pouvez utiliser cette fonction pour faire
+    # d'autres choses, selon votre imagination...
+    
+    # Montage du partage « perso » pour tout le monde.
+    monter_partage "//$SE3/homes/Docs" "Docs" \
+        "$REP_HOME/Documents de $LOGIN sur le réseau" \
+        "$REP_HOME/Bureau/Documents de $LOGIN sur le réseau"
+        
+    # Montage du partage « Classes » pour tout le monde.
+    monter_partage "//$SE3/Classes" "Classes" \
+        "$REP_HOME/Classes sur le réseau" \
+        "$REP_HOME/Bureau/Classes sur le réseau"
+
+    # Montage du partage public « Docs » seulement dans le cas où
+    # c'est un compte "prof" qui se connecte, ou bien "admin".
+    if [ "$LOGIN" = "admin" ] || est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"; then
+        monter_partage "//$SE3/Docs" "Public" \
+            "$REP_HOME/Public sur le réseau" \
+            "$REP_HOME/Bureau/Public sur le réseau"
+    fi
+    
+    # Montage du partage « admhomes » et de « netlogon-linux » 
+    # seulement dans le cas où c'est le compte "admin" qui se connecte.
+    if [ "$LOGIN" = "admin" ]; then
+        monter_partage "//$SE3/admhomes" "admhomes" \
+            "$REP_HOME/admhomes" \
+            "$REP_HOME/Bureau/admhomes"
+        monter_partage "//$SE3/netlogon-linux" "clients-linux" \
+            "$REP_HOME/clients-linux" \
+            "$REP_HOME/Bureau/clients-linux"
+    fi
+}
+
+function fermeture_perso ()
+{
+    # Vous ne pouvez pas laisser le corps de cette fonction complètement
+    # vide. Si vous n'avez rien à mettre dedans, laissez simplement
+    # la commande « true » toute seule.
+    true
+}
+
+
+

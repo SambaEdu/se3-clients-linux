@@ -1,0 +1,20 @@
+places_file=$(find "$REP_HOME/.mozilla/" -name places.sqlite)
+
+echo "DROP TABLE IF EXISTS  moz_bookmarks;
+DROP TABLE IF EXISTS  moz_bookmarks_roots;
+DROP TABLE IF EXISTS  moz_places;" > "$REP_HOME/.tmp.places"
+
+echo ".dump moz_bookmaks" | sqlite3 "$places_file" >> "$REP_HOME/.tmp.places"
+echo ".dump moz_bookmaks_roots" | sqlite3 "$places_file" >> "$REP_HOME/.tmp.places"
+echo ".dump moz_places" | sqlite3 "$places_file" >> "$REP_HOME/.tmp.places"
+
+Puis ensuite :
+
+places_file=$(find "$REP_HOME/.mozilla/" -name places.sqlite)
+sqlite3 "$places_file" < le_fichier_de_sauvegardes...
+
+
+
+
+
+

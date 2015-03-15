@@ -1,0 +1,89 @@
+Le 20 août 2012 version 1.0
+    C'est le début.
+
+Le 29 août 2012 version 1.0.1
+    Modification du script d'intégration pour la distribution Precise afin
+    qu'il fonctionne aussi avec Xubuntu "12.04". Petite modification de la
+    documentation en conséquence.
+
+Le 30 août 2012 version 1.0.2
+    Modification dans le profil par défaut (aussi bien pour Squeeze que pour
+    Precise) proposé par le paquet. Le lanceur "Google" supposait que Firefox
+    était installé sur les clients. Ce lanceur a été remplacé par un lanceur
+    de type "Link" et c'est le navigateur par défaut qui se lance 
+    automatiquement (qui peut être Firefox ou non).
+    
+Le 3 novembre 2012 version 1.0.3
+    Modification du fichier postinst du paquet : suppression du « exit 1 »
+    en cas d'erreur sur le test du serveur NTP du SE3. Ce « exit 1 » est
+    trop rude et peut coincer le gestionnaire de paquets.
+
+    Ajout de la dépendance « se3-logonpy > 2.3.7216 » pour résoudre le
+    conflit avec ce paquet au niveau du fichier smb-CIFS.conf.
+  
+Le 6 novembre 2012 version 1.1
+    Modification de la structure du paquet via la suppression du
+    fichier LISEZMOI.TXT du paquet .deb, sachant que ce fichier
+    est maintenant créé lors de l'appel du script postinst.
+    Modification des fichiers d'intégration afin qu'on ne puisse pas
+    intégrer une machine dont le nom fait plus de 15 caractères.
+    Mais le plus gros changement est le transfert de toute la partie
+    montage des partages du fichier logon vers le fichier logon_perso
+    à l'aide de fonctions « user-friendly ». Ainsi, l'administrateur
+    pourra gérer la partie montage des partages (suivant le compte,
+    suivant la station cliente, suivant l'appartenance à un groupe etc.)
+    comme il le souhaite et le tout de manière relativement simple.
+    
+Le 24 novembre 2012 version 1.1.1
+    Ajout de la fonction changer_papier_peint utilisable dans
+    le fichier logon_perso et qui fait ce qu'on attend d'elle.
+    Ajout du fichier connexion_ssh_serveur.bash qui est un
+    simple raccourci pour lancer une connexion ssh au sur
+    le serveur à partir d'un client Linux.
+
+    Modifications des lanceurs Google.desktop situés dans les profils par
+    défaut de Squeeze et de Precise afin d'ajouter le shebang. Dans le fichier
+    logon, au moment de l'ouverture de session, ajout d'un « chmod u+x » sur
+    tous les fichiers de la forme "$REP_HOME/Bureau/"*.desktop au cas où...
+
+    Ajout des options « port=139,netbiosname=$NOM_HOTE » dans le montage
+    des partages avec "mount.cifs". La conséquence est que la variable
+    de substitution %m utilisée dans les fichiers smb*.conf est bien
+    remplacée par le nom (netbios) du client Linux. Cela impliquera
+    peut-être une possibilité d'utiliser les imprimantes du serveur
+    Samba. Peut-être...
+
+Le 6 janvier 2013 version 1.1.2
+    Ajout du fichier reconfigure.bash afin que l'on puisse reconfigurer
+    les bons droits sur les fichiers du paquet, et que l'on puisse injecter
+    le contenu de logon_perso dans logon, le tout directement via un client
+    Linux avec le compte admin. Modification de la documentation en conséquence.
+    
+Le 6 janvier 2013 version 1.1.3
+    Modification du fichier preinst du paquet car deux vérifications un peu
+    zélées interrompaient directement un « apt-get upgrade » si celui-ci
+    correspondait simultanément à une mise à jour du paquet se3-clients-linux
+    et à une mise à jour de certains paquets Se3 (précisément les paquets se3
+    et se3-domain).
+
+Le 9 décembre 2013 version 1.1.6
+      Ajout de l'option de montage "sec=ntlmv2" car suite à une MAJ
+    sur Precise, sans cette option les montages ne se font plus.
+      Ajout de l'option "--bwlimit=2048" dans le rsync entre le
+    skel par défaut du serveur et le skel local. L'idée est
+    de limiter le débit du rsync afin, *on l'espère*, de garantir
+    une meilleure stabilité et un meilleur taux de réussite
+    de la synchronisation.
+      Désormais, si la synchronisation des skel ne se fait pas,
+    alors le .VERSION local est remis dans son état initial afin
+    que la synchrosation soit retentée la prochaine fois sans qu'on
+    ait besoin d'éditer le fichier .VERSION du serveur.
+      Prise en charge de Debian Wheezy au niveau de l'intégration.
+    La désintégration ne fonctionne pas pour l'instant et le
+    script a été mis dans /home/netlogon/clients-linux/.test.
+
+     
+Le 20 octobre 2014 version 1.1.7
+    Modification du fonctionnement du script logon afin de lui 
+    ajouter un une fois par parc et une fonction permettant le lancement 
+    de scripts par parc à chaque démarrage.
