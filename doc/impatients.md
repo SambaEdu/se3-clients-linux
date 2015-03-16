@@ -30,6 +30,7 @@ avec l'intitulé `Support des clients linux`.
 plus nécessaire. Le paquet est maintenant inclus dans le dépôt
 officiel du projet SambaÉdu.
 
+**Si votre serveur est sous Wheezy**, vous pouvez :
 
 TODO...
 
