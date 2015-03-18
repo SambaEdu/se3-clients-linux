@@ -4,7 +4,7 @@ script_dir=$(cd $(dirname "$0"); pwd)
 pkg_name="se3-clients-linux"
 
 cd "$script_dir" || {
-    echo "Error, impossible change directory to $script_dir."
+    echo "Error, impossible to change directory to $script_dir."
     echo "End of the script."
     exit 1
 }
