@@ -86,4 +86,10 @@ Le 9 décembre 2013 version 1.1.6
 Le 20 octobre 2014 version 1.1.7
     Modification du fonctionnement du script logon afin de lui 
     ajouter un une fois par parc et une fonction permettant le lancement 
-    de scripts par parc à chaque démarrage.
+    de scripts par parc à chaque démarrage. 
+
+Le 15 mars 2015 version 1.1.8
+- Ajout fonctions concernant les lancement par parcs.
+- Ajouts modifs sur script integration pour suppport lighdm
+- Ajout fichiers de conf pour support lightdm
+

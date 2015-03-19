@@ -13,7 +13,7 @@ REPERTOIRE_DIVERS="$REPERTOIRE_INSTALLATION/divers"
 REPERTOIRE_DIVERS_DEFAUT="$REPERTOIRE_DEFAUT/divers"
 REPERTOIRE_UNEFOIS="$REPERTOIRE_INSTALLATION/unefois"
 REPERTOIRE_UNEFOIS_DEFAUT="$REPERTOIRE_DEFAUT/unefois"
-REPERTOIRE_SSHKEY="$REPERTOIRE_DEFAUT/install"
+REPERTOIRE_SSHKEY="$REPERTOIRE_INSTALLATION/install"
 LOGON="$REPERTOIRE_INSTALLATION/bin/logon"
 LOGON_DEFAUT="$REPERTOIRE_DEFAUT/logon"
 LOGON_PERSO="$REPERTOIRE_INSTALLATION/bin/logon_perso"
@@ -80,10 +80,13 @@ function restaurer_droits ()
     chown "root:root" "$SMB_CIFSFS"
     chmod 644 "$SMB_CIFSFS"
     
-    rm -rf /var/www/install
+    mkdir -p "$REPERTOIRE_SSHKEY"
     chmod 755 "$REPERTOIRE_SSHKEY"
-    chown root "$REPERTOIRE_SSHKEY"
-    ln -s "$REPERTOIRE_SSHKEY" /var/www/install
+    chown admin:admins "$REPERTOIRE_SSHKEY"
+    
+    if [ ! -e "/var/www/install" ]; then
+        ln -s "$REPERTOIRE_SSHKEY" /var/www/install
+    fi
 }
 
 # Fonction qui adapte les scripts à l'environnement via des
@@ -310,7 +313,7 @@ case "$1" in
         done
 
 	if [ ! -e "$REPERTOIRE_SSHKEY/id_rsa.pub" ]; then
-		cp /var/remote_adm/.ssh/id_rsa.pub $REPERTOIRE_SSHKEY
+		cp /var/remote_adm/.ssh/id_rsa.pub "$REPERTOIRE_SSHKEY/"
         fi
         
         # Si le fichier LOGON_PERSO n'existe pas, le crée en se
