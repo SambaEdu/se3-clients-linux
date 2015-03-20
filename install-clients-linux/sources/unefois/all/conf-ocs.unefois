@@ -1,0 +1,9 @@
+#!/bin/bash
+
+mkdir -p /etc/ocsinventory
+echo "server=$SE3:909" > /etc/ocsinventory/ocsinventory-agent.cfg 
+apt-get install ocsinventory-agent -y
+
+
+# remontee immediate
+ocsinventory-agent 

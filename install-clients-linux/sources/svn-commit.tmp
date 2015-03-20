@@ -1,0 +1,37 @@
+
+--Cette ligne, et les suivantes ci-dessous, seront ignorées--
+
+A    .config/Thunar
+A    .config/Thunar/thunarrc
+A    .config/autostart
+A    .config/autostart/xfce4-settings-helper-autostart.desktop
+A    .config/dconf
+AM   .config/dconf/user
+A    .config/enchant
+A    .config/enchant/fr_FR.dic
+A    .config/enchant/fr_FR.exc
+A    .config/gedit
+A    .config/gedit/accels
+A    .config/user-dirs.dirs
+A    .config/user-dirs.locale
+A    .config/xfce4
+A    .config/xfce4/desktop
+A    .config/xfce4/desktop/icons.screen0.rc
+A    .config/xfce4/helpers.rc
+A    .config/xfce4/panel
+A    .config/xfce4/panel/launcher-10
+A    .config/xfce4/panel/launcher-10/13956197272.desktop
+A    .config/xfce4/panel/launcher-11
+A    .config/xfce4/panel/launcher-11/13956197273.desktop
+A    .config/xfce4/panel/launcher-12
+A    .config/xfce4/panel/launcher-12/13956197274.desktop
+A    .config/xfce4/panel/launcher-9
+A    .config/xfce4/panel/launcher-9/13956197271.desktop
+A    .config/xfce4/xfconf
+A    .config/xfce4/xfconf/xfce-perchannel-xml
+A    .config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+A    .config/xfce4/xfconf/xfce-perchannel-xml/xfce4-mixer.xml
+A    .config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
+A    .config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+A    .config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+A    .config/xfce4/xfwm4

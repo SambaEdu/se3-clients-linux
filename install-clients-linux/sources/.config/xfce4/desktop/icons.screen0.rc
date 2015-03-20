@@ -1,0 +1,36 @@
+[Public sur le réseau]
+row=2
+col=1
+
+[Google]
+row=3
+col=0
+
+[clients-linux]
+row=0
+col=2
+
+[Documents de admin sur le réseau]
+row=0
+col=1
+
+[Classes sur le réseau]
+row=1
+col=1
+
+[admhomes]
+row=3
+col=1
+
+[Corbeille]
+row=2
+col=0
+
+[Système de fichiers]
+row=1
+col=0
+
+[Répertoire personnel]
+row=0
+col=0
+
