@@ -10,12 +10,12 @@
 #
 #####	##### ##### #####
 
-# IP de l'Amon
-IP_amon="192.168.1.1"
+# recup proxy si existant pour https
 
-#####
-# pour joindre un site en https via Amon
-export https_proxy=$IP_amon
+if [ -e /etc/proxy.sh ]; then
+	. /etc/proxy.sh 
+fi
+
 
 # on met à jour flashplugin
 update-flashplugin-nonfree --install
