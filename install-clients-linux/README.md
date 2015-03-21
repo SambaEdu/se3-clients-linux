@@ -2,7 +2,7 @@
 
 Sources du dispositif. Ce dernier est archivé en tar.gz et disponible depuis le serveur wawadeb.
 
-Pour modifier cette partie fichiers il faut donc :
+Pour modifier cette partie il faut donc :
 * Modifier les sources (dosseir sources)
 * Au besoin modifier le script de mise en place
 * recréer l'archive
