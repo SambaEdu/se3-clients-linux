@@ -731,13 +731,17 @@ function lancer_unefois ()
         
          parc="$(echo ${d##*/})" 
          if appartient_au_parc $parc $NOM_HOTE; then
-		lancer_unefois_dans_repertoire "$d"
+			lancer_unefois_dans_repertoire "$d"
          fi
-               
-            regex=$(basename "$d")
-            if echo "$NOM_HOTE" | grep -Eiq -- "$regex"; then
-                lancer_unefois_dans_repertoire "$d"
-            fi
+         
+         if [ "$parc" = "_TousLesPostes" ] ; then
+			lancer_unefois_dans_repertoire "$d"
+         fi
+              
+         regex=$(basename "$d")
+         if echo "$NOM_HOTE" | grep -Eiq -- "$regex"; then
+            lancer_unefois_dans_repertoire "$d"
+         fi
         fi
     done
     shopt -u dotglob
