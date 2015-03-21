@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#####	##### ##### #####
+#
+# Script permettant de mettre à jour flashplugin
+#
+# version du 14/12/2014
+#
+#
+#
+#####	##### ##### #####
+
+# IP de l'Amon
+IP_amon="192.168.1.1"
+
+#####
+# pour joindre un site en https via Amon
+export https_proxy=$IP_amon
+
+# on met à jour flashplugin
+update-flashplugin-nonfree --install
+
+# fin du script
+#####
+
