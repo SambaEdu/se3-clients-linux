@@ -51,6 +51,6 @@ exclure.
 ## Table des matières
 
 * [Pour les impatients qui veulent tester rapidement](impatients.md)
-* TODO...
+* [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.mpd)
 
 
