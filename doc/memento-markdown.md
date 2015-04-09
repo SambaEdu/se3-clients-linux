@@ -62,7 +62,7 @@ git commit -av
 tu vas commiter, ie valider tes modifs sur ton dépôt *local* et sur *lui* *seulement* (à ce stade les modifs sont validées sur ton dépôt local mais pas sur le dépôt distant). Pour chaque commit, il faut un commentaire qui explique (de manière très courte) tes modifs.
 
 
-### Rémontée ses modifications sur le dépots distant 
+### Rémontée les modifications sur le dépots distant 
 
 ```
 git push 
@@ -133,7 +133,7 @@ avec ça pour que ton arborescence locale soit en phase avec la branche sur
 laquelle tu te trouves).
 
 
-## Quelques exempla de formatage MD
+## Quelques exemples de formatage MD
 
 * Pour faire un titre : # titre
 * un sous titre : ## sous titre
