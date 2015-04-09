@@ -206,7 +206,8 @@ cp $src/post-install* $src/preseed*.cfg $src/mesapplis*.txt $src/bashrc $src/ini
 chmod 755 /var/www/install/preseed* /var/www/install/post-install_debian_wheezy.sh
 
 if [ -e "/home/netlogon/clients-linux/distribs/wheezy/integration/integration_wheezy.bash" ]; then
-	cp /home/netlogon/clients-linux/distribs/wheezy/integration/integration_wheezy.bash /var/www/install/
+	rm -f /var/www/install/integration_wheezy.bash
+	ln /home/netlogon/clients-linux/distribs/wheezy/integration/integration_wheezy.bash /var/www/install/
 	chmod 755 /var/www/install/integration_wheezy.bash
 fi
 # ===============================================================================================
