@@ -54,7 +54,7 @@ REP_LOG_LOCAL="$REP_SE3_LOCAL/log"
 REP_TMP_LOCAL="$REP_SE3_LOCAL/tmp"
 LOGON_SCRIPT_LOCAL="$REP_BIN_LOCAL/logon"
 PAM_SCRIPT_AUTH="/usr/share/libpam-script/pam_script_auth"
-CREDENTIALS="$REP_TMP_LOCAL/credentials"'_$PAM_USER'
+CREDENTIALS="$REP_TMP_LOCAL/credentials"'_$username'
 LIGHTDM_CONF="/etc/lightdm/lightdm.conf"
 
 # Les options de base pour un montage CIFS.
@@ -1082,6 +1082,9 @@ fi
 
 echo "username=$PAM_USER
 password=$PAM_AUTHTOK" > "__CREDENTIALS__"
+
+chown root:root "__CREDENTIALS__"
+chmod 700 "__CREDENTIALS__"
 
 exit 0
 ' > "$PAM_SCRIPT_AUTH"
