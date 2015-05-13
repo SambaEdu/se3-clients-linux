@@ -258,8 +258,7 @@ sed -i '/auth optional pam_script.so/a \auth optional pam_exec.so /etc/se3/bin/o
 echo '#!/bin/bash
 
 if [ -x /etc/se3/bin/logon ]; then
-   export LOGNAME="$PAM_USER"
-   /etc/se3/bin/logon ouverture
+   LOGNAME="$PAM_USER" /etc/se3/bin/logon ouverture
 fi
 
 exit 0' > /etc/se3/bin/ouverture_ltsp.sh
