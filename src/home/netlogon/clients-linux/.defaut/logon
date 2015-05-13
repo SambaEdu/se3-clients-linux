@@ -1434,7 +1434,7 @@ REP_SKEL_LOCAL="$REP_SE3_LOCAL/skel"
 REP_UNEFOIS_LOCAL="$REP_SE3_LOCAL/unefois"
 LOGON_SCRIPT_LOCAL="$REP_BIN_LOCAL/logon"
 VERSION_SKEL_LOCAL="$REP_SKEL_LOCAL/.VERSION"
-CREDENTIALS="$REP_TMP_LOCAL/credentials"
+CREDENTIALS="$REP_TMP_LOCAL/credentials_$LOGNAME"
 REP_MONTAGE="/mnt"
 
 # Noms de fichiers ou de répertoires du Se3 accessibles par le client 
