@@ -102,7 +102,7 @@ correspond bien à la version de votre dernier commit :
 dpkg-query -W se3-clients-linux
 ```
 
-La version du paquet sera toujours de la forme `<epoch>-<commit-id>`
+La version du paquet sera toujours de la forme `<epoch>~<commit-id>`
 sachant que :
 
 * `<epoch>` est simplement le nombre de secondes écoulées
