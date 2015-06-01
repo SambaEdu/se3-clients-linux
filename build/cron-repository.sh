@@ -114,7 +114,7 @@ do
     else
         echo "==> The commit-id==${commit_id} version is not yet packaged in the branch ${branch}."
         # Build the new version of the package.
-        "$git_dir/build/build.sh"
+        "$git_dir/build/build.sh" "update-version"
         # Add the package in reprepro.
         reprepro --verbose --basedir "$reprepro_dir" --component="${branch}" includedeb "$codename" "$git_dir/build/se3-clients-linux"*".deb"
     fi
