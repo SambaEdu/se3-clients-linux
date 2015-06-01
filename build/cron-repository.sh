@@ -14,7 +14,7 @@ cd "$git_dir" || {
     exit 1
 }
 
-echo '==== Update the git repository ===='
+echo '=> Update the git repository'
 timeout --kill-after=10s 10s git pull || {
 
     echo "Impossible to update the git repository. End of the script."
@@ -55,7 +55,7 @@ test -e "$reprepro_dir/conf/distributions" || {
 
 }
 
-echo '==== Update the configuration of reprepro ===='
+echo '=> Update the configuration of reprepro'
 cat >"$reprepro_dir/conf/distributions" <<EOF
 Origin: Francois Lafont
 Label: Francois Lafont
@@ -70,30 +70,30 @@ EOF
 
 sleep 1
 
-echo '==== Remove packages from branches which does not exist anymore ===='
+echo '=> Remove packages from branches which does not exist anymore'
 reprepro --delete --verbose --basedir "$reprepro_dir" clearvanished
 
-echo '==== Remove components directories which does not correspond to a remote branch anymore ===='
+echo '=> Remove components directories which does not correspond to a remote branch anymore'
 current_components=$(find "$reprepro_dir/dists/$codename/" -maxdepth 1 -mindepth 1 -type d -exec basename '{}' \;)
 for component in $current_components
 do
 
-    echo "=> Component ${component}"
+    echo "==> Component ${component}"
 
     # To have current_branches=":branch1:branch2:...:"
     current_branches=$(echo -n ':'; echo -n "$branches" | tr ' ' ':'; echo ':')
 
-    if echo "$current_branches" | grep ":${component}:"
+    if echo "$current_branches" | grep -q ":${component}:"
     then
-        echo "Keep $component because the remote branch currently exists."
+        echo "==> Keep $component because the remote branch currently exists."
     else
-        echo "Remove $component because the remote branch currently does not exist."
+        echo "==> Remove $component because the remote branch currently does not exist."
         rm -rf "$reprepro_dir/dists/$codename/$component"
     fi
 
 done
 
-echo '==== Handle for each remote branch ===='
+echo '=> Handle for each remote branch'
 for branch in $branches
 do
     git checkout "$branch" || {
@@ -103,7 +103,7 @@ do
 
     }
 
-    echo "=> Branch ${branch}"
+    echo "==> Branch ${branch}"
 
     # The last commit id (just the last 10 characters).
     commit_id=$(git log --format="%H" -n 1 | sed -r 's/^(.{10}).*$/\1/')
@@ -111,22 +111,22 @@ do
     if reprepro --verbose --basedir "$reprepro_dir" list "$codename" \
         | grep -E "${codename}\|${branch}\|" | grep "~${commit_id}$"
     then
-        echo "The commit-id==${commit_id} version is already packaged in the branch ${branch}."
+        echo "==> The commit-id==${commit_id} version is already packaged in the branch ${branch}."
     else
-        echo "The commit-id==${commit_id} version is not yet packaged in the branch ${branch}."
+        echo "==> The commit-id==${commit_id} version is not yet packaged in the branch ${branch}."
         # Build the new version of the package.
         "$git_dir/build/build.sh"
         # Add the package in reprepro.
         reprepro --verbose --basedir "$reprepro_dir" --component="${branch}" includedeb "$codename" "$git_dir/build/se3-clients-linux"*".deb"
     fi
 
-    echo '=> Back to master branch'
+    echo '==> Back to master branch'
     git checkout master
 
     if [ "$branch" != "master" ]
     then
 
-        echo "=> Remove the local current branch $branch"
+        echo "==> Remove the local current branch $branch"
         git branch -D "$branch"
     fi
 
