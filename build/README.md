@@ -103,15 +103,26 @@ dpkg-query -W se3-clients-linux
 ```
 
 La version du paquet sera toujours de la forme `<epoch>-<commit-id>`
-sachant que `<epoch>` est simplement le nombre de secondes écoulées
-depuis le 1 janvier 1970 et `<commit-id>` est l'id du commit correspondant
-à la version du paquet (l'id est tronqué au 10 premiers caractères).
+sachant que :
+
+* `<epoch>` est simplement le nombre de secondes écoulées
+entre le 1 janvier 1970 à minuit (UTC) et l'instant où le build
+du package a été effectué;
+* `<commit-id>` est l'id du commit sur lequel se trouvait le dépôt
+git du serveur repository au moment du build du package (l'id est
+tronqué aux 10 premiers caractères). Le serveur repository possède
+son propre dépôt git de `se3-clients-linux` qu'il met à jour
+juste avant chaque build afin de récupérer les commits qui ont été
+pushés par les membres du projet.
 
 Il est facile de convertir la date `epoch` en une date au format
 classique :
 
 ```sh
-# Par exemple l'epoch 1433160890 correspond au 1 juin 2015 à 14h14.
+# Par exemple l'epoch 1433160890 correspond au 1 juin 2015 à 14h14,
+# ce qui veut donc dire qu'un package dont l'epoch dans le numéro
+# version correspond à 1433160890 est un package qui a été buildé
+# le 1 juin 2015 à 14h14 (et 50 secondes).
 ~$ date -d "@1433160890"
 lundi 1 juin 2015, 14:14:50 (UTC+0200)
 ```
