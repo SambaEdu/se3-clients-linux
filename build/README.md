@@ -38,7 +38,7 @@ git pull
 
 Ensuite, vous allez créer localement une nouvelle branche. Pour
 le nom de cette nouvelle branche, utilisez uniquement les caractères
-`abc...z01...9` ainsi que le tiret (`-`). C'est tout :
+`abc...z01...9` ainsi que le tiret (`-`), c'est tout.
 
 ```sh
 git branch my-new-feature      # La branche `my-new-feature` est créée en local.
@@ -49,7 +49,7 @@ git push origin my-new-feature # On crée la nouvelle branche sur le dépôt dis
 À ce stade une nouvelle branche a été créée sur votre dépôt local
 et sur le dépôt distant (ie GitHub). Attention, maintenant il faudra
 bien commiter sur la nouvelle branche. N'hésitez pas à lancer les
-commandes suivantes pour vous assurer que vous vous trouver bien sur
+commandes suivantes pour vous assurer que vous vous trouvez bien sur
 la bonne branche :
 
 ```sh
@@ -61,7 +61,7 @@ git checkout my-new-feature
 ```
 
 Ensuite, une fois que vous êtes sur la bonne branche, vous pouvez
-modifier les fichiers comme vous le souhaitez, commiter, pusher etc.
+modifier les fichiers, commiter, pusher etc. comme vous le souhaitez.
 Si jamais vous avez pushé un commit sur la nouvelle branche, le
 package sera buildé sur le serveur `repository.flaf.fr`.
 
@@ -105,7 +105,7 @@ dpkg-query -W se3-clients-linux
 La version du paquet sera toujours de la forme `<epoch>-<commit-id>`
 sachant que `<epoch>` est simplement le nombre de secondes écoulées
 depuis le 1 janvier 1970 et `<commit-id>` est l'id du commit correspondant
-à la version du paquet (l'id est tronqué au 10 premier caractères).
+à la version du paquet (l'id est tronqué au 10 premiers caractères).
 
 Il est facile de convertir la date `epoch` en une date au format
 classique :
@@ -116,7 +116,7 @@ classique :
 lundi 1 juin 2015, 14:14:50 (UTC+0200)
 ```
 
-Soyez patients entre le moment où vous avez commité et pushé
+Soyez patient entre le moment où vous avez commité et pushé
 une nouvelle modification sur votre branche et le moment où
 le package dans sa nouvelle version sera disponible sur le
 serveur repository. Il faut patienter au moins 5 minutes, tout
@@ -125,7 +125,8 @@ simplement parce qu'il y a une tâche cron qui tourne toutes les
 puis pushé une modification sur votre branche à 14h46, il faudra
 attendre 14h50 (et quelques secondes) avant que votre package
 soit disponible dans sa dernière version. Vous pourrez voir la
-version du package disponible en visitant la page :
+version du package disponible en visitant la page (`F5` pour
+la rafraîchir) :
 
 ```sh
 branch='my-new-feature' # Mettre ici le nom de votre nouvelle branche.
