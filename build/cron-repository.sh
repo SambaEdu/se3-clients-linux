@@ -102,7 +102,7 @@ do
     git checkout master
 
     # We remove the local current branch
-    git branch -D "$branch"
+    [ $branch != "master" ] && git branch -D "$branch"
 
 done
 
