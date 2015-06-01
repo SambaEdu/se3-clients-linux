@@ -58,7 +58,7 @@ reprepro --delete --verbose --basedir "$reprepro_dir" clearvanished
 
 # Remove components directories which does not correspond to a remote branch anymore.
 current_components=$(find "$reprepro_dir/dists/$codename/" -maxdepth 1 -mindepth 1 -type d -exec basename '{}' \;)
-for $component in $current_components
+for component in $current_components
 do
     # To have current_branches=":branch1:branch2:...:"
     current_branches=$(echo -n ':'; echo -n "$branches" | tr ' ' ':'; echo ':')
@@ -70,6 +70,7 @@ do
         echo "Remove $component because the remote branch currently does not exist."
         rm -rf "$reprepro_dir/dists/$codename/$component"
     fi
+
 done
 
 
