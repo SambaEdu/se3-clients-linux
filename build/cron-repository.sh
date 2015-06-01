@@ -80,7 +80,7 @@ do
     # To have current_branches=":branch1:branch2:...:"
     current_branches=$(echo -n ':'; echo -n "$branches" | tr ' ' ':'; echo ':')
 
-    if echo ":${component}:" | grep "$current_branches"
+    if echo "$current_branches" | grep ":${component}:"
     then
         echo "Keep $component because the remote branch currently exists."
     else
