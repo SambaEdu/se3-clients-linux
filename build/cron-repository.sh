@@ -2,6 +2,7 @@
 
 exec >"$HOME/cron-repository.log" 2>&1
 date # To have the date in the log.
+echo ''
 #set -x
 git_dir="$HOME/se3-clients-linux"
 reprepro_dir="$HOME/repository"
@@ -70,6 +71,7 @@ EOF
 
 sleep 1
 
+echo ''
 echo '=> Remove packages from branches which does not exist anymore'
 reprepro --delete --verbose --basedir "$reprepro_dir" clearvanished
 
@@ -77,8 +79,6 @@ echo '=> Remove components directories which does not correspond to a remote bra
 current_components=$(find "$reprepro_dir/dists/$codename/" -maxdepth 1 -mindepth 1 -type d -exec basename '{}' \;)
 for component in $current_components
 do
-
-    echo "==> Component ${component}"
 
     # To have current_branches=":branch1:branch2:...:"
     current_branches=$(echo -n ':'; echo -n "$branches" | tr ' ' ':'; echo ':')
@@ -93,6 +93,7 @@ do
 
 done
 
+echo ''
 echo '=> Handle for each remote branch'
 for branch in $branches
 do
@@ -103,13 +104,11 @@ do
 
     }
 
-    echo "==> Branch ${branch}"
-
     # The last commit id (just the last 10 characters).
     commit_id=$(git log --format="%H" -n 1 | sed -r 's/^(.{10}).*$/\1/')
 
     if reprepro --verbose --basedir "$reprepro_dir" list "$codename" \
-        | grep -E "${codename}\|${branch}\|" | grep "~${commit_id}$"
+        | grep -E "${codename}\|${branch}\|" | grep -q "~${commit_id}$"
     then
         echo "==> The commit-id==${commit_id} version is already packaged in the branch ${branch}."
     else
