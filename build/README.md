@@ -153,6 +153,10 @@ git checkout master
 
 # On merge, ie on fusionne nos changements sur la branche master.
 git merge my-new-feature
+
+# Si le merge n'a rencontré aucun conflit, on peut alors pusher.
+# Sinon, voir les quelques commentaires ci-dessous.
+git push
 ```
 
 Si on a de la chance, un merge peut se passer sans problème.
@@ -160,7 +164,8 @@ Mais si par exemple il y a eu des modifications sur la branche
 `master` (pendant que nous, on avançait sur la branche `my-new-feature`)
 et si certaines de ces modifications rentrent en conflit avec
 nos modifications alors il y a des étapes supplémentaires pour
-aider git à achever le merge (c'est une situation normale). Si
+aider git à achever le merge (c'est une situation assez courante qui
+n'a rien d'anormale lors d'un merge). Si
 jamais il y a des conflits non résolus, on peut le voir avec la
 commande `git status` : si certains fichiers sont marqués `unmerged`,
 cela veut dire que des conflits demeurent au niveau de ces fichiers
@@ -171,7 +176,7 @@ voir sur le Web qui regorge de tutoriels sur le merge avec git.
 Une fois que le merge c'est bien passé, ou bien si vous décidez
 d'abandonner votre branche (parce que votre idée de départ était
 une mauvaise idée etc.), il faut détruire la branche en local
-et sur le site distant :
+et sur le site distant (GitHub) :
 
 ```sh
 # On détruit la branche en local, attention on perd toute la branche.
