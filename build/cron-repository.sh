@@ -83,13 +83,6 @@ do
 
     }
 
-    timeout --kill-after=10s 10s git pull || {
-
-        echo "Impossible to update the git repository. End of the script."
-        exit 1
-
-    }
-
     # The last commit id (just the last 10 characters).
     commit_id=$(git log --format="%H" -n 1 | sed -r 's/^(.{10}).*$/\1/')
 
@@ -104,6 +97,12 @@ do
         # Add the package in reprepro.
         reprepro --verbose --basedir "$reprepro_dir" --component="${branch}" includedeb "$codename" "$git_dir/build/se3-clients-linux"*".deb"
     fi
+
+    # Back to master branch
+    git checkout master
+
+    # We remove the local current branch
+    git branch -D "$branch"
 
 done
 
