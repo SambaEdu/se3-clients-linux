@@ -154,6 +154,10 @@ git checkout master
 # On merge, ie on fusionne nos changements sur la branche master.
 git merge my-new-feature
 
+# Pour voir s'il y a des fichiers « unmerged », ie des conflits
+# que git ne peut pas résoudre lui-même automatiquement.
+git status
+
 # Si le merge n'a rencontré aucun conflit, on peut alors pusher.
 # Sinon, voir les quelques commentaires ci-dessous.
 git push
