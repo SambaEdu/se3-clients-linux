@@ -77,6 +77,9 @@ reprepro --delete --verbose --basedir "$reprepro_dir" clearvanished
 current_components=$(find "$reprepro_dir/dists/$codename/" -maxdepth 1 -mindepth 1 -type d -exec basename '{}' \;)
 for component in $current_components
 do
+
+    echo "==== Component ${component} ===="
+
     # To have current_branches=":branch1:branch2:...:"
     current_branches=$(echo -n ':'; echo -n "$branches" | tr ' ' ':'; echo ':')
 
