@@ -13,8 +13,17 @@ cd "$script_dir" || {
 rm -rf "$script_dir/"*.deb
 
 cp -ra "$script_dir/../src" "$script_dir/$pkg_name"
+
+commit_id=$(git log --format="%H" -n 1 | sed -r 's/^(.{10}).*$/\1/')
+epoch=$(date '+%s')
+version="${epoch}~${commit_id}"
+
+# Update the version number.
+sed -i -r "s/^Version:.*$/Version: ${version}/" "$script_dir/se3-clients-linux/DEBIAN/control"
+
 dpkg --build "$script_dir/$pkg_name" .
 
 # Cleaning.
 rm -r "$script_dir/$pkg_name"
+
 
