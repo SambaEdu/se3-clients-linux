@@ -1,8 +1,7 @@
 #!/bin/sh
 
-set -x
-
 exec >"$HOME/cron-repository.log" 2>&1
+set -x
 git_dir="$HOME/se3-clients-linux"
 reprepro_dir="$HOME/repository"
 codename='se3-clients-linux'
@@ -83,7 +82,7 @@ do
         # Build the new version of the package.
         "$git_dir/build/build.sh"
         # Add the package in reprepro.
-        reprepro --verbose --basedir "$reprepro_dir" --component="${branch}" includedeb "$codename"
+        reprepro --verbose --basedir "$reprepro_dir" --component="${branch}" includedeb "$codename" "$git_dir/build/se3-clients-linux"*".deb"
     fi
 
 done
