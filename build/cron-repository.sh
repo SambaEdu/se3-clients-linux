@@ -1,6 +1,7 @@
 #!/bin/sh
 
 exec >"$HOME/cron-repository.log" 2>&1
+date # To have the date in the log.
 set -x
 git_dir="$HOME/se3-clients-linux"
 reprepro_dir="$HOME/repository"
