@@ -22,6 +22,23 @@ timeout --kill-after=10s 10s git pull || {
 
 }
 
+# From `man git-remote`:
+#
+#       prune
+#          Deletes all stale remote-tracking branches under <name>.
+#          These stale branches have already been removed from the
+#          remote repository referenced by <name>, but are still
+#          locally available in "remotes/<name>".
+#
+# Without this command below, `git branch -r` can display remote branches
+# which have been already deleted.
+timeout --kill-after=10s 10s git remote prune origin || {
+
+    echo "\`git remote prune origin\` failed. End of the script."
+    exit 1
+
+}
+
 # Get the list of the remote branches.
 branches=$(git branch --no-color -r --no-abbrev | awk '{print $1}' \
     | grep '^origin' | cut -d'/' -f2 | grep -v '^HEAD$')
