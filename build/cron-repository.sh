@@ -14,7 +14,7 @@ cd "$git_dir" || {
     exit 1
 }
 
-# Update the git repository.
+echo '==== Update the git repository ===='
 timeout --kill-after=10s 10s git pull || {
 
     echo "Impossible to update the git repository. End of the script."
@@ -55,7 +55,7 @@ test -e "$reprepro_dir/conf/distributions" || {
 
 }
 
-# Update the configuration of reprepro.
+echo '==== Update the configuration of reprepro ===='
 cat >"$reprepro_dir/conf/distributions" <<EOF
 Origin: Francois Lafont
 Label: Francois Lafont
@@ -70,15 +70,15 @@ EOF
 
 sleep 1
 
-# Remove packages from branches which does not exist anymore.
+echo '==== Remove packages from branches which does not exist anymore ===='
 reprepro --delete --verbose --basedir "$reprepro_dir" clearvanished
 
-# Remove components directories which does not correspond to a remote branch anymore.
+echo '==== Remove components directories which does not correspond to a remote branch anymore ===='
 current_components=$(find "$reprepro_dir/dists/$codename/" -maxdepth 1 -mindepth 1 -type d -exec basename '{}' \;)
 for component in $current_components
 do
 
-    echo "==== Component ${component} ===="
+    echo "=> Component ${component}"
 
     # To have current_branches=":branch1:branch2:...:"
     current_branches=$(echo -n ':'; echo -n "$branches" | tr ' ' ':'; echo ':')
@@ -93,7 +93,7 @@ do
 
 done
 
-
+echo '==== Handle for each remote branch ===='
 for branch in $branches
 do
     git checkout "$branch" || {
@@ -102,6 +102,8 @@ do
         exit 1
 
     }
+
+    echo "=> Branch ${branch}"
 
     # The last commit id (just the last 10 characters).
     commit_id=$(git log --format="%H" -n 1 | sed -r 's/^(.{10}).*$/\1/')
@@ -118,11 +120,15 @@ do
         reprepro --verbose --basedir "$reprepro_dir" --component="${branch}" includedeb "$codename" "$git_dir/build/se3-clients-linux"*".deb"
     fi
 
-    # Back to master branch
+    echo '=> Back to master branch'
     git checkout master
 
-    # We remove the local current branch
-    [ "$branch" != "master" ] && git branch -D "$branch"
+    if [ "$branch" != "master" ]
+    then
+
+        echo "=> Remove the local current branch $branch"
+        git branch -D "$branch"
+    fi
 
 done
 
