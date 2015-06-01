@@ -6,6 +6,7 @@ set -x
 git_dir="$HOME/se3-clients-linux"
 reprepro_dir="$HOME/repository"
 codename='se3-clients-linux'
+id_pub_key='D96FA8EC'
 
 cd "$git_dir" || {
 
@@ -46,13 +47,30 @@ Codename: $codename
 Version: all
 Architectures: i386 amd64
 Components: $branches
+SignWith: $id_pub_key
 Description: Repository to test se3-clients-linux directly form git
 EOF
 
 sleep 1
 
-# Remove packages and components from branches which does not exist anymore.
+# Remove packages from branches which does not exist anymore.
 reprepro --delete --verbose --basedir "$reprepro_dir" clearvanished
+
+# Remove components directories which does not correspond to a remote branch anymore.
+current_components=$(find "$reprepro_dir/dists/$codename/" -maxdepth 1 -mindepth 1 -type d -exec basename '{}' \;)
+for $component in $current_components
+do
+    # To have current_branches=":branch1:branch2:...:"
+    current_branches=$(echo -n ':'; echo -n "$branches" | tr ' ' ':'; echo ':')
+
+    if echo ":${component}:" | grep "$current_branches"
+    then
+        echo "Keep $component because the remote branch currently exists."
+    else
+        echo "Remove $component because the remote branch currently does not exist."
+        rm -rf "$reprepro_dir/dists/$codename/$component"
+    fi
+done
 
 
 for branch in $branches
