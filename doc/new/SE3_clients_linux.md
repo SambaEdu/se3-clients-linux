@@ -6,10 +6,9 @@ Installation du paquet se3-clients-linux sur le serveur {#installation}
 
 Il faut que votre réseau local dispose d’une connexion Internet. Pour
 commencer, il faut préparer votre serveur Samba en y installant le
-paquet . Pour ce faire :
+paquet se3-clients-linux. Pour ce faire :
 
--   Si votre serveur est sous Lenny, il faut ouvrir une console en tant
-    que et lancer :
+-   Si votre serveur est sous Lenny (il est conseillé fortement de passer en Squeeze), il faut ouvrir une console en tant que root et lancer :
 
         apt-get update
         apt-get install se3-clients-linux
@@ -20,11 +19,12 @@ paquet . Pour ce faire :
         console donc);
 
     -   ou bien faire l’installation en passant par l’interface
-        d’administration Web du serveur via les menus . Dans le tableau
-        des modules, le paquet correspond à la ligne avec l’intitulé .
+        d’administration Web du serveur via les menus
+        Configuration générale → Modules. Dans le tableau
+        des modules, le paquet se3-clients-linux correspond à la ligne avec l’intitulé Support des clients linux.
 
 Attention, dans les versions précédentes du paquet, il fallait éditer le
-fichier [^1] et ajouter une des deux lignes suivantes :
+fichier /etc/apt/sources.list [^1] et ajouter une des deux lignes suivantes :
 
     # Pour un serveur en version Lenny.
     deb http://francois-lafont.ac-versailles.fr/debian lenny se3
@@ -46,14 +46,14 @@ retrouve très exactement le même état qu’avant l’installation (voir la
 section [desinstallation] page ). L’installation se borne uniquement à
 effectuer les tâches suivantes :
 
--   Création d’un nouveau répertoire : le répertoire .
+-   Création d’un nouveau répertoire : le répertoire /home/netlogon/clients-linux/.
 
 -   Création d’un partage Samba supplémentaire sur le serveur à travers
-    le fichier de configuration : il s’agit du partage CIFS nommé
-    correspondant au répertoire du serveur.
+    le fichier de configuration /etc/samba/smb_CIFSFS.conf : il s’agit du partage CIFS nommé netlogon-linux
+    correspondant au répertoire /home/netlogon/clients-linux/ du serveur.
 
 -   Lecture de certains paramètres du serveur afin d’adapter certains
-    scripts contenus dans le paquet à l’environnement de votre domaine
+    scripts contenus dans le paquet se3-clients-linux à l’environnement de votre domaine
     local. En fait, ces fameux paramètres récupérés lors de
     l’installation du paquet sont au nombre de trois :
 
@@ -66,10 +66,10 @@ effectuer les tâches suivantes :
 Lors de l’installation du paquet, si jamais vous obtenez un message vous
 indiquant que le serveur NTP ne semble pas fonctionner, avant de passer
 à la suite, vous devez vous rendre sur la console d’administration Web
-de votre serveur (dans ) afin de spécifier l’adresse d’un serveur de
+de votre serveur (dans Configuration générale → Paramètres serveur) afin de spécifier l’adresse d’un serveur de
 temps qui fonctionne correctement (chose que l’on peut vérifier ensuite
 dans la page de diagnostic du serveur). Une fois le paramétrage effectué
-il vous suffit de reconfigurer le paquet en lançant, en tant que sur une
+il vous suffit de reconfigurer le paquet en lançant, en tant que root sur une
 console du serveur, la commande suivante :
 
     dpkg-reconfigure se3-clients-linux
@@ -84,6 +84,7 @@ répertoire correspondant dans l’arborescence locale du serveur :
 
    Nom du partage   Chemin réseau   Chemin dans l’arborescence locale du serveur
   ---------------- --------------- ----------------------------------------------
+   netlogon-linux   //SERVEUR/netlogon-linux   /home/netlogon/clients-linux/
                                    
 
 Au niveau de l’installation du paquet proprement dite, côté serveur,
