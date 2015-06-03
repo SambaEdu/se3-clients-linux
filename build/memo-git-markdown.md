@@ -9,6 +9,28 @@ apt-get update
 apt-get install openssl ca-certificates git
 ```
 
+## Mise en place de sa clé publique/privé d'accès
+
+Pour ne pas avoir à se connecter/déconnecter à chaque fois, on peut utiliser un jeu de clé publique/privé. Voici comment les mettre en place :
+
+les créer :
+```sh
+ssh-keygen -t rsa
+```
+On vous pose des questions : `Entrée` 3 fois
+
+Afficher la clé publique :
+```sh
+cat ~/.ssh/id_rsa.pub
+```
+
+puis l'ajouter, par un copié/collé, dans son profil sur le site du Git via son butineur préféré.
+
+Tout cela avant de lancer la commande : `git clone git@github.com:flaf/se3-clients-linux.git` (voir ci-dessous)
+
+Ensuite, les différentes commandes de gestion se font en étant dans le répertoire se3-clients-linux (voir ci-dessous). 
+
+
 ## Configuration du fichier `~/.gitconfig`
 
 Quelques paramétrage à effectuer pour avoir de la couleur dans la sortie
@@ -41,8 +63,8 @@ En général avec GitHub, on crée un dépôt via l'interface Web de
 GitHub et ensuite on clone ce dépôt en local sur sa (ses) machine(s)
 personnelle(s). Dans le cas qui nous intéresse, le dépôt
 `se3-clients-linux` existe déjà, il ne reste plus qu'à le cloner sur
-sa machine. On se rend quelque part dans son home où on va placer un
-répertoire qui contiendra le dépôt puis :
+sa machine. On se rend quelque part dans son home où on va créer un
+répertoire, qui contiendra le dépôt, à l'aide de la commande suivante :
 
 ```sh
 git clone git@github.com:flaf/se3-clients-linux.git
@@ -68,6 +90,11 @@ permet d'avoir un dépôt local à jour par rapport au dépôt distant
 
 ```sh
 git pull
+```
+
+**NB :** cette commande de gestion, ainsi que les autres, ne fonctionnera que si on la lance qand on se trouve dans le répertoire `se3-clients-linux`. Ne pas oublier de s'y placer (en supposant que le répertoire `se3-clients-linux` est dans le votre répertoire personnel) :
+```sh
+cd ~/se3-clients-linux
 ```
 
 ### Vérification des modifications locales et commit
@@ -231,8 +258,8 @@ En fait, tout est parfaitement résumé
 [ici](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
 
 * Pour faire un titre : `# Titre`
-* Pour faire un sous titre : `## Sous titre`
-* Pour faire un sous sous titre : `### Sous sous titre`
+* Pour faire un sous-titre : `## Sous titre`
+* Pour faire un sous-sous-titre : `### Sous sous titre`
 * Pour mettre en gras  : `**du gras**`
 * Pour faire une liste à puce : ̀`*`
 * Pour faire un lien : `[cette page](<url relative ou absolue>)`
