@@ -26,9 +26,9 @@ cat ~/.ssh/id_rsa.pub
 
 puis l'ajouter, par un copié/collé, dans son profil sur le site du Git via son butineur préféré.
 
-Tout cela avant de lancer la commande : `git clone git@github.com:flaf/se3-clients-linux.git` (voir ci-dessous)
+Tout cela avant de lancer la commande : `git clone git@github.com:flaf/se3-clients-linux.git` (voir ci-dessous).
 
-Ensuite, les différentes commandes de gestion se font en étant dans le répertoire se3-clients-linux (voir ci-dessous). 
+Ensuite, les différentes commandes de gestion se font en étant dans le répertoire `se3-clients-linux` (voir ci-dessous).
 
 
 ## Configuration du fichier `~/.gitconfig`
@@ -94,7 +94,7 @@ git pull
 
 **NB :** cette commande de gestion, ainsi que les autres, ne fonctionnera que si on la lance qand on se trouve dans le répertoire `se3-clients-linux`. Ne pas oublier de s'y placer (en supposant que le répertoire `se3-clients-linux` est dans le votre répertoire personnel) :
 ```sh
-cd ~/se3-clients-linux
+cd ~/se3-clients-linux/
 ```
 
 ### Vérification des modifications locales et commit
