@@ -1627,6 +1627,41 @@ function initialisation ()
         rm -fr --one-file-system "$REP_SKEL_LOCAL/.dbus"
     fi
 
+    #######################################################################################
+    # Compatibilité du paquet >= 1.1.8.2 avec des clients linux intégrés antérieurement 
+    # avec le paquet clients linux <= 1.1.8.1 
+    # On réécrit completement le nouveau fichier pam_script_auth à chaque initialisation
+    #######################################################################################
+
+echo '#! /bin/bash
+
+function est_utilisateur_local ()
+{
+    if grep -q "^$1:" "/etc/passwd"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+if est_utilisateur_local "$PAM_USER"; then
+    # On ne fait rien.
+    exit 0
+fi
+
+# Sinon, on écrit les identifiants.
+
+echo "username=$PAM_USER
+password=$PAM_AUTHTOK" > "/etc/se3/tmp/credentials_$PAM_USER"
+
+chown root:root "/etc/se3/tmp/credentials_$PAM_USER"
+chmod 700 "/etc/se3/tmp/credentials_$PAM_USER"
+
+exit 0' > "/usr/share/libpam-script/pam_script_auth"
+
+    ######################################################################
+
+    
     initialisation_perso 1> "$REP_LOG_LOCAL/1.initialisation_perso.log" 2>&1
     
     exit 0
