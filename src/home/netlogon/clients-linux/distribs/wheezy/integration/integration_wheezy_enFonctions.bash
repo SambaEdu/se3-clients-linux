@@ -832,8 +832,6 @@ chmod 700 "$REP_TMP_LOCAL"
 recuperer_nom_client()
 {
 
-}
-
 # On récupère le nom du client dans la variable NOM_CLIENT.
 if "$OPTION_NOM_CLIENT"
 then
@@ -863,6 +861,8 @@ else
     # « Vérifications sur le client ».
     NOM_CLIENT="$NOM_CLIENT_ANCIEN"
 fi
+
+}
 
 installer_paquets_client_ldap()
 {
@@ -1189,8 +1189,10 @@ permettre_connexion_comptes_locaux()
 sed -i -r -e 's/^.*pam_unix\.so.*$/account    sufficient    pam_unix.so/g' "/etc/pam.d/common-account.AVEC-LDAP"
 sed -i -r -e 's/^.*pam_unix\.so.*$/auth    sufficient    pam_unix.so/g' "/etc/pam.d/common-auth.AVEC-LDAP"
 sed -i -r -e 's/^.*pam_unix\.so.*$/session    sufficient    pam_unix.so/g' "/etc/pam.d/common-session.AVEC-LDAP"
+}
 
-modifier_fichiers_pam
+modifier_fichiers_pam()
+{
 # On modifie le fichier /etc/pam.d/gdm3  ou /etc/pam.d/lightdm afin que :
 # 1) Il fasse appel à la bibliothèque pam_script.so.
 # 2) Il y ait des « includes » des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
