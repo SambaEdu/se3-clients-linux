@@ -511,7 +511,10 @@ then
              "le script. Fin du script."
 	exit 1
 fi
+}
 
+verifier_version_debian()
+{
 # On vérifie que le système est bien Debian Wheezy.
 if [ "$NOM_DE_CODE" != "wheezy" ]
 then
@@ -1142,6 +1145,7 @@ rm -f "$debconf_parametres"
 unset -v debconf_parametres
 
 apt-get install --no-install-recommends --yes --reinstall $PAQUETS_AUTRES > $SORTIE 2>&1
+}
 
 installer_paquet_sudo()
 {
