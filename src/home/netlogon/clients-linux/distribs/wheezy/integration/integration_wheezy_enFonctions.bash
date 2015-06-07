@@ -1309,7 +1309,7 @@ uri ldap://$SE3/
 base $BASE_DN
 
 # SSL options
-ssl start_tls7777777777777
+ssl start_tls
 tls_reqcert never
 
 " > "/etc/nslcd.conf"
