@@ -53,4 +53,7 @@ exclure.
 * [Pour les impatients qui veulent tester rapidement](impatients.md)
 * [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
 
+## Annexes
+
+* [Installer un miroir local APT de cache avec apt-cacher-ng](apt-cacher-ng.md)
 
