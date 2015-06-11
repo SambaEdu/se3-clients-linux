@@ -2,7 +2,11 @@
 
 # priority=critical permet d'éviter la question sur le firmware WiFi avant le chargement du preseed. Cela complète la ligne « d-i hw-detect/load_firmware boolean false » da preseed.
 
-#Le nom de la machine et le domaine sont absents pour permettre l'utilisation du menu TFTP dans les deux modes de déploiement : Voir comment remplacer le nom mis dans le preseed par celui de la machine lors du déploiement par parc.
+# Le nom de la machine et le domaine sont absents pour permettre l'utilisation du menu TFTP dans les deux modes de déploiement : Voir comment remplacer le nom mis dans le preseed par celui de la machine lors du déploiement par parc.
+
+# paramètres pour le nom de la machine : netcfg/get_hostname=socrate
+
+# paramètres pour le nom du domaine :  netcfg/get_domain=RNE.in.ac-versailles.fr
 
 LABEL ***** ***** ***** ***** installation manuelle
 
