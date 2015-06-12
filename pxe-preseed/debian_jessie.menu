@@ -1,3 +1,15 @@
+menu Title Debian Jessie 64 bits
+
+# Decommenter la ligne ci-dessous pour interdire les modifications
+#menu INCLUDE pxelinux.cfg/graphices.conf
+
+LABEL Menu_perso
+    MENU LABEL ^Retour au menu Perso
+    KERNEL menu.c32
+    APPEND pxelinux.cfg/perso.menu
+
+LABEL =====
+
 # auto=true permet d'attendre le chargement du preseed pour configurer locale et clavier
 
 # priority=critical permet d'éviter la question sur le firmware WiFi avant le chargement du preseed. Cela complète la ligne « d-i hw-detect/load_firmware boolean false » da preseed.
