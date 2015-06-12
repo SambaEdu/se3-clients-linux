@@ -1,4 +1,4 @@
-menu Title Debian Jessie 64 bits
+menu Title Debian Jessie 64 bits et 32 bits
 
 # Decommenter la ligne ci-dessous pour interdire les modifications
 #menu INCLUDE pxelinux.cfg/graphices.conf
