@@ -1,0 +1,2 @@
+/etc/grub.d/40_custom:root:root:755
+/usr/share/polkit-1/actions/org.freedesktop.upower.policy:root:root:644
