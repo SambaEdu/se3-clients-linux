@@ -1285,8 +1285,11 @@ session-cleanup-script=$LOGON_SCRIPT_LOCAL fermeture
 " > "$LIGHTDM_CONF"
 
 ##########################################################
-# Trusty Xubuntu : on déplace le repertoire lightdm.d
-mv /etc/lightdm/lightdm.conf.d /etc/se3/save/etc/lightdm/
+# Trusty Xubuntu : on déplace le repertoire lightdm.conf.d
+if [ -d /etc/lightdm/lighdm.conf.d ]; then
+	mkdir -p /etc/se3/save/etc/lightdm
+	mv /etc/lightdm/lightdm.conf.d /etc/se3/save/etc/lightdm/
+fi
 ##########################################################
 
 
