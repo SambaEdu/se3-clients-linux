@@ -1075,10 +1075,10 @@ cp -f "${REP_SAVE_LOCAL}/etc/pam.d/lightdm" /etc/pam.d/lightdm
 sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm	
 
 cp -f "${REP_SAVE_LOCAL}/etc/pam.d/lightdm-autologin" /etc/pam.d/lightdm-autologin
-sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm-autologin	
+#sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm-autologin	
 
 cp -f "${REP_SAVE_LOCAL}/etc/pam.d/lightdm-greeter" /etc/pam.d/lightdm-greeter
-sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm-greeter
+#sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm-greeter
 
 # Inclusion des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
 sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/lightdm"
