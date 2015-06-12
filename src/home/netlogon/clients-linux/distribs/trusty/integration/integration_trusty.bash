@@ -1,9 +1,9 @@
 #! /bin/bash
 
 #--%<----%<----%<----%<----%<----%<----%<----%<----%<----%<----%<--
-SE3="172.20.1.10"
-BASE_DN="ou=lyc-demo,ou=ac-versailles,ou=education,o=gouv,c=fr"
-SERVEUR_NTP="ntp.ac-creteil.fr"
+SE3="__SE3__"
+BASE_DN="__BASE_DN__"
+SERVEUR_NTP="__SERVEUR_NTP__"
 #--%<----%<----%<----%<----%<----%<----%<----%<----%<----%<----%<--
 
 # Pour avoir des sorties les plus simples possibles, c'est-à-dire
