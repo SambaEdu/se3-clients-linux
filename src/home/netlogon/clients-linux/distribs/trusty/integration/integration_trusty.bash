@@ -1038,18 +1038,18 @@ afficher "Configuration de PAM afin que seul lightdm (la fenêtre de login)" \
 # Si des fichiers ayant pour nom "common-*.AVEC-LDAP", c'est sans
 # doute qu'il y a déjà eu tentative d'intégration, alors on supprime
 # ces fichiers.
-for f in "/etc/pam.d/common-"*".AVEC-LDAP"; do
-    [ "$f" = "/etc/pam.d/common-*.AVEC-LDAP" ] && continue
-    rm -f "$f"
-done
+#for f in "/etc/pam.d/common-"*".AVEC-LDAP"; do
+#    [ "$f" = "/etc/pam.d/common-*.AVEC-LDAP" ] && continue
+#    rm -f "$f"
+#done
 
 # On renomme les fichiers "common-*" en ajoutant l'extension « .AVEC-LDAP »
 # et on restaure sa version d'origine.
-for f in "/etc/pam.d/common-"*; do
-    [ "$f" = "/etc/pam.d/common-*" ] && continue
-    mv -f "$f" "$f.AVEC-LDAP"
-    restaurer_via_save "$f"    
-done
+#for f in "/etc/pam.d/common-"*; do
+#    [ "$f" = "/etc/pam.d/common-*" ] && continue
+#    mv -f "$f" "$f.AVEC-LDAP"
+#    restaurer_via_save "$f"    
+#done
 
 # Dans les trois fichiers common-(auth|account|session).AVEC-LDAP, on 
 # remplace, au niveau de la ligne faisant appel à pam_unix.so,
@@ -1057,33 +1057,39 @@ done
 # en cas de panne du serveur, la connexion avec les comptes locaux
 # ne soit pas ralentie pour autant (ce qui est le cas si on laisse
 # en l'état la configuration.
-sed -i -r -e 's/^.*pam_unix\.so.*$/account    sufficient    pam_unix.so/g' "/etc/pam.d/common-account.AVEC-LDAP"
-sed -i -r -e 's/^.*pam_unix\.so.*$/auth    sufficient    pam_unix.so/g' "/etc/pam.d/common-auth.AVEC-LDAP"
-sed -i -r -e 's/^.*pam_unix\.so.*$/session    sufficient    pam_unix.so/g' "/etc/pam.d/common-session.AVEC-LDAP"
+#sed -i -r -e 's/^.*pam_unix\.so.*$/account    sufficient    pam_unix.so/g' "/etc/pam.d/common-account.AVEC-LDAP"
+#sed -i -r -e 's/^.*pam_unix\.so.*$/auth    sufficient    pam_unix.so/g' "/etc/pam.d/common-auth.AVEC-LDAP"
+#sed -i -r -e 's/^.*pam_unix\.so.*$/session    sufficient    pam_unix.so/g' "/etc/pam.d/common-session.AVEC-LDAP"
 
 # On modifie le fichier /etc/pam.d/lightdm afin que :
 # 1) Il fasse appel à la bibliothèque pam_script.so.
 # 2) Il y ait des « includes » des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
-restaurer_via_save "/etc/pam.d/lightdm"
-restaurer_via_save "/etc/pam.d/lightdm-autologin"
-restaurer_via_save "/etc/pam.d/lightdm-greeter"
+#restaurer_via_save "/etc/pam.d/lightdm"
 # Insertion de la ligne « auth    optional    pam_script.so ».
 #awk '{ print $0 } /^auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
 #     "${REP_SAVE_LOCAL}/etc/pam.d/lightdm" > "/etc/pam.d/lightdm"
 
-cp -f "${REP_SAVE_LOCAL}/etc/pam.d/lightdm" /etc/pam.d/lightdm
+
+################################################################
+# Modification pour Trusty :
+# Le module pam_script.so doit être appelé uniquement 
+# dans le module pam de lightdm, avant @common-account
+
 sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm	
 
-cp -f "${REP_SAVE_LOCAL}/etc/pam.d/lightdm-autologin" /etc/pam.d/lightdm-autologin
-#sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm-autologin	
+# L'installation de pam a ajouté des appels à pam_script.so 
+# dans tous les fichiers common-*, on les met en commentaire
+sed -i '/pam_script/ s/^/#/g' 	/etc/pam.d/common-session \
+				/etc/pam.d/common-session-noninteractive \
+				/etc/pam.d/common-account \
+				/etc/pam.d/common-auth \
+				/etc/pam.d/common-password
 
-cp -f "${REP_SAVE_LOCAL}/etc/pam.d/lightdm-greeter" /etc/pam.d/lightdm-greeter
-#sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm-greeter
+# Fin de la modification pam pour Trusty
+################################################################
 
 # Inclusion des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
-sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/lightdm"
-sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/lightdm-autologin"
-sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/lightdm-greeter"
+#sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/lightdm"
 
 # Création du fichier PAM_SCRIPT_AUTH.
 echo '#! /bin/bash
@@ -1122,10 +1128,10 @@ chmod "555" "$PAM_SCRIPT_AUTH"
 # Paramétrage de gnome-screensaver utiliser quand une session
 # doit être déverrouillée (ce fichier est présent sur Ubuntu,
 # mais pas sur Xubuntu).
-if [ -f "/etc/pam.d/gnome-screensaver" ]; then
-    restaurer_via_save "/etc/pam.d/gnome-screensaver"
-    sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/gnome-screensaver"
-fi
+#if [ -f "/etc/pam.d/gnome-screensaver" ]; then
+#    restaurer_via_save "/etc/pam.d/gnome-screensaver"
+#    sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/gnome-screensaver"
+#fi
 
 # Dans le cas de Xubuntu, c'est xscreensaver qui gère le verrouillage
 # de l'écran (et l'authentification derrière).
