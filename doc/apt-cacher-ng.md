@@ -1,6 +1,6 @@
 # Mise en place d'apt-cacher-ng
 
-`/apt-cacher-ng/` est un service de proxy APT. En clair, lors de
+`apt-cacher-ng` est un service de proxy APT. En clair, lors de
 la mise à jour d'un client Linux, au lieu de récupérer les
 nouvelles versions des packages directement via les dépôts
 Debian, celui-ci va interroger le service apt-cacher-ng qui
@@ -9,28 +9,28 @@ de les stocker en local. La prochaine fois qu'un autre
 client Linux voudra effectuer la même mise à jour, il pourra
 la récupérer directement via le serveur apt-cacher-ng ce qui
 évitera de solliciter à nouveau la connexion Internet.
-`/apt-cacher-ng/` est donc une sorte de miroir local qui se
+`apt-cacher-ng` est donc une sorte de miroir local qui se
 remplit au fur et à mesure et qui évite la gestion d'un miroir local complet, d'autant plus que la pluaprt des paquest seront non utilisés.
 
-Le module `/clients-linux/` du se3 met en œuvre cette solution `/apt-cacher-ng/` et le miroir local est stocké directement dans un répertoire du serveur se3. Ce qui peut poser des problèmes de place lorsqu'on a des disques durs de petites tailles (par exemple, 2 disques de 160 Go).
+Le module `clients-linux` du se3 met en œuvre cette solution `apt-cacher-ng` et le miroir local est stocké directement dans un répertoire du serveur se3. Ce qui peut poser des problèmes de place lorsqu'on a des disques durs de petites tailles (par exemple, 2 disques de 160 Go).
 
-La solution présentée ici est d'utiliser un serveur supplémentaire qui stockera le miroir géré par `/apt-cacher-ng/` : le répertoire du serveur complémentaire contenant les données est monté dans le répertoire du se3 dédié à cette fonction.
+La solution présentée ici est d'utiliser un serveur supplémentaire qui stockera le miroir géré par `apt-cacher-ng` : le répertoire du serveur complémentaire contenant les données est monté dans le répertoire du se3 dédié à cette fonction.
 
-On pourra s'inspirer de cette solution pour stocker sur le même serveur supplémentaire `/des données de volume important/`, données utilisées par vos collègues de langues ou de techno avec des vidéos par exemple : on peut leur créer un répertoire dédié accessible via le raccourci sur le Bureau "Docs sur le réseau", à renommer bien sûr en "Ressources sur le réseau" (c'est plus clair pour tous les utilisateurs). Ce répertoire dédié aura des droits particuliers pour que seul notre collègue puisse le voir et l'utiliser ;-) → cela se fait via l'interface web du se3.
+On pourra s'inspirer de cette solution pour stocker sur le même serveur supplémentaire `des données de volume important`, données utilisées par vos collègues de langues ou de techno avec des vidéos par exemple : on peut leur créer un répertoire dédié accessible via le raccourci sur le Bureau "Docs sur le réseau", à renommer bien sûr en "Ressources sur le réseau" (c'est plus clair pour tous les utilisateurs). Ce répertoire dédié aura des droits particuliers pour que seul notre collègue puisse le voir et l'utiliser ;-) → cela se fait via l'interface web du se3.
 
 
 
-## Installer Debian/Jessie sur une machine
+## 1. Installer `Debian/Jessie` sur une machine
 
 Cette machine sera un serveur distant (alice/192.168.1.4) et un
 répertoire de cette machine, `/var/www/miroir/`, sera utilisé pour les paquets du
-miroir `/apt-cacher-ng/` géré par le se3.
+miroir `apt-cacher-ng` géré par le se3.
 
 
 
-## Sur le serveur distant alice/192.168.1.4
+## 2. Sur le serveur distant `alice/192.168.1.4`
 
-* Installer les paquets `apache2` et `nfs-cacher-ng` :
+* Installer les paquets `apache2` et `nfs-kernel-server`, ainsi que `mc` (midnight-commander) :
 ```sh
 aptitude install apache2 mc nfs-kernel-server
 ```
@@ -65,7 +65,7 @@ rpcinfo -p | grep portmap
 
 
 
-## Sur le `se3/192.168.1.3`
+## 3. Sur le serveur se3 `se3/192.168.1.3`
 
 - voir les partages distants disponibles :
 ```sh
@@ -110,7 +110,9 @@ ls -l /var/se3/apt-cacher-ng/
 
 
 
-## sur le `se3/192.168.1.3`, montage au redémarrage du se3 du répertoire distant `192.168.1.4:/var/www/miroir`
+## 4. Montage au redémarrage du se3 du répertoire distant `192.168.1.4:/var/www/miroir`
+
+**Sur le se3 `se3/192.168.1.3`**
 
 * Ajouter dans le fichier `/etc/fstab` la ligne suivante :
 ```
