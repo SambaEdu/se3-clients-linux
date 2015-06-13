@@ -110,16 +110,16 @@ ls -l /var/se3/apt-cacher-ng/
 
 
 
-## 4. Montage au redémarrage du se3 du répertoire distant `192.168.1.4:/var/www/miroir`
+## 4. Montage au redémarrage du se3 du répertoire distant
 
-**Sur le se3 `se3/192.168.1.3`**
+****
 
-* Ajouter dans le fichier `/etc/fstab` la ligne suivante :
+* Sur le se3 `se3/192.168.1.3`, ajouter dans le fichier `/etc/fstab` la ligne suivante :
 ```
 192.168.1.4:/var/www/miroir /var/se3/apt-cacher-ng nfs _netdev,noatime,defaults 0 0
 ```
 
-* Test des montages et alertes mail si nécessaire.
+* Test des montages et alertes par courriel si nécessaire.
 Un script à mettre dans `/root` du se3 : `espion_montage_alice.sh`
 (le script est donné à la fin de cet article).
 
@@ -138,11 +138,11 @@ Sur le `se3/192.168.1.3`, tâche cron au démarrage (pour mémoire), rajouter la
 @reboot mount -t nfs 192.168.1.4:/var/www/miroir /var/se3/apt-cacher-ng
 ```
 
-**NB, Autre option : utiliser autofs ? → non testée**
+* Autre option : utiliser autofs ? → non testée
 
 
 
-## Pour les futures installations par pxe/preseed
+## 5. Pour les futures installations par pxe/preseed
 
 * Dans l'interface du se3, décocher l'option de l'IP du miroir APT et supprimer les contenus des deux champs
 
@@ -150,7 +150,7 @@ Sur le `se3/192.168.1.3`, tâche cron au démarrage (pour mémoire), rajouter la
 
 
 
-## Les clients linux
+## 6. Les clients linux
 
 - sur les clients-linux, il faudra modifier les `/etc/apt/sources.list`
 en remplaçant, si on avait un miroir local, `IP_miroir/miroir` par `IP_serveur_se3:9999`
@@ -158,7 +158,7 @@ en remplaçant, si on avait un miroir local, `IP_miroir/miroir` par `IP_serveur_
 
 
 
-## Divers
+## 7. Divers
 
 - Arrêt du service sur le `se3/192.168.1.3` :
 ```sh
@@ -172,7 +172,7 @@ umount /var/se3/apt-cacher-ng
 
 
 
-## Le script `espion_montage_alice.sh`
+## 8. Le script `espion_montage_alice.sh`
 
 ```sh
 #!/bin/bash
