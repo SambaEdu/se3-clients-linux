@@ -112,8 +112,6 @@ ls -l /var/se3/apt-cacher-ng/
 
 ## 4. Montage au redémarrage du se3 du répertoire distant
 
-****
-
 * Sur le se3 `se3/192.168.1.3`, ajouter dans le fichier `/etc/fstab` la ligne suivante :
 ```
 192.168.1.4:/var/www/miroir /var/se3/apt-cacher-ng nfs _netdev,noatime,defaults 0 0
@@ -171,8 +169,9 @@ umount /var/se3/apt-cacher-ng
 ```
 
 
-
-## 8. Le script `espion_montage_alice.sh`
+****
+**Annexe**
+## Le script `espion_montage_alice.sh`
 
 ```sh
 #!/bin/bash
