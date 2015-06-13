@@ -1,6 +1,6 @@
 # Mise en place d'apt-cacher-ng
 
-apt-cacher-ng est un service de proxy APT. En clair, lors de
+`/apt-cacher-ng/` est un service de proxy APT. En clair, lors de
 la mise à jour d'un client Linux, au lieu de récupérer les
 nouvelles versions des packages directement via les dépôts
 Debian, celui-ci va interroger le service apt-cacher-ng qui
@@ -9,37 +9,53 @@ de les stocker en local. La prochaine fois qu'un autre
 client Linux voudra effectuer la même mise à jour, il pourra
 la récupérer directement via le serveur apt-cacher-ng ce qui
 évitera de solliciter à nouveau la connexion Internet.
-apt-cacher-ng est donc une sorte de miroir local qui se
-remplit au fur et à mesure.
+`/apt-cacher-ng/` est donc une sorte de miroir local qui se
+remplit au fur et à mesure et qui évite la gestion d'un miroir local complet, d'autant plus que la pluaprt des paquest seront non utilisés.
 
-## installer Debian/Jessie sur une machine
+Le module `/clients-linux/` du se3 met en œuvre cette solution `/apt-cacher-ng/` et le miroir local est stocké directement dans un répertoire du serveur se3. Ce qui peut poser des problèmes de place lorsqu'on a des disques durs de petites tailles (par exemple, 2 disques de 160 Go).
+
+La solution présentée ici est d'utiliser un serveur supplémentaire qui stockera le miroir géré par `/apt-cacher-ng/` : le répertoire du serveur complémentaire contenant les données est monté dans le répertoire du se3 dédié à cette fonction.
+
+On pourra s'inspirer de cette solution pour stocker sur le même serveur supplémentaire `/des données de volume important/`, données utilisées par vos collègues de langues ou de techno avec des vidéos par exemple : on peut leur créer un répertoire dédié accessible via le raccourci sur le Bureau "Docs sur le réseau", à renommer bien sûr en "Ressources sur le réseau" (c'est plus clair pour tous les utilisateurs). Ce répertoire dédié aura des droits particuliers pour que seul notre collègue puisse le voir et l'utiliser ;-) → cela se fait via l'interface web du se3.
+
+
+
+## Installer Debian/Jessie sur une machine
 
 Cette machine sera un serveur distant (alice/192.168.1.4) et un
-répertoire `/var/www/miroir/` sera utilisé pour les paquets du
-miroir *apt-cacher-ng* géré par le se3.
+répertoire de cette machine, `/var/www/miroir/`, sera utilisé pour les paquets du
+miroir `/apt-cacher-ng/` géré par le se3.
 
 
 
-## sur alice/192.168.1.4
+## Sur le serveur distant alice/192.168.1.4
 
-* Installer les paquets `apache2` et `nfs-cacher-ng` via
-`aptitude install apache2 mc nfs-kernel-server`.
+* Installer les paquets `apache2` et `nfs-cacher-ng` :
+```sh
+aptitude install apache2 mc nfs-kernel-server
+```
 
-* Créer un répertoire `/var/www/miroir/` via `mkdir /var/www/miroir`.
+* Créer un répertoire `/var/www/miroir/` :
+```sh
+mkdir /var/www/miroir
+```
 
 * Pour partager `/var/www/miroir/` avec le `se3/192.168.1.3`, écrire
 la ligne suivante dans `/etc/exports` :
-
 ```
 /var/www/miroir 192.168.1.3(rw,no_root_squash)
 ```
 
-* Relancer le service `nfs-kernel-server` via
-`service nfs-kernel-server restart` ou bien, plus bavard :
-`/etc/init.d/nfs-kernel-server restart`.
+* Relancer le service `nfs-kernel-server` :
+```sh
+service nfs-kernel-server restart
+```
+ ou bien, plus bavard :
+```sh
+/etc/init.d/nfs-kernel-server restart
+```
 
 * Vérifications que les services sont bien en place :
-
 ```sh
 showmount -e
 rpcinfo -p | grep nfs
@@ -48,76 +64,109 @@ rpcinfo -p | grep portmap
 ```
 
 
+
 ## Sur le `se3/192.168.1.3`
 
-- voir les partages distants disponibles : `showmount -e 192.168.1.4`;
+- voir les partages distants disponibles :
+```sh
+showmount -e 192.168.1.4
+```sh
 
-- droit root pour `/var/se3/apt-cacher-ng` avant le montage `chown -R root:root /var/se3/apt-cacher-ng`;
+- droit root pour `/var/se3/apt-cacher-ng` avant le montage :
+```sh
+chown -R root:root /var/se3/apt-cacher-ng
+```
 
-- monter le répertoire distant `mount -t nfs 192.168.1.4:/var/www/miroir /var/se3/apt-cacher-ng`;
+- monter le répertoire distant :
+```sh
+mount -t nfs 192.168.1.4:/var/www/miroir /var/se3/apt-cacher-ng
+```
 
-- droits apt-cacher-ng après le montage `chown -R apt-cacher-ng:apt-cacher-ng /var/se3/apt-cacher-ng`;
+- droits apt-cacher-ng après le montage :
+```sh
+chown -R apt-cacher-ng:apt-cacher-ng /var/se3/apt-cacher-ng
+```
 
-- relancer le service apt-cacher-ng `service apt-cacher-ng restart`;
+- relancer le service apt-cacher-ng :
+```sh
+service apt-cacher-ng restart
+```
 
-- vérifications du montage avec `mount`;
+- vérifications du montage :
+```sh
+mount
+```
 
 - vérifications des droits : les droits en cas de montage (apt-cacher-ng) ou
-démontage (root) `ls -l /var/se3/apt-cacher-ng/`.
+démontage (root) :
+```sh
+ls -l /var/se3/apt-cacher-ng/
+```
 
 - vérification que le service est opérationnel:
-  - sur un client, changer le `sources.list` pour mettre `192.168.1.3:9999`
+  - sur un client, changer le `/etc/apt/sources.list` pour mettre `192.168.1.3:9999`
   - sur ce client, lancer un `aptitude update` puis un `aptitude safe-upgrade`
   - le répertoire `/var/www/miroir` de `alice/192.168.1.4` doit se remplir.
 
 
+
 ## sur le `se3/192.168.1.3`, montage au redémarrage du se3 du répertoire distant `192.168.1.4:/var/www/miroir`
 
-Ajouter dans le fichier `/etc/fstab` la ligne suivante :
-
+* Ajouter dans le fichier `/etc/fstab` la ligne suivante :
 ```
 192.168.1.4:/var/www/miroir /var/se3/apt-cacher-ng nfs _netdev,noatime,defaults 0 0
 ```
-
-Sur le `se3/192.168.1.3`, tâche cron au démarrage (pour mémoire) :
-
-```
-@reboot mount -t nfs 192.168.1.4:/var/www/miroir /var/se3/apt-cacher-ng
-```
-
-**Autre option : utiliser autofs ?**
 
 * Test des montages et alertes mail si nécessaire.
 Un script à mettre dans `/root` du se3 : `espion_montage_alice.sh`
 (le script est donné à la fin de cet article).
 
-* À mettre dans le crontab pour un lancement tous les jours à 8h02 :
-`crontab -e` puis ajouter la ligne :
-
+À mettre dans le crontab pour un lancement tous les jours à 8h02 :
+```sh
+crontab -e
+```
+ajouter la ligne :
 ```
 02 08 * * * bash espion_montage_alice.sh
 ```
 
+* Autre solution, non testée :
+Sur le `se3/192.168.1.3`, tâche cron au démarrage (pour mémoire), rajouter la ligne suivante à la cron-table :
+```
+@reboot mount -t nfs 192.168.1.4:/var/www/miroir /var/se3/apt-cacher-ng
+```
+
+**NB, Autre option : utiliser autofs ? → non testée**
+
+
 
 ## Pour les futures installations par pxe/preseed
 
-* Dans l'interface du se3, décocher l'option de l'IP du miroir APT et supprimer les contenus des deux champs;
+* Dans l'interface du se3, décocher l'option de l'IP du miroir APT et supprimer les contenus des deux champs
+
 * modifier les fichier preseed.
+
 
 
 ## Les clients linux
 
-- sur les clients-linux, il faudra modifier les `sources.list`
-en remplaçant `IP_miroir/miroir` par `IP_serveur_se3:9999`
+- sur les clients-linux, il faudra modifier les `/etc/apt/sources.list`
+en remplaçant, si on avait un miroir local, `IP_miroir/miroir` par `IP_serveur_se3:9999`
 (par exemple en passant par un script unefois).
+
 
 
 ## Divers
 
-- Arrêt du service sur le `se3/192.168.1.3` : `service apt-cacher-ng stop`.
+- Arrêt du service sur le `se3/192.168.1.3` :
+```sh
+service apt-cacher-ng stop
+```
 
-- Pour démonter le partage sur le `se3/192.168.1.3` : `umount /var/se3/apt-cacher-ng`.
-
+- Pour démonter le partage sur le `se3/192.168.1.3` :
+```sh
+umount /var/se3/apt-cacher-ng
+```
 
 
 
