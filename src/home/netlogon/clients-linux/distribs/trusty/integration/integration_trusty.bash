@@ -1285,15 +1285,25 @@ NTPOPTIONS=\"\"
 # 		n'est pas présent sous Ubuntu, Xubuntu, Lubuntu.
 #               Créer le fichier /etc/lightdm/lightdm.conf permet de passer outre la configuration 
 #		par défaut d'Ubuntu, Xubuntu et Lubuntu.
-#               Nous allons donc créer un unique fichier de configuration de lightdm.conf 
-#		qui sera valable pour les trois versions d'Ubuntu.
+#               Le fichier lightdm.conf est identique pour Xubuntu et Lubuntu
+#		Une légère différence pour Ubuntu.
+
+FLAVOR=$(uname -a | cut -d ' ' -f 2)
+if [ "$FLAVOR" = "ubuntu" ]			# On est sous Ubuntu
+then
+	PARAM_USER_SESSION=ubuntu
+	PARAM_GREETER_SESSION=false
+else						# On est sous Xubuntu ou Lubuntu
+	PARAM_USER_SESSION=default
+	PARAM_GREETER_SESSION=true
+fi
 
 echo "
 [SeatDefaults]
-user-session=default						# Choisi la session par défaut : ubuntu, xubuntu ou lubuntu selon la version
-greeter-show-manual-login=true					# Pour obtenir une invite de saisie pour les identifiants
-greeter-hide-users=true						# Cacher la liste des utilisateurs du système.
-allow-guest=false						# Ne pas permettre la connexion en mode invité
+user-session=$PARAM_USER_SESSION
+greeter-show-manual-login=$PARAM_GREETER_SESSION
+greeter-hide-users=true
+allow-guest=false
 greeter-setup-script=$LOGON_SCRIPT_LOCAL initialisation
 session-setup-script=$LOGON_SCRIPT_LOCAL ouverture
 session-cleanup-script=$LOGON_SCRIPT_LOCAL fermeture
