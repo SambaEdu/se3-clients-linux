@@ -1304,7 +1304,10 @@ session-cleanup-script=$LOGON_SCRIPT_LOCAL fermeture
 #		      on le force au démarrage à l'aide de la commande setxkbmap fr
 ########################################################################################
 
-echo '@setxkbmap fr' > /etc/xdg/lxsession/Lubuntu/autostart
+if [ -f "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]  # On est sous Lubuntu ...
+then
+	echo '@setxkbmap fr' > /etc/xdg/lxsession/Lubuntu/autostart
+fi
 
 # Fin de la modif pour Trusty
 ########################################################################################################
