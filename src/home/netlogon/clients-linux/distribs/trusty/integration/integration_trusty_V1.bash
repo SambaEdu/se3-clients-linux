@@ -1077,7 +1077,7 @@ afficher "Configuration de PAM afin que seul lightdm (la fenêtre de login)" \
 
 sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm	
 
-# L'installation de libpam-script a ajouté des appels à pam_script.so 
+# L'installation de pam a ajouté des appels à pam_script.so 
 # dans tous les fichiers common-*, on les met en commentaire
 sed -i '/pam_script/ s/^/#/g' 	/etc/pam.d/common-session \
 				/etc/pam.d/common-session-noninteractive \
@@ -1280,34 +1280,34 @@ NTPOPTIONS=\"\"
 # PARAM_GREETER_SESSION et PARAM_USER_SESSION qui ont été
 # définies lors de la phase de vérification du client.
 
-#######################################################################################################
-# Sous Trusty : par défaut, le fichier de configuration de lightdm /etc/lightdm/lightdm.conf
-# 		n'est pas présent sous Ubuntu, Xubuntu, Lubuntu.
-#               Créer le fichier /etc/lightdm/lightdm.conf permet de passer outre la configuration 
-#		par défaut d'Ubuntu, Xubuntu et Lubuntu.
-#               Nous allons donc créer un unique fichier de configuration de lightdm.conf 
-#		qui sera valable pour les trois versions d'Ubuntu.
+if [ -e /etc/lightdm/lightdm.conf.d/10-xubuntu.conf ]; then
+	PARAM_USER_SESSION=xubuntu
+	PARAM_GREETER_HIDE_USER=false
+else
+	PARAM_USER_SESSION=ubuntu
+	PARAM_GREETER_HIDE_USER=true
+fi
 
 echo "
 [SeatDefaults]
-user-session=default						# Choisi la session par défaut : ubuntu, xubuntu ou lubuntu selon la version
-greeter-show-manual-login=true					# Pour obtenir une invite de saisie pour les identifiants
-greeter-hide-users=true						# Cacher la liste des utilisateurs du système.
-allow-guest=false						# Ne pas permettre la connexion en mode invité
+#greeter-session=$PARAM_GREETER_SESSION
+user-session=$PARAM_USER_SESSION
+#user-session=default
+greeter-show-manual-login=true
+greeter-hide-users=$PARAM_GREETER_HIDE_USER
+greeter-allow-guest=false
 greeter-setup-script=$LOGON_SCRIPT_LOCAL initialisation
 session-setup-script=$LOGON_SCRIPT_LOCAL ouverture
 session-cleanup-script=$LOGON_SCRIPT_LOCAL fermeture
 " > "$LIGHTDM_CONF"
 
-#######################################################################################
-# Bug sous Lubuntu :  le clavier n'est pas par défaut en fr, 
-#		      on le force au démarrage à l'aide de la commande setxkbmap fr
-########################################################################################
-
-echo '@setxkbmap fr' > /etc/xdg/lxsession/Lubuntu/autostart
-
-# Fin de la modif pour Trusty
-########################################################################################################
+##########################################################
+# Trusty Xubuntu : on déplace le repertoire lightdm.conf.d
+if [ -d /etc/lightdm/lighdm.conf.d ]; then
+	mkdir -p /etc/se3/save/etc/lightdm
+	mv /etc/lightdm/lightdm.conf.d /etc/se3/save/etc/lightdm/
+fi
+##########################################################
 
 
 ###############################
