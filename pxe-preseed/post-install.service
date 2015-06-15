@@ -1,0 +1,12 @@
+[Unit]
+Description=Post installation Jessie
+After=tlp-init.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/root/post-install/post-install_debian_jessie.sh
+
+[Install]
+WantedBy=rescue.target
+

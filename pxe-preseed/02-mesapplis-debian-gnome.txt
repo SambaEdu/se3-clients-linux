@@ -1,0 +1,6 @@
+nautilus-image-converter
+nautilus-open-terminal
+gnome-shell-extension-suspend-button
+synaptic
+gdebi
+gksu
