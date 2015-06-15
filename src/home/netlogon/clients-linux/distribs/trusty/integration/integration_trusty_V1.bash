@@ -1069,7 +1069,24 @@ afficher "Configuration de PAM afin que seul lightdm (la fenêtre de login)" \
 #awk '{ print $0 } /^auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
 #     "${REP_SAVE_LOCAL}/etc/pam.d/lightdm" > "/etc/pam.d/lightdm"
 
+
+################################################################
+# Modification pour Trusty :
+# Le module pam_script.so doit être appelé uniquement 
+# dans le module pam de lightdm, avant @common-account
+
 sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm	
+
+# L'installation de pam a ajouté des appels à pam_script.so 
+# dans tous les fichiers common-*, on les met en commentaire
+sed -i '/pam_script/ s/^/#/g' 	/etc/pam.d/common-session \
+				/etc/pam.d/common-session-noninteractive \
+				/etc/pam.d/common-account \
+				/etc/pam.d/common-auth \
+				/etc/pam.d/common-password
+
+# Fin de la modification pam pour Trusty
+################################################################
 
 # Inclusion des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
 #sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/lightdm"
