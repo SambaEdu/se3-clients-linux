@@ -70,7 +70,7 @@ rpcinfo -p | grep portmap
 - voir les partages distants disponibles :
 ```sh
 showmount -e 192.168.1.4
-```sh
+```
 
 - droit root pour `/var/se3/apt-cacher-ng` avant le montage :
 ```sh
