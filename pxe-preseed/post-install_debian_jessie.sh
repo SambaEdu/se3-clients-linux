@@ -5,9 +5,12 @@
 #
 # 
 # lastupdate 5-06-2014
+
+# Récupération du DM installé et arrêt
 gdm="$(cat /etc/X11/default-display-manager | cut -d / -f 4)"
 service $gdm stop
 
+# Quel environnement est installé
 testenv=`aptitude search task-lxde-desktop | grep ^i`
 if [ -n $testenv ]; then
     $envbureau="lxde"
@@ -28,7 +31,7 @@ fi
 POST="/root/post-install"
 wget -O $POST/params.sh http://192.168.98.5/install/params.sh
 wget -O $POST/01-mesapplis-debian.txt http://192.168.98.5/install/01-mesapplis-debian.txt
-wget -O $POST/02-mesapplis-debian-lxde.txt http://192.168.98.5/install/02-mesapplis-debian-$envbureau.txt
+wget -O $POST/02-mesapplis-debian-${envbureau}.txt http://192.168.98.5/install/02-mesapplis-debian-${envbureau}.txt
 wget -O $POST/03-mesapplis-perso.txt http://192.168.98.5/install/03-mesapplis-perso.txt
 wget -O $POST/bashrc http://192.168.98.5/install/bashrc
 
@@ -74,7 +77,8 @@ echo "Post Configuration du poste"
 echo "--------------------------------------------------------------------------------"
 echo -e "$neutre"
 echo "Appuyez sur Entree pour continuer"
-#read -t 20 dummy
+read p
+#-t 20 dummy
 
 
 
@@ -105,6 +109,7 @@ else
 	echo "IP SE3 non trouvee???" | tee -a $compte_rendu
 fi
 sleep 5
+cd /root
 
 if [ -n "$ip_proxy" -a -n "$port_proxy" ]; then
 	echo "Config proxy..." | tee -a $compte_rendu
@@ -168,6 +173,7 @@ if [ -n "${ip_se3}" ]; then
 		echo "Le poste ne pourra pas être intégré au domaine" | tee -a $compte_rendu 
 		ISCRIPT="erreur"
 	fi
+	cd /root
 fi
 
 
@@ -249,7 +255,7 @@ hostname=$nom_machine.$nom_domaine
 sleep 2
 
 
-if [ $ISCRIPT != "erreur" ]; then
+if [ "$ISCRIPT" != "erreur" ]; then
 	echo -e "${jaune}"
 	echo -e "==========================================="
 	echo -e "Intégration au domaine SE3"
@@ -280,12 +286,15 @@ apt-get -q update
 # aptitude -y full-upgrade
 apt-get install -y tofrodos
 
-APPLIS=`ls $POST/*.txt `
+cd $POST
+APPLIS=`ls *.txt `
+echo $APPLIS
 for ap in $APPLIS
 do
     fromdos $ap
+    echo $ap
     echo "Installation des paquets définis dans $ap"
-
+    read p
     for i in $(cat $ap)
     do
 	#installation des paquets
@@ -311,9 +320,17 @@ do
 done
 echo -e "${jaune}"
 echo -e "==========================================="
-echo -e "Fin de l'installation des paquets mesapplis-debian"
+echo -e "Fin de l'installation des paquets applis-debian"
 echo -e "===========================================${neutre}"
 
+# On force l'usage de lightdm
+echo "On force l'usage de lightdm"
+testdm=`cat /etc/X11/default-display-manager | grep lightdm`
+if [ -n $testdm ]; then
+    aptitude install lightdm
+    echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager
+fi
+read p
 
 if [ "$rep" != "n" ]; then
 	./integration_jessie.bash --nom-client="$nom_machine" --is --ivl | tee -a $compte_rendu 
@@ -347,9 +364,6 @@ fi
 # if [ -n "$nom_machine" -a -n "$email" ]; then
 # 	cat /root/firstboot.txt|mail -s "[$nom_se3.$nom_domaine]: Post-install $nom_machine" $email
 # fi
-
-aptitude install lightdm
-update-rc.d lightdm defaults
 
 mv $POST/post-install_debian_jessie.sh $POST/post-install_debian_jessie.sh.$ladate
 
