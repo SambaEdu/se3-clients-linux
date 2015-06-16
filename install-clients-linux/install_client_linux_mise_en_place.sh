@@ -385,6 +385,13 @@ sed -i -r '/initialisation_perso[[:space:]]*\(\)/,/^\}/s/^([[:space:]]*)true/\1a
 # 	mv /home/netlogon/clients-linux/distribs/wheezy/skel/.mozilla /home/netlogon/clients-linux/distribs/wheezy/skel/mozilla-save-$LADATE
 # fi
 
+##
+if [ -e $src/update-mozilla-profile ]; then
+	rm -rf /home/netlogon/clients-linux/distribs/wheezy/skel/.mozilla
+	echo  "modif install_client_linux_archive - $LADATE" > /home/netlogon/clients-linux/distribs/wheezy/skel/.VERSION
+fi
+
+
 [ ! -e /home/netlogon/clients-linux/distribs/wheezy/skel/.config ] && cp -r $src/.config /home/netlogon/clients-linux/distribs/wheezy/skel/
 [ ! -e /home/netlogon/clients-linux/distribs/wheezy/skel/.mozilla ]&& cp -r $src/.mozilla /home/netlogon/clients-linux/distribs/wheezy/skel/
  
