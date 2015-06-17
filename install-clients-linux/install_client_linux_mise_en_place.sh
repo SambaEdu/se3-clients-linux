@@ -203,7 +203,13 @@ rm -f /root/pxelinux.0 /root/pxelinux.cfg /root/version.info
 
 
 cp $src/post-install* $src/preseed*.cfg $src/mesapplis*.txt $src/bashrc $src/inittab $src/tty1.conf /var/remote_adm/.ssh/id_rsa.pub /var/www/install/
-chmod 755 /var/www/install/preseed* /var/www/install/post-install_debian_wheezy.sh
+chmod 755 /var/www/install/preseed* /var/www/install/post-install_debian_wheezy.sh /var/www/install/post-install_ubuntu.sh
+
+if [ -e "/home/netlogon/clients-linux/distribs/trusty/integration/integration_trusty.bash" ]; then
+	rm -f /var/www/install/integration_trusty.bash
+	ln /home/netlogon/clients-linux/distribs/trusty/integration/integration_trusty.bash /var/www/install/
+	chmod 755 /var/www/install/integration_trusty.bash
+fi
 
 if [ -e "/home/netlogon/clients-linux/distribs/wheezy/integration/integration_wheezy.bash" ]; then
 	rm -f /var/www/install/integration_wheezy.bash
