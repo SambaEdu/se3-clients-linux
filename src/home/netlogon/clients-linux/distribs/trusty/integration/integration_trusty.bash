@@ -1301,7 +1301,7 @@ else
 	PARAM_GREETER_SESSION=true
 fi
 
-if [ "FLAVOR" = "lubuntu" ]
+if [ "$FLAVOR" = "lubuntu" ]
 else
 	PARAM_USER_SESSION=lubuntu
 	PARAM_GREETER_SESSION=true
