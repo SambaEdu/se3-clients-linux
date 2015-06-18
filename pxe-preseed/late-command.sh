@@ -7,7 +7,6 @@
 mkdir /target/root/post-install
 wget -O /target/root/post-install/post-install_debian_jessie.sh http://192.168.98.5/install/post-install_debian_jessie.sh
 chmod u+x /target/root/post-install/post-install_debian_jessie.sh
-wget -O /target/root/post-install/02-mesapplis-debian-lxde.txt http://192.168.98.5/install/02-mesapplis-debian-lxde.txt
 
 #Désactivation des DM
 #systemctl disable gdm3.service
