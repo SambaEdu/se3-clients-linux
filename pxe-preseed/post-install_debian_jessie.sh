@@ -400,7 +400,7 @@ apt-get remove -y xscreensaver
 
 
 # modif inittab
-sed 's|1:2345:respawn:/bin/login -f root tty1 </dev/tty1 >/dev/tty1 2>\&1|1:2345:respawn:/sbin/getty 38400 tty1|' -i /etc/inittab
+#sed 's|1:2345:respawn:/bin/login -f root tty1 </dev/tty1 >/dev/tty1 2>\&1|1:2345:respawn:/sbin/getty 38400 tty1|' -i /etc/inittab
 
 # Remise en place gdm3
 #update-rc.d gdm3 defaults
