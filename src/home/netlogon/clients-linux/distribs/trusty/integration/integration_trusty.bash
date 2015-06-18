@@ -1296,13 +1296,13 @@ then
 fi
 
 if [ "$FLAVOR" = "xubuntu" ]
-else
+then
 	PARAM_USER_SESSION=xubuntu
 	PARAM_GREETER_SESSION=true
 fi
 
 if [ "$FLAVOR" = "lubuntu" ]
-else
+then
 	PARAM_USER_SESSION=lubuntu
 	PARAM_GREETER_SESSION=true
 fi
