@@ -2,7 +2,8 @@
 
 ## Installation
 
-Installation du minimum pour faire du git en ligne de commandes :
+Installation du minimum pour faire du git en ligne de
+commandes :
 
 ```sh
 apt-get update
@@ -11,24 +12,30 @@ apt-get install openssl ca-certificates git
 
 ## Mise en place de sa clé publique/privé d'accès
 
-Pour ne pas avoir à se connecter/déconnecter à chaque fois, on peut utiliser un jeu de clé publique/privé. Voici comment les mettre en place :
+Pour ne pas avoir à se connecter/déconnecter à chaque fois,
+on peut utiliser un jeu de clés publique/privée. Voici comment
+les mettre en place :
 
-les créer :
+Les créer :
+
 ```sh
 ssh-keygen -t rsa
 ```
+
 On vous pose des questions : `Entrée` 3 fois
 
 Afficher la clé publique :
+
 ```sh
 cat ~/.ssh/id_rsa.pub
 ```
 
-puis l'ajouter, par un copié/collé, dans son profil sur le site du Git via son butineur préféré.
-
-Tout cela avant de lancer la commande : `git clone git@github.com:flaf/se3-clients-linux.git` (voir ci-dessous).
-
-Ensuite, les différentes commandes de gestion se font en étant dans le répertoire `se3-clients-linux` (voir ci-dessous).
+Puis l'ajouter, par un copier/coller, dans son profil sur le
+site du Git via son butineur préféré. Tout cela avant de lancer
+la commande `git clone git@github.com:flaf/se3-clients-linux.git`
+(voir ci-dessous). Ensuite, les différentes commandes de gestion
+se font en étant dans le répertoire `se3-clients-linux` (voir
+ci-dessous).
 
 
 ## Configuration du fichier `~/.gitconfig`
@@ -94,7 +101,12 @@ permet d'avoir un dépôt local à jour par rapport au dépôt distant
 git pull
 ```
 
-**NB :** cette commande de gestion, ainsi que les autres, ne fonctionnera que si on la lance qand on se trouve dans le répertoire `se3-clients-linux`. Ne pas oublier de s'y placer (en supposant que le répertoire `se3-clients-linux` est dans le votre répertoire personnel) :
+**NB :** cette commande de gestion, ainsi que les autres, ne
+fonctionnera que si on la lance quand on se trouve dans le
+répertoire local `se3-clients-linux`. Ne pas oublier de s'y
+placer. En supposant que le répertoire `se3-clients-linux`
+est dans le votre répertoire personnel, cela donnerait :
+
 ```sh
 cd ~/se3-clients-linux/
 ```
