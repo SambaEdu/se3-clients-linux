@@ -1289,12 +1289,21 @@ NTPOPTIONS=\"\"
 #		Une légère différence pour Ubuntu.
 
 FLAVOR=$(uname -a | cut -d ' ' -f 2)
-if [ "$FLAVOR" = "ubuntu" ]			# On est sous Ubuntu
+if [ "$FLAVOR" = "ubuntu" ]
 then
 	PARAM_USER_SESSION=ubuntu
 	PARAM_GREETER_SESSION=false
-else						# On est sous Xubuntu ou Lubuntu
-	PARAM_USER_SESSION=default
+fi
+
+if [ "$FLAVOR" = "xubuntu" ]
+else
+	PARAM_USER_SESSION=xubuntu
+	PARAM_GREETER_SESSION=true
+fi
+
+if [ "FLAVOR" = "lubuntu" ]
+else
+	PARAM_USER_SESSION=lubuntu
 	PARAM_GREETER_SESSION=true
 fi
 
