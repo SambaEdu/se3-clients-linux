@@ -1329,6 +1329,18 @@ fi
 ###############################
 ###############################
 
+##########################################################
+## Trusty : desactivation de apport
+# Cette fenetre de signalement de problème logiciel peut être 
+# génante en s'affichant de façon récurrente alors que le problème 
+# est minime (voir inexistant) ou a été supprimé
+##########################################################
+
+echo 'enabled=0' > /etc/default/apport
+
+# Fin de la modification pour Trusty
+##########################################################
+
 ###########################################################
 ### Modification du fichier /etc/xdg/user-dirs.defaults ###
 ###########################################################
