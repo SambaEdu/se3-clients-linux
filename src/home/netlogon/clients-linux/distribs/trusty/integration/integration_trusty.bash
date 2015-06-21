@@ -1289,10 +1289,12 @@ NTPOPTIONS=\"\"
 #		Une légère différence pour Ubuntu.
 
 if [ -e "/etc/lightdm/lightdm.conf.d/10-xubuntu.conf" ]
+then
 	PARAM_USER_SESSION=xubuntu
 	PARAM_GREETER_SESSION=true
 else
 	if [ -e "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]
+	then
 		PARAM_USER_SESSION=lubuntu
 		PARAM_GREETER_SESSION=true
 	else
