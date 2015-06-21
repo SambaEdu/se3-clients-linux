@@ -1288,23 +1288,17 @@ NTPOPTIONS=\"\"
 #               Le fichier lightdm.conf est identique pour Xubuntu et Lubuntu
 #		Une légère différence pour Ubuntu.
 
-FLAVOR=$(uname -a | cut -d ' ' -f 2)
-if [ "$FLAVOR" = "ubuntu" ]
-then
-	PARAM_USER_SESSION=ubuntu
-	PARAM_GREETER_SESSION=false
-fi
-
-if [ "$FLAVOR" = "xubuntu" ]
-then
+if [ -e "/etc/lightdm/lightdm.conf.d/10-xubuntu.conf" ]
 	PARAM_USER_SESSION=xubuntu
 	PARAM_GREETER_SESSION=true
-fi
-
-if [ "$FLAVOR" = "lubuntu" ]
-then
-	PARAM_USER_SESSION=lubuntu
-	PARAM_GREETER_SESSION=true
+else
+	if [ -e "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]
+		PARAM_USER_SESSION=lubuntu
+		PARAM_GREETER_SESSION=true
+	else
+		PARAM_USER_SESSION=ubuntu
+		PARAM_GREETER_SESSION=false
+	fi
 fi
 
 echo "
@@ -1323,7 +1317,7 @@ session-cleanup-script=$LOGON_SCRIPT_LOCAL fermeture
 #		      on le force au démarrage à l'aide de la commande setxkbmap fr
 ########################################################################################
 
-if [ "$FLAVOR" = "lubuntu" ]
+if [ -e "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]
 then
 	echo '@setxkbmap fr' > /etc/xdg/lxsession/Lubuntu/autostart
 fi
