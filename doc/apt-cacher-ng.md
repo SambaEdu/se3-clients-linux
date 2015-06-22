@@ -100,7 +100,7 @@ mount
 - vérifications des droits : les droits en cas de montage (apt-cacher-ng) ou
 démontage (root) :
 ```sh
-ls -l /var/se3/apt-cacher-ng/
+ls -l /var/se3/apt-cacher-ng/ | grep apt-cacher-ng
 ```
 
 - vérification que le service est opérationnel:

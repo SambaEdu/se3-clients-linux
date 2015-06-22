@@ -1,14 +1,18 @@
 #!/bin/bash
 
-
-# lastupdate 20150603
+#####
+# lastupdate 20150622
+#
 
 LADATE=$(date +%Y%m%d%H%M%S)
 
+#####
 # quelques couleurs ;-)
+#
 rouge='\e[0;31m'
 rose='\e[1;31m'
 COLTITRE='\e[0;33m'
+orange='\e[0;33m'
 jaune='\e[1;33m'
 vert='\e[0;32m'
 bleu='\e[1;34m'
@@ -20,6 +24,33 @@ src="$(pwd)"
 # répertoire install et lien
 repinstall="/home/netlogon/clients-linux/install"
 replink="/var/www/install"
+
+#####
+# version des systèmes
+# les autres seront effacés
+#
+version_debian="jessie"
+version_ubuntu="trusty"
+
+#####
+# options des systèmes
+# utiles pour récupérer un paramètre de l'interface web du se3'
+#
+option_debian="oui"
+option_ubuntu="oui"
+
+#####
+# url des dépôts
+#
+url_debian="ftp.fr.debian.org/debian"
+url_ubuntu="archive.ubuntu.com/ubuntu"
+
+#####
+# variables
+#
+rep_tftp="tftpboot"
+rep_temporaire="root/temp-linux"
+
 
 #=====
 # Les fonctions
@@ -75,7 +106,8 @@ recuperer_variables_se3()
 
 # Lire la valeur de MIROIR_LOCAL et MIROIR_IP et CHEMIN_MIROIR dans la base MySQL ?
 MIROIR_LOCAL=$(echo "SELECT value FROM params WHERE name='MiroirAptCliLin';"|mysql -N $dbname -u$dbuser -p$dbpass)
-if [ "$MIROIR_LOCAL" = "yes" ]; then
+if [ "$MIROIR_LOCAL" = "yes" ]
+then
 	MIROIR_IP=$(echo "SELECT value FROM params WHERE name='MiroirAptCliLinIP';"|mysql -N $dbname -u$dbuser -p$dbpass)
 	CHEMIN_MIROIR=$(echo "SELECT value FROM params WHERE name='MiroirAptCliLinChem';"|mysql -N $dbname -u$dbuser -p$dbpass)
 fi
@@ -151,7 +183,7 @@ mise_en_place_tftpboot()
 t=$(grep "Installation Debian" /tftpboot/tftp_modeles_pxelinux.cfg/menu/install.menu)
 if [ -z "$t" ]
 then
-  echo "   LABEL Installation Debian wheezy
+	echo "   LABEL Installation Debian wheezy
     MENU LABEL ^Installation Debian
     KERNEL menu.c32
     APPEND pxelinux.cfg/inst_wheezy.cfg
@@ -194,8 +226,166 @@ fi
 cp $src/inst_wheezy.cfg $src/inst_buntu.cfg /tftpboot/pxelinux.cfg/
 }
 
+repertoire_temporaire()
+{
+# on se met dans un répertoire temporaire
+echo -e "${vert}Début de la mise en place ou de la mise à jour des fichiers netboot pour Debian/$version_debian et/ou Ubuntu/$version_ubuntu"
+echo -e "    * ce script concerne Debian/$version_debian et/ou Ubuntu/$version_ubuntu"
+echo -e "    * les versions précédentes seront supprimées"
+echo -e "${neutre}"
+sleep 1s
+[ ! -e /$rep_temporaire ] && mkdir /$rep_temporaire
+cd /$rep_temporaire
+}
+
+recuperer_somme_controle_depot()
+{
+# 2 arguments :
+# $1 → debian ou ubuntu
+# $2 → i386 ou amd64
+#
+# on télécharge MD5SUMS
+eval url_dists='$'url_$1
+eval version='$'version_$1
+wget http://$url_dists/dists/$version/main/installer-$2/current/images/MD5SUMS
+if [ $? = "0" ]
+then
+	# on récupère la somme de contrôle concernant les fichiers linux et initrd.gz
+	eval somme_initrd_depot_${version}_$2=$(cat MD5SUMS | grep "./netboot/${1}-installer/$2/initrd.gz" | cut -f1 -d" ")
+	eval somme_linux_depot_${version}_$2=$(cat MD5SUMS | grep "./netboot/${1}-installer/$2/linux" | cut -f1 -d" ")
+	# on supprime le fichier récupéré
+	rm -f MD5SUMS
+else
+	echo -e "${rouge}échec de la récupération de MD5SUMS $1 $2${neutre}"
+	sleep 2s
+fi
+}
+
+calculer_somme_controle_se3()
+{
+# 2 arguments :
+# $1 → debian ou ubuntu
+# $2 → i386 ou amd64
+#
+eval version='$'version_$1
+if [ -e /$rep_tftp/${1}-installer/$2/linux ] && [ -e /$rep_tftp/${1}-installer/$2/initrd.gz ]
+then
+	mise="mise à jour"
+	# on calcule la somme de contrôle des fichiers linux et initrd.gz en place
+	eval somme_initrd_se3_${version}_$2=$(md5sum /$rep_tftp/${1}-installer/$2/initrd.gz | cut -f1 -d" ")
+	eval somme_linux_se3_${version}_$2=$(md5sum /$rep_tftp/${1}-installer/$2/linux | cut -f1 -d" ")
+else
+	# il manque un fichier : on remettra $1-installer en place
+	mise="mise en place"
+	eval somme_initrd_se3_${version}_$2=""
+	eval somme_linux_se3_${version}_$2=""
+fi
+}
+
+supprimer_fichiers()
+{
+# 2 arguments :
+# $1 → debian ou ubuntu
+# $2 → i386 ou amd64
+#
+if [ -e /$rep_tftp/${1}-installer/$2 ]
+then
+	# on supprime le répertoire en place
+	find /$rep_tftp/${1}-installer/$2/ -delete
+fi
+}
+
+telecharger_archives()
+{
+# 2 arguments :
+# $1 → debian ou ubuntu
+# $2 → i386 ou amd64
+#
+# téléchargement des archives debian/ubuntu 32 bits/64 bits
+eval url_dists='$'url_$1
+eval version='$'version_$1
+wget http://$url_dists/dists/$version/main/installer-$2/current/images/netboot/netboot.tar.gz -O netboot_${version}_${2}.tar.gz
+}
+
+extraire_archives()
+{
+# 2 arguments :
+# $1 → debian ou ubuntu
+# $2 → i386 ou amd64
+#
+# extraction des archives
+eval version='$'version_$1
+tar -xzf netboot_${version}_${2}.tar.gz
+}
+
+mise_en_place_pxe()
+{
+# 2 arguments :
+# $1 → debian ou ubuntu
+# $2 → i386 ou amd64
+#
+if [ ! -e /$rep_tftp/${1}-installer ]
+then
+	# le répertoire /tftpboot/$1-installer n'étant pas en place, il faut le créer
+	echo -e "${vert}on crée le répertoire /$rep_tftp/${1}-installer${neutre}"
+	echo -e ""
+	mkdir -p /$rep_tftp/${1}-installer
+fi
+# on déplace le répertoire $2 de $1-installer vers /tftpboot/$1-installer/
+mv ${1}-installer/$2/ /$rep_tftp/${1}-installer/
+}
+
+mettre_se3_archives()
+{
+# 2 arguments :
+# $1 → debian ou ubuntu
+# $2 → i386 ou amd64
+#
+# si les 2 sommes sont différentes, on supprime les anciens fichiers et on télécharge la nouvelle archive
+eval version='$'version_$1
+eval a='$'somme_initrd_se3_${version}_$2
+eval b='$'somme_initrd_depot_${version}_$2
+eval c='$'somme_linux_se3_${version}_$2
+eval d='$'somme_linux_depot_${version}_$2
+if [ "$a" != "$b" -o "$c" != "$d" ]
+then
+	supprimer_fichiers $1 $2
+	echo -e "${vert}téléchargement de l'archive netboot.tar.gz pour $1 $version $2${neutre}"
+	telecharger_archives $1 $2
+	if [ $? = "0" ]
+	then
+		echo -e "${vert}extraction des fichiers netboot $1 $version $2${neutre}"
+		extraire_archives $1 $2
+		echo -e "${vert}mise en place des fichiers netboot $1 $version $2${neutre}"
+		mise_en_place_pxe $1 $2
+		echo -e ""
+	else
+		echo -e "${rouge}échec de la récupération de l'archive netboot.tar.gz pour $1 $version $2${neutre}"
+		sleep 2s
+	fi
+else
+	echo -e "${vert}fichiers linux et initrd.gz en place pour $1 $version $2${neutre}"
+	echo -e ""
+fi
+}
+
+menage()
+{
+# on revient dans le répertoire précédent
+# puis on supprime le répertoire temporaire
+rm -f pxe* ldl* ver*
+[ -e /$rep_temporaire/debian-installer/ ] && find /$rep_temporaire/debian-installer/ -delete
+[ -e /$rep_temporaire/ubuntu-installer/ ] && find /$rep_temporaire/ubuntu-installer/ -delete
+cd - >/dev/null
+find /$rep_temporaire/ -delete
+echo -e "${vert}fin de la $mise des fichiers netboot pour Debian/$version_debian et Ubuntu/$version_ubuntu${neutre}"
+echo -e ""
+}
+
+
 telecharger_archives_netboot()
 {
+# ancienne version
 # echo "Menage prealable"
 rm -fr /tftpboot/debian-installer
 rm -fr /tftpboot/ubuntu-installer
@@ -224,6 +414,7 @@ fi
 
 extraire_archives_netboot()
 {
+# ancienne version
 echo "extraction du fichier netboot.tar.gz" 
 tar -xzf netboot-debian.tar.gz
 tar -xzf netboot64-debian.tar.gz
@@ -440,10 +631,10 @@ sed -i -r '/initialisation_perso[[:space:]]*\(\)/,/^\}/s/^([[:space:]]*)true/\1a
 
 if [ ! -e /home/netlogon/clients-linux/unefois/\^\. ]
 then
-  mv /home/netlogon/clients-linux/unefois/all /home/netlogon/clients-linux/unefois/\^\.
+	mv /home/netlogon/clients-linux/unefois/all /home/netlogon/clients-linux/unefois/\^\.
 else
-  cp /home/netlogon/clients-linux/unefois/all/* /home/netlogon/clients-linux/unefois/\^\./
-  rm -rf /home/netlogon/clients-linux/unefois/all
+	cp /home/netlogon/clients-linux/unefois/all/* /home/netlogon/clients-linux/unefois/\^\./
+	rm -rf /home/netlogon/clients-linux/unefois/all
 fi 
 [ -e /home/netlogon/clients-linux/unefois/\^\* ] && mv /home/netlogon/clients-linux/unefois/\^\*/*  /home/netlogon/clients-linux/unefois/\^\./
 rm -rf /home/netlogon/clients-linux/unefois/\^\*
@@ -487,8 +678,27 @@ installation_se3_clients_linux
 droits_repertoires
 verifier_presence_mkpasswd
 mise_en_place_tftpboot
-telecharger_archives_netboot
-extraire_archives_netboot
+#telecharger_archives_netboot	# ancienne fonction
+# on crée un répertoire temporaire
+repertoire_temporaire
+# sommes de contrôle des fichiers des dépôts
+[ $option_debian = "oui" ] && recuperer_somme_controle_depot debian i386	# i386 → 32 bits
+[ $option_debian = "oui" ] && recuperer_somme_controle_depot debian amd64	# amd64 → 64 bits
+[ $option_ubuntu = "oui" ] && recuperer_somme_controle_depot ubuntu i386
+#[ $option_ubuntu = "oui" ] && recuperer_somme_controle_depot ubuntu amd64	# il y a un probleme sur la somme de controle disponible sur le dépôt
+# sommes de contrôle des fichiers en place sur le se3 (vides la première fois)
+[ $option_debian = "oui" ] && calculer_somme_controle_se3 debian i386
+[ $option_debian = "oui" ] && calculer_somme_controle_se3 debian amd64
+[ $option_ubuntu = "oui" ] && calculer_somme_controle_se3 ubuntu i386
+#[ $option_ubuntu = "oui" ] && calculer_somme_controle_se3 ubuntu amd64
+# on met à jour si nécessaire (mise en place la première fois)
+[ $option_debian = "oui" ] && mettre_se3_archives debian i386
+[ $option_debian = "oui" ] && mettre_se3_archives debian amd64
+[ $option_ubuntu = "oui" ] && mettre_se3_archives ubuntu i386
+#[ $option_ubuntu = "oui" ] && mettre_se3_archives ubuntu amd64
+# on supprime le répertoire temporaire
+menage
+#extraire_archives_netboot		# ancienne fonction
 transfert_repertoire_install
 gestion_script_integration
 gestion_cles_publiques
