@@ -340,7 +340,7 @@ $content .= "<p>Choisissez les paramètres pour le lancement de l'installation: <
 
 <ul>
   <li>
-   <label for='mirroir'>Choix du mirroir Debian</label> : <input type='text' name='mirroir' id='mirroir' value='$se3ip/debian' disabled='disabled'/><div style='font-size:small;'>On utilisera le se3 et son service apt-cacher <br /></div>
+   <label for='mirroir'>Choix du beau mirroir Debian</label> : <input type='text' name='mirroir' id='mirroir' value='$se3ip/debian' disabled='disabled'/><div style='font-size:small;'>On utilisera le se3 et son service apt-cacher <br /></div>
   </li>
   <li>Choix de la distribution :<br />";
 
@@ -348,7 +348,7 @@ $content .= "<p>Choisissez les paramètres pour le lancement de l'installation: <
  $content .= "   <label for='version'>Version</label> : <input type='text' name='version' id='version' value='$os' disabled='disabled' /><br />";
 //    <label for='sections'>Sections</label> : <input type='text' name='sections' id='sections' value='main, contrib, non-free' disabled='disabled' /><br />
  $content .= " </li>
-  <li>Architecture :<br />
+  <li>La belle Architecture :<br />
 <ol>
     <li><input type='radio' name='arch' id='arch32' value='i386' check='checked' /><label for='arch32'>32 bits</label></li>
     <li><input type='radio' name='arch' id='arch64' value='amd64' /><label for='arch64'>64 bits</label></li>
@@ -538,14 +538,18 @@ for($i=0;$i<count($id_machine);$i++) {
 		// On écrit le fichier preseed dans le bon dossier
 		$dossier_preseed="/var/www/se3/tmp/";
         $dossier_preseed_src="/var/www/install/";
+        $preseeddebian="preseed_debian_jessie.cfg";
+        $preseedmonreseau="preseed_debian_jessie_monreseau.cfg";
 		//$dossier_unattend_txt="/var/www/preseeds";
         $preseeddest=$dossier_preseed.$nom_machine."_preseed.cfg";
     if ($fdisk==0) {
         $preseedsrc=$dossier_preseed_src."preseed_debian_jessie_".$envbur.".cfg";
+        $preseedboot="preseed_debian_jessie_only.cfg";
     }
     else {
      if ($fdisk==1) {
-         $preseedsrc=$dossier_preseed_src."preseed_debian_jessie_".$envbur.".cfg";
+         $preseedsrc=$dossier_preseed_src."preseed_debian_jessie_".$envbur."_dboot.cfg";
+         $preseedboot="preseed_debian_jessie_dboot.cfg";
     }   
     }
     $fu=fopen($dossier_preseed.$nom_machine."_preseed.cfg","w+");
@@ -553,8 +557,16 @@ for($i=0;$i<count($id_machine);$i++) {
 			echo "<p>ERREUR lors de la cr&eacute;ation de ".$dossier_preseed."/".$nom_machine."_preseed.cfg</p>\n";
 			include ("pdp.inc.php");
 			die();
-		}
-			}
+    }
+    $fu=fopen($dossier_preseed.$preseeddebian,"w+");
+    copy($dossier_preseed_src.$preseeddebian,$dossier_preseed.$preseeddebian);
+    $fu=fopen($dossier_preseed.$preseedmonreseau,"w+");
+    copy($dossier_preseed_src.$preseedmonreseau,$dossier_preseed.$preseedmonreseau);
+    $fu=fopen($dossier_preseed.$preseedboot,"w+");
+    copy($dossier_preseed_src.$preseedboot,$dossier_preseed.$preseedboot);
+    
+    }
+    
 }
 
 echo "<p>G&eacute;n&eacute;ration des fichiers dans /tftpboot/pxelinux.cfg/ pour l'installation automatique<br />\n";
@@ -578,6 +590,7 @@ for($i=0;$i<count($id_machine);$i++) {
 		$ip_machine=$lig->ip;
 //Ajouter ici le domaine local et l'url du preseed à  passer à  pxe_gen_cfg_debian.sh
 // domaine fait au début du script
+        
 		$url_du_preseed="http://".$se3ip.":909/tmp/".$nom_machine."_preseed.cfg";
 
 		echo "G&eacute;n&eacute;ration pour $nom_machine : ";
