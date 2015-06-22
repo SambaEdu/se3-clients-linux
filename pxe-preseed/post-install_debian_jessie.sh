@@ -405,6 +405,10 @@ apt-get remove -y xscreensaver
 # Remise en place gdm3
 #update-rc.d gdm3 defaults
 
+echo "Annulation désactivation de $gdm"
+rm /usr/sbin/$gdm
+mv /usr/sbin/$gdm.save /usr/sbin/$gdm
+
 echo "Annulation de l'autologin"
 rm -rf /etc/systemd/system/getty@tty1.service.d
 
