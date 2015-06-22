@@ -1288,14 +1288,19 @@ NTPOPTIONS=\"\"
 #               Le fichier lightdm.conf est identique pour Xubuntu et Lubuntu
 #		Une légère différence pour Ubuntu.
 
-FLAVOR=$(uname -a | cut -d ' ' -f 2)
-if [ "$FLAVOR" = "ubuntu" ]			# On est sous Ubuntu
+if [ -e "/etc/lightdm/lightdm.conf.d/10-xubuntu.conf" ]
 then
-	PARAM_USER_SESSION=ubuntu
-	PARAM_GREETER_SESSION=false
-else						# On est sous Xubuntu ou Lubuntu
-	PARAM_USER_SESSION=default
+	PARAM_USER_SESSION=xubuntu
 	PARAM_GREETER_SESSION=true
+else
+	if [ -e "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]
+	then
+		PARAM_USER_SESSION=lubuntu
+		PARAM_GREETER_SESSION=true
+	else
+		PARAM_USER_SESSION=ubuntu
+		PARAM_GREETER_SESSION=false
+	fi
 fi
 
 echo "
@@ -1314,7 +1319,7 @@ session-cleanup-script=$LOGON_SCRIPT_LOCAL fermeture
 #		      on le force au démarrage à l'aide de la commande setxkbmap fr
 ########################################################################################
 
-if [ "$FLAVOR" = "lubuntu" ]
+if [ -e "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]
 then
 	echo '@setxkbmap fr' > /etc/xdg/lxsession/Lubuntu/autostart
 fi
@@ -1328,6 +1333,18 @@ fi
 ### Configurations diverses ###
 ###############################
 ###############################
+
+##########################################################
+## Trusty : desactivation de apport
+# Cette fenetre de signalement de problème logiciel peut être 
+# génante en s'affichant de façon récurrente alors que le problème 
+# est minime (voir inexistant) ou a été supprimé
+##########################################################
+
+echo 'enabled=0' > /etc/default/apport
+
+# Fin de la modification pour Trusty
+##########################################################
 
 ###########################################################
 ### Modification du fichier /etc/xdg/user-dirs.defaults ###

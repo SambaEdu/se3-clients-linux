@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-# lastupdate 12-10-2014
+# lastupdate 18-06-2015
 
 LADATE=$(date +%Y%m%d%H%M%S)
  
@@ -171,7 +171,7 @@ echo "Telechargement du paquet netboot debian wheezy..."
 cd /root
 
 if [ "$DEBUG" = "yes" ]; then
-	if [ -e "netboot-debian.tar.gz" ] && [ -e "netboot64-debian.tar.gz" ] && [ -e "netboot-ubuntu.tar.gz" ] ; then
+	if [ -e "netboot-debian.tar.gz" ] && [ -e "netboot64-debian.tar.gz" ] && [ -e "netboot-ubuntu.tar.gz" ] && [ -e "netboot64-ubuntu.tar.gz" ]; then
 		echo "Fichier netboot PXE existants sur le serveur" 
 # 	cp $src/install.menu /tftpboot/tftp_modeles_pxelinux.cfg/menu/
 	else 
@@ -179,6 +179,7 @@ if [ "$DEBUG" = "yes" ]; then
 		wget http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-i386/current/images/netboot/netboot.tar.gz -O netboot-debian.tar.gz	
 		wget http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz -O netboot64-debian.tar.gz
 		wget http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot/netboot.tar.gz -O netboot-ubuntu.tar.gz
+		wget http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-amd64/current/images/netboot/netboot.tar.gz -O netboot64-ubuntu.tar.gz
 	fi
 
 else
@@ -186,6 +187,7 @@ else
 	wget http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-i386/current/images/netboot/netboot.tar.gz -O netboot-debian.tar.gz	
 	wget http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz -O netboot64-debian.tar.gz
 	wget http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot/netboot.tar.gz -O netboot-ubuntu.tar.gz
+	wget http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-amd64/current/images/netboot/netboot.tar.gz -O netboot64-ubuntu.tar.gz
 fi
 
 
@@ -193,6 +195,7 @@ echo "extraction du fichier netboot.tar.gz"
 tar -xzf netboot-debian.tar.gz
 tar -xzf netboot64-debian.tar.gz
 tar -xzf netboot-ubuntu.tar.gz
+tar -xzf netboot64-ubuntu.tar.gz
 
 mv debian-installer /tftpboot/
 mv ubuntu-installer /tftpboot/
@@ -203,7 +206,13 @@ rm -f /root/pxelinux.0 /root/pxelinux.cfg /root/version.info
 
 
 cp $src/post-install* $src/preseed*.cfg $src/mesapplis*.txt $src/bashrc $src/inittab $src/tty1.conf /var/remote_adm/.ssh/id_rsa.pub /var/www/install/
-chmod 755 /var/www/install/preseed* /var/www/install/post-install_debian_wheezy.sh
+chmod 755 /var/www/install/preseed* /var/www/install/post-install_debian_wheezy.sh /var/www/install/post-install_ubuntu.sh
+
+if [ -e "/home/netlogon/clients-linux/distribs/trusty/integration/integration_trusty.bash" ]; then
+	rm -f /var/www/install/integration_trusty.bash
+	ln /home/netlogon/clients-linux/distribs/trusty/integration/integration_trusty.bash /var/www/install/
+	chmod 755 /var/www/install/integration_trusty.bash
+fi
 
 if [ -e "/home/netlogon/clients-linux/distribs/wheezy/integration/integration_wheezy.bash" ]; then
 	rm -f /var/www/install/integration_wheezy.bash
@@ -384,6 +393,13 @@ sed -i -r '/initialisation_perso[[:space:]]*\(\)/,/^\}/s/^([[:space:]]*)true/\1a
 # 	rm -rf /home/netlogon/clients-linux/distribs/wheezy/skel/mozilla-save*
 # 	mv /home/netlogon/clients-linux/distribs/wheezy/skel/.mozilla /home/netlogon/clients-linux/distribs/wheezy/skel/mozilla-save-$LADATE
 # fi
+
+##
+if [ -e $src/update-mozilla-profile ]; then
+	rm -rf /home/netlogon/clients-linux/distribs/wheezy/skel/.mozilla
+	echo  "modif install_client_linux_archive - $LADATE" > /home/netlogon/clients-linux/distribs/wheezy/skel/.VERSION
+fi
+
 
 [ ! -e /home/netlogon/clients-linux/distribs/wheezy/skel/.config ] && cp -r $src/.config /home/netlogon/clients-linux/distribs/wheezy/skel/
 [ ! -e /home/netlogon/clients-linux/distribs/wheezy/skel/.mozilla ]&& cp -r $src/.mozilla /home/netlogon/clients-linux/distribs/wheezy/skel/

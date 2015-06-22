@@ -7,9 +7,13 @@
 mkdir /target/root/post-install
 wget -O /target/root/post-install/post-install_debian_jessie.sh http://192.168.98.5/install/post-install_debian_jessie.sh
 chmod u+x /target/root/post-install/post-install_debian_jessie.sh
-wget -O /target/root/post-install/02-mesapplis-debian-lxde.txt http://192.168.98.5/install/02-mesapplis-debian-lxde.txt
 
 #Désactivation des DM
+gdm="$(cat /target/etc/X11/default-display-manager | cut -d / -f 4)"
+mv /target/usr/sbin/$gdm /target/usr/sbin/$gdm.save                        
+printf '#!/bin/sh\nwhile true; do sleep 10; done\n' >/target/usr/sbin/$gdm; 
+chmod 755 /target/usr/sbin/$gdm;
+
 #systemctl disable gdm3.service
 #systemctl disable lightdm.service
 #Activation du service de post-installation

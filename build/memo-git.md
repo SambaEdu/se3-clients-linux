@@ -2,7 +2,8 @@
 
 ## Installation
 
-Installation du minimum pour faire du git en ligne de commandes :
+Installation du minimum pour faire du git en ligne de
+commandes :
 
 ```sh
 apt-get update
@@ -11,24 +12,30 @@ apt-get install openssl ca-certificates git
 
 ## Mise en place de sa clé publique/privé d'accès
 
-Pour ne pas avoir à se connecter/déconnecter à chaque fois, on peut utiliser un jeu de clé publique/privé. Voici comment les mettre en place :
+Pour ne pas avoir à se connecter/déconnecter à chaque fois,
+on peut utiliser un jeu de clés publique/privée. Voici comment
+les mettre en place :
 
-les créer :
+Les créer :
+
 ```sh
 ssh-keygen -t rsa
 ```
+
 On vous pose des questions : `Entrée` 3 fois
 
 Afficher la clé publique :
+
 ```sh
 cat ~/.ssh/id_rsa.pub
 ```
 
-puis l'ajouter, par un copié/collé, dans son profil sur le site du Git via son butineur préféré.
-
-Tout cela avant de lancer la commande : `git clone git@github.com:flaf/se3-clients-linux.git` (voir ci-dessous).
-
-Ensuite, les différentes commandes de gestion se font en étant dans le répertoire `se3-clients-linux` (voir ci-dessous).
+Puis l'ajouter, par un copier/coller, dans son profil sur le
+site du Git via son butineur préféré. Tout cela avant de lancer
+la commande `git clone git@github.com:flaf/se3-clients-linux.git`
+(voir ci-dessous). Ensuite, les différentes commandes de gestion
+se font en étant dans le répertoire `se3-clients-linux` (voir
+ci-dessous).
 
 
 ## Configuration du fichier `~/.gitconfig`
@@ -55,7 +62,9 @@ git config --global user.name <son-login-github>
 git config --global user.email <son-adresse-github>
 ```
 
-## Commandes utiles
+
+
+## Commandes de base
 
 ### Clonage d'un dépôt distant
 
@@ -92,7 +101,12 @@ permet d'avoir un dépôt local à jour par rapport au dépôt distant
 git pull
 ```
 
-**NB :** cette commande de gestion, ainsi que les autres, ne fonctionnera que si on la lance qand on se trouve dans le répertoire `se3-clients-linux`. Ne pas oublier de s'y placer (en supposant que le répertoire `se3-clients-linux` est dans le votre répertoire personnel) :
+**NB :** cette commande de gestion, ainsi que les autres, ne
+fonctionnera que si on la lance quand on se trouve dans le
+répertoire local `se3-clients-linux`. Ne pas oublier de s'y
+placer. En supposant que le répertoire `se3-clients-linux`
+est dans le votre répertoire personnel, cela donnerait :
+
 ```sh
 cd ~/se3-clients-linux/
 ```
@@ -250,6 +264,99 @@ automatiquement afin de coller à la branche choisie. Il n'y aura pas
 trouve à la racine du dépôt local et qui contient toutes les informations
 nécessaires afin que git se débrouille pour que l'arborescence locale soit
 en phase avec la branche sur laquelle on se trouve).
+
+
+
+
+## Voir les pushs des autres avec Git et Gihub
+
+Avec git, il faut absolument utiliser une paire de clés ssh
+pour pouvoir pusher les commits de son dépôt local (quand
+bien même il existerait un autre moyen, c'est définitivement
+la paire de clés ssh qui doit être privilégiée). On peut
+commiter puis pusher sans demande de mot de passe. Mais il
+faut faire attention de bien paramétrer les éléments
+suivants sur toute machine où l'on utilise le dépôt git :
+
+```sh
+# Ces commandes ne font rien d'autres qu'éditer votre
+# fichier de configuration de votre home `~/.gitconfig`.
+# Attention en revanche ce paramétrage n'est valable
+# que pour le compte Unix qu'on utilise pour lancer
+# les commandes ci-dessous.
+git config --global user.name <votre-login-sur-github>
+git config --global user.email <votre-adresse-mail-de-contact-sur-github>
+```
+
+En effet, Github se base sur la configuration du login et
+aussi du mail pour mettre un nom sur un utilisateur qui
+pushe. On peut faire sans le paramétrage ci-dessus (si vous
+avez votre paire de clé ssh, vous pourrez toujours commiter
+et pusher) mais Github ne sera pas capable d'identifier
+celui qui a pushé et il mettra le nom du compte unix que
+vous utilisez à la place (si vous avez pushé un commit avec
+le compte root, Github estimera que le commit provient de
+l'utilisateur `root`). Du coup, votre commit ne vous sera
+pas comptabilisé dans la page des contributeurs qui se
+trouve [ici](https://github.com/flaf/se3-clients-linux/graphs/contributors)
+ce qui serait tellement dommage... ;)
+
+Si vous voulez suivre un peu les commits des autres, une
+fois dans votre dépôt local, lancez ces commandes :
+
+```sh
+# On met à jour le dépôt local :
+git pull
+
+# Pour voir les commits des autres (et les siens au passage) :
+git log # flèches pour naviguer de haut en bas et `q` pour quitter.
+```
+
+Avec la dernière commande ci-dessus, on voit les commits des
+autres (et les siens aussi d'ailleurs) mais on ne voit pas
+les modifications. On voit juste l'auteur et l'intitulé des
+commits. Si jamais on veut une affichage un peu plus bavard :
+
+```sh
+git log -p
+```
+
+Avec cette commande ci-dessus, on voit le détail des
+modifications de chaque commit.
+
+**Remarque :** il est juste inconcevable de lancer `git log`
+et `git log -p` sans avoir de la couleur dans l'affichage.
+Pour ce faire, lancer une bonne fois pour toutes :
+
+```sh
+git config --global color.diff auto
+git config --global color.status auto
+git config --global color.branch auto
+```
+
+Voir les commits est également possible sur Github bien sûr.
+Vous allez sur la page du [dépôt](https://github.com/flaf/se3-clients-linux).
+Ensuite vous cliquez sur l'onglet `commits` en haut au
+dessus de la barre verte. Là, vous avez l'historique des
+commits. Au niveau d'un commit, vous pouvez cliquer sur le
+commentaire d'un commit et vous aurez le détail des
+modifications de ce commit (un peu comme avec `git log -p`
+en ligne de commandes).
+
+Un lien qui peut être intéressant également, c'est le bouton
+`<>` en face de chaque commit au niveau de la page de
+[l'historique des commits](https://github.com/flaf/se3-clients-linux/commits/master).
+Ce bouton vous permet de naviguer dans l'arborescence des
+fichiers tels qu'ils étaient au moment du commit en
+question.
+
+Enfin, si vous utilisez Git en ligne de commandes et si vous
+voulez que Git utilise `vim` par défaut à chaque fois que
+vous devez indiquer le commentaire d'un commit, vous pouvez
+mettre cette ligne `export EDITOR="vim"` dans le fichier
+`~/.bashrc` de votre home.
+
+
 
 
 # Memo sur le formatage markdown (fichiers `.md`)

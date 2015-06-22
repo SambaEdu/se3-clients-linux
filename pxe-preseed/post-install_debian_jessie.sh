@@ -5,30 +5,41 @@
 #
 # 
 # lastupdate 5-06-2014
+
+# Récupération du DM installé et arrêt
 gdm="$(cat /etc/X11/default-display-manager | cut -d / -f 4)"
 service $gdm stop
+#envbureau=""
 
-testenv=`aptitude search task-lxde-desktop | grep ^i`
-if [ -n $testenv ]; then
-    $envbureau="lxde"
+# Quel environnement est installé
+testenvl=`aptitude search task-lxde-desktop | grep ^i | cut -d - -f 2`
+echo "Testenvl est $testenvl"
+#echo "Environnement de bureau : $envbureau"
+if [ "$testenvl" = "lxde" ]; then
+    envbureau="lxde"
 fi
 
-testenv=`aptitude search task-xfce-desktop | grep ^i`
-if [ -n $testenv ]; then
-    $envbureau="xfce"
+testenvx=`aptitude search task-xfce-desktop | grep ^i | cut -d - -f 2`
+echo "Testenvx est $testenvx"
+#echo "Environnement de bureau : $envbureau"
+if [ "$testenvx" = "xfce" ]; then
+    envbureau="xfce"
 fi
 
-testenv=`aptitude search task-gnome-desktop | grep ^i`
-if [ -n $testenv ]; then
-    $envbureau="gnome"
+testenvg=`aptitude search task-gnome-desktop | grep ^i | cut -d - -f 2`
+echo "Testenvg est $testenvg"
+#echo "Environnement de bureau : $envbureau"
+if [ "$testenvg" = "gnome" ]; then
+    envbureau="gnome"
 fi
 
-
+echo "Environnement de bureau : $envbureau"
+read p
 
 POST="/root/post-install"
 wget -O $POST/params.sh http://192.168.98.5/install/params.sh
 wget -O $POST/01-mesapplis-debian.txt http://192.168.98.5/install/01-mesapplis-debian.txt
-wget -O $POST/02-mesapplis-debian-lxde.txt http://192.168.98.5/install/02-mesapplis-debian-$envbureau.txt
+wget -O $POST/02-mesapplis-debian-${envbureau}.txt http://192.168.98.5/install/02-mesapplis-debian-${envbureau}.txt
 wget -O $POST/03-mesapplis-perso.txt http://192.168.98.5/install/03-mesapplis-perso.txt
 wget -O $POST/bashrc http://192.168.98.5/install/bashrc
 
@@ -74,7 +85,8 @@ echo "Post Configuration du poste"
 echo "--------------------------------------------------------------------------------"
 echo -e "$neutre"
 echo "Appuyez sur Entree pour continuer"
-#read -t 20 dummy
+read p
+#-t 20 dummy
 
 
 
@@ -105,6 +117,7 @@ else
 	echo "IP SE3 non trouvee???" | tee -a $compte_rendu
 fi
 sleep 5
+cd /root
 
 if [ -n "$ip_proxy" -a -n "$port_proxy" ]; then
 	echo "Config proxy..." | tee -a $compte_rendu
@@ -157,8 +170,7 @@ fi
 
 if [ -n "${ip_se3}" ]; then
 	echo "Telechargement de integration_jessie.bash..." | tee -a $compte_rendu
-	mkdir -p /root/bin
-	cd /root/bin
+	cd $POST
 	wget http://${ip_se3}/install/integration_jessie.bash >/dev/null 2>&1
 	if [ "$?" = "0" ]; then
 		echo "Telechargement reussi." | tee -a $compte_rendu
@@ -168,6 +180,7 @@ if [ -n "${ip_se3}" ]; then
 		echo "Le poste ne pourra pas être intégré au domaine" | tee -a $compte_rendu 
 		ISCRIPT="erreur"
 	fi
+	cd /root
 fi
 
 
@@ -249,7 +262,7 @@ hostname=$nom_machine.$nom_domaine
 sleep 2
 
 
-if [ $ISCRIPT != "erreur" ]; then
+if [ "$ISCRIPT" != "erreur" ]; then
 	echo -e "${jaune}"
 	echo -e "==========================================="
 	echo -e "Intégration au domaine SE3"
@@ -280,12 +293,18 @@ apt-get -q update
 # aptitude -y full-upgrade
 apt-get install -y tofrodos
 
-APPLIS=`ls $POST/*.txt `
+cd $POST
+APPLIS=`ls *.txt `
+echo $APPLIS
 for ap in $APPLIS
 do
     fromdos $ap
+    echo $ap
+    echo -e "${jaune}"
+    echo -e "==========================================="
     echo "Installation des paquets définis dans $ap"
-
+    echo -e "===========================================${neutre}"
+    read p
     for i in $(cat $ap)
     do
 	#installation des paquets
@@ -311,16 +330,25 @@ do
 done
 echo -e "${jaune}"
 echo -e "==========================================="
-echo -e "Fin de l'installation des paquets mesapplis-debian"
+echo -e "Fin de l'installation des paquets applis-debian"
 echo -e "===========================================${neutre}"
 
+# On force l'usage de lightdm
+echo "On force l'usage de lightdm"
+testdm=`cat /etc/X11/default-display-manager | grep lightdm`
+if [ -n $testdm ]; then
+    aptitude -y install lightdm
+    echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager
+fi
+read p
 
 if [ "$rep" != "n" ]; then
-	./integration_jessie.bash --nom-client="$nom_machine" --is --ivl | tee -a $compte_rendu 
-	
+    cd $POST
+    ./integration_jessie.bash --nom-client="$nom_machine" --is --ivl | tee -a $compte_rendu 
+    cd /root
 else
 	
-	echo "on intègre pas au domaine....Renommage du poste pour $nom_machine"| tee -a $compte_rendu 
+	echo "on n'intègre pas au domaine....Renommage du poste pour $nom_machine"| tee -a $compte_rendu 
 	echo "$nom_machine" > "/etc/hostname"  
 	invoke-rc.d hostname.sh stop > $SORTIE 2>&1
 	invoke-rc.d hostname.sh start > $SORTIE 2>&1
@@ -339,7 +367,7 @@ else
 
 	echo "Renommage termine."| tee -a $compte_rendu 
 	echo "pour intégrer le poste plus tard : 
-	cd /root/bin/
+	cd $POST
 	./integration_jessie.bash --nom-client=\"$nom_machine\" --is --ivl" | tee -a $compte_rendu 
 fi
 
@@ -347,9 +375,6 @@ fi
 # if [ -n "$nom_machine" -a -n "$email" ]; then
 # 	cat /root/firstboot.txt|mail -s "[$nom_se3.$nom_domaine]: Post-install $nom_machine" $email
 # fi
-
-aptitude install lightdm
-update-rc.d lightdm defaults
 
 mv $POST/post-install_debian_jessie.sh $POST/post-install_debian_jessie.sh.$ladate
 
@@ -375,10 +400,14 @@ apt-get remove -y xscreensaver
 
 
 # modif inittab
-sed 's|1:2345:respawn:/bin/login -f root tty1 </dev/tty1 >/dev/tty1 2>\&1|1:2345:respawn:/sbin/getty 38400 tty1|' -i /etc/inittab
+#sed 's|1:2345:respawn:/bin/login -f root tty1 </dev/tty1 >/dev/tty1 2>\&1|1:2345:respawn:/sbin/getty 38400 tty1|' -i /etc/inittab
 
 # Remise en place gdm3
 #update-rc.d gdm3 defaults
+
+echo "Annulation désactivation de $gdm"
+rm /usr/sbin/$gdm
+mv /usr/sbin/$gdm.save /usr/sbin/$gdm
 
 echo "Annulation de l'autologin"
 rm -rf /etc/systemd/system/getty@tty1.service.d
