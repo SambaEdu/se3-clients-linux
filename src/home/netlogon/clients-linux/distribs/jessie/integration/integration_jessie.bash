@@ -1,7 +1,7 @@
 #! /bin/bash
 
 ##### #####
-# script d'intégration des clients Wheezy
+# script d'intégration des clients Jessie
 #
 #
 # version : 20150607
@@ -515,10 +515,10 @@ fi
 
 verifier_version_debian()
 {
-# On vérifie que le système est bien Debian Wheezy.
-if [ "$NOM_DE_CODE" != "wheezy" ]
+# On vérifie que le système est bien Debian Jessie.
+if [ "$NOM_DE_CODE" != "jessie" ]
 then
-	afficher "Désolé, le script doit être exécuté sur Debian Wheezy." \
+	afficher "Désolé, le script doit être exécuté sur Debian Jessie." \
              "Fin du script."
 	exit 1
 fi
