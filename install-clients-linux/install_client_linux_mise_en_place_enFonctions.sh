@@ -247,7 +247,7 @@ recuperer_somme_controle_depot()
 # on télécharge MD5SUMS
 eval url_dists='$'url_$1
 eval version='$'version_$1
-wget http://$url_dists/dists/$version/main/installer-$2/current/images/MD5SUMS
+wget -q http://$url_dists/dists/$version/main/installer-$2/current/images/MD5SUMS
 if [ $? = "0" ]
 then
 	# on récupère la somme de contrôle concernant les fichiers linux et initrd.gz
@@ -304,7 +304,7 @@ telecharger_archives()
 # téléchargement des archives debian/ubuntu 32 bits/64 bits
 eval url_dists='$'url_$1
 eval version='$'version_$1
-wget http://$url_dists/dists/$version/main/installer-$2/current/images/netboot/netboot.tar.gz -O netboot_${version}_${2}.tar.gz
+wget -q http://$url_dists/dists/$version/main/installer-$2/current/images/netboot/netboot.tar.gz -O netboot_${version}_${2}.tar.gz
 }
 
 extraire_archives()
@@ -380,51 +380,6 @@ cd - >/dev/null
 find /$rep_temporaire/ -delete
 echo -e "${vert}fin de la $mise des fichiers netboot pour Debian/$version_debian et Ubuntu/$version_ubuntu${neutre}"
 echo -e ""
-}
-
-
-telecharger_archives_netboot()
-{
-# ancienne version
-# echo "Menage prealable"
-rm -fr /tftpboot/debian-installer
-rm -fr /tftpboot/ubuntu-installer
-
-echo "Téléchargement des paquets netboot debian, ubuntu..."
-cd /root
-if [ "$DEBUG" = "yes" ]
-then
-	if [ -e "netboot-debian.tar.gz" ] && [ -e "netboot64-debian.tar.gz" ] && [ -e "netboot-ubuntu.tar.gz" ]
-	then
-		echo "Fichier netboot PXE existants sur le serveur" 
-# 	cp $src/install.menu /tftpboot/tftp_modeles_pxelinux.cfg/menu/
-	else 
-		rm -f netboot*.tar.gz
-		wget http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-i386/current/images/netboot/netboot.tar.gz -O netboot-debian.tar.gz	
-		wget http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz -O netboot64-debian.tar.gz
-		wget http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot/netboot.tar.gz -O netboot-ubuntu.tar.gz
-	fi
-else
-	rm -f netboot*.tar.gz
-	wget http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-i386/current/images/netboot/netboot.tar.gz -O netboot-debian.tar.gz	
-	wget http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot/netboot.tar.gz -O netboot64-debian.tar.gz
-	wget http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot/netboot.tar.gz -O netboot-ubuntu.tar.gz
-fi
-}
-
-extraire_archives_netboot()
-{
-# ancienne version
-echo "extraction du fichier netboot.tar.gz" 
-tar -xzf netboot-debian.tar.gz
-tar -xzf netboot64-debian.tar.gz
-tar -xzf netboot-ubuntu.tar.gz
-
-mv debian-installer /tftpboot/
-mv ubuntu-installer /tftpboot/
-rm -f /root/pxelinux.0 /root/pxelinux.cfg /root/version.info
-
-# http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot/netboot.tar.gz
 }
 
 transfert_repertoire_install()
