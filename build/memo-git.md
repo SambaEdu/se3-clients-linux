@@ -382,12 +382,12 @@ tout est expliqué
 Voici un exemple simple ci-dessous dans le cas d'un code shell
 dans un bloc :
 
-````
+<pre>
 ```sh
 # Du code en shell
 find /dir -type f -name '*.sh'
 ```
-````
+</pre>
 
 Le `sh` juste après les 3 backquotes est optionnel mais il
 permet d'avoir une coloration syntaxique du code adapté au
