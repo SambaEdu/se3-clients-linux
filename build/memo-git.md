@@ -361,36 +361,70 @@ mettre cette ligne `export EDITOR="vim"` dans le fichier
 
 # Memo sur le formatage markdown (fichiers `.md`)
 
+Le site Github est capable d'interpréter correctement des
+fichiers de type markdown (ie des fichiers avec l'extension
+`.md`) ce qui permet d'écrire des documentations assez
+facilement (via une syntaxe très simple) tout en ayant un
+rendu vraiment convenable.
+
 En fait, tout est parfaitement résumé
-[ici](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
-Voici quelques syntaxes fondamentales ci-dessous.
+[ici](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+mais voici quelques syntaxes fondamentales ci-dessous.
 
 ## Mise en forme de base
 
-* Pour faire un titre : `# Titre` (en début de ligne)
-* Pour faire un sous-titre : `## Sous titre` (en début de ligne)
-* Pour faire un sous-sous-titre : `### Sous sous titre` (en début de ligne)
-* Pour mettre en gras  : `**du gras**`
-* Pour faire une liste à puce : ̀`*`
-* Pour faire un lien : `Consultez [cette page](<url relative ou absolue>)`
+* Pour faire un titre : `# Titre` (en début de ligne).
+* Pour faire un sous-titre : `## Sous titre` (en début de ligne).
+* Pour faire un sous-sous-titre : `### Sous sous titre` (en début de ligne).
+* Pour mettre en gras  : `**du gras**`.
+* Pour faire une liste à puce : ̀`* Premièrement...`.
+* Pour faire un lien : `Consultez [cette page](<url relative ou absolue>)`,
+si la cible du lien est un fichier interne au dépôt, il faut
+toujours privilégier une url relative.
 
 ## Insérer du code
 
 Pour insérer du code sur une ligne de texte ou dans un bloc,
 tout est expliqué
 [ici](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#code-and-syntax-highlighting).
-Voici un exemple simple ci-dessous dans le cas d'un code shell
+Voici tout de même deux exemples simples. D'abord une
+exemple de code dans le texte :
+
+```
+Mettez à jour via la commande `apt-get update && apt-get dist-upgrade`...
+```
+
+ce qui donnera :
+
+* * *
+Mettez à jour via la commande `apt-get update && apt-get dist-upgrade`...
+* * *
+
+Enfin voici un exemple dans le cas d'un code shell
 dans un bloc :
 
 <pre>
+Afin de chercher les fichiers `.sh`, lancez la commande :
+
 ```sh
-# Du code en shell
+# Un petit commentaire...
 find /dir -type f -name '*.sh'
 ```
 </pre>
 
+ce qui donnera ceci :
+
+* * *
+Afin de chercher les fichiers `.sh` lancez la commande :
+
+```sh
+# Un petit commentaire...
+find /dir -type f -name '*.sh'
+```
+* * *
+
 Le `sh` juste après les 3 backquotes est optionnel mais il
-permet d'avoir une coloration syntaxique du code adapté au
+permet d'avoir une coloration syntaxique du code adaptée au
 langage (le langage shell ici) ce qui rend les extraits de
 codes nettement plus jolis.
 
