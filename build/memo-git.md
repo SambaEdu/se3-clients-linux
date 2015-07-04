@@ -363,9 +363,10 @@ mettre cette ligne `export EDITOR="vim"` dans le fichier
 
 Le site Github est capable d'interpréter correctement des
 fichiers de type markdown (ie des fichiers avec l'extension
-`.md`) ce qui permet d'écrire des documentations assez
-facilement (via une syntaxe très simple) tout en ayant un
-rendu vraiment convenable.
+`.md` comme celui que vous êtes en train de lire
+présentement) ce qui permet d'écrire des documentations
+assez facilement (via une syntaxe très simple) tout en ayant
+un rendu vraiment convenable.
 
 En fait, tout est parfaitement résumé
 [ici](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
@@ -387,7 +388,7 @@ toujours privilégier une url relative.
 Pour insérer du code sur une ligne de texte ou dans un bloc,
 tout est expliqué
 [ici](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#code-and-syntax-highlighting).
-Voici tout de même deux exemples simples. D'abord une
+Voici tout de même deux exemples simples. D'abord un
 exemple de code dans le texte :
 
 ```
@@ -410,6 +411,8 @@ Afin de chercher les fichiers `.sh`, lancez la commande :
 # Un petit commentaire...
 find /dir -type f -name '*.sh'
 ```
+
+Blabla blabla...
 </pre>
 
 ce qui donnera ceci :
@@ -421,6 +424,8 @@ Afin de chercher les fichiers `.sh` lancez la commande :
 # Un petit commentaire...
 find /dir -type f -name '*.sh'
 ```
+
+Blabla blabla...
 * * *
 
 Le `sh` juste après les 3 backquotes est optionnel mais il
@@ -438,7 +443,7 @@ Blabla blabla Blabla blabla Blabla blabla Blabla blabla
 Blabla blabla Blabla blabla Blabla blabla Blabla blabla
 
 <p align="center">
-  <img src="images/bidul.png" width="50%" alt="Texte alternatif" title="Info lors du survol ">
+  <img src="images/bidul.png" width="50%" alt="Texte alternatif" title="Info lors du survol">
 </p>
 
 Blabla blabla Blabla blabla Blabla blabla Blabla blabla
@@ -451,17 +456,19 @@ Dans l'exemple ci-dessus :
 fichier image par rapport au fichier markdown qu'on est en
 train d'éditer.
 * Pour être respectueux de la norme html, il faut bien mettre
-les attributs d'une balise sous la forme `name="value" comme
+les attributs d'une balise sous la forme `name="value"` comme
 dans `width="50%"` avec la valeur entre doubles quotes.
-* Dans la balise `img`, l'attribut `alt` est obligatoire (si on
-veut être respectueux de la norme html). Il s'agit d'un texte
-affiché à la place de l'image si celle-ci n'est pas trouvée par
-le serveur.
+* Dans la balise `img`, l'attribut `alt` est obligatoire (en
+fait ça marchera sans mais dans ce cas on ne respecte plus la
+norme html). Il s'agit d'un texte affiché à la place de l'image
+si celle-ci n'est pas trouvée par le serveur.
 * L'attribut `title` définit du texte (court) qui sera affiché
 lors du survol de la souris au niveau de l'image. Cet attribut
-est optionnel.
+est complètement optionnel.
 * L'attribut `width="50%"` permet de redimensionner la taille
 de l'image. Dans le cas présent, l'image occupera la moitié
-(ie 50%) de la largeur du texte des paragraphes.
+(ie 50%) de la largeur du texte des paragraphes (éviter de
+préciser des tailles d'images en pixels `px`, un pourcentage
+par rapport à la largeur du texte est un bien meilleur choix).
 
 
