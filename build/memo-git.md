@@ -363,16 +363,71 @@ mettre cette ligne `export EDITOR="vim"` dans le fichier
 
 En fait, tout est parfaitement résumé
 [ici](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
+Voici quelques syntaxes fondamentales ci-dessous.
 
-* Pour faire un titre : `# Titre`
-* Pour faire un sous-titre : `## Sous titre`
-* Pour faire un sous-sous-titre : `### Sous sous titre`
+## Mise en forme de base
+
+* Pour faire un titre : `# Titre` (en début de ligne)
+* Pour faire un sous-titre : `## Sous titre` (en début de ligne)
+* Pour faire un sous-sous-titre : `### Sous sous titre` (en début de ligne)
 * Pour mettre en gras  : `**du gras**`
 * Pour faire une liste à puce : ̀`*`
-* Pour faire un lien : `[cette page](<url relative ou absolue>)`
+* Pour faire un lien : `Consultez [cette page](<url relative ou absolue>)`
 
-Pour insérer du code sur une ligne de texte ou dans d'un bloc,
+## Insérer du code
+
+Pour insérer du code sur une ligne de texte ou dans un bloc,
 tout est expliqué
 [ici](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#code-and-syntax-highlighting).
+Voici un exemple simple ci-dessous dans le cas d'un code shell
+dans un bloc :
+
+````
+```sh
+# Du code en shell
+find /dir -type f -name '*.sh'
+```
+````
+
+Le `sh` juste après les 3 backquotes est optionnel mais il
+permet d'avoir une coloration syntaxique du code adapté au
+langage (le langage shell ici) ce qui rend les extraits de
+codes nettement plus jolis.
+
+## Insérer une image
+
+Pour insérer une image centrée, on doit insérer un petit
+bout de code html au sein du fichier markdown comme ceci :
+
+```
+Blabla blabla Blabla blabla Blabla blabla Blabla blabla
+Blabla blabla Blabla blabla Blabla blabla Blabla blabla
+
+<p align="center">
+  <img src="images/bidul.png" width="50%" alt="Texte alternatif" title="Info lors du survol ">
+</p>
+
+Blabla blabla Blabla blabla Blabla blabla Blabla blabla
+Blabla blabla Blabla blabla Blabla blabla Blabla blabla
+```
+
+Dans l'exemple ci-dessus :
+
+* `src="images/bidul.png"` correspond au chemin relatif du
+fichier image par rapport au fichier markdown qu'on est en
+train d'éditer.
+* Pour être respectueux de la norme html, il faut bien mettre
+les attributs d'une balise sous la forme `name="value" comme
+dans `width="50%"` avec la valeur entre doubles quotes.
+* Dans la balise `img`, l'attribut `alt` est obligatoire (si on
+veut être respectueux de la norme html). Il s'agit d'un texte
+affiché à la place de l'image si celle-ci n'est pas trouvée par
+le serveur.
+* L'attribut `title` définit du texte (court) qui sera affiché
+lors du survol de la souris au niveau de l'image. Cet attribut
+est optionnel.
+* L'attribut `width="50%"` permet de redimensionner la taille
+de l'image. Dans le cas présent, l'image occupera la moitié
+(ie 50%) de la largeur du texte des paragraphes.
 
 
