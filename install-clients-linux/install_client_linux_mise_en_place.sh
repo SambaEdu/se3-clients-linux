@@ -36,9 +36,14 @@ if egrep -q "^6.0" /etc/debian_version; then
 	echo "Votre serveur est bien version Debian Squeeze"
 	echo "Le script peut se poursuivre"
 else
-	echo "Votre serveur n'est pas en version Squeeze."
-	echo "Operation annulee !"
-	exit 1
+	if egrep -q "^7" /etc/debian_version; then
+		echo "Votre serveur est bien version Debian Wheezy"
+		echo "Le script peut se poursuivre"
+	else
+		echo "Votre serveur n'est ni en version Squeeze ni en version Wheezy"
+		echo "Operation annulee !"
+		exit 1
+	fi
 fi
  
  
