@@ -7,7 +7,7 @@
 # ou pour une migration d'un ancien serveur à un nouveau serveur se3
 #
 # version du 16/04/2014
-# modifiée le 06/07/2015
+# modifiée le 09/07/2015
 #
 # Auteurs :		Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
 #				François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
@@ -49,7 +49,7 @@
 SAUV="SauveGarde"			# Nom du répertoire de sauvegarde de /var/se3/save
 SAUVHOME="SauveGardeHome"	# Nom du répertoire de sauvegarde de /home et de /var/se3
 ##### #####
-DATERESTAURATION=$(date +%F+%0kh%0Mmin)	# Date de la restauration
+DATERESTAURATION=$(date +%F+%0kh%0M)	# Date de la restauration
 DATEDEBUT=$(date +%s)					# Début de la restauration
 DATEJOUR=$(date +%A)					# Jour de la restauration
 COURRIEL="/root/mail.txt"				# compte-rendu de la restauration
@@ -84,6 +84,7 @@ mise_a_jour()
 # Mise à jour
 echo -e ""
 echo -e "${jaune}`date +%r` ${neutre}Mise à jour du se3${neutre}" 2>&1 | tee -a $COURRIEL
+sleep 1
 aptitude update
 /usr/share/se3/scripts/se3_update_system.sh
 echo -e ""
@@ -108,12 +109,12 @@ echo -e "${jaune}`date +%r` ${neutre}Démarrage du serveur samba" 2>&1 | tee -a 
 restaure_varse3home()
 {
 SAVHOME=`ls $MONTAGE | grep $SAUVHOME`
-if [ -n "$SAVHOME" ]
+if [ -n "$SAVHOME" ]	# faut-il faire un test plus subtil ?
 then
 	echo -e ""
-	echo -e "${bleu}Une sauvegarde de /home et /var/se3 est présente"
+	echo -e "${neutre}Une sauvegarde de /home et /var/se3 est présente"
 	echo -e "${orange}Cette restauration peut durer plusieurs heures"
-	echo -e "${neutre}Voulez-vous restaurer ces données ? (oui ou OUI) ${vert}\c"
+	echo -e "${bleu}Voulez-vous restaurer ces données ? ${neutre}(oui ou OUI) ${vert}\c"
 	read REPONSE
 	case $REPONSE in
 		oui|OUI)
@@ -212,17 +213,17 @@ echo ""
 # gestion de l'accord pour les heures ; pour les minutes, elles seront souvent plusieurs ;-)
 case $HEURES in
 	0)
-		echo "Restauration terminée en $MINUTES minutes" 2>&1 | tee -a $COURRIEL
+		echo "Restauration effectuée en environ $MINUTES minutes" 2>&1 | tee -a $COURRIEL
 	;;
 	1)
-		echo "Restauration terminée en $HEURES heure et $MINUTES minutes" 2>&1 | tee -a $COURRIEL
+		echo "Restauration effectuée en environ $HEURES heure et $MINUTES minutes" 2>&1 | tee -a $COURRIEL
 	;;
 	*)
-		echo "Restauration terminée en $HEURES heures et $MINUTES minutes" 2>&1 | tee -a $COURRIEL
+		echo "Restauration effectuée en environ $HEURES heures et $MINUTES minutes" 2>&1 | tee -a $COURRIEL
 	;;
 esac
 echo "" >> $COURRIEL
-echo "Les fichiers de logs sont disponibles dans /root si nécessaire" >> $COURRIEL
+echo "Un fichier récapitulatif est disponible : $COURRIEL si nécessaire" >> $COURRIEL
 echo "" >> $COURRIEL
 }
 
@@ -246,21 +247,31 @@ echo -e "${jaune}`date +%r` ${neutre}Restauration configuration DHCP" 2>&1 | tee
 /usr/share/se3/scripts/makedhcpdconf
 }
 
+abandonner()
+{
+echo -e "${neutre}"
+echo -e "${orange}Restauration abandonnée, vous pourrez la relancer en utilisant ${neutre}restaure_serveur.sh"
+echo -e "${neutre}"
+[ -d $MONTAGE ] && mount | grep $MONTAGE >/dev/null && umount $MONTAGE
+[ -d $MONTAGE ] && rm -r $MONTAGE
+}
+
 choix_archive_sauvegarde()
 {
 # 1 argument : la partition à examiner
 [ ! -d $MONTAGE ] && mkdir $MONTAGE
 mount /dev/$1 $MONTAGE
 pasbon="true"
-Sauvegardedisponible=$(ls -lt $SAUVEGARDE/etc/ | awk -- '{ print $9 " " $6 " " $7 }' | grep etc | sed "s/etc//g" | sed "s/tar.gz//g" | sed "s/\.//g")
+Sauvegardedisponible=$(ls -ltr $SAUVEGARDE/etc/ | awk -- '{ print $9 " " $6 " " $7 }' | grep etc | sed "s/etc//g" | sed "s/tar.gz//g" | sed "s/\.//g")
 echo -e ""
 while $pasbon :
 do
 	# affichage des sauvegardes disponibles
-	echo -e "${neutre}Sur le disque $PART, voici les sauvegardes disponibles :"
+	echo -e "${neutre}Sur le disque $1, voici les sauvegardes disponibles :"
 	echo "$Sauvegardedisponible"
-	echo -e "${bleu}Vous souhaitez restaurer la sauvegarde de quel jour ?"
-	echo -e "${neutre}(ne saisir que les trois premières lettres du jour : lun, mar,…)${vert} \c"
+	echo -e "${neutre}ne saisir que les trois premières lettres du jour : lun, mar,…"
+	echo -e "ou bien q pour abandonner"
+	echo -e "${bleu}Vous souhaitez restaurer la sauvegarde de quel jour ?${vert} \c"
 	read JOUR
 	# on vérifie que le choix est correct
 	case "$JOUR" in
@@ -273,9 +284,15 @@ do
 				echo -e "${neutre}"
 			fi
 			;;
+		q)
+			# abandon en cours possible
+			abandonner
+			return 1
+			;;
 		*)
 			echo -e "${rouge}Le choix saisi ${vert}$JOUR${rouge} est incorrect${neutre}"
 			echo -e "Exemples de choix corrects : lun, mar, mer, jeu, ven, sam, dim ou Sun, Mon,…"
+			echo -e "${orange}Si vous voulez abandonner la restauration, choisir q${neutre}"
 			echo -e ""
 			;;
 	esac
@@ -328,7 +345,7 @@ trouver_disque()
 echo -e "${neutre}\c"
 # on repère les disques branchés
 DISQUES=$(fdisk -l | grep ^/dev | grep -v Extended | grep -v swap | gawk -F" " '/[^:]/ {print $1}'| sed 's:/dev/::')
-# on repère les candidats : sauvegarde ayant au moins une archive quotidienne
+# on collecte les candidats : sauvegarde ayant au moins une archive quotidienne
 for part in $DISQUES
 do
 	trouver_sauvegarde $part
@@ -347,52 +364,40 @@ do
 			;;
 	esac
 done
-# on examine la liste des candidats
+# on examine la liste des candidats collectés
 if [ -z $candidat ]
 then
 	# aucun candidat
 	echo -e ""
 	echo -e "${rouge}Aucun disque ne contient de répertoire ${orange}$SAUV${rouge} ou d'archive quotidienne${neutre}"
-	echo -e "${neutre}"
-	echo -e "${orange}Restauration annulée, vous pourrez la relancer en utilisant ${neutre}restaure_serveur.sh"
-	echo -e "${neutre}"
-	return 1
+	abandonner
+	exit 1
 else
 	# tester s'il y a plusieurs disques possédant une sauvegarde
 	nombre=$(echo ${#candidat[*]})
 	case $nombre in
 		1)
-			# un seul disque possède une sauvegarde
+			# un seul disque possède une sauvegarde : normal
 			PART=$candidat
 			;;
 		*)
-			# plusieurs disques possèdent des sauvegardes
-			pasbon="true"
-			while $pasbon :
-			do
-				echo -e ""
-				echo -e "${neutre}Plusieurs disques possèdent une sauvegarde :${neutre} \c"
-				echo ${candidat[*]}
-				echo -e "${bleu}Lequel doit-on choisir ?${vert} \c"
-				read PART
-				echo -e "${neutre}\c"
-				# on vérifie que le choix opéré est un de ceux disponibles
-				test=""
-				for element in ${candidat[*]}
-				do
-					[ "$PART" = "$element" ] && test="cbon"
-				done
-				if [ "$test" = "cbon" ]
-				then
-						pasbon="false"
-				else
-					echo -e "${rouge}Le choix ${vert}$PART${rouge} saisi est incorrect${neutre}"
-				fi
-			done
+			# plusieurs disques possèdent des sauvegardes : bizarre
+			echo -e ""
+			echo -e "${rouge}Plusieurs disques possèdent une sauvegarde :${neutre} \c"
+			echo ${candidat[*]}
+			echo -e "${neutre}Il ne faut qu'un seul disque possédant une sauvegarde${neutre}"
+			abandonner
+			exit 1
 			;;
 	esac
 	choix_archive_sauvegarde $PART
-	return 0
+	if [ $? = "0" ]
+	then
+		return 0
+	else
+		exit 1
+	fi
+	
 fi
 }
 
@@ -446,10 +451,12 @@ restaure_dhcp
 # Début du programme
 #
 echo -e ""
-echo -e "$DATERESTAURATION ${bleu}Restauration du se3\n" 2>&1 | tee -a $COURRIEL
-echo -e "${neutre}Ce script va restaurer la configuration de votre SE3 à partir d'une sauvegarde"
+echo -e "${bleu}Restauration du se3 ${neutre}$DATERESTAURATION${neutre}\n" 2>&1 | tee -a $COURRIEL
+echo -e "Ce script va restaurer la configuration de votre SE3 à partir d'une sauvegarde"
 echo -e "${orange}Assurez-vous d'avoir installé tous les modules du se3 préalablement utilisés"
-echo -e "Si vous installez ces modules *après* la restauration, les fichiers de configuration seront remis à zéro${neutre}"
+echo -e "Si vous installez ces modules *après* la restauration, les fichiers de configuration seront remis à zéro"
+echo -e ""
+echo -e "${neutre}N'oubliez pas de brancher sur un port usb le disque comportant une sauvegarde de votre se3"
 echo -e "-------------------"
 echo -e "${bleu}Souhaitez-vous procéder à la restauration maintenant ? ${neutre}(oui ou  OUI)${vert} \c"
 read REPONSE1
@@ -465,9 +472,7 @@ case $REPONSE1 in
 		redemarrer					# demande de redémarrage du serveur
 		;;
 	*)
-		echo -e ""
-		echo -e "${orange}Restauration annulée, vous pourrez la relancer en utilisant ${neutre}restaure_serveur.sh"
-		echo -e "${neutre}"
+		abandonner
 		;;
 esac
 exit 0
