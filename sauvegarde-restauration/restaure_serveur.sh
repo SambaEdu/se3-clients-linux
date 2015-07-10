@@ -75,7 +75,7 @@ neutre='\e[0;m'
 recuperer_mail()
 {
 # on récupére l'adresse mel de l'administrateur
-echo -e "${jaune}`date +%r` ${neutre}Récupération de l'adresse de messagerie de l'administrateur${neutre}" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Récupération de l'adresse de messagerie de l'administrateur${neutre}" 2>&1 | tee -a $COURRIEL
 MAIL=$(cat /etc/ssmtp/ssmtp.conf | grep root | cut -d "=" -f 2) 
 }
 
@@ -83,7 +83,7 @@ mise_a_jour()
 {
 # Mise à jour
 echo -e ""
-echo -e "${jaune}`date +%r` ${neutre}Mise à jour du se3${neutre}" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Mise à jour du se3${neutre}" 2>&1 | tee -a $COURRIEL
 sleep 1
 aptitude update
 /usr/share/se3/scripts/se3_update_system.sh
@@ -92,17 +92,17 @@ echo -e ""
 
 arret_des_serveurs()
 {
-echo -e "${jaune}`date +%r` ${neutre}Arrêt du serveur ldap${neutre}" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Arrêt du serveur ldap${neutre}" 2>&1 | tee -a $COURRIEL
 /etc/init.d/slapd stop
-echo -e "${jaune}`date +%r` ${neutre}Arrêt du serveur samba" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Arrêt du serveur samba" 2>&1 | tee -a $COURRIEL
 /etc/init.d/samba stop
 }
 
 lancement_des_serveurs()
 {
-echo -e "${jaune}`date +%r` ${neutre}Démarrage du serveur ldap" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Démarrage du serveur ldap" 2>&1 | tee -a $COURRIEL
 /etc/init.d/slapd start
-echo -e "${jaune}`date +%r` ${neutre}Démarrage du serveur samba" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Démarrage du serveur samba" 2>&1 | tee -a $COURRIEL
 /etc/init.d/samba start
 }
 
@@ -118,23 +118,28 @@ then
 	read REPONSE
 	case $REPONSE in
 		oui|OUI)
-			echo -e "${jaune}`date +%r` ${neutre}Restauration des homes" 2>&1 | tee -a $COURRIEL
+			echo -e "${jaune}`date +%R` ${neutre}Restauration des homes" 2>&1 | tee -a $COURRIEL
 			cd /
 			cp -ar $SAUVEGARDEHOME/home/* /home
-			echo -e "${jaune}`date +%r` ${neutre}Restauration de /var/se3" 2>&1 | tee -a $COURRIEL
+			echo -e "${jaune}`date +%R` ${neutre}Restauration de /var/se3" 2>&1 | tee -a $COURRIEL
 			cd /
 			cp -ar $SAUVEGARDEHOME/se3/* /var/se3
-			echo -e "${jaune}`date +%r` ${neutre}Restauration des ACL de /var/se3" 2>&1 | tee -a $COURRIEL
+			echo -e "${jaune}`date +%R` ${neutre}Restauration des ACL de /var/se3" 2>&1 | tee -a $COURRIEL
 			cd /var/se3
 			setfacl --restore=$SAUVEGARDEHOME/varse3.acl
 			cd /home
-			echo -e "${jaune}`date +%r` ${neutre}Restauration des droits" 2>&1 | tee -a $COURRIEL
+			echo -e "${jaune}`date +%R` ${neutre}Restauration des droits" 2>&1 | tee -a $COURRIEL
 			/usr/share/se3/sbin/restore_droits.sh
 			;;
 		*)
-			echo -e "${jaune}`date +%r` ${neutre}Pas de restauration des homes et de /var/se3" 2>&1 | tee -a $COURRIEL
+			echo -e "${jaune}`date +%R` ${neutre}Pas de restauration des homes et de /var/se3" 2>&1 | tee -a $COURRIEL
 			;;
 	esac
+else
+	echo -e ""
+	echo -e "${jaune}`date +%R` ${orange}Pas de répertoire $SAVHOME${neutre}" 2>&1 | tee -a $COURRIEL
+	echo -e "Pas de restauration possible des homes et de /var/se3"
+	sleep 1
 fi
 }
 
@@ -148,44 +153,44 @@ test1=$(ls /savetc/etc/cups/ | grep printers.conf)
 test2=$(test -d /savetc/etc/samba/printers_se3/ && ls /savetc/etc/samba/printers_se3/)
 if [ "$test1" != "" ] || [ "$test2" != "" ]
 then
-	echo -e "${jaune}`date +%r` ${neutre}Restauration de la conf des imprimantes" 2>&1 | tee -a $COURRIEL
+	echo -e "${jaune}`date +%R` ${neutre}Restauration de la conf des imprimantes" 2>&1 | tee -a $COURRIEL
 	[ "$test1" != "" ] && cp -ar /savetc/etc/cups/printers.conf* /etc/cups/
 	[ "$test2" != "" ] && [ ! -d /etc/samba/printers_se3/ ] && mkdir -p /etc/samba/printers_se3
 	[ "$test2" != "" ] && cp -ar /savetc/etc/samba/printers_se3/* /etc/samba/printers_se3
 else
-	echo -e "${jaune}`date +%r` ${orange}Pas de conf d'imprimante à restaurer${neutre}" 2>&1 | tee -a $COURRIEL
+	echo -e "${jaune}`date +%R` ${orange}Pas de conf d'imprimante à restaurer${neutre}" 2>&1 | tee -a $COURRIEL
 fi
 }
 
 restaure_ldap()
 {
-echo -e "${jaune}`date +%r` ${neutre}Nettoyage ldap" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Nettoyage ldap" 2>&1 | tee -a $COURRIEL
 cp -r /var/lib/ldap /var/lib/ldapold
 rm -Rf /var/lib/ldap/*
-echo -e "${jaune}`date +%r` ${neutre}Gestion du DB_CONFIG" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Gestion du DB_CONFIG" 2>&1 | tee -a $COURRIEL
 cp /var/lib/ldapold/DB_CONFIG /var/lib/ldap
-echo -e "${jaune}`date +%r` ${neutre}Restauration de la base ldap" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Restauration de la base ldap" 2>&1 | tee -a $COURRIEL
 slapadd  -l $SAUVEGARDE/ldap/ldap.$JOUR.ldif
 chown -R openldap:openldap /var/lib/ldap
 }
 
 restaure_mysql()
 {
-echo -e "${jaune}`date +%r` ${neutre}Nettoyage mysql" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Nettoyage mysql" 2>&1 | tee -a $COURRIEL
 cp -r /var/lib/mysql /var/lib/mysql.ori
 rm -Rf /var/lib/mysql/se3db/*
-echo -e "${jaune}`date +%r` ${neutre}Restauration se3db"  2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Restauration se3db"  2>&1 | tee -a $COURRIEL
 mysql --database se3db < $SAUVEGARDE/mysql/se3db.$JOUR.sql
-echo -e "${jaune}`date +%r` ${neutre}Redémarrage du serveur mysql" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Redémarrage du serveur mysql" 2>&1 | tee -a $COURRIEL
 /etc/init.d/mysql restart
 }
 
 restaure_samba()
 {
 cd /
-echo -e "${jaune}`date +%r` ${neutre}Restauration de Samba" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Restauration de Samba" 2>&1 | tee -a $COURRIEL
 cp -ar $SAUVEGARDEHOME/samba/* /etc/samba
-echo -e "${jaune}`date +%r` ${neutre}Restauration du secrets.tdb" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Restauration du secrets.tdb" 2>&1 | tee -a $COURRIEL
 cp $SAUVEGARDE/secrets.tdb /var/lib/samba/secrets.tdb
 }
 
@@ -193,57 +198,25 @@ restaure_imprimantes()
 {
 if [ -f "$SAUVEGARDE/printers.tgz" ]
 then
-	echo -e "${jaune}`date +%r` ${neutre}Restauration des imprimantes" 2>&1 | tee -a $COURRIEL
+	echo -e "${jaune}`date +%R` ${neutre}Restauration des imprimantes" 2>&1 | tee -a $COURRIEL
 	cp $SAUVEGARDE/printers.tgz /etc/cups
 	cd /etc/cups
 	tar zxf printers.tgz
 	#cd -
 else
-	echo -e "${jaune}`date +%r` ${orange}Pas d'imprimante à restaurer${neutre}" 2>&1 | tee -a $COURRIEL
+	echo -e "${jaune}`date +%R` ${orange}Pas d'imprimante à restaurer${neutre}" 2>&1 | tee -a $COURRIEL
 fi
-}
-
-gestion_temps()
-{
-DATEFIN=$(date +%s)				# Fin de la restauration en secondes
-TEMPS=$(($DATEFIN-$DATEDEBUT))	# durée de la restauration, en secondes
-HEURES=$(( TEMPS/3600 ))
-MINUTES=$(( (TEMPS-HEURES*3600)/60 ))
-echo ""
-# gestion de l'accord pour les heures ; pour les minutes, elles seront souvent plusieurs ;-)
-case $HEURES in
-	0)
-		echo "Restauration effectuée en environ $MINUTES minutes" 2>&1 | tee -a $COURRIEL
-	;;
-	1)
-		echo "Restauration effectuée en environ $HEURES heure et $MINUTES minutes" 2>&1 | tee -a $COURRIEL
-	;;
-	*)
-		echo "Restauration effectuée en environ $HEURES heures et $MINUTES minutes" 2>&1 | tee -a $COURRIEL
-	;;
-esac
-echo "" >> $COURRIEL
-echo "Un fichier récapitulatif est disponible : $COURRIEL si nécessaire" >> $COURRIEL
-echo "" >> $COURRIEL
-}
-
-courriel()
-{
-gestion_temps
-# Envoi du compte-rendu
-cat $COURRIEL | mail $MAIL -s "Restauration Se3 : compte-rendu" -a "Content-type: text/plain; charset=UTF-8"
-#rm $COURRIEL
 }
 
 restaure_adminse3()
 {
-echo -e "${jaune}`date +%r` ${neutre}Création du compte adminse3" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Création du compte adminse3" 2>&1 | tee -a $COURRIEL
 create_adminse3.sh
 }
 
 restaure_dhcp()
 {
-echo -e "${jaune}`date +%r` ${neutre}Restauration configuration DHCP" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Restauration configuration DHCP" 2>&1 | tee -a $COURRIEL
 /usr/share/se3/scripts/makedhcpdconf
 }
 
@@ -325,6 +298,7 @@ trouver_sauvegarde()
 [ -d $MONTAGE ] && mount | grep $MONTAGE >/dev/null && umount $MONTAGE
 [ ! -d $MONTAGE ] && mkdir $MONTAGE
 mount /dev/$1 $MONTAGE
+# Y a-t-il un répertoire SauveGarde, sans que ce soit SauveGardeHome ?
 SAV=$(ls $MONTAGE | grep $SAUV | grep -v $SAUVHOME)
 if [ -n "$SAV" ]
 then
@@ -352,6 +326,7 @@ do
 	case $? in
 		0)
 			# le candidat contient un répertoire SauveGarde
+			# reste à savoir s'il contient des archives
 			trouver_archive_sauvegarde $part
 			if [ "$?" = "0" ]
 			then
@@ -367,7 +342,7 @@ done
 # on examine la liste des candidats collectés
 if [ -z $candidat ]
 then
-	# aucun candidat
+	# aucun candidat : bizarre
 	echo -e ""
 	echo -e "${rouge}Aucun disque ne contient de répertoire ${orange}$SAUV${rouge} ou d'archive quotidienne${neutre}"
 	abandonner
@@ -401,11 +376,41 @@ else
 fi
 }
 
+gestion_temps()
+{
+DATEFIN=$(date +%s)				# Fin de la restauration en secondes
+TEMPS=$(($DATEFIN-$DATEDEBUT))	# durée de la restauration, en secondes
+HEURES=$(( TEMPS/3600 ))
+MINUTES=$(( (TEMPS-HEURES*3600)/60 ))
+# gestion de l'accord pour les heures ; pour les minutes, elles seront souvent plusieurs ;-)
+case $HEURES in
+	0)
+		echo "Restauration effectuée en environ $MINUTES minutes" 2>&1 | tee -a $COURRIEL
+	;;
+	1)
+		echo "Restauration effectuée en environ $HEURES heure et $MINUTES minutes" 2>&1 | tee -a $COURRIEL
+	;;
+	*)
+		echo "Restauration effectuée en environ $HEURES heures et $MINUTES minutes" 2>&1 | tee -a $COURRIEL
+	;;
+esac
+}
+
+courriel()
+{
+# Envoi du compte-rendu
+echo "Un fichier récapitulatif est disponible si nécessaire : $COURRIEL" >> $COURRIEL
+echo "" >> $COURRIEL
+cat $COURRIEL | mail $MAIL -s "Restauration Se3 : compte-rendu" -a "Content-type: text/plain; charset=UTF-8"
+#rm $COURRIEL
+}
+
 menage()
 {
 rm -rf /savetc
-echo -e "${jaune}`date +%r` ${neutre}Travail terminé : ${vert}se3 restauré${neutre}" 2>&1 | tee -a $COURRIEL
-echo -e "${neutre}" 2>&1 | tee -a $COURRIEL
+echo -e "${jaune}`date +%R` ${neutre}Travail terminé : ${vert}se3 restauré${neutre}" 2>&1 | tee -a $COURRIEL
+gestion_temps
+#echo -e "${neutre}" 2>&1 | tee -a $COURRIEL
 echo -e "Le se3 doit redémarrer pour prendre en compte toutes les modifications" 2>&1 | tee -a $COURRIEL
 umount $MONTAGE
 rm -r $MONTAGE
@@ -413,8 +418,8 @@ rm -r $MONTAGE
 
 redemarrer()
 {
-echo -e "Un compte-rendu de la restauration a été envoyé par la messagerie"
-echo -e "${orange}Souhaitez-vous redémarrer maintenant ? ${neutre}(oui ou OUI)${vert} \c"
+echo -e "${neutre}Un compte-rendu de la restauration a été envoyé par la messagerie"
+echo -e "${bleu}Souhaitez-vous redémarrer maintenant ? ${neutre}(oui ou OUI)${vert} \c"
 read REPONSE2
 case $REPONSE2 in
 	oui|OUI)
@@ -423,7 +428,7 @@ case $REPONSE2 in
 		;;
 	*)
 		echo -e ""
-		echo -e "${bleu}À bientôt ! N'oubliez pas de redémarrer…${neutre}"
+		echo -e "${neutre}À bientôt ! N'oubliez pas de redémarrer…${neutre}"
 		echo -e ""
 		;;
 esac
@@ -450,7 +455,7 @@ restaure_dhcp
 #####
 # Début du programme
 #
-echo -e ""
+echo -e "" > $COURRIEL
 echo -e "${bleu}Restauration du se3 ${neutre}$DATERESTAURATION${neutre}\n" 2>&1 | tee -a $COURRIEL
 echo -e "Ce script va restaurer la configuration de votre SE3 à partir d'une sauvegarde"
 echo -e "${orange}Assurez-vous d'avoir installé tous les modules du se3 préalablement utilisés"
