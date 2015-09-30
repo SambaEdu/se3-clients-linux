@@ -7,7 +7,7 @@
 # ou pour une migration d'un ancien serveur à un nouveau serveur se3
 #
 # version du 16/04/2014
-# modifiée le 09/07/2015
+# modifiée le 30/09/2015
 #
 # Auteurs :		Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
 #				François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
@@ -74,9 +74,10 @@ neutre='\e[0;m'
 
 recuperer_mail()
 {
-# on récupére l'adresse mel de l'administrateur
+# on récupère l'adresse mel de l'administrateur
 echo -e "${jaune}`date +%R` ${neutre}Récupération de l'adresse de messagerie de l'administrateur${neutre}" 2>&1 | tee -a $COURRIEL
-MAIL=$(cat /etc/ssmtp/ssmtp.conf | grep root | cut -d "=" -f 2) 
+MAIL=$(cat /etc/ssmtp/ssmtp.conf | grep ^root | cut -d "=" -f 2)
+echo -e "l'adresse de messagerie est $MAIL" 2>&1 | tee -a $COURRIEL
 }
 
 mise_a_jour()
@@ -396,15 +397,6 @@ case $HEURES in
 esac
 }
 
-courriel()
-{
-# Envoi du compte-rendu
-echo "Un fichier récapitulatif est disponible si nécessaire : $COURRIEL" >> $COURRIEL
-echo "" >> $COURRIEL
-cat $COURRIEL | mail $MAIL -s "Restauration Se3 : compte-rendu" -a "Content-type: text/plain; charset=UTF-8"
-#rm $COURRIEL
-}
-
 menage()
 {
 rm -rf /savetc
@@ -414,6 +406,15 @@ gestion_temps
 echo -e "Le se3 doit redémarrer pour prendre en compte toutes les modifications" 2>&1 | tee -a $COURRIEL
 umount $MONTAGE
 rm -r $MONTAGE
+}
+
+courriel()
+{
+# Envoi du compte-rendu
+echo "Un fichier récapitulatif est disponible si nécessaire : $COURRIEL" >> $COURRIEL
+echo "" >> $COURRIEL
+OBJET="Restauration Se3 : compte-rendu"
+cat $COURRIEL | mail $MAIL -s "$OBJET" -a "Content-type: text/plain; charset=UTF-8"
 }
 
 redemarrer()
