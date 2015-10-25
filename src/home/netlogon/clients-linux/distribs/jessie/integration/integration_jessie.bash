@@ -1,10 +1,12 @@
 #! /bin/bash
 
 ##### #####
-# script d'intégration des clients Jessie
+# script d'intégration des clients Jessie à un domaine géré par un se3
 #
 #
-# version : 20150607
+# version : 20151026
+#
+# NB : seul gdm3 a été testé avec ce script (20151026)
 #
 ##### #####
 
@@ -39,7 +41,9 @@ NOM_CLIENT_ANCIEN=$(cat "/etc/hostname")
 
 # Le nom de code de la distribution (par exemple "squeeze").
 NOM_DE_CODE=$(lsb_release --codename | cut -f 2)
-#NOM_DE_CODE="wheezy"
+
+# Le gestionnaire de connexion
+gdm="$(cat /etc/X11/default-display-manager | cut -d / -f 4)"
 
 # Le partage du Se3.
 NOM_PARTAGE_NETLOGON="netlogon-linux"
@@ -63,7 +67,8 @@ REP_LOG_LOCAL="$REP_SE3_LOCAL/log"
 REP_TMP_LOCAL="$REP_SE3_LOCAL/tmp"
 LOGON_SCRIPT_LOCAL="$REP_BIN_LOCAL/logon"
 PAM_SCRIPT_AUTH="/usr/share/libpam-script/pam_script_auth"
-CREDENTIALS="$REP_TMP_LOCAL/credentials"'_$PAM_USER'
+CREDENTIALS="$REP_TMP_LOCAL/credentials"
+#LIGHTDM_CONF="/etc/lightdm/lightdm.conf"
 
 # Les options de base pour un montage CIFS.
 OPTIONS_MOUNT_CIFS_BASE="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
@@ -234,10 +239,10 @@ function configurer_gdm3 ()
     #############################
     #############################
 
-    afficher "Configuration de gdm3 afin que le script de logon soit" \
-         "exécuté au démarrage de gdm3, à l'ouverture et à la" \
-         "fermeture de session"
-       
+    afficher "Configuration du gestionnaire de connexion ${gdm} "\
+         "afin que le script de logon soit exécuté au démarrage de ${gdm}," \
+         "à l'ouverture et à la fermeture de session."
+
     ######################################################
     ### Modification du fichier /etc/gdm3/Init/Default ###
     ######################################################
@@ -331,7 +336,7 @@ exit 0
     chmod "700" "/etc/gdm3/PostSession/Default"
 
     ########################################################
-    ### Modification de /etc/gdm3/greeter.gsettings ###
+    ### Modification de /etc/gdm3/greeter.dconf-defaults ###
     ########################################################
 
     # Ce fichier permet de gérer quelques options de la fenêtre de
@@ -339,26 +344,34 @@ exit 0
 
     # Modification du fichier en partant de la version sauvegardée
     # toujours pour être sûr de partir d'un fichier « clean ».
-    restaurer_via_save "/etc/gdm3/greeter.gsettings"
-    echo "
-
-###########################################################################
-###         Modification pour l'intégration au domaine                  ###
-###########################################################################"
-
-    sed -r -i -e 's/^\# disable-user-list=true.*$/disable-user-list=true/g' /etc/gdm3/greeter.gsettings
-
+    restaurer_via_save "/etc/gdm3/greeter.dconf-defaults"
+    sed -r -i -e 's/^\# disable-user-list=true.*$/disable-user-list=true/g' /etc/gdm3/greeter.dconf-defaults
 }
 
+# à analyser pour lightdm (20151026)
 function configurer_lightdm ()
 {
+    #############################
+    #############################
+    ### Configuration de gdm3 ###
+    #############################
+    #############################
+
+    afficher "Configuration du gestionnaire de connexion ${gdm} "\
+         "afin que le script de logon soit exécuté au démarrage de ${gdm}," \
+         "à l'ouverture et à la fermeture de session."
+
+    #########################################################
+    ### Modification du fichier /etc/lightdm/lightdm.conf ###
+    #########################################################
+
     restaurer_via_save "/etc/lightdm/lightdm.conf"
     sed -r -i "s|#greeter-setup-script.*$|greeter-setup-script=\"${LOGON_SCRIPT_LOCAL}\" initialisation|g" /etc/lightdm/lightdm.conf
     sed -r -i "s|#session-setup-script.*$|session-setup-script=\"${LOGON_SCRIPT_LOCAL}\" ouverture|g" /etc/lightdm/lightdm.conf
     sed -r -i "s|#session-cleanup-script.*$|session-cleanup-script=\"${LOGON_SCRIPT_LOCAL}\" fermeture|g" /etc/lightdm/lightdm.conf
 }
 
-# Avec de se terminer la fonction nettoyer_avant_de_sortir sera appelée.
+# Avant de se terminer la fonction nettoyer_avant_de_sortir sera appelée.
 trap 'nettoyer_avant_de_sortir' EXIT
 
 #=====
@@ -524,6 +537,18 @@ then
 fi
 }
 
+verifier_gdm()
+{
+# On vérifie que le système utilise un gestionnaire de connexion testé
+# NB : pour l'instant, ce sript n'a été testé qu'avec gdm3
+if [ "$gdm" != "gdm3" ]
+then
+	afficher "Désolé, le script doit être exécuté avec gdm3  et non ${gdm}." \
+             "Fin du script."
+	exit 1
+fi
+}
+
 verifier_nom_client()
 {
 # Vérification du nom du client à intégrer.
@@ -680,7 +705,8 @@ arret_definitif_avahi_daemon()
 # ampute le système de plein de fonctionnalités. Le mieux, c'est donc
 # de stopper ce daemon et d'empêcher son lancement lors du démarrage
 # du système.
-invoke-rc.d avahi-daemon stop >$SORTIE 2>&1
+#invoke-rc.d avahi-daemon stop >$SORTIE 2>&1
+service avahi-daemon stop >$SORTIE 2>&1
 update-rc.d -f avahi-daemon remove >$SORTIE 2>&1
 }
 
@@ -701,7 +727,8 @@ arret_definitif_exim4_daemon()
 # On stoppe définitivement le daemon exim4 qui ne sert pas dans le
 # cas d'une station cliente et qui peut bloquer pendant quelques secondes
 # (voire quelques minutes) l'arrivée du prompt de login sur tty[1-6].
-invoke-rc.d exim4 stop >$SORTIE 2>&1
+#invoke-rc.d exim4 stop >$SORTIE 2>&1
+service exim4 stop >$SORTIE 2>&1
 update-rc.d -f exim4 remove >$SORTIE 2>&1
 }
 
@@ -975,8 +1002,10 @@ if "$OPTION_NOM_CLIENT"
 then
 	afficher "Changement de nom du système."
 	echo "$NOM_CLIENT" > "/etc/hostname"
-	invoke-rc.d hostname.sh stop > $SORTIE 2>&1
-	invoke-rc.d hostname.sh start > $SORTIE 2>&1
+	#invoke-rc.d hostname.sh stop > $SORTIE 2>&1
+	service hostname stop > $SORTIE 2>&1
+	#invoke-rc.d hostname.sh start > $SORTIE 2>&1
+	service hostname start > $SORTIE 2>&1
 fi
 
 unset -v cartes_reseau carte_mac_ip carte adresse_mac adresse_ip 
@@ -999,8 +1028,10 @@ then
 	# mot de passe Grub terminée.
 	apt-get install --reinstall --yes --force-yes $PAQUETS_RANDOM > $SORTIE 2>&1
 	echo "HRNGDEVICE=/dev/urandom" >> "/etc/default/rng-tools"
-	invoke-rc.d rng-tools stop > $SORTIE 2>&1
-	invoke-rc.d rng-tools start > $SORTIE 2>&1
+	#invoke-rc.d rng-tools stop > $SORTIE 2>&1
+	service rng-tools stop > $SORTIE 2>&1
+	#invoke-rc.d rng-tools start > $SORTIE 2>&1
+	service rng-tools start > $SORTIE 2>&1
 	
 	if [ -z "$MDP_GRUB" ]
 	then
@@ -1042,12 +1073,6 @@ then
 fi
 }
 
-annuler_timeout_demarrage()
-{
-sed -r -i -e 's/^\GRUB_TIMEOUT=5.*$/GRUB_TIMEOUT=-1/g' /etc/default/grub
-update-grub > $SORTIE 2>&1
-}
-
 mise_en_place_mot_de_passe_root()
 {
 # Si l'option  --mdp-root n'a pas été spécifiée,
@@ -1076,48 +1101,6 @@ then
 	unset -v mot_de_passe
 	
 fi
-}
-
-
-enumerer_cartes_reseau()
-{
-# Avant de désinstaller network-manager*, on énumère les cartes
-# réseau présentes sur le système, sachant que ça inclut « lo ».
-cartes_reseau=$(ifconfig | grep -i '^[a-z]' | cut -d' ' -f 1)
-
-config_cartes="/etc/network/interfaces"
-}
-
-purger_network_manager()
-{
-apt-get remove --purge --yes network-manager network-manager-gnome > $SORTIE 2>&1
-}
-
-infos_configuration_cartes_reseau()
-{
-echo "
-# Fichier édité lors de l'intégration de la machine au domaine SE3.
-# NetworkManager a été désinstallé du système et c'est maintenant ce
-# fichier qui gère la configuration des cartes réseau de la machines.
-
-auto lo
-iface lo inet loopback
-" > "$config_cartes"
-
-for carte in $cartes_reseau
-do
-    [ "$carte" = "lo" ] && continue
-	echo "auto $carte" >> "$config_cartes"
-	echo "iface $carte inet dhcp" >> "$config_cartes"
-	echo "" >> "$config_cartes"
-done
-
-invoke-rc.d networking stop > $SORTIE 2>&1
-invoke-rc.d networking start > $SORTIE 2>&1
-
-verifier_acces_ping_se3
-
-unset -v cartes_reseau config_cartes
 }
 
 installer_paquets_integration()
@@ -1150,7 +1133,7 @@ apt-get install --no-install-recommends --yes --reinstall $PAQUETS_AUTRES > $SOR
 installer_paquet_sudo()
 {
 # Cas particulier. Sur Squeeze, on a besoin du paquet sudo.
-# est-ce toujours le cas avec Wheezy ?
+# est-ce toujours le cas avec Jessie ?
 apt-get install --yes  sudo > $SORTIE 2>&1
 }
 
@@ -1209,19 +1192,31 @@ sed -i -r -e 's/^.*pam_unix\.so.*$/session    sufficient    pam_unix.so/g' "/etc
 
 modifier_fichiers_pam()
 {
-# On modifie le fichier /etc/pam.d/gdm3  ou /etc/pam.d/lightdm afin que :
-# 1) Il fasse appel à la bibliothèque pam_script.so.
-# 2) Il y ait des « includes » des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
+# On modifie le fichier /etc/pam.d/gdm-password  ou /etc/pam.d/lightdm afin que :
+# 1) il fasse appel à la bibliothèque pam_script.so.
+# 2) il y ait des « includes » des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
 
-gdm="$(cat /etc/X11/default-display-manager | cut -d / -f 4)"
-echo "Gestionnaire graphique installé $gdm"
-restaurer_via_save "/etc/pam.d/${gdm}"
+echo "Gestionnaire de connexion installé : $gdm"
+if [ "$gdm" = "gdm3" ]
+then
+	# le nom du fichier gdm3 a changé avec Jessie
+	fichier_gdm="gdm-password"
+fi
+if [ "$gdm" = "lightdm" ]
+then
+	# non testé avec Jessie (20151026)
+	fichier_gdm="lightdm"
+fi
+restaurer_via_save "/etc/pam.d/${fichier_gdm}"
 # Insertion de la ligne « auth    optional    pam_script.so ».
 awk '{ print $0 } /^auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
-"${REP_SAVE_LOCAL}/etc/pam.d/${gdm}" > "/etc/pam.d/${gdm}"
+"${REP_SAVE_LOCAL}/etc/pam.d/${fichier_gdm}" > "/etc/pam.d/${fichier_gdm}"
 # Inclusion des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
-sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/${gdm}"
+sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/${fichier_gdm}"
+}
 
+creation_fichier_pam()
+{
 # Création du fichier PAM_SCRIPT_AUTH.
 echo '#! /bin/bash
 
@@ -1263,6 +1258,7 @@ parametrer_gnome_screensaver()
 {
 # Paramétrage de gnome-screensaver utiliser quand une session
 # doit être déverrouillée.
+# NB : à modifier pour Jessie ! (20151026)
 restaurer_via_save "/etc/pam.d/gnome-screensaver"
 sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/gnome-screensaver"
 }
@@ -1280,16 +1276,6 @@ ff00::0  ip6-mcastprefix
 ff02::1  ip6-allnodes
 ff02::2  ip6-allrouters
 " > "/etc/hosts"
-
-#Modification inutile sur Wheezy
-#afficher "Modification du fichier /etc/dhcp/chclient.conf afin que le" \
-#         "nom de la machine soit envoyé au serveur DHCP par le client DHCP."
-
-# Et nous allons également modifier le fichier
-# /etc/dhcp/chclient.conf afin que le nom de machine soit
-# envoyé au serveur DHCP.
-#restaurer_via_save "/etc/dhcp/dhclient.conf"
-#sed -i -r -e "s/^.*send host-name.*$/send host-name \"$NOM_CLIENT\";/g" "/etc/dhcp/dhclient.conf"
 }
 
 reecrire_fichier_nslcd()
@@ -1314,8 +1300,10 @@ tls_reqcert never
 
 " > "/etc/nslcd.conf"
 
-invoke-rc.d nslcd stop > $SORTIE 2>&1
-invoke-rc.d nslcd start > $SORTIE 2>&1
+#invoke-rc.d nslcd stop > $SORTIE 2>&1
+service nslcd stop > $SORTIE 2>&1
+#invoke-rc.d nslcd start > $SORTIE 2>&1
+service nslcd start > $SORTIE 2>&1
 }
 
 modifier_fichier_smb()
@@ -1327,7 +1315,8 @@ then
              "à la machine cliente que le serveur SambaÉdu est le" \
              "serveur WINS du domaine."
 	sed -i -r -e "s/^.*wins +server +=.*$/wins server = $SE3/" "/etc/samba/smb.conf"
-	invoke-rc.d samba restart > $SORTIE 2>&1
+	#invoke-rc.d samba restart > $SORTIE 2>&1
+	service samba restart > $SORTIE 2>&1
 fi
 }
 
@@ -1354,7 +1343,7 @@ NTPOPTIONS=\"\"
 " > "/etc/default/ntpdate"
 }
 
-configurer_gestionnaire_graphique()
+configurer_gestionnaire_connexion()
 {
 if [ "$gdm" = "gdm3" ]
 then
@@ -1559,10 +1548,12 @@ definir_paquets_a_installer
 ###################################
 
 afficher "Vérifications sur le système client..."
-echo -n " 7..."
+echo -n " 8..."
 verifier_droits_root
-echo -n " 6..."
+echo -n " 7..."
 verifier_version_debian
+echo -n " 6..."
+verifier_gdm
 echo -n " 5..."
 verifier_nom_client
 echo -n " 4..."
@@ -1574,16 +1565,18 @@ verifier_disponibilite_paquets
 echo -n " 1..."
 verifier_ip_se3
 echo " 0..."
+afficher "Vérification accès se3"
 verifier_acces_ping_se3
-afficher " Vérifications OK."
+afficher "Vérifications OK."
 afficher "désinstallation du paquet libnss-mdns"
 desinstaller_mDNS
 afficher "arrêt définitif du service avahi-daemon"
 arret_definitif_avahi_daemon
 afficher "purge des paquets $PAQUETS_TOUS"
 purger_paquets
-afficher "arrêt définitif du daemon exim4"
-arret_definitif_exim4_daemon
+#afficher "arrêt définitif du daemon exim4"
+# NB : est-ce utile ? (20151026)
+#arret_definitif_exim4_daemon
 
 ###############################################
 ###############################################
@@ -1592,7 +1585,7 @@ arret_definitif_exim4_daemon
 ###############################################
 
 afficher "Montage du partage « $NOM_PARTAGE_NETLOGON » du serveur."
-afficher "installation des paquets $PAQUETS_MONTAGE_CIFS"
+afficher "installation du paquet $PAQUETS_MONTAGE_CIFS"
 installer_paquets_cifs
 afficher "montage du partage netlogon"
 montage_partage_netlogon
@@ -1632,7 +1625,7 @@ afficher "Installation de l'exécutable ldapsearch et vérification de la" \
          "connexion avec l'annuaire LDAP du serveur à travers une" \
          "recherche d'enregistrements en rapport avec le client (au niveau" \
          "du nom de machine ou de l'adresse MAC ou de l'adresse IP)."
-afficher "installation des paquets $PAQUETS_CLIENT_LDAP"
+afficher "installation du paquet $PAQUETS_CLIENT_LDAP"
 installer_paquets_client_ldap
 afficher "vérification de la connexion à l'annuaire ldap du se3"
 verifier_connexion_ldap_se3
@@ -1654,13 +1647,6 @@ renommer_nom_client
 # dépend de l'option --mdp-grub
 mettre_en_place_mot_de_passe_grub
 
-######################################################
-# Annulation du timeout de démarrage
-######################################################
-
-# est-il utile d'annuler le timeout du grub ?
-annuler_timeout_demarrage
-
 #######################################################
 #######################################################
 ### Mise en place (éventuelle) du mot de passe root ###
@@ -1670,31 +1656,16 @@ annuler_timeout_demarrage
 # dépend de l'option --mdp-root
 mise_en_place_mot_de_passe_root
 
-#########################################################################
-#########################################################################
-### Désinstallation des paquets network-manager network-manager-gnome ###
-#########################################################################
-#########################################################################
-
-enumerer_cartes_reseau
-afficher "Les paquets network-manager et network-manager-gnome vont être" \
-         "désinstallés. C'est le fichier $config_cartes qui permettra" \
-         "désormais de paramétrer la configuration IP des cartes réseau." \
-         "Par défaut, toutes les cartes réseau vont être configurées" \
-         "via le DHCP."
-purger_network_manager
-infos_configuration_cartes_reseau
-
 ################################
 ################################
 ### Installation des paquets ###
 ################################
 ################################
 
-afficher "Installation des paquets nécessaires à l'intégration."
+afficher "Installation des paquets nécessaires à l'intégration. : $PAQUETS_AUTRES"
 installer_paquets_integration
 # Cas particulier. Sur Squeeze, on a besoin du paquet sudo.
-# Est-ce toujours le cas avec Wheezy ?
+# Est-ce toujours le cas avec Jessie ?
 installer_paquet_sudo
 afficher "Installation des paquets terminée."
 desinstaller_gestionnaire_fenetres
@@ -1713,13 +1684,14 @@ afficher "Configuration de PAM afin que seul gdm3 (la fenêtre de login)" \
 renommer_fichiers_pam
 permettre_connexion_comptes_locaux
 modifier_fichiers_pam
-parametrer_gnome_screensaver
+creation_fichier_pam
+#parametrer_gnome_screensaver
 
-######################################################################
-######################################################################
-### Réécriture des fichiers /etc/hosts et /etc/dhcp/dhclient.conf ####
-######################################################################
-######################################################################
+###########################################
+###########################################
+### Réécriture des fichiers /etc/hosts ####
+###########################################
+###########################################
 
 # Peu importe que l'option --nom-client ait été spécifiée ou non,
 # nous allons réécriture le fichier /etc/hosts.
@@ -1764,8 +1736,7 @@ reecrire_fichier_ntpdate
 #########################################
 #########################################
 
-afficher "configuration du gestionnaire graphique"
-configurer_gestionnaire_graphique
+configurer_gestionnaire_connexion
 
 ###############################
 ###############################
@@ -1784,11 +1755,12 @@ modifier_fichier_user_dirs
 
 #########################################################################################
 ### Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy ###
+# fichier inexistant dans Jessie : à modifier ! (20151026)
 #########################################################################################
 
-afficher "Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy" \
-         "afin de désactiver l'hibernation et la mise en veille du système."
-desactiver_hibernation_mise_en_veille
+#afficher "Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy" \
+#         "afin de désactiver l'hibernation et la mise en veille du système."
+#desactiver_hibernation_mise_en_veille
 
 ############################
 ############################
