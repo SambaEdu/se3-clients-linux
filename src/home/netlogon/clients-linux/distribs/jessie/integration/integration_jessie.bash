@@ -4,9 +4,9 @@
 # script d'intégration des clients Jessie à un domaine géré par un se3
 #
 #
-# version : 20151026
+# version : 20151028
 #
-# NB : seul gdm3 a été testé avec ce script (20151026)
+# NB : seul gdm3 a été testé avec ce script (voir 20151026 dans le script)
 #
 ##### #####
 
@@ -27,11 +27,9 @@ export LC_ALL="C"
 export DEBIAN_FRONTEND=noninteractive
 
 
-#######################################
-#######################################
-### Quelques variables importantes. ###
-#######################################
-#######################################
+#=====
+# Quelques variables importantes
+#=====
 
 # Le nom de ce script.
 NOM_DU_SCRIPT=${0##*/}
@@ -76,99 +74,99 @@ OPTIONS_MOUNT_CIFS_BASE="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
 # Variable de sortie en cas de debuggage
 SORTIE="/dev/null"
 
-########################
-########################
-### Fonctions utiles ###
-########################
-########################
+
+#=====
+# Fonctions du programme
+# début
+#=====
 
 # Fonction pour afficher des messages.
-function afficher ()
+afficher ()
 {
-    echo ""
-    # On écrira des lignes de 65 caractères maximum.
-    echo "$@" | fmt -w 65
-    sleep 0.5
+echo ""
+# On écrira des lignes de 65 caractères maximum.
+echo "$@" | fmt -w 65
+sleep 0.5
 }
 
 # Fonction qui teste si le nom du client est un nom valide.
 # Elle prend un argument qui est le nom à tester bien sûr. 
 # Elle renvoie 0 si tout est Ok, 1 sinon (et dans ce cas un
 # message d'erreur est envoyé).
-function tester_nom_client ()
+tester_nom_client ()
 {
-    # $1 représente le nom du client
-    # La classe [a-z] dépend de la locale : sur mon système (Debian Squeeze)
-    # et avec la locale fr_FR.utf8 la classe [a-z] attrape les caractères
-    # accentués ce que je ne souhaite pas. Mais avec la locale C, 
-    # la classe [a-z] n'attrape pas les caractères accentués. 
-    # Devant ce comportement un peu versatile, je préfère mettre explicitement 
-    # la locale "C", même si en principe elle est déjà définie au début
-    # du script.
-    if echo "$1" | LC_ALL=C grep -Eiq '^[-a-z0-9]{1,15}$'
-    then
-        return 0
-    else
-        return 1
-    fi
+# $1 représente le nom du client
+# La classe [a-z] dépend de la locale : sur mon système (Debian Squeeze)
+# et avec la locale fr_FR.utf8 la classe [a-z] attrape les caractères
+# accentués ce que je ne souhaite pas. Mais avec la locale C, 
+# la classe [a-z] n'attrape pas les caractères accentués. 
+# Devant ce comportement un peu versatile, je préfère mettre explicitement 
+# la locale "C", même si en principe elle est déjà définie au début
+# du script.
+if echo "$1" | LC_ALL=C grep -Eiq '^[-a-z0-9]{1,15}$'
+then
+	return 0
+else
+	return 1
+fi
 }
 
 # Affiche un message d'erreur concernant le nom du client à intégrer.
-function afficher_erreur_nom_client ()
+afficher_erreur_nom_client ()
 {
-    afficher "Désolé, le client ne peut pas être intégré au" \
-             "domaine car son nom doit être uniquement constitué" \
-             "des caractères « -A-Za-z0-9 » avec 15 caractères maximum."
+afficher "Désolé, le client ne peut pas être intégré au" \
+         "domaine car son nom doit être uniquement constitué" \
+         "des caractères « -A-Za-z0-9 » avec 15 caractères maximum."
 }
 
 # Fonction qui Demande un mot de passe à l'utilisateur avec confirmation
 # et définit ensuite la variable « mot_de_passe » qui contient alors 
 # la saisie de l'utilisateur.
-function demander_mot_de_passe ()
+demander_mot_de_passe ()
 {
-    local mdp1
-    local mdp2
-    
-    printf "Saissez le mot de passe : "
-    read -s -r mdp1
-    printf "\n"
+local mdp1
+local mdp2
 
-    printf "Saissez le mot de passe à nouveau : "
-    read -s -r mdp2
-    printf "\n"
- 
-    while [ "$mdp1" != "$mdp2" ]
-    do
-        printf "Désolé, mais vos deux saisies ne sont pas identiques. Recommencez.\n"
+printf "saissez le mot de passe : "
+read -s -r mdp1
+printf "\n"
 
-        printf "Saissez le mot de passe : "
-        read -s -r mdp1
-        printf "\n"
+printf "saissez le mot de passe à nouveau : "
+read -s -r mdp2
+printf "\n"
 
-        printf "Saissez le mot de passe à nouveau : "
-        read -s -r mdp2
-        printf "\n"
-    done
-    
-    mot_de_passe="$mdp1" 
+while [ "$mdp1" != "$mdp2" ]
+do
+	printf "Désolé, mais vos deux saisies ne sont pas identiques. Recommencez.\n"
+
+	printf "saissez le mot de passe : "
+	read -s -r mdp1
+	printf "\n"
+
+	printf "saissez le mot de passe à nouveau : "
+	read -s -r mdp2
+	printf "\n"
+done
+
+mot_de_passe="$mdp1" 
 }
 
 # Fonction qui permet d'obtenir le hachage version Grub2 d'un mot 
 # de passe donné. La fonction prend un argument qui est le mot de 
 # passe en question.
-function hacher_mot_de_passe_grub ()
+hacher_mot_de_passe_grub ()
 {
-    { echo "$1"; echo "$1"; } \
-        | grub-mkpasswd-pbkdf2 -c 30 -l 30 -s 30 2>$SORTIE \
-        | grep -v 'password' \
-        | sed -r 's/Your PBKDF2 is (.+)$/\1/'  
+{ echo "$1"; echo "$1"; } \
+	| grub-mkpasswd-pbkdf2 -c 30 -l 30 -s 30 2>$SORTIE \
+	| grep -v 'password' \
+	| sed -r 's/Your PBKDF2 is (.+)$/\1/'  
 }
 
 # Fonction qui permet de changer le mot de passe root. Elle prend
 # un argument qui correspond au mot de passe souhaité.
-function changer_mot_de_passe_root ()
+changer_mot_de_passe_root ()
 {
-    { echo "$1"; echo "$1"; } | passwd root > $SORTIE 2>&1
+{ echo "$1"; echo "$1"; } | passwd root > $SORTIE 2>&1
 }
 
 # Fonction qui restaure, en préservant les droits, un fichier
@@ -177,87 +175,83 @@ function changer_mot_de_passe_root ()
 # 2) son nom doit être exprimé sous la forme d'un chemin absolu, correspondant
 # à son emplacement dans le système. Par exemple "/etc/machin" comme paramètre
 # implique que "$REP_SAVE_LOCAL"/etc/machin" doit exister.
-function restaurer_via_save ()
+restaurer_via_save ()
 {
-    # Si la cible existe déjà, elle sera écrasée.
-    cp -a "${REP_SAVE_LOCAL}$1" "$1"
+# Si la cible existe déjà, elle sera écrasée.
+cp -a "${REP_SAVE_LOCAL}$1" "$1"
 }
 
 # Fonction qui permettra de supprimer le montage REP_NETLOGON
 # (entre autres) si le script se termine incorrectement.
-function nettoyer_avant_de_sortir ()
+nettoyer_avant_de_sortir ()
 {
-    case "$?" in
+case "$?" in
 
-        "0")
-            # Tout va bien, on ne fait rien.
-            true
-            ;;
+	"0")
+		# Tout va bien, on ne fait rien
+		true
+		;;
 
-        "1")
-            # Là, il y a eu un problème. Il faut démonter REP_NETLOGON
-            # et supprimer le répertoire.
-            
-            afficher "Nettoyage du système avant de quitter."
-            
-            if mountpoint -q "$REP_NETLOGON"
-            then
-                umount "$REP_NETLOGON" && rmdir "$REP_NETLOGON"
-            else
-                if [ -d "$REP_NETLOGON" ]
-                then
-                    rmdir "$REP_NETLOGON"
-                fi
-            fi
-            
-            if [ -e "$REP_SE3_LOCAL" ]
-            then
-                if mountpoint -q  "$REP_TMP_LOCAL"
-                then
-                    umount "$REP_TMP_LOCAL"
-                fi
-                rm -fR "$REP_SE3_LOCAL"
-            fi
-            
-            # On supprime les paquets installés.
-            apt-get purge --yes $PAQUETS_TOUS >$SORTIE 2>&1
-            ;;
-            
-        *)
-            # On ne fait rien.
-            true
-            ;;
+	"1")
+		# Là, il y a eu un problème. Il faut démonter REP_NETLOGON
+		# et supprimer le répertoire.
 
-    esac
+		afficher "nettoyage du système avant de quitter."
+
+		if mountpoint -q "$REP_NETLOGON"
+		then
+			umount "$REP_NETLOGON" && rmdir "$REP_NETLOGON"
+		else
+			if [ -d "$REP_NETLOGON" ]
+			then
+				rmdir "$REP_NETLOGON"
+			fi
+		fi
+
+		if [ -e "$REP_SE3_LOCAL" ]
+		then
+			if mountpoint -q  "$REP_TMP_LOCAL"
+			then
+				umount "$REP_TMP_LOCAL"
+			fi
+			rm -fR "$REP_SE3_LOCAL"
+		fi
+
+		# On supprime les paquets installés.
+		apt-get purge --yes $PAQUETS_TOUS >$SORTIE 2>&1
+		;;
+
+	*)
+		# On ne fait rien
+		true
+		;;
+
+esac
 }
 
-function configurer_gdm3 ()
+configurer_gdm3 ()
 {
-    #############################
-    #############################
-    ### Configuration de gdm3 ###
-    #############################
-    #############################
-
-    afficher "Configuration du gestionnaire de connexion ${gdm} "\
+#####
+### Configuration de gdm3
+#
+afficher "configuration du gestionnaire de connexion : ${gdm} "\
          "afin que le script de logon soit exécuté au démarrage de ${gdm}," \
          "à l'ouverture et à la fermeture de session."
 
-    ######################################################
-    ### Modification du fichier /etc/gdm3/Init/Default ###
-    ######################################################
+#####
+# Modification du fichier /etc/gdm3/Init/Default
+#
+# Ce fichier est exécuté à chaque fois que la fenêtre de connexion
+# gdm3 est affichée, à savoir à chaque démarrage du système et après 
+# chaque fermeture de session d'un utilisateur. C'est dans l'exécution
+# de ce script, entre autres, que le partage NOM_PARTAGE_NETLOGON va
+# être monté.
 
-    # Ce fichier est exécuté à chaque fois que la fenêtre de connexion
-    # gdm3 est affichée, à savoir à chaque démarrage du système et après 
-    # chaque fermeture de session d'un utilisateur. C'est dans l'exécution
-    # de ce script, entre autres, que le partage NOM_PARTAGE_NETLOGON va
-    # être monté.
-
-    # Modification du fichier en partant de la version sauvegardée.
-    # On supprime le « exit 0 » à la fin.
-    grep -v '^exit 0' "$REP_SAVE_LOCAL/etc/gdm3/Init/Default" > "/etc/gdm3/Init/Default"
-    # Puis on y ajoute ceci :
-    echo "
+# Modification du fichier en partant de la version sauvegardée.
+# On supprime le « exit 0 » à la fin.
+grep -v '^exit 0' "$REP_SAVE_LOCAL/etc/gdm3/Init/Default" > "/etc/gdm3/Init/Default"
+# Puis on y ajoute ceci :
+echo "
 
 ###########################################################################
 ###         Modification pour l'intégration au domaine                  ###
@@ -274,23 +268,22 @@ exit 0
 
 " >> "/etc/gdm3/Init/Default"
 
-    # Modifications des droits (les droits par défaut me semblent trop
-    # permissifs.
-    chown "root:root" "/etc/gdm3/Init/Default"
-    chmod "700" "/etc/gdm3/Init/Default"
+# Modifications des droits
+# les droits par défaut me semblent trop permissifs
+chown "root:root" "/etc/gdm3/Init/Default"
+chmod "700" "/etc/gdm3/Init/Default"
 
-    #########################################################
-    #### Création du fichier /etc/gdm3/PostLogin/Default ####
-    #########################################################
+#####
+# Création du fichier /etc/gdm3/PostLogin/Default
+#
+# Ce script sera lancé à l'ouverture de session, juste après avoir 
+# entré le mot de passe.
+touch "/etc/gdm3/PostLogin/Default"
+chown "root:root" "/etc/gdm3/PostLogin/Default"
+chmod "700" "/etc/gdm3/PostLogin/Default"
 
-    # Ce script sera lancé à l'ouverture de session, juste après avoir 
-    # entré le mot de passe.
-    touch "/etc/gdm3/PostLogin/Default"
-    chown "root:root" "/etc/gdm3/PostLogin/Default"
-    chmod "700" "/etc/gdm3/PostLogin/Default"
-
-    # On édite le fichier /etc/gdm3/PostLogin/Default de A à Z.
-    echo "#! /bin/bash
+# On édite le fichier /etc/gdm3/PostLogin/Default de A à Z.
+echo "#! /bin/bash
 
 ###########################################################################
 ###         Création du fichier pour l'intégration au domaine           ###
@@ -307,14 +300,13 @@ exit 0
 
 " > "/etc/gdm3/PostLogin/Default"
 
-    #############################################################
-    ### Modification du fichier /etc/gdm3/PostSession/Default ###
-    #############################################################
+#####
+# Modification du fichier /etc/gdm3/PostSession/Default
+#
+# Ce script sera lancé à la fermeture de session.
 
-    # Ce script sera lancé à la fermeture de session.
-
-    # On édite carrément ce fichier de A à Z.
-    echo "#! /bin/bash
+# On édite carrément ce fichier de A à Z.
+echo "#! /bin/bash
 
 ###########################################################################
 ###         Modification pour l'intégration au domaine                  ###
@@ -331,53 +323,43 @@ exit 0
 
 " > "/etc/gdm3/PostSession/Default"
 
-    # Modifications des droits.
-    chown "root:" "/etc/gdm3/PostSession/Default"
-    chmod "700" "/etc/gdm3/PostSession/Default"
+# Modifications des droits.
+chown "root:" "/etc/gdm3/PostSession/Default"
+chmod "700" "/etc/gdm3/PostSession/Default"
 
-    ########################################################
-    ### Modification de /etc/gdm3/greeter.dconf-defaults ###
-    ########################################################
+#####
+# Modification de /etc/gdm3/greeter.dconf-defaults
+#
+# Ce fichier permet de gérer quelques options de la fenêtre de
+# connexion qui s'affiche après le démarrage du système.
 
-    # Ce fichier permet de gérer quelques options de la fenêtre de
-    # connexion qui s'affiche après le démarrage du système.
-
-    # Modification du fichier en partant de la version sauvegardée
-    # toujours pour être sûr de partir d'un fichier « clean ».
-    restaurer_via_save "/etc/gdm3/greeter.dconf-defaults"
-    sed -r -i -e 's/^\# disable-user-list=true.*$/disable-user-list=true/g' /etc/gdm3/greeter.dconf-defaults
+# Modification du fichier en partant de la version sauvegardée
+# toujours pour être sûr de partir d'un fichier « clean ».
+restaurer_via_save "/etc/gdm3/greeter.dconf-defaults"
+sed -r -i -e 's/^\# disable-user-list=true.*$/disable-user-list=true/g' /etc/gdm3/greeter.dconf-defaults
 }
 
 # à analyser pour lightdm (20151026)
-function configurer_lightdm ()
+configurer_lightdm ()
 {
-    #############################
-    #############################
-    ### Configuration de gdm3 ###
-    #############################
-    #############################
-
-    afficher "Configuration du gestionnaire de connexion ${gdm} "\
+#####
+# Configuration de lightdm
+#
+afficher "configuration du gestionnaire de connexion ${gdm} "\
          "afin que le script de logon soit exécuté au démarrage de ${gdm}," \
          "à l'ouverture et à la fermeture de session."
 
-    #########################################################
-    ### Modification du fichier /etc/lightdm/lightdm.conf ###
-    #########################################################
-
-    restaurer_via_save "/etc/lightdm/lightdm.conf"
-    sed -r -i "s|#greeter-setup-script.*$|greeter-setup-script=\"${LOGON_SCRIPT_LOCAL}\" initialisation|g" /etc/lightdm/lightdm.conf
-    sed -r -i "s|#session-setup-script.*$|session-setup-script=\"${LOGON_SCRIPT_LOCAL}\" ouverture|g" /etc/lightdm/lightdm.conf
-    sed -r -i "s|#session-cleanup-script.*$|session-cleanup-script=\"${LOGON_SCRIPT_LOCAL}\" fermeture|g" /etc/lightdm/lightdm.conf
+#####
+# Modification du fichier /etc/lightdm/lightdm.conf
+#
+restaurer_via_save "/etc/lightdm/lightdm.conf"
+sed -r -i "s|#greeter-setup-script.*$|greeter-setup-script=\"${LOGON_SCRIPT_LOCAL}\" initialisation|g" /etc/lightdm/lightdm.conf
+sed -r -i "s|#session-setup-script.*$|session-setup-script=\"${LOGON_SCRIPT_LOCAL}\" ouverture|g" /etc/lightdm/lightdm.conf
+sed -r -i "s|#session-cleanup-script.*$|session-cleanup-script=\"${LOGON_SCRIPT_LOCAL}\" fermeture|g" /etc/lightdm/lightdm.conf
 }
 
 # Avant de se terminer la fonction nettoyer_avant_de_sortir sera appelée.
 trap 'nettoyer_avant_de_sortir' EXIT
-
-#=====
-# Fonctions du programme
-# début
-#=====
 
 recuperer_options()
 {
@@ -540,13 +522,25 @@ fi
 verifier_gdm()
 {
 # On vérifie que le système utilise un gestionnaire de connexion testé
-# NB : pour l'instant, ce sript n'a été testé qu'avec gdm3
-if [ "$gdm" != "gdm3" ]
-then
-	afficher "Désolé, le script doit être exécuté avec gdm3  et non ${gdm}." \
-             "Fin du script."
-	exit 1
-fi
+# pour l'instant, ce script n'a été testé qu'avec gdm3, bientôt avec lightdm (20151026)
+case "$gdm" in
+	gdm3)
+		# test réussi pour gdm3
+		true
+		;;
+
+	lightdm)
+		# à tester…
+		true
+		;;
+
+	*)
+		afficher "Désolé, le script doit être exécuté avec gdm3 ou lightdm et non ${gdm}." \
+                 "Fin du script."
+		exit 1
+		;;
+
+esac
 }
 
 verifier_nom_client()
@@ -876,7 +870,7 @@ then
 		# Si $NOM_CLIENT est vide, c'est que l'option a été spécifié
 		# sans paramètre et il faut demander à l'utilisateur le nom
 		# qu'il souhaite pour le client.
-		afficher "Saisissez le nom de la machine cliente :"
+		afficher "saisissez le nom de la machine cliente :"
 		read -r NOM_CLIENT
 		if ! tester_nom_client "$NOM_CLIENT"
 		then
@@ -924,18 +918,18 @@ rechercher_ldap_client()
 # toute entrée de machine dont le nom, l'adresse MAC ou l'adresse IP seraient
 # identique à la machine cliente.
 
-# Liste des cartes réseau (eth0, lo etc).
+# Liste des cartes réseau (eth0, lo etc)
 cartes_reseau=$(ifconfig | grep -i '^[a-z]' | cut -d' ' -f 1)
 
 # Variable contenant les lignes de la forme 
 # nom-de-carte;adresse-mac;adresse-ip.
 carte_mac_ip=$(for carte in $cartes_reseau; do
-                   # On passe le cas où la carte est lo.
+                   # On passe le cas où la carte est lo
                    [ "$carte" = "lo" ] && continue
                    ifconfig "$carte" | awk 'BEGIN { v="rien"} 
                                             /^'"$carte"' / { printf $1 ";" $NF ";" }
                                             /inet addr/ {v=$2; gsub("addr:", "", v); print v }
-                                            END { if (v == "rien") print "SANS-IP" }'   
+                                            END { if (v == "rien") print "SANS-IP" }'
                done)
 
 # Construction du filtre de recherche LDAP, par rapport au nom du client,
@@ -965,7 +959,7 @@ afficher_info_carte_reseau_client()
 {
 # On affiche quelques informations sur les cartes réseau de la
 # machine cliente.
-afficher "Pour information, voici l'adresse MAC et l'adresse IP des cartes" \
+afficher "pour information, voici l'adresse MAC et l'adresse IP des cartes" \
          "réseau de la machine cliente ($NOM_CLIENT) :"
 for i in $carte_mac_ip
 do
@@ -978,8 +972,8 @@ done
 
 if "$OPTION_IV_LDAP"
 then
-	afficher "Vous avez choisi d'ignorer la vérification LDAP, le script" \
-             "d'intégration continue son exécution."
+	afficher "vous avez choisi d'ignorer la vérification LDAP, le script" \
+             "d'intégration continue son exécution"
 else
 	afficher "D'après les informations ci-dessus, voulez-vous continuer" \
              "l'exécution du script d'intégration ? Si oui, alors répondez" \
@@ -1000,7 +994,7 @@ renommer_nom_client()
 # spécifié.
 if "$OPTION_NOM_CLIENT"
 then
-	afficher "Changement de nom du système."
+	afficher "changement de nom du système."
 	echo "$NOM_CLIENT" > "/etc/hostname"
 	#invoke-rc.d hostname.sh stop > $SORTIE 2>&1
 	service hostname stop > $SORTIE 2>&1
@@ -1019,7 +1013,7 @@ mettre_en_place_mot_de_passe_grub()
 # un mot de passe Grub.
 if "$OPTION_MDP_GRUB"
 then
-	afficher "Mise en place du mot de passe Grub (le login sera « admin »)."
+	afficher "mise en place du mot de passe Grub (le login sera « admin »)."
 	
 	# Installation temporaire qui permet de rendre le fichier
 	# /dev/random plus loquace ce qui permet ainsi de rectifier
@@ -1080,7 +1074,7 @@ mise_en_place_mot_de_passe_root()
 # Sinon, il faut modifier le mot de passe root.
 if "$OPTION_MDP_ROOT"
 then
-	afficher "Changement du mot de passe root."
+	afficher "changement du mot de passe root."
 	
 	if [ -z "$MDP_ROOT" ]
 	then
@@ -1142,6 +1136,7 @@ desinstaller_gestionnaire_fenetres()
 # On désinstalle le gestionnaire de fenêtres TWM pour qu'au moment
 # de l'ouverture de session l'utilisateur ne puisse choisir que Gnome
 # et seulement Gnome.
+# Ce paquet n'est plus installé dans Jessie
 apt-get remove --purge --yes twm >$SORTIE 2>&1
 }
 
@@ -1151,12 +1146,6 @@ renommer_fichiers_pam()
 # "/etc/pam.d/common-*" tiennent compte de LDAP. On va les renommer
 # de manière explicite, avec l'extension « .AVEC-LDAP », et on va
 # remettre les fichiers "/etc/pam.d/common-*" d'origine.
-# Ensuite, dans le fichier "/etc/pam.d/gdm3" et lui seul, on va
-# changer les instructions « @include » pour importer les fichiers
-# "/etc/pam.d/common-*.AVEC-LDAP". Ainsi, gdm3 sera la seule application
-# utilisant PAM qui tiendra compte de LDAP. Par exemple, les comptes
-# LDAP ne pourront pas se connecter au système via la console ou via
-# ssh.
 
 # Si des fichiers ayant pour nom "common-*.AVEC-LDAP", c'est sans
 # doute qu'il y a déjà eu tentative d'intégration, alors on supprime
@@ -1192,14 +1181,18 @@ sed -i -r -e 's/^.*pam_unix\.so.*$/session    sufficient    pam_unix.so/g' "/etc
 
 modifier_fichiers_pam()
 {
-# On modifie le fichier /etc/pam.d/gdm-password  ou /etc/pam.d/lightdm afin que :
+# On modifie le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm afin que :
 # 1) il fasse appel à la bibliothèque pam_script.so.
 # 2) il y ait des « includes » des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
 
-echo "Gestionnaire de connexion installé : $gdm"
 if [ "$gdm" = "gdm3" ]
 then
 	# le nom du fichier gdm3 a changé avec Jessie
+	# Ensuite (cas gdm3), dans le fichier "/etc/pam.d/gdm-password" et lui seul, on va
+	# changer les instructions « @include » pour importer les fichiers
+	# "/etc/pam.d/common-*.AVEC-LDAP". Ainsi, gdm3 sera la seule application
+	# utilisant PAM qui tiendra compte de LDAP. Par exemple, les comptes
+	# LDAP ne pourront pas se connecter au système via la console ou via ssh.
 	fichier_gdm="gdm-password"
 fi
 if [ "$gdm" = "lightdm" ]
@@ -1259,6 +1252,7 @@ parametrer_gnome_screensaver()
 # Paramétrage de gnome-screensaver utiliser quand une session
 # doit être déverrouillée.
 # NB : à modifier pour Jessie ! (20151026)
+# → passer par une modification de dconf ?
 restaurer_via_save "/etc/pam.d/gnome-screensaver"
 sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/gnome-screensaver"
 }
@@ -1376,6 +1370,7 @@ desactiver_hibernation_mise_en_veille()
 {
 # Ce fichier permet de désactiver l'hibernation et la mise en veille
 # qui mettent souvent la pagaille sous Linux.
+# → passer par une modification via dconf ?
 
 # On crée le fichier en partant de sa version sauvegardée dont on
 # est sûr qu'elle est non bidouillée.
@@ -1414,16 +1409,12 @@ fi
 #####
 # début du programme
 
-###################
-###################
-### Les options ###
-###################
-###################
-
-#####
+#=====
+# Les options
+#=====
 # mettre cette partie en fonction ?
-#recuperer_options
-#####
+#recuperer_options()
+#
 # Une options longue avec les « :: » signifie que le paramètre est optionnel
 # (par exemple « --nom-client » ou « --nom-client="S121-HPS-04" »).
 # getopt réorganise les chaînes de caractères de "$@" pour que si par
@@ -1539,15 +1530,15 @@ then
 	exit 1
 fi
 
+#=====
+# selon les options choisies, on rajoute certains paquets
+#=====
 definir_paquets_a_installer
 
-###################################
-###################################
-### Vérifications sur le client ###
-###################################
-###################################
-
-afficher "Vérifications sur le système client..."
+#=====
+# Vérifications sur le client
+#=====
+afficher "vérifications sur le système client..."
 echo -n " 8..."
 verifier_droits_root
 echo -n " 7..."
@@ -1565,9 +1556,10 @@ verifier_disponibilite_paquets
 echo -n " 1..."
 verifier_ip_se3
 echo " 0..."
-afficher "Vérification accès se3"
+afficher "gestionnaire de connexion installé : $gdm"
+afficher "vérification accès se3"
 verifier_acces_ping_se3
-afficher "Vérifications OK."
+afficher "vérifications terminées"
 afficher "désinstallation du paquet libnss-mdns"
 desinstaller_mDNS
 afficher "arrêt définitif du service avahi-daemon"
@@ -1578,25 +1570,18 @@ purger_paquets
 # NB : est-ce utile ? (20151026)
 #arret_definitif_exim4_daemon
 
-###############################################
-###############################################
-### Montage du partage NOM_PARTAGE_NETLOGON ###
-###############################################
-###############################################
-
-afficher "Montage du partage « $NOM_PARTAGE_NETLOGON » du serveur."
+#=====
+# Montage du partage NOM_PARTAGE_NETLOGON
+#=====
 afficher "installation du paquet $PAQUETS_MONTAGE_CIFS"
 installer_paquets_cifs
-afficher "montage du partage netlogon"
+afficher "montage du partage « $NOM_PARTAGE_NETLOGON » du serveur"
 montage_partage_netlogon
 
-#######################################################
-#######################################################
-### Mise en place du répertoire local REP_SE3_LOCAL ###
-#######################################################
-#######################################################
-
-afficher "Mise en place du répertoire local $REP_SE3_LOCAL."
+#=====
+# Mise en place du répertoire local REP_SE3_LOCAL
+#=====
+afficher "mise en place du répertoire local $REP_SE3_LOCAL"
 echo -n " 7..."
 effacer_repertoire_rep_se3_local
 echo -n " 6..."
@@ -1614,23 +1599,20 @@ creation_repertoire_rep_log_local
 echo " 0..."
 creation_repertoire_rep_tmp_local
 
-######################################
-######################################
-### Renommage (éventuel) du client ###
-######################################
-######################################
-
+#=====
+# Renommage (éventuel) du client
+#=====
 recuperer_nom_client
-afficher "Installation de l'exécutable ldapsearch et vérification de la" \
+afficher "installation de l'exécutable ldapsearch et vérification de la" \
          "connexion avec l'annuaire LDAP du serveur à travers une" \
          "recherche d'enregistrements en rapport avec le client (au niveau" \
-         "du nom de machine ou de l'adresse MAC ou de l'adresse IP)."
+         "du nom de machine ou de l'adresse MAC ou de l'adresse IP)"
 afficher "installation du paquet $PAQUETS_CLIENT_LDAP"
 installer_paquets_client_ldap
 afficher "vérification de la connexion à l'annuaire ldap du se3"
 verifier_connexion_ldap_se3
 rechercher_ldap_client
-afficher "Résultat de la recherche LDAP :"
+afficher "résultat de la recherche LDAP :"
 echo "-------------------------------------------------"
 echo "$resultat"
 echo "-------------------------------------------------"
@@ -1638,141 +1620,103 @@ afficher_info_carte_reseau_client
 # dépend de l'option --nom-client
 renommer_nom_client
 
-#######################################################
-#######################################################
-### Mise en place (éventuelle) du mot de passe Grub ###
-#######################################################
-#######################################################
-
+#=====
+# Mise en place (éventuelle) du mot de passe Grub
+#=====
 # dépend de l'option --mdp-grub
 mettre_en_place_mot_de_passe_grub
 
-#######################################################
-#######################################################
-### Mise en place (éventuelle) du mot de passe root ###
-#######################################################
-#######################################################
-
+#=====
+# Mise en place (éventuelle) du mot de passe root
+#=====
 # dépend de l'option --mdp-root
 mise_en_place_mot_de_passe_root
 
-################################
-################################
-### Installation des paquets ###
-################################
-################################
-
-afficher "Installation des paquets nécessaires à l'intégration. : $PAQUETS_AUTRES"
+#=====
+# Installation des paquets
+#=====
+afficher "installation des paquets nécessaires à l'intégration : $PAQUETS_AUTRES"
 installer_paquets_integration
-# Cas particulier. Sur Squeeze, on a besoin du paquet sudo.
+# Cas particulier. Sur Squeeze, on a besoin du paquet sudo
 # Est-ce toujours le cas avec Jessie ?
 installer_paquet_sudo
-afficher "Installation des paquets terminée."
-desinstaller_gestionnaire_fenetres
-afficher "Configuration post-installation du système."
+afficher "installation des paquets terminée"
+# twn n'est plus utilisé par debian : à confirmer ?
+#desinstaller_gestionnaire_fenetres
 
-############################
-############################
-### Configuration de PAM ###
-############################
-############################
-
-afficher "Configuration de PAM afin que seul gdm3 (la fenêtre de login)" \
-         "consulte l'annuaire LDAP du serveur pour l'authentification. Une" \
-         "authentification via ssh (par exemple) ne sera possible qu'avec" \
-         "un compte local."
+#=====
+# Configuration de PAM
+#=====
+afficher "configuration de PAM afin que seul le gestionnaire de connexion" \
+         "consulte l'annuaire LDAP du serveur pour l'authentification." \
+         "Une authentification via ssh (par exemple) ne sera possible" \
+         "qu'avec un compte local"
 renommer_fichiers_pam
 permettre_connexion_comptes_locaux
 modifier_fichiers_pam
 creation_fichier_pam
-#parametrer_gnome_screensaver
+#parametrer_gnome_screensaver	# obsolète ? (20151026)
 
-###########################################
-###########################################
-### Réécriture des fichiers /etc/hosts ####
-###########################################
-###########################################
-
+#=====
+# Réécriture des fichiers /etc/hosts
+#=====
 # Peu importe que l'option --nom-client ait été spécifiée ou non,
 # nous allons réécriture le fichier /etc/hosts.
-afficher "Réécriture complète du fichier /etc/hosts."
+afficher "réécriture complète du fichier /etc/hosts"
 reecrire_fichier_hosts
 
-#############################################
-#############################################
-### Réécriture du fichier /etc/nslcd.conf ###
-#############################################
-#############################################
-
-afficher "Réécriture complète du fichier /etc/nslcd.conf afin que la" \
+#=====
+# Réécriture du fichier /etc/nslcd.conf
+#=====
+afficher "réécriture complète du fichier /etc/nslcd.conf afin que la" \
          "communication LDAP entre le client et le serveur (notamment" \
-         "au moment de l'authentification) soit cryptée."
+         "au moment de l'authentification) soit cryptée"
 reecrire_fichier_nslcd
 
-##############################################################################
-##############################################################################
-### Modification du fichier smb.conf (s'il s'avère qu'on a installé Samba) ###
-##############################################################################
-##############################################################################
-
+#=====
+# Modification du fichier smb.conf (s'il s'avère qu'on a installé Samba)
+#=====
 # dépend de l'option --installer-samba
 modifier_fichier_smb
 
-#######################################
-#######################################
-### Configuration de ntpdate-debian ###
-#######################################
-#######################################
-
-afficher "Réécriture complète du fichier /etc/default/ntpdate" \
+#=====
+# Configuration de ntpdate-debian
+#=====
+afficher "réécriture complète du fichier /etc/default/ntpdate" \
          "afin que l'heure du système soit mise à jour via le" \
-         "serveur NTP indiqué dans le script d'intégration."
+         "serveur NTP indiqué dans le script d'intégration"
 reecrire_fichier_ntpdate
 
-#########################################
-#########################################
-### Configurations des gestionnaires  ###
-### graphiques d'ouverture de session ###
-#########################################
-#########################################
-
+#=====
+# Configurations des gestionnaires graphiques d'ouverture de session
+#=====
 configurer_gestionnaire_connexion
 
-###############################
-###############################
-### Configurations diverses ###
-###############################
-###############################
-
-###########################################################
-### Modification du fichier /etc/xdg/user-dirs.defaults ###
-###########################################################
-
-afficher "Modification du fichier /etc/xdg/user-dirs.defaults afin" \
+#=====
+# Modification du fichier /etc/xdg/user-dirs.defaults
+#=====
+afficher "modification du fichier /etc/xdg/user-dirs.defaults afin" \
          "que « Bureau » soit le seul répertoire créé automatiquement" \
-         "dans le home d'un utilisateur."
+         "dans le home d'un utilisateur"
 modifier_fichier_user_dirs
 
-#########################################################################################
-### Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy ###
-# fichier inexistant dans Jessie : à modifier ! (20151026)
-#########################################################################################
-
-#afficher "Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy" \
-#         "afin de désactiver l'hibernation et la mise en veille du système."
+#=====
+# Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy
+# fichier inexistant dans Jessie : à modifier ? (20151026)
+# → passer par une modification via dconf ?
+#=====
+#afficher "modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy" \
+#         "afin de désactiver l'hibernation et la mise en veille du système"
 #desactiver_hibernation_mise_en_veille
 
-############################
-############################
-### FIN DE L'INTÉGRATION ###
-############################
-############################
-
-afficher "Fin de l'intégration." \
-         "Si ce n'est pas déjà fait, pensez à effectuer une réservation" \
-         "d'adresse IP du client via" \
-         "le serveur DHCP du SambaÉdu, afin d'inscrire le nom" \
-         "de la machine cliente dans l'annuaire."
+#=====
+# FIN DE L'INTÉGRATION
+#=====
+afficher "intégration terminée"
+afficher "si ce n'est pas déjà fait, pensez à effectuer" \
+         "une réservation d'adresse IP du client via" \
+         "le serveur DHCP du SambaÉdu, afin d'inscrire" \
+         "le nom de la machine cliente dans l'annuaire"
 decompte_10s
 
 # fin du programme

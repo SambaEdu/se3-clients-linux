@@ -34,7 +34,7 @@ version_ubuntu="trusty"
 
 #####
 # options des systèmes
-# utiles pour récupérer un paramètre de l'interface web du se3'
+# utiles pour récupérer un paramètre de l'interface web du se3
 #
 option_debian="oui"
 option_ubuntu="oui"
@@ -636,7 +636,7 @@ installation_se3_clonage
 installation_se3_clients_linux
 droits_repertoires
 verifier_presence_mkpasswd
-mise_en_place_tftpboot
+mise_en_place_tftpboot	#
 #telecharger_archives_netboot	# ancienne fonction
 # on crée un répertoire temporaire
 repertoire_temporaire
@@ -658,8 +658,8 @@ repertoire_temporaire
 # on supprime le répertoire temporaire
 menage
 #extraire_archives_netboot		# ancienne fonction
-transfert_repertoire_install
-gestion_script_integration
+transfert_repertoire_install	#
+gestion_script_integration		#
 gestion_cles_publiques
 gestion_fichiers_preseed
 gestion_miroir
