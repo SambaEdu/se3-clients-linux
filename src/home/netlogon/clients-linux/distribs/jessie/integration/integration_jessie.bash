@@ -1205,6 +1205,9 @@ restaurer_via_save "/etc/pam.d/${fichier_gdm}"
 awk '{ print $0 } /^auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
 "${REP_SAVE_LOCAL}/etc/pam.d/${fichier_gdm}" > "/etc/pam.d/${fichier_gdm}"
 
+# Inclusion des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
+sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/${fichier_gdm}"
+
 ###################################################
 # Modification Jessie pour pam de lightdm :
 
@@ -1218,18 +1221,16 @@ then
 
 	# L'installation de libpam-script a ajouté des appels à pam_script.so 
 	# dans tous les fichiers common-*, on les met en commentaire
-	sed -i '/pam_script/ s/^/#/g' 	/etc/pam.d/common-session \
-									/etc/pam.d/common-session-noninteractive \
-									/etc/pam.d/common-account \
-									/etc/pam.d/common-auth \
-									/etc/pam.d/common-password
+	sed -i '/pam_script/ s/^/#/g' 	/etc/pam.d/common-session.AVEC-LDAP \
+									/etc/pam.d/common-session-noninteractive.AVEC-LDAP \
+									/etc/pam.d/common-account.AVEC-LDAP \
+									/etc/pam.d/common-auth.AVEC-LDAP \
+									/etc/pam.d/common-password.AVEC-LDAP
 fi
 
 # Fin de la modification Jessie pour pam de lightdm
 ######################################################
 
-# Inclusion des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
-sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/${fichier_gdm}"
 }
 
 creation_fichier_pam()
