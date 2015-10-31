@@ -1,6 +1,12 @@
 /etc/gdm3/Init/Default:root:root:755
 /etc/gdm3/PostSession/Default:root:root:755
 /etc/gdm3/greeter.dconf-defaults:root:root:644
+
+/etc/lightdm/keys.conf:root:root:644
+/etc/lightdm/lightdm.conf:root:root:644
+/etc/lightdm/lightdm-gtk-greeter.conf:root:root:644
+/etc/lightdm/users.conf:root:root:644
+
 /etc/grub.d/40_custom:root:root:755
 /etc/pam.d/common-account:root:root:644
 /etc/pam.d/common-auth:root:root:644
@@ -9,4 +15,6 @@
 /etc/pam.d/common-session-noninteractive:root:root:644
 /etc/pam.d/gdm-launch-environment:root:root:644
 /etc/pam.d/gdm-password:root:root:644
+/etc/pam.d/lightdm-autologin:root:root:644
+/etc/pam.d/lightdm:root:root:644
 /etc/xdg/user-dirs.defaults:root:root:644
