@@ -1202,33 +1202,22 @@ then
 fi
 restaurer_via_save "/etc/pam.d/${fichier_gdm}"
 # Insertion de la ligne « auth    optional    pam_script.so ».
-awk '{ print $0 } /^auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
+awk '{ print $0 }  /^\-?auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
 "${REP_SAVE_LOCAL}/etc/pam.d/${fichier_gdm}" > "/etc/pam.d/${fichier_gdm}"
 
 # Inclusion des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
 sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/${fichier_gdm}"
 
 ###################################################
-# Modification Jessie pour pam de lightdm :
-
-if [ "$gdm" = "lightdm" ]
-then
-
-	# Le module pam_script.so doit être appelé uniquement 
-	# dans le module pam de lightdm, avant @common-account
-
-	sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/lightdm	
-
-	# L'installation de libpam-script a ajouté des appels à pam_script.so 
-	# dans tous les fichiers common-*, on les met en commentaire
-	sed -i '/pam_script/ s/^/#/g' 	/etc/pam.d/common-session.AVEC-LDAP \
-									/etc/pam.d/common-session-noninteractive.AVEC-LDAP \
-									/etc/pam.d/common-account.AVEC-LDAP \
-									/etc/pam.d/common-auth.AVEC-LDAP \
-									/etc/pam.d/common-password.AVEC-LDAP
-fi
-
-# Fin de la modification Jessie pour pam de lightdm
+# Modification de pam pour Jessie :
+# L'installation de libpam-script a ajouté des appels à pam_script.so 
+# dans tous les fichiers common-*, on les met en commentaire
+sed -i '/pam_script/ s/^/#/g' 	/etc/pam.d/common-session.AVEC-LDAP \
+								/etc/pam.d/common-session-noninteractive.AVEC-LDAP \
+								/etc/pam.d/common-account.AVEC-LDAP \
+								/etc/pam.d/common-auth.AVEC-LDAP \
+								/etc/pam.d/common-password.AVEC-LDAP
+# Fin de la modification de pam pour Jessie
 ######################################################
 
 }
