@@ -17,6 +17,11 @@ par exemple, abrunet (→ élève) puis abrune2 (→ prof) et enfin abrune3 (→
 - tester avec gdm3
 - idem avec lightdm
 
+- démarrer un client, câble réseau débranché, puis le brancher et tester l'ouverture d'une session
+→ regarder si les montages sont actifs
+- une session étant ouverte, débranché puis rebranché le câble réseau
+→ idem
+
 
 # Compte-rendu de test
 
