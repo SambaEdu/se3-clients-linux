@@ -1059,7 +1059,7 @@ set_grub_pwd ()
         fi
 
         # On met à jour la configuration de Grub.
-        if update-grub >"$SORTIE" 2>&1
+        if ! update-grub >"$SORTIE" 2>&1
         then
             afficher "Attention, la commande « update_grub » ne s'est pas" \
                      "effectuée correctement, a priori Grub n'est pas"     \
