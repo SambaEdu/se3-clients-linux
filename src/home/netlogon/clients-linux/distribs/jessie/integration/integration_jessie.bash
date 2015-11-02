@@ -4,9 +4,9 @@
 # script d'intégration des clients Jessie à un domaine géré par un se3
 #
 #
-# version : 20151028
+# version : 20151102
 #
-# NB : seul gdm3 a été testé avec ce script (voir 20151026 dans le script)
+#
 #
 ##### #####
 
@@ -80,22 +80,25 @@ SORTIE="/dev/null"
 # début
 #=====
 
-# Fonction pour afficher des messages.
 afficher ()
 {
+# Fonction pour afficher des messages.
+#
 echo ""
 # On écrira des lignes de 65 caractères maximum.
 echo "$@" | fmt -w 65
 sleep 0.5
 }
 
+tester_nom_client ()
+{
 # Fonction qui teste si le nom du client est un nom valide.
 # Elle prend un argument qui est le nom à tester bien sûr. 
 # Elle renvoie 0 si tout est Ok, 1 sinon (et dans ce cas un
 # message d'erreur est envoyé).
-tester_nom_client ()
-{
-# $1 représente le nom du client
+#
+# 1 argument : $1 représente le nom du client
+#
 # La classe [a-z] dépend de la locale : sur mon système (Debian Squeeze)
 # et avec la locale fr_FR.utf8 la classe [a-z] attrape les caractères
 # accentués ce que je ne souhaite pas. Mais avec la locale C, 
@@ -111,19 +114,23 @@ else
 fi
 }
 
-# Affiche un message d'erreur concernant le nom du client à intégrer.
+
 afficher_erreur_nom_client ()
 {
+# Affiche un message d'erreur concernant le nom du client à intégrer.
+#
 afficher "Désolé, le client ne peut pas être intégré au" \
          "domaine car son nom doit être uniquement constitué" \
          "des caractères « -A-Za-z0-9 » avec 15 caractères maximum."
 }
 
+
+demander_mot_de_passe ()
+{
 # Fonction qui Demande un mot de passe à l'utilisateur avec confirmation
 # et définit ensuite la variable « mot_de_passe » qui contient alors 
 # la saisie de l'utilisateur.
-demander_mot_de_passe ()
-{
+#
 local mdp1
 local mdp2
 
@@ -138,11 +145,11 @@ printf "\n"
 while [ "$mdp1" != "$mdp2" ]
 do
 	printf "Désolé, mais vos deux saisies ne sont pas identiques. Recommencez.\n"
-
+	
 	printf "saissez le mot de passe : "
 	read -s -r mdp1
 	printf "\n"
-
+	
 	printf "saissez le mot de passe à nouveau : "
 	read -s -r mdp2
 	printf "\n"
@@ -151,53 +158,64 @@ done
 mot_de_passe="$mdp1" 
 }
 
+
+hash_grub_pwd ()
+{
 # Fonction qui permet d'obtenir le hachage version Grub2 d'un mot 
 # de passe donné. La fonction prend un argument qui est le mot de 
 # passe en question.
-hash_grub_pwd ()
-{
-    { echo "$1"; echo "$1"; }                                       \
-        | LC_ALL=C grub-mkpasswd-pbkdf2 -c 30 -l 30 -s 30 2>$SORTIE \
-        | grep 'PBKDF2'                                             \
-        | sed 's/^.* is //'
+#
+{ echo "$1"; echo "$1"; }                                       \
+    | LC_ALL=C grub-mkpasswd-pbkdf2 -c 30 -l 30 -s 30 2>$SORTIE \
+    | grep 'PBKDF2'                                             \
+    | sed 's/^.* is //'
 }
 
-# Fonction qui permet de changer le mot de passe root. Elle prend
-# un argument qui correspond au mot de passe souhaité.
+
 changer_mot_de_passe_root ()
 {
+# Fonction qui permet de changer le mot de passe root.
+#
+# 1 argument qui correspond au mot de passe souhaité.
+#
 { echo "$1"; echo "$1"; } | passwd root > $SORTIE 2>&1
 }
 
+
+restaurer_via_save ()
+{
 # Fonction qui restaure, en préservant les droits, un fichier
-# à partir de sa version dans REP_SAVE_LOCAL. Le nom du fichier est donné 
-# en unique paramètre. 1) Le fichier doit exister dans REP_SAVE_LOCAL et 
+# à partir de sa version dans REP_SAVE_LOCAL.
+
+# 1 argument : Le nom du fichier est donné 
+# 1) Le fichier doit exister dans REP_SAVE_LOCAL et 
 # 2) son nom doit être exprimé sous la forme d'un chemin absolu, correspondant
 # à son emplacement dans le système. Par exemple "/etc/machin" comme paramètre
 # implique que "$REP_SAVE_LOCAL"/etc/machin" doit exister.
-restaurer_via_save ()
-{
+#
 # Si la cible existe déjà, elle sera écrasée.
 cp -a "${REP_SAVE_LOCAL}$1" "$1"
 }
 
-# Fonction qui permettra de supprimer le montage REP_NETLOGON
-# (entre autres) si le script se termine incorrectement.
+
 nettoyer_avant_de_sortir ()
 {
+# Fonction qui permettra de supprimer le montage REP_NETLOGON
+# (entre autres) si le script se termine incorrectement.
+#
 case "$?" in
-
+	
 	"0")
 		# Tout va bien, on ne fait rien
 		true
-		;;
-
+	;;
+	
 	"1")
 		# Là, il y a eu un problème. Il faut démonter REP_NETLOGON
 		# et supprimer le répertoire.
-
+		
 		afficher "nettoyage du système avant de quitter."
-
+		
 		if mountpoint -q "$REP_NETLOGON"
 		then
 			umount "$REP_NETLOGON" && rmdir "$REP_NETLOGON"
@@ -207,7 +225,7 @@ case "$?" in
 				rmdir "$REP_NETLOGON"
 			fi
 		fi
-
+		
 		if [ -e "$REP_SE3_LOCAL" ]
 		then
 			if mountpoint -q  "$REP_TMP_LOCAL"
@@ -216,23 +234,22 @@ case "$?" in
 			fi
 			rm -fR "$REP_SE3_LOCAL"
 		fi
-
+		
 		# On supprime les paquets installés.
 		apt-get purge --yes $PAQUETS_TOUS >$SORTIE 2>&1
-		;;
-
+	;;
+	
 	*)
 		# On ne fait rien
 		true
-		;;
-
+	;;
+	
 esac
 }
 
 configurer_gdm3 ()
 {
-#####
-### Configuration de gdm3
+# Configuration de gdm3
 #
 afficher "configuration du gestionnaire de connexion : ${gdm} "\
          "afin que le script de logon soit exécuté au démarrage de ${gdm}," \
@@ -339,7 +356,7 @@ restaurer_via_save "/etc/gdm3/greeter.dconf-defaults"
 sed -r -i -e 's/^\# disable-user-list=true.*$/disable-user-list=true/g' /etc/gdm3/greeter.dconf-defaults
 }
 
-# à analyser pour lightdm (20151026)
+
 configurer_lightdm ()
 {
 #####
@@ -363,6 +380,9 @@ trap 'nettoyer_avant_de_sortir' EXIT
 
 recuperer_options()
 {
+# fonction inutilisée actuellement :
+# la récupération des options se fait en début du programme (voir ci-dessous)
+
 # Une options longue avec les « :: » signifie que le paramètre est optionnel
 # (par exemple « --nom-client » ou « --nom-client="S121-HPS-04" »).
 # getopt réorganise les chaînes de caractères de "$@" pour que si par
@@ -418,55 +438,55 @@ do
 		-h|--help)
 			afficher "Aide : voir la documentation (au format pdf) associée." 
 			exit 0
-			;;
+		;;
 		
 		--nom-client|--nc)
 			OPTION_NOM_CLIENT="true"
 			NOM_CLIENT="$2"
 			shift 2
-			;;
+		;;
 		
 		--mdp-grub|--mg) 
 			OPTION_MDP_GRUB="true"
 			MDP_GRUB="$2"
 			shift 2
-			;;
+		;;
 		
 		--mdp-root|--mr) 
 			OPTION_MDP_ROOT="true"
 			MDP_ROOT="$2"
 			shift 2
-			;;
+		;;
 		
 		--ignorer-verification-ldap|--ivl) 
 			OPTION_IV_LDAP="true"
 			shift 1
-			;;
+		;;
 		
 		--redemarrer-client|--rc) 
 			OPTION_REDEMARRER="true"
 			shift 1
-			;;
+		;;
 		
 		--installer-samba|--is) 
 			OPTION_INSTALLER_SAMBA="true"
 			shift 1
-			;;
+		;;
 		
 		--debug|--d) 
 			SORTIE=">&1"
 			shift 1
-			;;
+		;;
 		
 		--) 
 			shift
 			break
-			;;
+		;;
 		
 		*) 
 			afficher "Erreur: «$1» est une option non implémentée."
 			exit 1
-			;;
+		;;
 		
 	esac
 done
@@ -481,8 +501,13 @@ fi
 
 definir_paquets_a_installer()
 {
-# Les paquets nécessaires à l'intégration. Ne peuvent être définis qu'après
-# avoir connaissance de l'activation éventuelle de l'option --installer-samba.
+# Les paquets nécessaires à l'intégration.
+# Ces paquets seront désinstaller pour être installés par la suite_options
+# Cela permettra la configuration convenable de certains d'entre eux
+#
+# Ils ne peuvent être définis qu'après avoir connaissance
+# de l'activation éventuelle de l'option --installer-samba.
+#
 PAQUETS_MONTAGE_CIFS="cifs-utils"
 PAQUETS_CLIENT_LDAP="ldap-utils"
 PAQUETS_AUTRES="libnss-ldapd libpam-ldapd nscd nslcd libpam-script rsync ntpdate xterm imagemagick"
@@ -496,9 +521,11 @@ PAQUETS_TOUS="$PAQUETS_MONTAGE_CIFS $PAQUETS_CLIENT_LDAP $PAQUETS_AUTRES"
 verifier_droits_root()
 {
 # On vérifie que l'utilisateur a bien les droits de root.
+#
 # Tester « "$USER" == "root" » est possible mais la variable
 # $USER peut être modifiée par n'importe quel utilisateur,
 # tandis que la variable $UID est en lecture seule.
+#
 if [ "$UID" != "0" ]
 then
 	afficher "Désolé, vous devez avoir les droits « root » pour lancer" \
@@ -510,6 +537,7 @@ fi
 verifier_version_debian()
 {
 # On vérifie que le système est bien Debian Jessie.
+#
 if [ "$NOM_DE_CODE" != "jessie" ]
 then
 	afficher "Désolé, le script doit être exécuté sur Debian Jessie." \
@@ -521,23 +549,24 @@ fi
 verifier_gdm()
 {
 # On vérifie que le système utilise un gestionnaire de connexion testé
-# pour l'instant, ce script n'a été testé qu'avec gdm3, bientôt avec lightdm (20151026)
+# Actuellement : gdm3 et lightdm
+#
 case "$gdm" in
 	gdm3)
 		# test réussi pour gdm3
 		true
-		;;
+	;;
 
 	lightdm)
 		# à tester…
 		true
-		;;
+	;;
 
 	*)
 		afficher "Désolé, le script doit être exécuté avec gdm3 ou lightdm et non ${gdm}." \
                  "Fin du script."
 		exit 1
-		;;
+	;;
 
 esac
 }
@@ -545,6 +574,7 @@ esac
 verifier_nom_client()
 {
 # Vérification du nom du client à intégrer.
+#
 if "$OPTION_NOM_CLIENT"
 then
 	# L'option a été spécifiée.
@@ -576,6 +606,7 @@ fi
 verifier_repertoire_montage()
 {
 # On vérifie que le répertoire de montage existe bien.
+#
 if [ ! -d "$REP_MONTAGE" ]
 then
 	afficher "Désolé, le répertoire $REP_MONTAGE n'existe pas." \
@@ -608,10 +639,12 @@ fi
 verifier_apt_get()
 {
 # Vérification du bon fonctionnement de « apt-get update ».
+#
 # Cette commande semble renvoyer la valeur 0 à chaque fois,
 # même quand les dépôts ne sont pas accessibles par exemple.
 # Du coup, je ne vois rien de mieux que de compter le nombre 
 # de lignes écrites sur la sortie standard des erreurs.
+#
 if [ $(apt-get update 2>&1 >$SORTIE | wc -l) -gt 0 ]
 then
 	afficher "Désolé, la commande « apt-get update » ne fonctionne pas" \
@@ -624,6 +657,7 @@ fi
 verifier_disponibilite_paquets()
 {
 # Vérification de la disponibilité des paquets nécessaires à l'intégration.
+#
 for paquet in $PAQUETS_TOUS
 do
 	if ! apt-get install "$paquet" --yes --simulate >$SORTIE 2>&1
@@ -641,8 +675,10 @@ done
 verifier_ip_se3()
 {
 # On teste la variable SE3 pour savoir si son contenu est une IP ou non.
+#
 # Si ce n'est pas une IP (et donc un nom), on teste sa résolution
 # en adresse IP.
+#
 octet="[0-9]{1,3}"
 if ! echo "$SE3" | grep -qE "^$octet\.$octet\.$octet\.$octet$"
 then
@@ -660,6 +696,7 @@ unset -v octet
 verifier_acces_ping_se3()
 {
 # On vérifie que le Se3 est bien accessible via un ping.
+#
 if ! ping -c 5 -W 2 "$SE3" >$SORTIE 2>&1
 then
 	afficher "Désolé, le SambaÉdu est inaccessible via la commande ping." \
@@ -672,32 +709,39 @@ fi
 desinstaller_mDNS()
 {
 # Pas de client mDNS (le paquet tout seul est désinstallé).
+#
 # En effet, lors de la résolution d'un nom, ce protocole est
 # utilisé avant DNS si et seulement si le nom d'hôte se termine
 # par ".local". Et comme sur un réseau pédagogique il n'y a pas
 # serveur mDNS, la résolution ne fonctionne pas. Et par défaut,
 # quand la résolution mDNS n'aboutit pas, le protocole DNS n'est
 # pas utilisé ensuite si bien que le nom d'hôte n'est pas résolu.
+#
 # Ça provient de la ligne
 # « hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4 »
-# dans le fichier /etc/nsswitch.conf. Bref, ce protocole ne sert
-# à rien dans un réseau pédagogique et il peut même entraîner
-# des erreurs (par exemple un simple « ping se3.intranet.local »
-# ne fonctionnera pas alors que « ping se3 » fonctionnera).
+# dans le fichier /etc/nsswitch.conf.
+#
+# Bref, ce protocole ne sert à rien dans un réseau pédagogique
+# et il peut même entraîner des erreurs (par exemple un simple
+# « ping se3.intranet.local » ne fonctionnera pas alors que
+#  « ping se3 » fonctionnera).
+#
 apt-get remove --purge --yes libnss-mdns >$SORTIE 2>&1
 }
 
 arret_definitif_avahi_daemon()
 {
-# Arrêt définitif du service avahi-daemon. C'est la partie serveur
-# du protocole mDNS dont on n'a que faire. Désintaller le paquet
-# avahi-daemon ne doit pas être tenté car, par le jeu des dépendances,
-# le paquet gnome-desktop-environment a besoin de avahi-daemon
-# et du coup, si on désintalle avahi-daemon, gnome-desktop-environment
-# se désinstalle et avec lui de très nombreuses dépendances ce qui
-# ampute le système de plein de fonctionnalités. Le mieux, c'est donc
-# de stopper ce daemon et d'empêcher son lancement lors du démarrage
-# du système.
+# Arrêt définitif du service avahi-daemon.
+#
+# C'est la partie serveur du protocole mDNS dont on n'a que faire.
+# Désintaller le paquet avahi-daemon ne doit pas être tenté
+# car, par le jeu des dépendances, le paquet gnome-desktop-environment
+# a besoin de avahi-daemon et du coup, si on désintalle avahi-daemon,
+# gnome-desktop-environment se désinstalle et avec lui de très nombreuses
+# dépendances ce qui ampute le système de plein de fonctionnalités.
+# Le mieux, c'est donc de stopper ce daemon et d'empêcher son lancement
+# lors du démarrage du système.
+#
 #invoke-rc.d avahi-daemon stop >$SORTIE 2>&1
 service avahi-daemon stop >$SORTIE 2>&1
 update-rc.d -f avahi-daemon remove >$SORTIE 2>&1
@@ -708,10 +752,12 @@ purger_paquets()
 {
 # Purge des paquets pour repartir sur une base saine et pouvoir
 # enchaîner deux intégrations de suite sur le même client.
+#
 # Peut-être que l'option --installer-samba n'est pas activée
 # et dans ce cas $PAQUETS_TOUS ne contient pas samba.
 # Donc on l'ajoute dans la liste pour être sûr qu'il soit
 # désintallé.
+#
 apt-get purge --yes $PAQUETS_TOUS samba >$SORTIE 2>&1
 }
 
@@ -720,6 +766,7 @@ arret_definitif_exim4_daemon()
 # On stoppe définitivement le daemon exim4 qui ne sert pas dans le
 # cas d'une station cliente et qui peut bloquer pendant quelques secondes
 # (voire quelques minutes) l'arrivée du prompt de login sur tty[1-6].
+#
 #invoke-rc.d exim4 stop >$SORTIE 2>&1
 service exim4 stop >$SORTIE 2>&1
 update-rc.d -f exim4 remove >$SORTIE 2>&1
@@ -727,11 +774,13 @@ update-rc.d -f exim4 remove >$SORTIE 2>&1
 
 installer_paquets_cifs()
 {
-# Nous allons installer PAQUETS_MONTAGE_CIFS nécessaire pour les montages CIFS,
-# mais ce paquet nécessite l'installation du paquet samba-common
+# Nous allons installer PAQUETS_MONTAGE_CIFS nécessaire pour les montages CIFS.
+#
+# Cependant, ce paquet nécessite l'installation du paquet samba-common
 # qui lui-même pose des questions à l'utilisateur au moment de
 # l'installation. D'où la nécessité de renseigner la configuration
 # de ce paquet via debconf.
+#
 debconf_parametres=$(mktemp)
 echo "
 samba-common	samba-common/encrypt_passwords	boolean	true
@@ -754,6 +803,7 @@ apt-get install --no-install-recommends --reinstall --yes $PAQUETS_MONTAGE_CIFS 
 montage_partage_netlogon()
 {
 # Montage du partage NOM_PARTAGE_NETLOGON.
+#
 mkdir "$REP_NETLOGON"
 chown "root:root" "$REP_NETLOGON"
 chmod 700 "$REP_NETLOGON"
@@ -771,6 +821,7 @@ effacer_repertoire_rep_se3_local()
 {
 # On efface le fichier ou répertoire REP_SE3_LOCAL s'il existe
 # pour créer un répertoire vide qui sera rempli ensuite.
+#
 if [ -e "$REP_SE3_LOCAL" ]
 then
 	if mountpoint -q  "$REP_TMP_LOCAL"
@@ -787,6 +838,7 @@ chmod "700" "$REP_SE3_LOCAL"
 copier_repertoire_rep_bin()
 {
 # Copie du répertoire REP_BIN.
+#
 cp -r "$REP_BIN" "$REP_BIN_LOCAL"
 rm -fr "$REP_BIN_LOCAL/logon_perso" # En revanche le fichier logon_perso est inutile.
 # On y ajoute les scripts d'intégration et de désintégration.
@@ -798,6 +850,7 @@ chmod -R "700" "$REP_BIN_LOCAL"
 copier_repertoire_rep_skel()
 {
 # Copie du répertoire REP_SKEL et mise en place de droits cohérents.
+#
 cp -r "$REP_SKEL" "$REP_SKEL_LOCAL"
 chown -R "root:" "$REP_SKEL_LOCAL"
 chmod "700" "$REP_SKEL_LOCAL"
@@ -811,6 +864,7 @@ find "$REP_SKEL_LOCAL" -type f -exec chmod u=rw,g=rw,o='',u-s,g-s,o-t '{}' \;
 copier_repertoire_rep_save()
 {
 # Copie du répertoire REP_SAVE
+#
 cp -r "$REP_SAVE" "$REP_SAVE_LOCAL"
 chown -R "root:" "$REP_SAVE_LOCAL"
 chmod "700" "$REP_SAVE_LOCAL"
@@ -819,9 +873,12 @@ chmod "700" "$REP_SAVE_LOCAL"
 droits_fichiers_locaux()
 {
 # Mise en place des droits sur les fichiers tels qu'ils sont
-# sur un système « clean ». Pour ce faire, on utilise le fichier
-# "droits" qui contient, sous un certain format, toutes les
+# sur un système « clean ».
+#
+# Pour ce faire, on utilise le fichier "droits"
+# qui contient, sous un certain format, toutes les
 # informations nécessaires.
+#
 cat "$REP_SAVE_LOCAL/droits" | while read
 do
 	nom="$REP_SAVE_LOCAL$(echo "$REPLY" | cut -d ':' -f 1)"
@@ -837,6 +894,7 @@ unset -v nom proprietaire groupe_proprietaire droits
 creation_repertoire_unefois_local()
 {
 # Création du répertoire REP_UNEFOIS_LOCAL
+#
 mkdir -p "$REP_UNEFOIS_LOCAL"
 chown "root:" "$REP_UNEFOIS_LOCAL"
 chmod 700 "$REP_UNEFOIS_LOCAL"
@@ -845,6 +903,7 @@ chmod 700 "$REP_UNEFOIS_LOCAL"
 creation_repertoire_rep_log_local()
 {
 # Création du répertoire REP_LOG_LOCAL
+#
 mkdir -p "$REP_LOG_LOCAL"
 chown "root:" "$REP_LOG_LOCAL"
 chmod 700 "$REP_LOG_LOCAL"
@@ -853,6 +912,7 @@ chmod 700 "$REP_LOG_LOCAL"
 creation_repertoire_rep_tmp_local()
 {
 # Création du répertoire REP_TMP_LOCAL
+#
 mkdir -p "$REP_TMP_LOCAL"
 chown "root:" "$REP_TMP_LOCAL"
 chmod 700 "$REP_TMP_LOCAL"
@@ -861,6 +921,7 @@ chmod 700 "$REP_TMP_LOCAL"
 recuperer_nom_client()
 {
 # On récupère le nom du client dans la variable NOM_CLIENT.
+#
 if "$OPTION_NOM_CLIENT"
 then
 	# L'option a été spécifiée.
@@ -894,14 +955,16 @@ fi
 
 installer_paquets_client_ldap()
 {
-# Installation du ou des paquets contenant un client LDAP (pour
-# faire des recherches.
+# Installation du ou des paquets contenant un client LDAP
+# pour faire des recherches dans l'annuaire ldap du se3.
+#
 apt-get install --no-install-recommends --reinstall --yes "$PAQUETS_CLIENT_LDAP" >$SORTIE 2>&1
 }
 
 verifier_connexion_ldap_se3()
 {
 # Vérification de la connexion LDAP avec le Se3.
+#
 ldapsearch -xLLL -h "$SE3" -b "ou=Computers,$BASE_DN" "(|(uid=$NOM_CLIENT$)(cn=$NOM_CLIENT))" "dn" > $SORTIE 2>&1
 if [ "$?" != 0 ]
 then
@@ -913,8 +976,10 @@ fi
 
 rechercher_ldap_client()
 {
-# On passe à la recherche LDAP proprement dite. On va cherche dans l'annuaire
-# toute entrée de machine dont le nom, l'adresse MAC ou l'adresse IP seraient
+# On passe à la recherche LDAP proprement dite.
+#
+# On va cherche dans l'annuaire toute entrée de machine
+# dont le nom, l'adresse MAC ou l'adresse IP seraient
 # identique à la machine cliente.
 
 # Liste des cartes réseau (eth0, lo etc)
@@ -956,8 +1021,9 @@ fi
 
 afficher_info_carte_reseau_client()
 {
-# On affiche quelques informations sur les cartes réseau de la
-# machine cliente.
+# On affiche quelques informations sur les cartes réseau
+# de la machine cliente.
+#
 afficher "pour information, voici l'adresse MAC et l'adresse IP des cartes" \
          "réseau de la machine cliente ($NOM_CLIENT) :"
 for i in $carte_mac_ip
@@ -966,7 +1032,7 @@ do
 	adresse_mac=$(echo "$i" | cut -d";" -f 2)
 	adresse_ip=$(echo "$i" | cut -d";" -f 3)
 	# On ne saute pas de ligne ici, alors on utilise echo.
-    echo "* $carte <--> $adresse_mac (IP: $adresse_ip)"
+	echo "* $carte <--> $adresse_mac (IP: $adresse_ip)"
 done
 
 if "$OPTION_IV_LDAP"
@@ -988,9 +1054,11 @@ fi
 
 renommer_nom_client()
 {
-# Après les vérifications, on procède au renommage proprement
-# dit. Renommage qui n'a lieu que si l'option --nom-client a été
-# spécifié.
+# Après les vérifications, on procède au renommage proprement dit.
+#
+# Renommage qui n'a lieu que si l'option --nom-client
+# a étéspécifié.
+#
 if "$OPTION_NOM_CLIENT"
 then
 	afficher "changement de nom du système."
@@ -1007,76 +1075,78 @@ unset -v filtre_recherche resultat reponse
 
 set_grub_pwd ()
 {
-    # Si l'option --mdp-grub n'a pas été spécifiée, alors on passe
-    # à la suite sans rien faire. Sinon, il faut mettre en place
-    # un mot de passe Grub.
-    if "$OPTION_MDP_GRUB"
-    then
-        afficher "mise en place du mot de passe Grub (le login sera « admin »)."
-
-        if [ -z "$MDP_GRUB" ]
-        then
-            # MDP_GRUB est vide (l'option --mdp-grub a été spécifiée
-            # sans paramètre), il faut donc demander à l'utilisateur
-            # le mot de passe.
-            demander_mot_de_passe # La variable mot_de_passe est alors définie.
-            MDP_GRUB="$mot_de_passe"
-        else
-            # MDP_GRUB a été spécifié via le paramètre de l'option
-            # --mdp-grub. Il n'y a rien à faire dans ce cas.
-            true
-        fi
-
-        # On hache le mot de passe Grub.
-        local hached_grub_pwd
-        hached_grub_pwd=$(hash_grub_pwd "$MDP_GRUB")
-
-        # Le fichier /etc/grub.d/40_custom existe déjà. Il faut le rééditer
-        # en partant de zéro.
-        printf '#!/bin/sh\n'                                    >/etc/grub.d/40_custom
-        printf 'exec tail -n +3 $0\n'                          >>/etc/grub.d/40_custom
-        printf 'set superusers="admin"\n'                      >>/etc/grub.d/40_custom
-        printf 'password_pbkdf2 admin %s\n' "$hached_grub_pwd" >>/etc/grub.d/40_custom
-
-        # Dans le fichier /etc/grub.d/10_linux, il faut chercher une ligne
-        # spécifique qui va générer les entrées de boot Grub dite "simples"
-        # (typiquement l'entrée de boot par défaut qui va lancer Jessie).
-        # Au niveau de cette ligne, il faudra ajouter « --unrestricted ».
-        # En effet, sans cela, par défaut avec seulement le compte "admin"
-        # créé, aucun boot ne sera possible sans les identifiants du compte
-        # admin (par exemple si on laisse le compteur de temps défiler, Grub
-        # lancera le boot par défaut mais il demandera des identifiants pour
-        # autoriser le boot ce qui n'est franchement pas pratique).
-
-        local pattern="'gnulinux-simple-\$boot_device_id'"
-
-        # Si, au niveau de la ligne, l'option est déjà présente alors
-        # on ne modifie pas le fichier. Sinon on le modifie.
-        if ! grep -- "$pattern" /etc/grub.d/10_linux | grep -q -- '--unrestricted'
-        then
-            # Ajout de l'option « --unrestricted ».
-            sed -i "s/$pattern/& --unrestricted/" /etc/grub.d/10_linux
-        fi
-
-        # On met à jour la configuration de Grub.
-        if ! update-grub >"$SORTIE" 2>&1
-        then
-            afficher "Attention, la commande « update_grub » ne s'est pas" \
-                     "effectuée correctement, a priori Grub n'est pas"     \
-                     "opérationnel. Il faut rectifier la configuration de" \
-                     "Grub jusqu'à ce que la commande se déroule sans erreur."
-            exit 1
-        fi
-
-        unset -v mot_de_passe
-    fi
+# Si l'option --mdp-grub n'a pas été spécifiée, alors on passe
+# à la suite sans rien faire. Sinon, il faut mettre en place
+# un mot de passe Grub.
+if "$OPTION_MDP_GRUB"
+then
+	afficher "mise en place du mot de passe Grub (le login sera « admin »)."
+	
+	if [ -z "$MDP_GRUB" ]
+	then
+		# MDP_GRUB est vide (l'option --mdp-grub a été spécifiée
+		# sans paramètre), il faut donc demander à l'utilisateur
+		# le mot de passe.
+		demander_mot_de_passe # La variable mot_de_passe est alors définie.
+		MDP_GRUB="$mot_de_passe"
+	else
+		# MDP_GRUB a été spécifié via le paramètre de l'option
+		# --mdp-grub. Il n'y a rien à faire dans ce cas.
+		true
+	fi
+	
+	# On hache le mot de passe Grub.
+	local hached_grub_pwd
+	hached_grub_pwd=$(hash_grub_pwd "$MDP_GRUB")
+	
+	# Le fichier /etc/grub.d/40_custom existe déjà. Il faut le rééditer
+	# en partant de zéro.
+	printf '#!/bin/sh\n'                                    >/etc/grub.d/40_custom
+	printf 'exec tail -n +3 $0\n'                          >>/etc/grub.d/40_custom
+	printf 'set superusers="admin"\n'                      >>/etc/grub.d/40_custom
+	printf 'password_pbkdf2 admin %s\n' "$hached_grub_pwd" >>/etc/grub.d/40_custom
+	
+	# Dans le fichier /etc/grub.d/10_linux, il faut chercher une ligne
+	# spécifique qui va générer les entrées de boot Grub dite "simples"
+	# (typiquement l'entrée de boot par défaut qui va lancer Jessie).
+	# Au niveau de cette ligne, il faudra ajouter « --unrestricted ».
+	# En effet, sans cela, par défaut avec seulement le compte "admin"
+	# créé, aucun boot ne sera possible sans les identifiants du compte
+	# admin (par exemple si on laisse le compteur de temps défiler, Grub
+	# lancera le boot par défaut mais il demandera des identifiants pour
+	# autoriser le boot ce qui n'est franchement pas pratique).
+	
+	local pattern="'gnulinux-simple-\$boot_device_id'"
+	
+	# Si, au niveau de la ligne, l'option est déjà présente alors
+	# on ne modifie pas le fichier. Sinon on le modifie.
+	if ! grep -- "$pattern" /etc/grub.d/10_linux | grep -q -- '--unrestricted'
+	then
+		# Ajout de l'option « --unrestricted ».
+		sed -i "s/$pattern/& --unrestricted/" /etc/grub.d/10_linux
+	fi
+	
+	# On met à jour la configuration de Grub.
+	if ! update-grub >"$SORTIE" 2>&1
+	then
+		afficher "Attention, la commande « update_grub » ne s'est pas" \
+                 "effectuée correctement, a priori Grub n'est pas"     \
+                 "opérationnel. Il faut rectifier la configuration de" \
+                 "Grub jusqu'à ce que la commande se déroule sans erreur."
+		exit 1
+	fi
+	
+	unset -v mot_de_passe
+fi
 }
 
 mise_en_place_mot_de_passe_root()
 {
 # Si l'option  --mdp-root n'a pas été spécifiée,
 # alors on passe à la suite sans rien faire.
+#
 # Sinon, il faut modifier le mot de passe root.
+#
 if "$OPTION_MDP_ROOT"
 then
 	afficher "changement du mot de passe root."
@@ -1106,6 +1176,7 @@ installer_paquets_integration()
 {
 # Utilisation de debconf pour rendre l'installation non-interactive
 # mais adaptée à la situation présente.
+#
 debconf_parametres=$(mktemp)
 echo "
 libnss-ldapd	libnss-ldapd/nsswitch	multiselect	group, passwd, shadow
@@ -1133,25 +1204,31 @@ installer_paquet_sudo()
 {
 # Cas particulier. Sur Squeeze, on a besoin du paquet sudo.
 # est-ce toujours le cas avec Jessie ?
+#
 apt-get install --yes  sudo > $SORTIE 2>&1
 }
 
 desinstaller_gestionnaire_fenetres()
 {
+# fonction plus utilsée avec Jessie. À supprimer ?
+
 # On désinstalle le gestionnaire de fenêtres TWM pour qu'au moment
 # de l'ouverture de session l'utilisateur ne puisse choisir que Gnome
 # et seulement Gnome.
+#
 # Ce paquet n'est plus installé dans Jessie
+#
 apt-get remove --purge --yes twm >$SORTIE 2>&1
 }
 
 renommer_fichiers_pam()
 {
 # L'installation des paquets a eu lieu et maintenant les fichiers
-# "/etc/pam.d/common-*" tiennent compte de LDAP. On va les renommer
-# de manière explicite, avec l'extension « .AVEC-LDAP », et on va
-# remettre les fichiers "/etc/pam.d/common-*" d'origine.
-
+# "/etc/pam.d/common-*" tiennent compte de LDAP.
+#
+# On va les renommer de manière explicite, avec l'extension « .AVEC-LDAP »,
+# et on va remettre les fichiers "/etc/pam.d/common-*" d'origine.
+#
 # Si des fichiers ayant pour nom "common-*.AVEC-LDAP", c'est sans
 # doute qu'il y a déjà eu tentative d'intégration, alors on supprime
 # ces fichiers.
@@ -1175,10 +1252,12 @@ permettre_connexion_comptes_locaux()
 {
 # Dans les trois fichiers common-(auth|account|session).AVEC-LDAP, on 
 # remplace, au niveau de la ligne faisant appel à pam_unix.so,
-# l'instruction de contrôle par « sufficient ». Le but est que,
-# en cas de panne du serveur, la connexion avec les comptes locaux
-# ne soit pas ralentie pour autant (ce qui est le cas si on laisse
-# en l'état la configuration.
+# l'instruction de contrôle par « sufficient ».
+#
+# Le but est que, en cas de panne du serveur,
+# la connexion avec les comptes locaux ne soit pas ralentie pour autant,
+# ce qui est le cas si on laisse # en l'état la configuration.
+#
 sed -i -r -e 's/^.*pam_unix\.so.*$/account    sufficient    pam_unix.so/g' "/etc/pam.d/common-account.AVEC-LDAP"
 sed -i -r -e 's/^.*pam_unix\.so.*$/auth    sufficient    pam_unix.so/g' "/etc/pam.d/common-auth.AVEC-LDAP"
 sed -i -r -e 's/^.*pam_unix\.so.*$/session    sufficient    pam_unix.so/g' "/etc/pam.d/common-session.AVEC-LDAP"
@@ -1186,10 +1265,12 @@ sed -i -r -e 's/^.*pam_unix\.so.*$/session    sufficient    pam_unix.so/g' "/etc
 
 modifier_fichiers_pam()
 {
-# On modifie le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm afin que :
+# On modifie le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
+#
+# Buts :
 # 1) il fasse appel à la bibliothèque pam_script.so.
 # 2) il y ait des « includes » des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
-
+#
 if [ "$gdm" = "gdm3" ]
 then
 	# le nom du fichier gdm3 a changé avec Jessie
@@ -1213,23 +1294,26 @@ awk '{ print $0 }  /^\-?auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpa
 # Inclusion des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
 sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/${fichier_gdm}"
 
-###################################################
+#####
 # Modification de pam pour Jessie :
-# L'installation de libpam-script a ajouté des appels à pam_script.so 
-# dans tous les fichiers common-*, on les met en commentaire
+# L'installation de libpam-script a ajouté des appels à pam_script.so
+# Or cet appel ne doit se faire que dans le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
+# dans tous les fichiers common-*.AVEC-LDAP, on les met donc en commentaire
+# → inutile pour les autres puisqu'ils ont été restaurer via la fonction "restaurer_via_save"
 sed -i '/pam_script/ s/^/#/g' 	/etc/pam.d/common-session.AVEC-LDAP \
 								/etc/pam.d/common-session-noninteractive.AVEC-LDAP \
 								/etc/pam.d/common-account.AVEC-LDAP \
 								/etc/pam.d/common-auth.AVEC-LDAP \
 								/etc/pam.d/common-password.AVEC-LDAP
 # Fin de la modification de pam pour Jessie
-######################################################
+#####
 
 }
 
 creation_fichier_pam()
 {
 # Création du fichier PAM_SCRIPT_AUTH.
+#
 echo '#! /bin/bash
 
 function est_utilisateur_local ()
@@ -1268,10 +1352,14 @@ chmod "555" "$PAM_SCRIPT_AUTH"
 
 parametrer_gnome_screensaver()
 {
-# Paramétrage de gnome-screensaver utiliser quand une session
-# doit être déverrouillée.
+# fonction plus utilisée ?
+
+# Paramétrage de gnome-screensaver,
+# utiliser quand une session doit être déverrouillée.
+#
 # NB : à modifier pour Jessie ! (20151026)
 # → passer par une modification de dconf ?
+#
 restaurer_via_save "/etc/pam.d/gnome-screensaver"
 sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/gnome-screensaver"
 }
@@ -1293,6 +1381,8 @@ ff02::2  ip6-allrouters
 
 reecrire_fichier_nslcd()
 {
+# commentaires ?
+#
 echo "
 # /etc/nslcd.conf
 # nslcd configuration file. See nslcd.conf(5) for details.
@@ -1321,7 +1411,10 @@ service nslcd start > $SORTIE 2>&1
 
 modifier_fichier_smb()
 {
+# commentaires ?
+#
 # À faire seulement si le fichier existe bien sûr.
+#
 if [ -f "/etc/samba/smb.conf" ]
 then
 	afficher "Modification du fichier /etc/samba/smb.conf afin d'indiquer" \
@@ -1336,9 +1429,11 @@ fi
 reecrire_fichier_ntpdate()
 {
 # On réécrit simplement le fichier de configuration
-# associé (/etc/default/ntpdate). Ensuite, tout se passe comme si,
-# à chaque démarrage, la commande « ntpdate-debian » était lancée
-# en tant que root.
+# associé (/etc/default/ntpdate).
+
+# Ensuite, tout se passe comme si, à chaque démarrage,
+# la commande « ntpdate-debian » était lancée en tant que root.
+#
 echo "
 # The settings in this file are used by the program ntpdate-debian, but not
 # by the upstream program ntpdate.
@@ -1373,6 +1468,7 @@ modifier_fichier_user_dirs()
 {
 # Ce fichier permet de gérer les répertoires créés par défaut dans
 # le /home de l'utilisateur (comme le répertoire Bureau ou Images etc).
+#
 restaurer_via_save "/etc/xdg/user-dirs.defaults"
 
 # On édite carrément le fichier de A à Z.
@@ -1387,10 +1483,12 @@ DESKTOP=Desktop
 
 desactiver_hibernation_mise_en_veille()
 {
+# fonction plus utilisée ?
+#
 # Ce fichier permet de désactiver l'hibernation et la mise en veille
 # qui mettent souvent la pagaille sous Linux.
 # → passer par une modification via dconf ?
-
+#
 # On crée le fichier en partant de sa version sauvegardée dont on
 # est sûr qu'elle est non bidouillée.
 restaurer_via_save "/usr/share/polkit-1/actions/org.freedesktop.upower.policy"
@@ -1495,49 +1593,49 @@ do
 			OPTION_NOM_CLIENT="true"
 			NOM_CLIENT="$2"
 			shift 2
-			;;
+		;;
 		
 		--mdp-grub|--mg) 
 			OPTION_MDP_GRUB="true"
 			MDP_GRUB="$2"
 			shift 2
-			;;
+		;;
 		
 		--mdp-root|--mr) 
 			OPTION_MDP_ROOT="true"
 			MDP_ROOT="$2"
 			shift 2
-			;;
+		;;
 		
 		--ignorer-verification-ldap|--ivl) 
 			OPTION_IV_LDAP="true"
 			shift 1
-			;;
+		;;
 		
 		--redemarrer-client|--rc) 
 			OPTION_REDEMARRER="true"
 			shift 1
-			;;
+		;;
 		
 		--installer-samba|--is) 
 			OPTION_INSTALLER_SAMBA="true"
 			shift 1
-			;;
+		;;
 		
 		--debug|--d) 
 			SORTIE=">&1"
 			shift 1
-			;;
-			
-		--) 
+		;;
+		
+		--)
 			shift
 			break
-			;;
+		;;
 		
 		*) 
 			afficher "Erreur: «$1» est une option non implémentée."
 			exit 1
-			;;
+		;;
 	
 	esac
 done
@@ -1660,8 +1758,9 @@ installer_paquets_integration
 # Est-ce toujours le cas avec Jessie ?
 installer_paquet_sudo
 afficher "installation des paquets terminée"
+
 # twn n'est plus utilisé par debian : à confirmer ?
-#desinstaller_gestionnaire_fenetres
+#desinstaller_gestionnaire_fenetres		# supprimer cette fonction ?
 
 #=====
 # Configuration de PAM
@@ -1674,6 +1773,7 @@ renommer_fichiers_pam
 permettre_connexion_comptes_locaux
 modifier_fichiers_pam
 creation_fichier_pam
+
 #parametrer_gnome_screensaver	# obsolète ? (20151026)
 
 #=====
