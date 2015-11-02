@@ -1,0 +1,1 @@
+Vous pourrez mettre dans ce répertoire l'ensemble des polices de caractères à utiliser par les utilisateurs.

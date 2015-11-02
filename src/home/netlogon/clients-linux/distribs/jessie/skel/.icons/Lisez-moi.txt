@@ -1,0 +1,1 @@
+Vous pourrez mettre dans ce répertoire l'ensemble des icones qui permettront de customiser l'apparence des raccourcis sur le Bureau des utilisateurs.
