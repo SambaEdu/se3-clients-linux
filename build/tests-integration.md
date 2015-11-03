@@ -22,6 +22,9 @@ par exemple, abrunet (→ élève) puis abrune2 (→ prof) et enfin abrune3 (→
 - une session étant ouverte, débranché puis rebranché le câble réseau
 → idem
 
+- éteindre ou redémarrer un client
+→ une session ouverte
+→ aucune session ouverte
 
 # Compte-rendu de test
 
