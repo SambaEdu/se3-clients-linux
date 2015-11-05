@@ -1308,6 +1308,50 @@ modifier_fichiers_pam()
     #####
 }
 
+# Jessie - Modification pour "ldapiser" tous les processus utilisant les common-*
+modifier_fichiers_pam_bis()
+{
+    # On modifie le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
+    #
+    # Buts :
+    # 1) il fasse appel à la bibliothèque pam_script.so.
+    # 2) il y ait des « includes » des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
+    #
+    if [ "$gdm" = "gdm3" ]
+    then
+        # le nom du fichier gdm3 a changé avec Jessie
+        # Ensuite (cas gdm3), dans le fichier "/etc/pam.d/gdm-password" et lui seul, on va
+        # changer les instructions « @include » pour importer les fichiers
+        # "/etc/pam.d/common-*.AVEC-LDAP". Ainsi, gdm3 sera la seule application
+        # utilisant PAM qui tiendra compte de LDAP. Par exemple, les comptes
+        # LDAP ne pourront pas se connecter au système via la console ou via ssh.
+        fichier_gdm="gdm-password"
+    fi
+    if [ "$gdm" = "lightdm" ]
+    then
+        # non testé avec Jessie (20151026)
+        fichier_gdm="lightdm"
+    fi
+    restaurer_via_save "/etc/pam.d/${fichier_gdm}"
+    # Insertion de la ligne « auth    optional    pam_script.so ».
+    awk '{ print $0 }  /^\-?auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
+    "${REP_SAVE_LOCAL}/etc/pam.d/${fichier_gdm}" > "/etc/pam.d/${fichier_gdm}"
+    
+    #####
+    # Modification de pam pour Jessie :
+    # L'installation de libpam-script a ajouté des appels à pam_script.so
+    # Or cet appel ne doit se faire que dans le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
+    # dans tous les fichiers common-*.AVEC-LDAP, on les met donc en commentaire
+    # → inutile pour les autres puisqu'ils ont été restaurer via la fonction "restaurer_via_save"
+    sed -i '/pam_script/ s/^/#/g'     /etc/pam.d/common-session \
+                                    /etc/pam.d/common-session-noninteractive \
+                                    /etc/pam.d/common-account \
+                                    /etc/pam.d/common-auth \
+                                    /etc/pam.d/common-password
+    # Fin de la modification de pam pour Jessie
+    #####
+}
+
 creation_fichier_pam()
 {
     # Création du fichier PAM_SCRIPT_AUTH.
@@ -1776,22 +1820,7 @@ afficher "configuration de PAM afin que seul le gestionnaire de connexion" \
 #renommer_fichiers_pam
 #permettre_connexion_comptes_locaux
 #modifier_fichiers_pam
-
-awk '{ print $0 }  /^\-?auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
-    "${REP_SAVE_LOCAL}/etc/pam.d/${fichier_gdm}" > "/etc/pam.d/${fichier_gdm}"
-        
-
-# L'installation de libpam-script a ajouté des appels à pam_script.so
-# Or cet appel ne doit se faire que dans le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
-# dans tous les fichiers common-*.AVEC-LDAP, on les met donc en commentaire
-# → inutile pour les autres puisqu'ils ont été restaurer via la fonction "restaurer_via_save"
-sed -i '/pam_script/ s/^/#/g'     /etc/pam.d/common-session \
-                                    /etc/pam.d/common-session-noninteractive \
-                                    /etc/pam.d/common-account \
-                                    /etc/pam.d/common-auth \
-                                    /etc/pam.d/common-password
-
-
+modifier_fichiers_pam_bis
 creation_fichier_pam
 
 # Jessie - Fin de la modification pour "ldapiser" tous les processus utilisant les common-*
