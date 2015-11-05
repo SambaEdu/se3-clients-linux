@@ -1767,10 +1767,35 @@ afficher "configuration de PAM afin que seul le gestionnaire de connexion" \
          "consulte l'annuaire LDAP du serveur pour l'authentification." \
          "Une authentification via ssh (par exemple) ne sera possible" \
          "qu'avec un compte local"
-renommer_fichiers_pam
-permettre_connexion_comptes_locaux
-modifier_fichiers_pam
+
+
+# ###########################################################################################
+# Jessie - Modification pour "ldapiser" tous les processus utilisant les common-*
+# On se ramène à l'installation "par défaut" fait par le paquet de pam/ldap
+
+#renommer_fichiers_pam
+#permettre_connexion_comptes_locaux
+#modifier_fichiers_pam
+
+awk '{ print $0 }  /^\-?auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
+    "${REP_SAVE_LOCAL}/etc/pam.d/${fichier_gdm}" > "/etc/pam.d/${fichier_gdm}"
+        
+
+# L'installation de libpam-script a ajouté des appels à pam_script.so
+# Or cet appel ne doit se faire que dans le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
+# dans tous les fichiers common-*.AVEC-LDAP, on les met donc en commentaire
+# → inutile pour les autres puisqu'ils ont été restaurer via la fonction "restaurer_via_save"
+sed -i '/pam_script/ s/^/#/g'     /etc/pam.d/common-session \
+                                    /etc/pam.d/common-session-noninteractive \
+                                    /etc/pam.d/common-account \
+                                    /etc/pam.d/common-auth \
+                                    /etc/pam.d/common-password
+
+
 creation_fichier_pam
+
+# Jessie - Fin de la modification pour "ldapiser" tous les processus utilisant les common-*
+##############################################################################################
 
 #parametrer_gnome_screensaver    # obsolète ? (20151026)
 
