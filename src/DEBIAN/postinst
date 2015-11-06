@@ -33,16 +33,20 @@ SMB_CIFSFS="/etc/samba/smb_CIFSFS.conf"
 
 # Le programme awk injectera le contenu du fichier LOGON_PERSO
 # qui devra exister en amont.
-PROG_AWK_INSERTION='{ 
-    if ($0 ~ /^### LOGON_PERSO ###/) {
-        system("cat \"'"$LOGON_PERSO"'\"")
+PROG_AWK_INSERTION=$(cat <<EOF
+{
+    if (\$0 ~ /^### LOGON_PERSO ###/) {
+        system("cat '$LOGON_PERSO'")
     }
-    else if ($0 ~ /^### LOGON_PARAM_FOND_ECRAN ###/) {
-        system("cat \"'"$LOGON_PARAM_FOND_ECRAN"'\"")
-    } else { 
-        print $0 
+    else if (\$0 ~ /^### LOGON_PARAM_FOND_ECRAN ###/) {
+        system("[ -e '$LOGON_PARAM_FOND_ECRAN' ] && cat '$LOGON_PARAM_FOND_ECRAN'")
+    } else {
+        print \$0
     }
-}'
+}
+EOF
+)
+
 
 
 
