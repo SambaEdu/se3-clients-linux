@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm -f /home/netlogon/clients-linux/bin/logon_param_fond_ecran
-if [ -e "/etc/se3/fonds_ecran/actif.txt" -a "$(cat /etc/se3/fonds_ecran/actif.txt)" = "1" ]; then
+if [ -e "/etc/se3/fonds_ecran/actif.txt" ] && [ "$(cat /etc/se3/fonds_ecran/actif.txt)" = "1" ]; then
     echo "function parametres_generation_fonds() {" > /home/netlogon/clients-linux/bin/logon_param_fond_ecran
     # Pour etre sur de ne pas avoir un fichier vide.
     echo "recup_parametres_generation_fonds=faite" >> /home/netlogon/clients-linux/bin/logon_param_fond_ecran
