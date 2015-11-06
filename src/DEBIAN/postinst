@@ -89,13 +89,6 @@ function restaurer_droits ()
     chown "root:root" "$SMB_CIFSFS"
     chmod 644 "$SMB_CIFSFS"
     
-    mkdir -p "$REPERTOIRE_SSHKEY"
-    chmod 755 "$REPERTOIRE_SSHKEY"
-    chown admin:admins "$REPERTOIRE_SSHKEY"
-    
-    if [ ! -e "/var/www/install" ]; then
-        ln -s "$REPERTOIRE_SSHKEY" /var/www/install
-    fi
 }
 
 # Fonction qui adapte les scripts à l'environnement via des
@@ -321,8 +314,18 @@ case "$1" in
             fi
         done
 
-	if [ ! -e "$REPERTOIRE_SSHKEY/id_rsa.pub" ]; then
-		cp /var/remote_adm/.ssh/id_rsa.pub "$REPERTOIRE_SSHKEY/"
+        mkdir -p "$REPERTOIRE_SSHKEY"
+        chmod 755 "$REPERTOIRE_SSHKEY"
+        chown admin:admins "$REPERTOIRE_SSHKEY"
+
+        if [ ! -e "/var/www/install" ]
+        then
+            ln -s "$REPERTOIRE_SSHKEY" /var/www/install
+        fi
+
+        if [ ! -e "$REPERTOIRE_SSHKEY/id_rsa.pub" ]
+        then
+           cp /var/remote_adm/.ssh/id_rsa.pub "$REPERTOIRE_SSHKEY/"
         fi
         
         # Si le fichier LOGON_PERSO n'existe pas, le crée en se
