@@ -23,10 +23,12 @@ GENERE_PARAM_FOND_ECRAN="$REPERTOIRE_INSTALLATION/bin/genere_param_fonds_clients
 CONNEXION_SSH_SERVEUR="$REPERTOIRE_INSTALLATION/bin/connexion_ssh_serveur.bash"
 RECONFIGURE_SSH="$REPERTOIRE_INSTALLATION/bin/reconfigure.bash"
 SMB_CIFSFS="/etc/samba/smb_CIFSFS.conf"
-VERSION_PAQUET=$(LC_ALL="C" dpkg -s "$NOM_PAQUET" | grep -i '^version:' | cut -d' ' -f 2)
-FICHIER_LISEZMOI="$REPERTOIRE_INSTALLATION/doc/LISEZMOI.TXT"
-URL_DOC_PDF="http://francois-lafont.ac-versailles.fr/sedu-linux/doc_v$VERSION_PAQUET.pdf"
-URL_DOC_ZIP="http://francois-lafont.ac-versailles.fr/sedu-linux/doc_v$VERSION_PAQUET.zip"
+
+# TODO: deprecated. Will be deleted.
+#VERSION_PAQUET=$(LC_ALL="C" dpkg -s "$NOM_PAQUET" | grep -i '^version:' | cut -d' ' -f 2)
+#FICHIER_LISEZMOI="$REPERTOIRE_INSTALLATION/doc/LISEZMOI.TXT"
+#URL_DOC_PDF="http://francois-lafont.ac-versailles.fr/sedu-linux/doc_v$VERSION_PAQUET.pdf"
+#URL_DOC_ZIP="http://francois-lafont.ac-versailles.fr/sedu-linux/doc_v$VERSION_PAQUET.zip"
 
 
 # Le programme awk injectera le contenu du fichier LOGON_PERSO
@@ -243,21 +245,21 @@ function maj_logon ()
 }
 
 
-
+# TODO: deprecated. Will be deleted.
 # Fonction qui génère le fichier de doc, qui n'est qu'un simple
 # fichier texte contenant un lien vers la doc sur mon site perso.
-function ecrire_doc ()
-{
-    # Création du fichier LISEZMOI.TXT dans le répertoire doc/.
-    echo "La documentation en ligne de cette version du paquet $NOM_PAQUET se trouve ici :
-
-$URL_DOC_PDF
-
-Les sources au format LaTeX (compilables avec pdflatex) sont ici :
-
-$URL_DOC_ZIP
-    " > "$FICHIER_LISEZMOI"
-}
+#function ecrire_doc ()
+#{
+#    # Création du fichier LISEZMOI.TXT dans le répertoire doc/.
+#    echo "La documentation en ligne de cette version du paquet $NOM_PAQUET se trouve ici :
+#
+#$URL_DOC_PDF
+#
+#Les sources au format LaTeX (compilables avec pdflatex) sont ici :
+#
+#$URL_DOC_ZIP
+#    " > "$FICHIER_LISEZMOI"
+#}
 
 
 
@@ -338,8 +340,8 @@ case "$1" in
         afficher "Insertion du contenu de logon_perso dans le fichier logon."        
         maj_logon
 
-        afficher "Écriture du fichier de documentation."
-        ecrire_doc
+        #afficher "Écriture du fichier de documentation."
+        #ecrire_doc
         
         afficher "Restauration des droits sur tous les fichiers du paquet."
         restaurer_droits
