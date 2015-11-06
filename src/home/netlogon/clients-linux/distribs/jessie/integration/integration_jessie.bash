@@ -18,11 +18,13 @@ BASE_DN="__BASE_DN__"
 SERVEUR_NTP="__SERVEUR_NTP__"
 #--%<----%<----%<----%<----%<----%<----%<----%<----%<----%<----%<--
 
+#####
 # Pour avoir des sorties les plus simples possibles, c'est-à-dire
 # en anglais avec des caractères 100% ASCII ! Ce changement de locales
 # est temporaire et ne durera que le temps de l'exécution du script.
 export LC_ALL="C"
 
+#####
 # Pour faire des installations via apt-get non interactives.
 export DEBIAN_FRONTEND=noninteractive
 
@@ -93,7 +95,7 @@ afficher ()
 tester_nom_client ()
 {
     # Fonction qui teste si le nom du client est un nom valide.
-    # Elle prend un argument qui est le nom à tester bien sûr. 
+    # Elle prend un argument qui est le nom à tester bien sûr.
     # Elle renvoie 0 si tout est Ok, 1 sinon (et dans ce cas un
     # message d'erreur est envoyé).
     #
@@ -101,8 +103,8 @@ tester_nom_client ()
     #
     # La classe [a-z] dépend de la locale : sur mon système (Debian Squeeze)
     # et avec la locale fr_FR.utf8 la classe [a-z] attrape les caractères
-    # accentués ce que je ne souhaite pas. Mais avec la locale C, 
-    # la classe [a-z] n'attrape pas les caractères accentués. 
+    # accentués ce que je ne souhaite pas. Mais avec la locale C,
+    # la classe [a-z] n'attrape pas les caractères accentués.
     # Devant ce comportement un peu versatile, je préfère mettre explicitement 
     # la locale "C", même si en principe elle est déjà définie au début
     # du script.
@@ -502,7 +504,7 @@ recuperer_options()
 definir_paquets_a_installer()
 {
     # Les paquets nécessaires à l'intégration.
-    # Ces paquets seront désinstaller pour être installés par la suite_options
+    # Ces paquets seront désinstaller pour être installés par la suite
     # Cela permettra la configuration convenable de certains d'entre eux
     #
     # Ils ne peuvent être définis qu'après avoir connaissance
@@ -1678,10 +1680,10 @@ do
             afficher "Erreur: «$1» est une option non implémentée."
             exit 1
         ;;
-    
+        
     esac
 done
-
+    
 if [ -n "$1" ]
 then
     afficher "Désolé le script ne prend aucun argument à part des" \
