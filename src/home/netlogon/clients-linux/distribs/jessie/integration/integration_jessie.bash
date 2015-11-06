@@ -1525,19 +1525,19 @@ DESKTOP=Desktop
 
 desactiver_hibernation_mise_en_veille()
 {
-    # fonction plus utilisée ?
+    # Ce fichier permet de désactiver l'hibernation et la mise en veille et le "suspendre"
+    # qui mettent souvent la pagaille sous Linux.    # 
     #
-    # Ce fichier permet de désactiver l'hibernation et la mise en veille
-    # qui mettent souvent la pagaille sous Linux.
-    # → passer par une modification via dconf ?
-    #
-    # On crée le fichier en partant de sa version sauvegardée dont on
-    # est sûr qu'elle est non bidouillée.
-    restaurer_via_save "/usr/share/polkit-1/actions/org.freedesktop.upower.policy"
-    sed -i -r \
-     -e 's:<allow_inactive>no</allow_inactive>:<allow_inactive>yes</allow_inactive>:g' \
-     -e 's:<allow_active>yes</allow_active>:<allow_active>no</allow_active>:g' \
-     "/usr/share/polkit-1/actions/org.freedesktop.upower.policy"
+    # Sous Jessie, le fichier polkit à modifier est "org.freedesktop.login1.policy" (et non plus "org.freedesktop.upower.policy" comme sous Squeeze ...)
+    # Le fichier déjà modifié pour désactiver l'hibernation, la mise en veille et le suspendre est déposé directement dans le dossier save/
+    # De la sorte, il n'y a plus qu'à le restaurer ...
+    
+    restaurer_via_save "/usr/share/polkit-1/actions/org.freedesktop.login1.policy"
+    
+    # Sous Xfce, on désinstalle l'économiseur d'écran "xscreensaver" (l'onglet "Verrouillage de l'écran" devient de ce fait caduque ...) 
+    # afin d'éviter qu'un PC soit vérouillé par un utilisateur et nécessite de ce fait un redémarrage pour être déverrouiller ...
+    # Et sous Gnome et lxde, est-ce xscreensaver ?
+    apt-get purge -y xscreensaver
 }
 
 decompte_10s()
@@ -1872,13 +1872,11 @@ afficher "modification du fichier /etc/xdg/user-dirs.defaults afin" \
 modifier_fichier_user_dirs
 
 #=====
-# Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy
-# fichier inexistant dans Jessie : à modifier ? (20151026)
-# → passer par une modification via dconf ?
+# Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.login1.policy
 #=====
-#afficher "modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy" \
-#         "afin de désactiver l'hibernation et la mise en veille du système"
-#desactiver_hibernation_mise_en_veille
+#afficher "modification du fichier /usr/share/polkit-1/actions/org.freedesktop.login1.policy" \
+#         "afin de désactiver l'hibernation, la mise en veille et le suspendre du système"
+desactiver_hibernation_mise_en_veille
 
 #=====
 # FIN DE L'INTÉGRATION
