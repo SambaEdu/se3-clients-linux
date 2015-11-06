@@ -238,8 +238,8 @@ git push
 
 ### Le renommage d'un fichier/répertoire
 
-Le renommage modifie modifie la structure d'un projet. Il possède lui
-aussi une commande dédiée :
+Le renommage modifie la structure d'un projet. Il possède lui
+aussi une commande dédiée `git mv` :
 
 ```sh
 # Renomme le fichier1 en fichier2
@@ -247,6 +247,41 @@ git mv ./fichier1 ./fichier2
 git commit -av
 git push
 ```
+
+Les commandes sont exactement les mêmes pour un répertoire.
+
+
+### Suppression d'un fichier/répertoire
+
+Pour supprimer un fichier/répertoire du dépôt, il y a aussi
+une commande dédiée `git rm`. Attention, la suppression se
+fait sur le dépôt distant (une fois qu'on a pushé) et sur
+le dépôt local (dès la commande `git rm` exécutée) :
+
+```sh
+# Pour un fichier
+git rm ./fichier1
+git commit -av
+git push
+
+# Pour un répertoire non vide : dans ce cas il faut ajouter
+# l'option -r :
+git rm -r ./rep1
+git commit -av
+git push
+```
+
+**Remarque :** il faut bien comprendre que les commandes
+`git mv` et `git rm` ne sont pas équivalentes aux commandes
+habituelles `mv` et `rm`. Ces dernières agissent sur
+l'arborescence locale uniquement. Quant à `git mv` et `git
+rm`, en plus d'agir sur l'arborescence locale, écrivent des
+informations dans la base locale du dépôt (ie dans le
+répertoire `.git/` à la racine du dépôt local). Typiquement,
+`git rm` écrit d'une manière ou d'une autre l'information «
+suppression de tel fichier du dépôt », information qui sera
+transmise au dépôt distant lors du `git push`.
+
 
 ### Manipulation de branches
 

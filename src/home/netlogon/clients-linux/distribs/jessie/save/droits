@@ -16,3 +16,4 @@
 /etc/pam.d/lightdm-autologin:root:root:644
 /etc/pam.d/lightdm:root:root:644
 /etc/xdg/user-dirs.defaults:root:root:644
+/usr/share/polkit-1/actions/org.freedesktop.login1.policy:root:root:644
