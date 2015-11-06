@@ -64,12 +64,12 @@ function restaurer_droits ()
     # car c'est indispensable mais pour le chmod, on n'interfère
     # pas dans les skels des administrateurs.
     chown -R "admin:admins" "$REPERTOIRE_INSTALLATION"
-    find "$REPERTOIRE_INSTALLATION" -regextype posix-extended      \
-        ! -regex "^$REPERTOIRE_INSTALLATION/distribs/[a-z]+/skel/" \
-        -exec chmod -R "u=rwx,g=rx,o=rx,u-s,g-s,o-t" "{}" \+
+    find "$REPERTOIRE_INSTALLATION" -regextype posix-extended        \
+        ! -regex "^$REPERTOIRE_INSTALLATION/distribs/[a-z]+/skel/.*" \
+        -exec chmod "u=rwx,g=rx,o=rx,u-s,g-s,o-t" "{}" \+
     # Pour les fichiers, on enlève le droit x pour tout le monde.
-    find "$REPERTOIRE_INSTALLATION" -regextype posix-extended       \
-         ! -regex "^$REPERTOIRE_INSTALLATION/distribs/[a-z]+/skel/" \
+    find "$REPERTOIRE_INSTALLATION" -regextype posix-extended         \
+         ! -regex "^$REPERTOIRE_INSTALLATION/distribs/[a-z]+/skel/.*" \
         -type f -exec chmod "a-x" "{}" \+
     setfacl -m u:www-data:rx "$REPERTOIRE_INSTALLATION"
     setfacl -m d:u:www-data:rx "$REPERTOIRE_INSTALLATION"
