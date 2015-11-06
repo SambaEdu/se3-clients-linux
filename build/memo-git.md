@@ -280,7 +280,7 @@ informations dans la base locale du dépôt (ie dans le
 répertoire `.git/` à la racine du dépôt local). Typiquement,
 `git rm` écrit d'une manière ou d'une autre l'information «
 suppression de tel fichier du dépôt », information qui sera
-transmise dépôt distant lors du `git push`.
+transmise au dépôt distant lors du `git push`.
 
 
 ### Manipulation de branches
