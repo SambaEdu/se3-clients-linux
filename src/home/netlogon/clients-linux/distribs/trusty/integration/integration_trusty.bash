@@ -405,8 +405,8 @@ recuperer_options()
     # Si l'appel est syntaxiquement incorrect on arrête le script.
     if [ $? != 0 ]
     then
-    	echo "Arrêt du script $NOM_DU_SCRIPT." >&2
-    	exit 1
+        echo "Arrêt du script $NOM_DU_SCRIPT." >&2
+        exit 1
     fi
     
     unset -v suite_options
@@ -436,69 +436,69 @@ recuperer_options()
     # arguments du script et qui ne sont pas des options (à droite de --).
     while true 
     do
-    	case "$1" in
-    	
-    		-h|--help)
-    			afficher "Aide : voir la documentation (au format pdf) associée." 
-    			exit 0
-			;;
-    		
-    		--nom-client|--nc)
-    			OPTION_NOM_CLIENT="true"
-    			NOM_CLIENT="$2"
-    			shift 2
-			;;
-		
-    		--mdp-grub|--mg) 
-    			OPTION_MDP_GRUB="true"
-    			MDP_GRUB="$2"
-    			shift 2
-			;;
-    		
-    		--mdp-root|--mr) 
-    			OPTION_MDP_ROOT="true"
-    			MDP_ROOT="$2"
-    			shift 2
-			;;
-    		
-    		--ignorer-verification-ldap|--ivl) 
-    			OPTION_IV_LDAP="true"
-    			shift 1
-			;;
-    		
-    		--redemarrer-client|--rc) 
-    			OPTION_REDEMARRER="true"
-    			shift 1
-			;;
-    		
-    		--installer-samba|--is) 
-    			OPTION_INSTALLER_SAMBA="true"
-    			shift 1
-			;;
-    		
-    		--debug|--d) 
-    			SORTIE=">&1"
-    			shift 1
-			;;
-    		
-    		--) 
-    			shift
-    			break
-			;;
-    		
-    		*) 
-    			afficher "Erreur: «$1» est une option non implémentée."
-    			exit 1
-			;;
-    		
-    	esac
+        case "$1" in
+        
+            -h|--help)
+                afficher "Aide : voir la documentation (au format pdf) associée." 
+                exit 0
+            ;;
+            
+            --nom-client|--nc)
+                OPTION_NOM_CLIENT="true"
+                NOM_CLIENT="$2"
+                shift 2
+            ;;
+        
+            --mdp-grub|--mg) 
+                OPTION_MDP_GRUB="true"
+                MDP_GRUB="$2"
+                shift 2
+            ;;
+            
+            --mdp-root|--mr) 
+                OPTION_MDP_ROOT="true"
+                MDP_ROOT="$2"
+                shift 2
+            ;;
+            
+            --ignorer-verification-ldap|--ivl) 
+                OPTION_IV_LDAP="true"
+                shift 1
+            ;;
+            
+            --redemarrer-client|--rc) 
+                OPTION_REDEMARRER="true"
+                shift 1
+            ;;
+            
+            --installer-samba|--is) 
+                OPTION_INSTALLER_SAMBA="true"
+                shift 1
+            ;;
+            
+            --debug|--d) 
+                SORTIE=">&1"
+                shift 1
+            ;;
+            
+            --) 
+                shift
+                break
+            ;;
+            
+            *) 
+                afficher "Erreur: «$1» est une option non implémentée."
+                exit 1
+            ;;
+            
+        esac
     done
     
     if [ -n "$1" ]
     then
-    	afficher "Désolé le script ne prend aucun argument à part des" \
+        afficher "Désolé le script ne prend aucun argument à part des" \
                  "options de la forme « --xxx ». Fin du script."
-    	exit 1
+        exit 1
     fi
 }
 
@@ -517,7 +517,7 @@ definir_paquets_a_installer()
     PAQUETS_AUTRES="libnss-ldapd libpam-ldapd nscd nslcd libpam-script rsync ntpdate xterm imagemagick"
     if "$OPTION_INSTALLER_SAMBA"
     then
-    	PAQUETS_AUTRES="$PAQUETS_AUTRES samba"
+        PAQUETS_AUTRES="$PAQUETS_AUTRES samba"
     fi
     PAQUETS_TOUS="$PAQUETS_MONTAGE_CIFS $PAQUETS_CLIENT_LDAP $PAQUETS_RANDOM $PAQUETS_AUTRES"
 }
@@ -545,9 +545,9 @@ verifier_droits_root()
     #
     if [ "$UID" != "0" ]
     then
-    	afficher "Désolé, vous devez avoir les droits « root » pour lancer" \
+        afficher "Désolé, vous devez avoir les droits « root » pour lancer" \
                  "le script. Fin du script."
-    	exit 1
+        exit 1
     fi
 }
 
@@ -557,9 +557,9 @@ verifier_version_debian()
     #
     if [ "$NOM_DE_CODE" != "trusty" ]
     then
-    	afficher "Désolé, le script doit être exécuté sur Ubuntu Trusty." \
+        afficher "Désolé, le script doit être exécuté sur Ubuntu Trusty." \
                  "Fin du script."
-    	exit 1
+        exit 1
     fi
 }
 
@@ -594,29 +594,29 @@ verifier_nom_client()
     #
     if "$OPTION_NOM_CLIENT"
     then
-    	# L'option a été spécifiée.
-    	if [ -n "$NOM_CLIENT" ]
-    	then
-    		# Si $NOM_CLIENT n'est pas vide, c'est que l'option a
-    		# été spécifiée avec paramètre.
-    		if ! tester_nom_client "$NOM_CLIENT"
-    		then
-    			afficher_erreur_nom_client
-    			exit 1
-    		fi
-    	else
-    		# $NOM_CLIENT est vide et l'utilisateur va choisir
-    		# manuellement le nom du client plus loin. Pas de test.
-    		true
-    	fi
+        # L'option a été spécifiée.
+        if [ -n "$NOM_CLIENT" ]
+        then
+            # Si $NOM_CLIENT n'est pas vide, c'est que l'option a
+            # été spécifiée avec paramètre.
+            if ! tester_nom_client "$NOM_CLIENT"
+            then
+                afficher_erreur_nom_client
+                exit 1
+            fi
+        else
+            # $NOM_CLIENT est vide et l'utilisateur va choisir
+            # manuellement le nom du client plus loin. Pas de test.
+            true
+        fi
     else
-    	# L'option n'a pas été spécifiée, il faut vérifier le nom
-    	# actuel du client.
-    	if ! tester_nom_client "$NOM_CLIENT_ANCIEN"
-    	then
-    		afficher_erreur_nom_client
-    		exit 1
-    	fi
+        # L'option n'a pas été spécifiée, il faut vérifier le nom
+        # actuel du client.
+        if ! tester_nom_client "$NOM_CLIENT_ANCIEN"
+        then
+            afficher_erreur_nom_client
+            exit 1
+        fi
     fi
 }
 
@@ -626,30 +626,30 @@ verifier_repertoire_montage()
     #
     if [ ! -d "$REP_MONTAGE" ]
     then
-    	afficher "Désolé, le répertoire $REP_MONTAGE n'existe pas." \
+        afficher "Désolé, le répertoire $REP_MONTAGE n'existe pas." \
                  "Sa présence est nécessaire pour le script." \
                  "Fin du script."
-    	exit 1
+        exit 1
     fi
     
     # On vérifie l'absence de montage dans le répertoire de montage.
     if df | grep -q "$REP_MONTAGE"
     then
-    	afficher "Désolé, le répertoire $REP_MONTAGE ne doit contenir aucun" \
+        afficher "Désolé, le répertoire $REP_MONTAGE ne doit contenir aucun" \
                  "montage de système de fichiers. Charge à vous d'enlever" \
                  "le ou les montages et de supprimer le ou les répertoires" \
                  "associés. Relancez le script d'intégration ensuite." \
                  "Fin du script."
-    	exit 1
+        exit 1
     fi
     
     # On vérifie alors qu'il n'existe pas de fichier ou répertoire REP_NETLOGON.
     if [ -e "$REP_NETLOGON" ]
     then
-    	afficher "Désolé, un répertoire ou fichier $REP_NETLOGON existe déjà" \
+        afficher "Désolé, un répertoire ou fichier $REP_NETLOGON existe déjà" \
                  "dans $REP_MONTAGE. Charge à vous de le supprimer." \
                  "Relancez le script d'intégration ensuite. Fin du script."
-    	exit 1
+        exit 1
     fi
 }
 
@@ -663,10 +663,10 @@ verifier_apt_get()
     #
     if [ $(apt-get update 2>&1 >$SORTIE | wc -l) -gt 0 ]
     then
-    	afficher "Désolé, la commande « apt-get update » ne fonctionne pas" \
+        afficher "Désolé, la commande « apt-get update » ne fonctionne pas" \
                  "correctement. Il y des erreurs que vous devez rectifier." \
                  "Relancez le script d'intégration ensuite. Fin du script."
-    	exit 1
+        exit 1
     fi
 }
 
@@ -675,15 +675,15 @@ verifier_disponibilite_paquets()
     # Vérification de la disponibilité des paquets nécessaires à l'intégration.
     for paquet in $PAQUETS_TOUS
     do
-    	if ! apt-get install "$paquet" --yes --simulate >$SORTIE 2>&1
-    	then
-    		afficher "Désolé, le paquet $paquet n'est pas disponible dans" \
+        if ! apt-get install "$paquet" --yes --simulate >$SORTIE 2>&1
+        then
+            afficher "Désolé, le paquet $paquet n'est pas disponible dans" \
                      "les dépôts alors que celui-ci est nécessaire pour" \
                      "effectuer l'intégration de la machine cliente." \
                      "La liste des dépôts dans le fichier /etc/apt/sources.list" \
                      "est sans doute incomplète. Fin du script."
-    		exit 1
-    	fi
+            exit 1
+        fi
     done
 }
 
@@ -697,12 +697,12 @@ verifier_ip_se3()
     octet="[0-9]{1,3}"
     if ! echo "$SE3" | grep -qE "^$octet\.$octet\.$octet\.$octet$"
     then
-    	if ! host "$SE3" >$SORTIE
-    	then
-    		afficher "Désolé, le nom d'hôte du SambaÉdu ($SE3) n'est pas résolu" \
+        if ! host "$SE3" >$SORTIE
+        then
+            afficher "Désolé, le nom d'hôte du SambaÉdu ($SE3) n'est pas résolu" \
                      "par la machine cliente. Fin du script."
-    		exit 1
-    	fi
+            exit 1
+        fi
     fi
     unset -v octet
 }
@@ -714,9 +714,9 @@ verifier_acces_ping_se3()
     #
     if ! ping -c 5 -W 2 "$SE3" >$SORTIE 2>&1
     then
-    	afficher "Désolé, le SambaÉdu est inaccessible via la commande ping." \
+        afficher "Désolé, le SambaÉdu est inaccessible via la commande ping." \
                  "Fin du script."
-    	exit 1
+        exit 1
     fi
 }
 
@@ -797,10 +797,10 @@ installer_paquets_cifs()
     #
     debconf_parametres=$(mktemp)
     echo "
-samba-common	samba-common/encrypt_passwords	boolean	true
-samba-common	samba-common/dhcp	boolean	false
-samba-common	samba-common/workgroup	string	WORKGROUP
-samba-common	samba-common/do_debconf	boolean	true
+samba-common    samba-common/encrypt_passwords    boolean    true
+samba-common    samba-common/dhcp    boolean    false
+samba-common    samba-common/workgroup    string    WORKGROUP
+samba-common    samba-common/do_debconf    boolean    true
 " > "$debconf_parametres"
     debconf-set-selections < "$debconf_parametres"
     rm -f "$debconf_parametres"
@@ -824,10 +824,10 @@ montage_partage_netlogon()
     mount -t cifs "$CHEMIN_PARTAGE_NETLOGON" "$REP_NETLOGON" -o ro,guest,"$OPTIONS_MOUNT_CIFS_BASE" >$SORTIE 2>&1
     if [ "$?" != "0" ]
     then
-    	rmdir "$REP_NETLOGON"
-    	afficher "Échec du montage du partage $NOM_PARTAGE_NETLOGON du SambaÉdu." \
+        rmdir "$REP_NETLOGON"
+        afficher "Échec du montage du partage $NOM_PARTAGE_NETLOGON du SambaÉdu." \
                  "Fin du script."
-    	exit 1
+        exit 1
     fi
 }
 
@@ -838,11 +838,11 @@ effacer_repertoire_rep_se3_local()
     #
     if [ -e "$REP_SE3_LOCAL" ]
     then
-    	if mountpoint -q  "$REP_TMP_LOCAL"
-    	then
-    		umount "$REP_TMP_LOCAL"
-    	fi
-    	rm -fR "$REP_SE3_LOCAL"
+        if mountpoint -q  "$REP_TMP_LOCAL"
+        then
+            umount "$REP_TMP_LOCAL"
+        fi
+        rm -fR "$REP_SE3_LOCAL"
     fi
     mkdir -p "$REP_SE3_LOCAL"
     chown "root:" "$REP_SE3_LOCAL"
@@ -893,12 +893,12 @@ droits_fichiers_locaux()
     #
     cat "$REP_SAVE_LOCAL/droits" | while read
     do
-    	nom="$REP_SAVE_LOCAL$(echo "$REPLY" | cut -d ':' -f 1)"
-    	proprietaire="$(echo "$REPLY" | cut -d ':' -f 2)"
-    	groupe_proprietaire="$(echo "$REPLY" | cut -d ':' -f 3)"
-    	droits="$(echo "$REPLY" | cut -d ':' -f 4)"
-    	chown "$proprietaire:$groupe_proprietaire" "$nom"
-    	chmod "$droits" "$nom"
+        nom="$REP_SAVE_LOCAL$(echo "$REPLY" | cut -d ':' -f 1)"
+        proprietaire="$(echo "$REPLY" | cut -d ':' -f 2)"
+        groupe_proprietaire="$(echo "$REPLY" | cut -d ':' -f 3)"
+        droits="$(echo "$REPLY" | cut -d ':' -f 4)"
+        chown "$proprietaire:$groupe_proprietaire" "$nom"
+        chmod "$droits" "$nom"
     done
     unset -v nom proprietaire groupe_proprietaire droits
 }
@@ -936,31 +936,31 @@ recuperer_nom_client()
     #
     if "$OPTION_NOM_CLIENT"
     then
-    	# L'option a été spécifiée.
-    	if [ -z "$NOM_CLIENT" ]
-    	then
-    		# Si $NOM_CLIENT est vide, c'est que l'option a été spécifié
-    		# sans paramètre et il faut demander à l'utilisateur le nom
-    		# qu'il souhaite pour le client.
-    		afficher "Saisissez le nom de la machine cliente :"
-    		read -r NOM_CLIENT
-    		if ! tester_nom_client "$NOM_CLIENT"
-    		then
-    			afficher_erreur_nom_client
-    			exit 1
-    		fi
-    	else
-    		# $NOM_CLIENT n'est pas vide et l'utilisateur a déjà
-    		# spécifié la valeur de ce paramètre. La vérification
-    		# sur les caractères a déjà été effectuée dans la partie
-    		# « Vérifications sur le client ».
-    		true
-    	fi
+        # L'option a été spécifiée.
+        if [ -z "$NOM_CLIENT" ]
+        then
+            # Si $NOM_CLIENT est vide, c'est que l'option a été spécifié
+            # sans paramètre et il faut demander à l'utilisateur le nom
+            # qu'il souhaite pour le client.
+            afficher "Saisissez le nom de la machine cliente :"
+            read -r NOM_CLIENT
+            if ! tester_nom_client "$NOM_CLIENT"
+            then
+                afficher_erreur_nom_client
+                exit 1
+            fi
+        else
+            # $NOM_CLIENT n'est pas vide et l'utilisateur a déjà
+            # spécifié la valeur de ce paramètre. La vérification
+            # sur les caractères a déjà été effectuée dans la partie
+            # « Vérifications sur le client ».
+            true
+        fi
     else
-    	# L'option n'a pas été spécifiée et le nom (ancien) a déjà été
-    	# vérifié au niveau des caractères dans la partie
-    	# « Vérifications sur le client ».
-    	NOM_CLIENT="$NOM_CLIENT_ANCIEN"
+        # L'option n'a pas été spécifiée et le nom (ancien) a déjà été
+        # vérifié au niveau des caractères dans la partie
+        # « Vérifications sur le client ».
+        NOM_CLIENT="$NOM_CLIENT_ANCIEN"
     fi
 }
 
@@ -979,9 +979,9 @@ verifier_connexion_ldap_se3()
     ldapsearch -xLLL -h "$SE3" -b "ou=Computers,$BASE_DN" "(|(uid=$NOM_CLIENT$)(cn=$NOM_CLIENT))" "dn" > $SORTIE 2>&1
     if [ "$?" != 0 ]
     then
-    	afficher "Désolé, le serveur LDAP n'est pas joignable." \
+        afficher "Désolé, le serveur LDAP n'est pas joignable." \
                  "Fin du script."
-    	exit 1
+        exit 1
     fi
 }
 
@@ -1010,12 +1010,12 @@ rechercher_ldap_client()
     filtre_recherche="(|(uid=$NOM_CLIENT$)(cn=$NOM_CLIENT)"
     for i in $carte_mac_ip
     do
-    	carte=$(echo "$i" | cut -d";" -f 1)
-    	adresse_mac=$(echo "$i" | cut -d";" -f 2)
-    	adresse_ip=$(echo "$i" | cut -d";" -f 3)
-    	# Si jamais "$adresse_ip" = "SANS-IP", on ajoute simplement un  critère inutile
-    	# dans la recherche mais ce n'est pas un problème.
-    	filtre_recherche="$filtre_recherche(ipHostNumber=$adresse_ip)(macAddress=$adresse_mac)"
+        carte=$(echo "$i" | cut -d";" -f 1)
+        adresse_mac=$(echo "$i" | cut -d";" -f 2)
+        adresse_ip=$(echo "$i" | cut -d";" -f 3)
+        # Si jamais "$adresse_ip" = "SANS-IP", on ajoute simplement un  critère inutile
+        # dans la recherche mais ce n'est pas un problème.
+        filtre_recherche="$filtre_recherche(ipHostNumber=$adresse_ip)(macAddress=$adresse_mac)"
     done
     # On ferme la parenthèse.
     filtre_recherche="$filtre_recherche)"
@@ -1024,7 +1024,7 @@ rechercher_ldap_client()
     resultat=$(ldapsearch -xLLL -h "$SE3" -b "ou=Computers,$BASE_DN" "$filtre_recherche" dn ipHostNumber macAddress)
     if [ "$resultat" = "" ]
     then
-    	resultat="AUCUNE ENTRÉE CORRESPONDANT DANS L'ANNUAIRE."
+        resultat="AUCUNE ENTRÉE CORRESPONDANT DANS L'ANNUAIRE."
     fi
 }
 
@@ -1037,27 +1037,27 @@ afficher_info_carte_reseau_client()
              "réseau de la machine cliente ($NOM_CLIENT) :"
     for i in $carte_mac_ip
     do
-    	carte=$(echo "$i" | cut -d";" -f 1)
-    	adresse_mac=$(echo "$i" | cut -d";" -f 2)
-    	adresse_ip=$(echo "$i" | cut -d";" -f 3)
-    	# On ne saute pas de ligne ici, alors on utilise echo.
+        carte=$(echo "$i" | cut -d";" -f 1)
+        adresse_mac=$(echo "$i" | cut -d";" -f 2)
+        adresse_ip=$(echo "$i" | cut -d";" -f 3)
+        # On ne saute pas de ligne ici, alors on utilise echo.
         echo "* $carte <--> $adresse_mac (IP: $adresse_ip)"
     done
     
     if "$OPTION_IV_LDAP"
     then
-    	afficher "Vous avez choisi d'ignorer la vérification LDAP, le script" \
+        afficher "Vous avez choisi d'ignorer la vérification LDAP, le script" \
                  "d'intégration continue son exécution."
     else
-    	afficher "D'après les informations ci-dessus, voulez-vous continuer" \
+        afficher "D'après les informations ci-dessus, voulez-vous continuer" \
                  "l'exécution du script d'intégration ? Si oui, alors répondez" \
                  "« oui » (en minuscules), sinon répondez autre chose :"
-    	read -r reponse
-    	if [ "$reponse" != "oui" ]
-    	then
-    		afficher "Fin du script."
-    		exit 1
-    	fi
+        read -r reponse
+        if [ "$reponse" != "oui" ]
+        then
+            afficher "Fin du script."
+            exit 1
+        fi
     fi
 }
 
@@ -1070,12 +1070,12 @@ renommer_nom_client()
     #
     if "$OPTION_NOM_CLIENT"
     then
-    	afficher "Changement de nom du système."
-    	echo "$NOM_CLIENT" > "/etc/hostname"
-    	#invoke-rc.d hostname.sh stop > $SORTIE 2>&1
-    	service hostname stop > $SORTIE 2>&1
-    	#invoke-rc.d hostname.sh start > $SORTIE 2>&1
-    	service hostname start > $SORTIE 2>&1
+        afficher "Changement de nom du système."
+        echo "$NOM_CLIENT" > "/etc/hostname"
+        #invoke-rc.d hostname.sh stop > $SORTIE 2>&1
+        service hostname stop > $SORTIE 2>&1
+        #invoke-rc.d hostname.sh start > $SORTIE 2>&1
+        service hostname start > $SORTIE 2>&1
     fi
     
     unset -v cartes_reseau carte_mac_ip carte adresse_mac adresse_ip 
@@ -1090,57 +1090,57 @@ mettre_en_place_mot_de_passe_grub()
     
     if "$OPTION_MDP_GRUB"
     then
-    	afficher "Mise en place du mot de passe Grub (le login sera « admin »)."
-    	
-    	# Installation temporaire qui permet de rendre le fichier
-    	# /dev/random plus loquace ce qui permet ainsi de rectifier
-    	# un bug de la commande grub-mkpasswd-pbkdf2. Ces installations
-    	# seront supprimées ensuite, une fois la mise en place du
-    	# mot de passe Grub terminée.
-    	apt-get install --reinstall --yes --force-yes $PAQUETS_RANDOM > $SORTIE 2>&1
-    	echo "HRNGDEVICE=/dev/urandom" >> "/etc/default/rng-tools"
-    	#invoke-rc.d rng-tools stop > $SORTIE 2>&1
-    	service rng-tools stop > $SORTIE 2>&1
-    	#invoke-rc.d rng-tools start > $SORTIE 2>&1
-    	service rng-tools start > $SORTIE 2>&1
-    	
-    	if [ -z "$MDP_GRUB" ]
-    	then
-    		# MDP_GRUB est vide (l'option --mdp-grub a été spécifiée
-    		# sans paramètre), il faut donc demander à l'utilisateur
-    		# le mot de passe.
-    		demander_mot_de_passe # La variable mot_de_passe est alors définie.
-    		MDP_GRUB=$mot_de_passe
-    	else
-    		# MDP_GRUB a été spécifié via le paramètre de l'option
-    		# --mdp-grub. Il n'y a rien à faire dans ce cas.
-    		true
-    	fi
-    	
-    	# On hache le mot de passe Grub.
-    	mdp_grub_hache=$(hacher_mot_de_passe_grub "$MDP_GRUB")
-    	
-    	# On édite le fichier /etc/grub.d/40_custom.
-    	fichier_grub_custom="/etc/grub.d/40_custom"
-    	restaurer_via_save "$fichier_grub_custom"
-    	echo 'set superusers="admin"' >> "$fichier_grub_custom"
-    	echo "password_pbkdf2 admin $mdp_grub_hache" >> "$fichier_grub_custom"
-    	
-    	# On met à jour la configuration de Grub.
-    	update-grub > $SORTIE 2>&1
-    	if [ "$?" != "0" ]
-    	then
-    		afficher "Attention, la commande « update_grub » ne s'est pas" \
+        afficher "Mise en place du mot de passe Grub (le login sera « admin »)."
+        
+        # Installation temporaire qui permet de rendre le fichier
+        # /dev/random plus loquace ce qui permet ainsi de rectifier
+        # un bug de la commande grub-mkpasswd-pbkdf2. Ces installations
+        # seront supprimées ensuite, une fois la mise en place du
+        # mot de passe Grub terminée.
+        apt-get install --reinstall --yes --force-yes $PAQUETS_RANDOM > $SORTIE 2>&1
+        echo "HRNGDEVICE=/dev/urandom" >> "/etc/default/rng-tools"
+        #invoke-rc.d rng-tools stop > $SORTIE 2>&1
+        service rng-tools stop > $SORTIE 2>&1
+        #invoke-rc.d rng-tools start > $SORTIE 2>&1
+        service rng-tools start > $SORTIE 2>&1
+        
+        if [ -z "$MDP_GRUB" ]
+        then
+            # MDP_GRUB est vide (l'option --mdp-grub a été spécifiée
+            # sans paramètre), il faut donc demander à l'utilisateur
+            # le mot de passe.
+            demander_mot_de_passe # La variable mot_de_passe est alors définie.
+            MDP_GRUB=$mot_de_passe
+        else
+            # MDP_GRUB a été spécifié via le paramètre de l'option
+            # --mdp-grub. Il n'y a rien à faire dans ce cas.
+            true
+        fi
+        
+        # On hache le mot de passe Grub.
+        mdp_grub_hache=$(hacher_mot_de_passe_grub "$MDP_GRUB")
+        
+        # On édite le fichier /etc/grub.d/40_custom.
+        fichier_grub_custom="/etc/grub.d/40_custom"
+        restaurer_via_save "$fichier_grub_custom"
+        echo 'set superusers="admin"' >> "$fichier_grub_custom"
+        echo "password_pbkdf2 admin $mdp_grub_hache" >> "$fichier_grub_custom"
+        
+        # On met à jour la configuration de Grub.
+        update-grub > $SORTIE 2>&1
+        if [ "$?" != "0" ]
+        then
+            afficher "Attention, la commande « update_grub » ne s'est pas" \
                      "effectuée correctement, a priori Grub n'est pas" \
                      "opérationnel. Il faut rectifier la configuration de" \
                      "Grub jusqu'à ce que la commande se déroule sans erreur."
-    		exit 1
-    	fi
-    	
-    	unset -v mot_de_passe mdp_grub_hache fichier_grub_custom
-    	
-    	# Désinstallation de PAQUETS_RANDOM.
-    	apt-get remove --purge --yes $PAQUETS_RANDOM > $SORTIE 2>&1
+            exit 1
+        fi
+        
+        unset -v mot_de_passe mdp_grub_hache fichier_grub_custom
+        
+        # Désinstallation de PAQUETS_RANDOM.
+        apt-get remove --purge --yes $PAQUETS_RANDOM > $SORTIE 2>&1
 fi
 }
 
@@ -1159,26 +1159,26 @@ mise_en_place_mot_de_passe_root()
     # Sinon, il faut modifier le mot de passe root.
     if "$OPTION_MDP_ROOT"
     then
-    	afficher "Changement du mot de passe root."
-    	
-    	if [ -z "$MDP_ROOT" ]
-    	then
-    		# MDP_ROOT est vide (l'option --mdp-root a été spécifiée
-    		# sans paramètre), il faut donc demander à l'utilisateur
-    		# le mot de passe.
-    		demander_mot_de_passe # La variable mot_de_passe est alors définie.
-    		MDP_ROOT=$mot_de_passe
-    	else
-    		# MDP_ROOT a été spécifié via le paramètre de l'option
-    		# --mdp-root. Il n'y a rien à faire dans ce cas.
-    		true
-    	fi
-    	
-    	# On peut alors changer le mot de passe de root.
-    	changer_mot_de_passe_root "$MDP_ROOT"
-    	
-    	unset -v mot_de_passe
-    	
+        afficher "Changement du mot de passe root."
+        
+        if [ -z "$MDP_ROOT" ]
+        then
+            # MDP_ROOT est vide (l'option --mdp-root a été spécifiée
+            # sans paramètre), il faut donc demander à l'utilisateur
+            # le mot de passe.
+            demander_mot_de_passe # La variable mot_de_passe est alors définie.
+            MDP_ROOT=$mot_de_passe
+        else
+            # MDP_ROOT a été spécifié via le paramètre de l'option
+            # --mdp-root. Il n'y a rien à faire dans ce cas.
+            true
+        fi
+        
+        # On peut alors changer le mot de passe de root.
+        changer_mot_de_passe_root "$MDP_ROOT"
+        
+        unset -v mot_de_passe
+        
     fi
 }
 
@@ -1218,9 +1218,9 @@ iface lo inet loopback
     for carte in $cartes_reseau
     do
         [ "$carte" = "lo" ] && continue
-    	echo "auto $carte" >> "$config_cartes"
-    	echo "iface $carte inet dhcp" >> "$config_cartes"
-    	echo "" >> "$config_cartes"
+        echo "auto $carte" >> "$config_cartes"
+        echo "iface $carte inet dhcp" >> "$config_cartes"
+        echo "" >> "$config_cartes"
     done
     
     #invoke-rc.d networking stop > $SORTIE 2>&1
@@ -1232,11 +1232,11 @@ iface lo inet loopback
     # Sous Trusty : service networking ne semble pas fonctionner, on utilse ifdown et ifup
     for carte in $cartes_reseau
     do
-    	if [ "$carte" != "lo" ]
-    	then
-    		ifdown $carte > /dev/null 2>&1
-    		ifup $carte > /dev/null 2>&1
-    	fi
+        if [ "$carte" != "lo" ]
+        then
+            ifdown $carte > /dev/null 2>&1
+            ifup $carte > /dev/null 2>&1
+        fi
     done
     ###################################
     
@@ -1251,19 +1251,19 @@ installer_paquets_integration()
     # mais adaptée à la situation présente.
     debconf_parametres=$(mktemp)
     echo "
-libnss-ldapd	libnss-ldapd/nsswitch	multiselect	group, passwd, shadow
-libnss-ldapd	libnss-ldapd/clean_nsswitch	boolean	false
-libpam-ldapd	libpam-ldapd/enable_shadow	boolean	true
-nslcd	nslcd/ldap-bindpw	password	
-nslcd	nslcd/ldap-starttls	boolean	false
-nslcd	nslcd/ldap-base	string	$BASE_DN
-nslcd	nslcd/ldap-reqcert	select	
-nslcd	nslcd/ldap-uris	string	ldap://$SE3/
-nslcd	nslcd/ldap-binddn	string	
-samba-common	samba-common/encrypt_passwords	boolean	true
-samba-common	samba-common/dhcp	boolean	false
-samba-common	samba-common/workgroup	string	WORKGROUP
-samba-common	samba-common/do_debconf	boolean	true
+libnss-ldapd    libnss-ldapd/nsswitch    multiselect    group, passwd, shadow
+libnss-ldapd    libnss-ldapd/clean_nsswitch    boolean    false
+libpam-ldapd    libpam-ldapd/enable_shadow    boolean    true
+nslcd    nslcd/ldap-bindpw    password    
+nslcd    nslcd/ldap-starttls    boolean    false
+nslcd    nslcd/ldap-base    string    $BASE_DN
+nslcd    nslcd/ldap-reqcert    select    
+nslcd    nslcd/ldap-uris    string    ldap://$SE3/
+nslcd    nslcd/ldap-binddn    string    
+samba-common    samba-common/encrypt_passwords    boolean    true
+samba-common    samba-common/dhcp    boolean    false
+samba-common    samba-common/workgroup    string    WORKGROUP
+samba-common    samba-common/do_debconf    boolean    true
 " > "$debconf_parametres"
     debconf-set-selections < "$debconf_parametres"
     rm -f "$debconf_parametres"
@@ -1298,17 +1298,17 @@ renommer_fichiers_pam()
     # ces fichiers.
     for f in "/etc/pam.d/common-"*".AVEC-LDAP"
     do
-    	[ "$f" = "/etc/pam.d/common-*.AVEC-LDAP" ] && continue
-    	rm -f "$f"
+        [ "$f" = "/etc/pam.d/common-*.AVEC-LDAP" ] && continue
+        rm -f "$f"
     done
     
     # On renomme les fichiers "common-*" en ajoutant l'extension « .AVEC-LDAP »
     # et on restaure sa version d'origine.
     for f in "/etc/pam.d/common-"*
     do
-    	[ "$f" = "/etc/pam.d/common-*" ] && continue
-    	mv -f "$f" "$f.AVEC-LDAP"
-    	restaurer_via_save "$f"    
+        [ "$f" = "/etc/pam.d/common-*" ] && continue
+        mv -f "$f" "$f.AVEC-LDAP"
+        restaurer_via_save "$f"    
     done
 }
 
@@ -1347,11 +1347,11 @@ modifier_fichiers_pam()
     
     # L'installation de libpam-script a ajouté des appels à pam_script.so 
     # dans tous les fichiers common-*, on les met en commentaire
-    sed -i '/pam_script/ s/^/#/g' 	/etc/pam.d/common-session \
-    				/etc/pam.d/common-session-noninteractive \
-    				/etc/pam.d/common-account \
-    				/etc/pam.d/common-auth \
-    				/etc/pam.d/common-password
+    sed -i '/pam_script/ s/^/#/g'     /etc/pam.d/common-session \
+                    /etc/pam.d/common-session-noninteractive \
+                    /etc/pam.d/common-account \
+                    /etc/pam.d/common-auth \
+                    /etc/pam.d/common-password
     
     # Fin de la modification pam pour Trusty
     ################################################################
@@ -1406,16 +1406,16 @@ parametrer_gnome_screensaver()
     # mais pas sur Xubuntu).
     if [ -f "/etc/pam.d/gnome-screensaver" ]
     then
-    	restaurer_via_save "/etc/pam.d/gnome-screensaver"
-    	sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/gnome-screensaver"
+        restaurer_via_save "/etc/pam.d/gnome-screensaver"
+        sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/gnome-screensaver"
     fi
     
     # Dans le cas de Xubuntu, c'est xscreensaver qui gère le verrouillage
     # de l'écran (et l'authentification derrière).
     if [ -f "/etc/pam.d/xscreensaver" ]
     then
-    	restaurer_via_save "/etc/pam.d/xscreensaver"
-    	sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/xscreensaver"
+        restaurer_via_save "/etc/pam.d/xscreensaver"
+        sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/xscreensaver"
     fi
 }
 
@@ -1467,12 +1467,12 @@ modifier_fichier_smb()
     # À faire seulement si le fichier existe bien sûr.
     if [ -f "/etc/samba/smb.conf" ]
     then
-    	afficher "Modification du fichier /etc/samba/smb.conf afin d'indiquer" \
+        afficher "Modification du fichier /etc/samba/smb.conf afin d'indiquer" \
                  "à la machine cliente que le serveur SambaÉdu est le" \
                  "serveur WINS du domaine."
-    	sed -i -r -e "s/^.*wins +server +=.*$/wins server = $SE3/" "/etc/samba/smb.conf"
-    	#invoke-rc.d samba restart > $SORTIE 2>&1
-    	service samba restart > $SORTIE 2>&1
+        sed -i -r -e "s/^.*wins +server +=.*$/wins server = $SE3/" "/etc/samba/smb.conf"
+        #invoke-rc.d samba restart > $SORTIE 2>&1
+        service samba restart > $SORTIE 2>&1
 fi
 }
 
@@ -1503,12 +1503,12 @@ configurer_gestionnaire_graphique_old()
 {
     if [ "$gdm" = "gdm3" ]
     then
-    	configurer_gdm3
+        configurer_gdm3
     fi
     
     if [ "$gdm" = "lightdm" ]
     then
-    	configurer_lightdm
+        configurer_lightdm
     fi
 }
 
@@ -1516,24 +1516,24 @@ configurer_gestionnaire_graphique()
 {
     # Sous Trusty : par défaut, le fichier de configuration de lightdm /etc/lightdm/lightdm.conf
     # n'est pas présent sous Ubuntu, Xubuntu, Lubuntu.
-    #	Créer le fichier /etc/lightdm/lightdm.conf permet de passer outre la configuration 
-    #	par défaut d'Ubuntu, Xubuntu et Lubuntu.
-    #	Le fichier lightdm.conf est identique pour Xubuntu et Lubuntu
-    #	Une légère différence pour Ubuntu.
+    #    Créer le fichier /etc/lightdm/lightdm.conf permet de passer outre la configuration 
+    #    par défaut d'Ubuntu, Xubuntu et Lubuntu.
+    #    Le fichier lightdm.conf est identique pour Xubuntu et Lubuntu
+    #    Une légère différence pour Ubuntu.
     
     if [ -e "/etc/lightdm/lightdm.conf.d/10-xubuntu.conf" ]
     then
-    	PARAM_USER_SESSION=xubuntu
-    	PARAM_GREETER_SESSION=true
+        PARAM_USER_SESSION=xubuntu
+        PARAM_GREETER_SESSION=true
     else
-    	if [ -e "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]
-    	then
-    		PARAM_USER_SESSION=lubuntu
-    		PARAM_GREETER_SESSION=true
-    	else
-    		PARAM_USER_SESSION=ubuntu
-    		PARAM_GREETER_SESSION=false
-    	fi
+        if [ -e "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]
+        then
+            PARAM_USER_SESSION=lubuntu
+            PARAM_GREETER_SESSION=true
+        else
+            PARAM_USER_SESSION=ubuntu
+            PARAM_GREETER_SESSION=false
+        fi
     fi
     
     echo "
@@ -1549,12 +1549,12 @@ session-cleanup-script=$LOGON_SCRIPT_LOCAL fermeture
     
     #######################################################################################
     # Bug sous Lubuntu :  le clavier n'est pas par défaut en fr, 
-    #		      on le force au démarrage à l'aide de la commande setxkbmap fr
+    #              on le force au démarrage à l'aide de la commande setxkbmap fr
     ########################################################################################
     
     if [ -e "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]
     then
-    	echo '@setxkbmap fr' > /etc/xdg/lxsession/Lubuntu/autostart
+        echo '@setxkbmap fr' > /etc/xdg/lxsession/Lubuntu/autostart
     fi
 }
 
@@ -1592,19 +1592,19 @@ decompte_10s()
 {
     if "$OPTION_REDEMARRER"
     then
-    	afficher "La machine va redémarrer dans 10 secondes."
-    	echo ""
-    	for i in 1 2 3 4 5 6 7 8 9 10
-    	do
-    		sleep 1
-    		echo -n "$i... "
-    	done
-    	printf "\n"
-    	reboot
-    	exit 0
+        afficher "La machine va redémarrer dans 10 secondes."
+        echo ""
+        for i in 1 2 3 4 5 6 7 8 9 10
+        do
+            sleep 1
+            echo -n "$i... "
+        done
+        printf "\n"
+        reboot
+        exit 0
     else
-    	afficher "Pour pour que le système soit opérationnel, vous devez le redémarrer."
-    	exit 0
+        afficher "Pour pour que le système soit opérationnel, vous devez le redémarrer."
+        exit 0
     fi
 }
 
@@ -1643,8 +1643,8 @@ LISTE_OPTIONS=$(getopt --options h --longoptions "$suite_options" -n "$NOM_DU_SC
 # Si l'appel est syntaxiquement incorrect on arrête le script.
 if [ $? != 0 ]
 then
-	echo "Arrêt du script $NOM_DU_SCRIPT." >&2
-	exit 1
+    echo "Arrêt du script $NOM_DU_SCRIPT." >&2
+    exit 1
 fi
 
 unset -v suite_options
@@ -1674,69 +1674,69 @@ OPTION_INSTALLER_SAMBA="false"
 # arguments du script et qui ne sont pas des options (à droite de --).
 while true
 do
-	case "$1" in
-	
-		-h|--help)
-			afficher "Aide : voir la documentation (au format pdf) associée." 
-			exit 0
-		;;
-		
-		--nom-client|--nc)
-			OPTION_NOM_CLIENT="true"
-			NOM_CLIENT="$2"
-			shift 2
-		;;
-		
-		--mdp-grub|--mg) 
-			OPTION_MDP_GRUB="true"
-			MDP_GRUB="$2"
-			shift 2
-		;;
-		
-		--mdp-root|--mr) 
-			OPTION_MDP_ROOT="true"
-			MDP_ROOT="$2"
-			shift 2
-		;;
-		
-		--ignorer-verification-ldap|--ivl) 
-			OPTION_IV_LDAP="true"
-			shift 1
-		;;
-		
-		--redemarrer-client|--rc) 
-			OPTION_REDEMARRER="true"
-			shift 1
-		;;
-		
-		--installer-samba|--is) 
-			OPTION_INSTALLER_SAMBA="true"
-			shift 1
-		;;
-		
-		--debug|--d) 
-			SORTIE=">&1"
-			shift 1
-		;;
-		
-		--) 
-			shift
-			break
-		;;
-		
-		*) 
-			afficher "Erreur: «$1» est une option non implémentée."
-			exit 1
-		;;
+    case "$1" in
+    
+        -h|--help)
+            afficher "Aide : voir la documentation (au format pdf) associée." 
+            exit 0
+        ;;
         
-	esac
+        --nom-client|--nc)
+            OPTION_NOM_CLIENT="true"
+            NOM_CLIENT="$2"
+            shift 2
+        ;;
+        
+        --mdp-grub|--mg) 
+            OPTION_MDP_GRUB="true"
+            MDP_GRUB="$2"
+            shift 2
+        ;;
+        
+        --mdp-root|--mr) 
+            OPTION_MDP_ROOT="true"
+            MDP_ROOT="$2"
+            shift 2
+        ;;
+        
+        --ignorer-verification-ldap|--ivl) 
+            OPTION_IV_LDAP="true"
+            shift 1
+        ;;
+        
+        --redemarrer-client|--rc) 
+            OPTION_REDEMARRER="true"
+            shift 1
+        ;;
+        
+        --installer-samba|--is) 
+            OPTION_INSTALLER_SAMBA="true"
+            shift 1
+        ;;
+        
+        --debug|--d) 
+            SORTIE=">&1"
+            shift 1
+        ;;
+        
+        --) 
+            shift
+            break
+        ;;
+        
+        *) 
+            afficher "Erreur: «$1» est une option non implémentée."
+            exit 1
+        ;;
+        
+    esac
 done
 
 if [ -n "$1" ]
 then
-	afficher "Désolé le script ne prend aucun argument à part des" \
+    afficher "Désolé le script ne prend aucun argument à part des" \
              "options de la forme « --xxx ». Fin du script."
-	exit 1
+    exit 1
 fi
 
 #=====
