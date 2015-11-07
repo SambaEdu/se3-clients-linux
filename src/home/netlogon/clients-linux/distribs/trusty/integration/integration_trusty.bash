@@ -41,6 +41,9 @@ NOM_CLIENT_ANCIEN=$(cat "/etc/hostname")
 # Le nom de code de la distribution (par exemple "trusty").
 NOM_DE_CODE=$(lsb_release --codename | cut -f 2)
 
+# Le gestionnaire de connexion
+gdm="$(cat /etc/X11/default-display-manager | cut -d / -f 4)"
+
 # Le partage du Se3.
 NOM_PARTAGE_NETLOGON="netlogon-linux"
 CHEMIN_PARTAGE_NETLOGON="//$SE3/$NOM_PARTAGE_NETLOGON"
@@ -1586,6 +1589,9 @@ desactiver_hibernation_mise_en_veille()
      -e 's:<allow_inactive>no</allow_inactive>:<allow_inactive>yes</allow_inactive>:g' \
      -e 's:<allow_active>yes</allow_active>:<allow_active>no</allow_active>:g' \
      "/usr/share/polkit-1/actions/org.freedesktop.upower.policy"
+    
+    restaurer_via_save "/usr/share/polkit-1/actions/org.freedesktop.login1.policy" 
+     
 }
 
 decompte_10s()

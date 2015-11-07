@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+        "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+
+        <vendor>The systemd Project</vendor>
+        <vendor_url>http://www.freedesktop.org/wiki/Software/systemd</vendor_url>
+
+        <action id="org.freedesktop.login1.inhibit-block-shutdown">
+                <description>Allow applications to inhibit system shutdown</description>
+                <description xml:lang="pl">Zezwolenie programom na wstrzymywanie wyłączenia systemu</description>
+                <message>Authentication is required to allow an application to inhibit system shutdown.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zezwolić programowi na wstrzymanie wyłączenia systemu.</message>
+                <defaults>
+                        <allow_any>no</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.inhibit-delay-shutdown org.freedesktop.login1.inhibit-block-sleep org.freedesktop.login1.inhibit-delay-sleep org.freedesktop.login1.inhibit-block-idle</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.inhibit-delay-shutdown">
+                <description>Allow applications to delay system shutdown</description>
+                <description xml:lang="pl">Zezwolenie programom na opóźnienie wyłączenia systemu</description>
+                <message>Authentication is required to allow an application to delay system shutdown.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zezwolić programowi na opóźnienie wyłączenia systemu.</message>
+                <defaults>
+                        <allow_any>yes</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.inhibit-delay-sleep</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.inhibit-block-sleep">
+                <description>Allow applications to inhibit system sleep</description>
+                <description xml:lang="pl">Zezwolenie programom na wstrzymanie uśpienia systemu</description>
+                <message>Authentication is required to allow an application to inhibit system sleep.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zezwolić programowi na wstrzymanie uśpienia systemu.</message>
+                <defaults>
+                        <allow_any>no</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.inhibit-delay-sleep org.freedesktop.login1.inhibit-block-idle</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.inhibit-delay-sleep">
+                <description>Allow applications to delay system sleep</description>
+                <description xml:lang="pl">Zezwolenie programom na opóźnienie uśpienia systemu</description>
+                <message>Authentication is required to allow an application to delay system sleep.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zezwolić programowi na opóźnienie uśpienia systemu.</message>
+                <defaults>
+                        <allow_any>yes</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.login1.inhibit-block-idle">
+                <description>Allow applications to inhibit automatic system suspend</description>
+                <description xml:lang="pl">Zezwolenie programom na wstrzymanie automatycznego uśpienia systemu</description>
+                <message>Authentication is required to allow an application to inhibit automatic system suspend.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zezwolić programowi na wstrzymanie automatycznego uśpienia systemu.</message>
+                <defaults>
+                        <allow_any>yes</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.login1.inhibit-handle-power-key">
+                <description>Allow applications to inhibit system handling of the power key</description>
+                <description xml:lang="pl">Zezwolenie programom na wstrzymanie obsługi klawisza zasilania przez system</description>
+                <message>Authentication is required to allow an application to inhibit system handling of the power key.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zezwolić programowi na wstrzymanie obsługi klawisza zasilania przez system.</message>
+                <defaults>
+                        <allow_any>no</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.inhibit-handle-suspend-key org.freedesktop.login1.inhibit-handle-hibernate-key org.freedesktop.login1.inhibit-handle-lid-switch</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.inhibit-handle-suspend-key">
+                <description>Allow applications to inhibit system handling of the suspend key</description>
+                <description xml:lang="pl">Zezwolenie programom na wstrzymanie obsługi klawisza uśpienia przez system</description>
+                <message>Authentication is required to allow an application to inhibit system handling of the suspend key.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zezwolić programowi na wstrzymanie obsługi klawisza uśpienia przez system.</message>
+                <defaults>
+                        <allow_any>no</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.inhibit-handle-hibernate-key org.freedesktop.login1.inhibit-handle-lid-switch</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.inhibit-handle-hibernate-key">
+                <description>Allow applications to inhibit system handling of the hibernate key</description>
+                <description xml:lang="pl">Zezwolenie programom na wstrzymanie obsługi klawisza hibernacji przez system</description>
+                <message>Authentication is required to allow an application to inhibit system handling of the hibernate key.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zezwolić programowi na wstrzymanie obsługi klawisza hibernacji przez system.</message>
+                <defaults>
+                        <allow_any>no</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.login1.inhibit-handle-lid-switch">
+                <description>Allow applications to inhibit system handling of the lid switch</description>
+                <description xml:lang="pl">Zezwolenie programom na wstrzymanie obsługi przełącznika pokrywy przez system</description>
+                <message>Authentication is required to allow an application to inhibit system handling of the lid switch.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zezwolić programowi na wstrzymanie obsługi przełącznika pokrywy przez system.</message>
+                <defaults>
+                        <allow_any>no</allow_any>
+                        <allow_inactive>yes</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.login1.set-user-linger">
+                <description>Allow non-logged-in users to run programs</description>
+                <description xml:lang="pl">Zezwolenie niezalogowanym użytkownikom na uruchamianie programów</description>
+                <message>Authentication is required to allow a non-logged-in user to run programs.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zezwolić niezalogowanemu użytkownikowi na uruchamianie programów.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>auth_admin_keep</allow_active>
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.login1.attach-device">
+                <description>Allow attaching devices to seats</description>
+                <description xml:lang="pl">Zezwolenie na podłączanie urządzeń do stanowisk</description>
+                <message>Authentication is required for attaching a device to a seat.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby podłączyć urządzenie do stanowiska.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>auth_admin_keep</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.flush-devices</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.flush-devices">
+                <description>Flush device to seat attachments</description>
+                <description xml:lang="pl">Usunięcie podłączenia urządzeń do stanowisk</description>
+                <message>Authentication is required for resetting how devices are attached to seats.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby ponownie ustawić sposób podłączenia urządzeń do stanowisk.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>auth_admin_keep</allow_active>
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.login1.power-off">
+                <description>Power off the system</description>
+                <description xml:lang="pl">Wyłączenie systemu</description>
+                <message>Authentication is required for powering off the system.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby wyłączyć system.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.login1.power-off-multiple-sessions">
+                <description>Power off the system while other users are logged in</description>
+                <description xml:lang="pl">Wyłączenie systemu, kiedy są zalogowani inni użytkownicy</description>
+                <message>Authentication is required for powering off the system while other users are logged in.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby wyłączyć system, kiedy są zalogowani inni użytkownicy.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.power-off</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.power-off-ignore-inhibit">
+                <description>Power off the system while an application asked to inhibit it</description>
+                <description xml:lang="pl">Wyłączenie systemu, kiedy program zażądał jego wstrzymania</description>
+                <message>Authentication is required for powering off the system while an application asked to inhibit it.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby wyłączyć system, kiedy program zażądał jego wstrzymania.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>auth_admin_keep</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.power-off</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.reboot">
+                <description>Reboot the system</description>
+                <description xml:lang="pl">Ponowne uruchomienie systemu</description>
+                <message>Authentication is required for rebooting the system.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby ponownie uruchomić system.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.login1.reboot-multiple-sessions">
+                <description>Reboot the system while other users are logged in</description>
+                <description xml:lang="pl">Ponowne uruchomienie systemu, kiedy są zalogowani inni użytkownicy</description>
+                <message>Authentication is required for rebooting the system while other users are logged in.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby ponownie uruchomić system, kiedy są zalogowani inni użytkownicy.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>yes</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.reboot</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.reboot-ignore-inhibit">
+                <description>Reboot the system while an application asked to inhibit it</description>
+                <description xml:lang="pl">Ponowne uruchomienie systemu, kiedy program poprosił o jego wstrzymanie</description>
+                <message>Authentication is required for rebooting the system while an application asked to inhibit it.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby ponownie uruchomić system, kiedy program zażądał jego wstrzymania.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>auth_admin_keep</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.reboot</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.suspend">
+                <description>Suspend the system</description>
+                <description xml:lang="pl">Uśpienie systemu</description>
+                <message>Authentication is required for suspending the system.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby uśpić system.</message>
+                <defaults>
+#						<allow_any>auth_admin_keep</allow_any>
+#						<allow_inactive>auth_admin_keep</allow_inactive>
+#						<allow_active>yes</allow_active>
+						<allow_any>no</allow_any>
+						<allow_inactive>yes</allow_inactive>
+						<allow_active>no</allow_active>
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.login1.suspend-multiple-sessions">
+                <description>Suspend the system while other users are logged in</description>
+                <description xml:lang="pl">Uśpienie systemu, kiedy są zalogowani inni użytkownicy</description>
+                <message>Authentication is required for suspending the system while other users are logged in.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby uśpić system, kiedy są zalogowani inni użytkownicy.</message>
+                <defaults>
+#						<allow_any>auth_admin_keep</allow_any>
+#						<allow_inactive>auth_admin_keep</allow_inactive>
+#						<allow_active>yes</allow_active>
+                        <allow_any>no</allow_any>
+						<allow_inactive>yes</allow_inactive>
+						<allow_active>no</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.suspend</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.suspend-ignore-inhibit">
+                <description>Suspend the system while an application asked to inhibit it</description>
+                <description xml:lang="pl">Uśpienie systemu, kiedy program poprosił o jego wstrzymanie</description>
+                <message>Authentication is required for suspending the system while an application asked to inhibit it.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby uśpić system, kiedy program zażądał jego wstrzymania.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>auth_admin_keep</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.suspend</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.hibernate">
+                <description>Hibernate the system</description>
+                <description xml:lang="pl">Hibernacja systemu</description>
+                <message>Authentication is required for hibernating the system.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zahibernować system.</message>
+                <defaults>
+#						<allow_any>auth_admin_keep</allow_any>
+#						<allow_inactive>auth_admin_keep</allow_inactive>
+#						<allow_active>yes</allow_active>
+                        <allow_any>no</allow_any>
+						<allow_inactive>yes</allow_inactive>
+						<allow_active>no</allow_active>                      
+                </defaults>
+        </action>
+
+        <action id="org.freedesktop.login1.hibernate-multiple-sessions">
+                <description>Hibernate the system while other users are logged in</description>
+                <description xml:lang="pl">Hibernacja systemu, kiedy są zalogowani inni użytkownicy</description>
+                <message>Authentication is required for hibernating the system while other users are logged in.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zahibernować system, kiedy są zalogowani inni użytkownicy.</message>
+                <defaults>
+                        <allow_any>auth_admin_keep</allow_any>
+                        <allow_inactive>auth_admin_keep</allow_inactive>
+                        <allow_active>auth_admin_keep</allow_active>
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.hibernate</annotate>
+        </action>
+
+        <action id="org.freedesktop.login1.hibernate-ignore-inhibit">
+                <description>Hibernate the system while an application asked to inhibit it</description>
+                <description xml:lang="pl">Hibernacja systemu, kiedy program zażądał jej wstrzymania</description>
+                <message>Authentication is required for hibernating the system while an application asked to inhibit it.</message>
+                <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zahibernować system, kiedy program zażądał jej wstrzymania.</message>
+                <defaults>
+#						<allow_any>auth_admin_keep</allow_any>
+#						<allow_inactive>auth_admin_keep</allow_inactive>
+#						<allow_active>auth_admin_keep</allow_active>
+                        <allow_any>no</allow_any>
+						<allow_inactive>yes</allow_inactive>
+						<allow_active>no</allow_active>                        
+                </defaults>
+                <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.hibernate</annotate>
+        </action>
+
+</policyconfig>
