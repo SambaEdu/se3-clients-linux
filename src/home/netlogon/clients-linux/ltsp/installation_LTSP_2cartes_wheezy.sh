@@ -40,6 +40,16 @@ fi
 # Quelques vérifications pour le bon déroulement de l'installation ...
 ########################################################################
 
+echo "------------------------------------------------------------------------------------------------------------------------------"
+echo " Verification de la version de Debian																							"
+VERSION_DEBIAN=$(cat /etc/debian_version | cut -d "." -f 1)
+if [ "$VERSION_DEBIAN" != "7" ]; then
+	echo " Installation interrompue																									"
+	echo " Ce script doit être lancé sur Debian Wheezy et votre version de Debian n est pas Wheezy ... 								"
+	exit 1;
+fi
+echo "------------------------------------------------------------------------------------------------------------------------------"
+
 LOGIN=$(who i am | cut -d ' ' -f1)
 if [ "$LOGIN" != "admin" ]; then
 	echo "Installation interrompue"
