@@ -297,9 +297,12 @@
                 <message>Authentication is required for hibernating the system while other users are logged in.</message>
                 <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zahibernować system, kiedy są zalogowani inni użytkownicy.</message>
                 <defaults>
-                        <allow_any>auth_admin_keep</allow_any>
-                        <allow_inactive>auth_admin_keep</allow_inactive>
-                        <allow_active>auth_admin_keep</allow_active>
+#						<allow_any>auth_admin_keep</allow_any>
+#						<allow_inactive>auth_admin_keep</allow_inactive>
+#						<allow_active>auth_admin_keep</allow_active>
+                        <allow_any>no</allow_any>
+						<allow_inactive>yes</allow_inactive>
+						<allow_active>no</allow_active>                        
                 </defaults>
                 <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.hibernate</annotate>
         </action>
@@ -310,12 +313,9 @@
                 <message>Authentication is required for hibernating the system while an application asked to inhibit it.</message>
                 <message xml:lang="pl">Wymagane jest uwierzytelnienie, aby zahibernować system, kiedy program zażądał jej wstrzymania.</message>
                 <defaults>
-#						<allow_any>auth_admin_keep</allow_any>
-#						<allow_inactive>auth_admin_keep</allow_inactive>
-#						<allow_active>auth_admin_keep</allow_active>
-                        <allow_any>no</allow_any>
-						<allow_inactive>yes</allow_inactive>
-						<allow_active>no</allow_active>                        
+						<allow_any>auth_admin_keep</allow_any>
+						<allow_inactive>auth_admin_keep</allow_inactive>
+						<allow_active>auth_admin_keep</allow_active>
                 </defaults>
                 <annotate key="org.freedesktop.policykit.imply">org.freedesktop.login1.hibernate</annotate>
         </action>
