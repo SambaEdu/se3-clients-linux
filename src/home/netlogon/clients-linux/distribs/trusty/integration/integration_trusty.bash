@@ -1594,6 +1594,20 @@ desactiver_hibernation_mise_en_veille()
      
 }
 
+masquer_liste_utilisateurs_connectes_unity()
+{
+	# Sous Unity (Ubuntu donc), la liste de tous les utilisateurs qui se sont connectés au PC apparaît dans l'onglet de fermeture ...
+	# Avec un annuaire ldap, la liste peut être longue ...
+	# On désactive donc cette fonctionnalité propre au bureau Unity (Ubuntu)
+	
+	if [ ! -e "/etc/lightdm/lightdm.conf.d/10-xubuntu.conf" ] && [ ! -e "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]
+	then
+		echo -e "[com.canonical.indicator.session]\nuser-show-menu=false" > /usr/share/glib-2.0/schemas/myoverride.gschema.override
+		cp /usr/share/glib-2.0/schemas/gschemas.compiled /usr/share/glib-2.0/schemas/gschemas.compiled.bak
+		glib-compile-schemas /usr/share/glib-2.0/schemas
+	fi
+}
+
 decompte_10s()
 {
     if "$OPTION_REDEMARRER"
@@ -1952,8 +1966,14 @@ modifier_fichier_user_dirs
 #=====
 # Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy
 afficher "Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy" \
+		 "et /usr/share/polkit-1/actions/org.freedesktop.login1.policy" \
          "afin de désactiver l'hibernation et la mise en veille du système."
 desactiver_hibernation_mise_en_veille
+
+#=====
+# Pour Unity (Ubuntu), masquer la liste de tous les utilisateurs qui se sont déjà connectés au système
+afficher "Unity sous Ubuntu : Modification pour masquer la liste des utilisateurs qui se sont déjà connectés " \
+masquer_liste_utilisateurs_connectes_unity
 
 #=====
 # FIN DE L'INTÉGRATION
