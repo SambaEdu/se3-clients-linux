@@ -1972,7 +1972,7 @@ desactiver_hibernation_mise_en_veille
 
 #=====
 # Pour Unity (Ubuntu), masquer la liste de tous les utilisateurs qui se sont déjà connectés au système
-afficher "Unity sous Ubuntu : Modification pour masquer la liste des utilisateurs qui se sont déjà connectés " \
+afficher "Modification pour masquer la liste des utilisateurs qui se sont déjà connectés (Unity sous Ubuntu)" 
 masquer_liste_utilisateurs_connectes_unity
 
 #=====
