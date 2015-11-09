@@ -1888,7 +1888,8 @@ modifier_fichier_user_dirs
 # Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.login1.policy
 #=====
 afficher "modification du fichier /usr/share/polkit-1/actions/org.freedesktop.login1.policy" \
-         "afin de désactiver l'hibernation, la mise en veille et le verrouillage du système"
+         "afin de désactiver l'hibernation, la mise en veille et le verrouillage du système" \
+         "afin de désactiver l'hibernation, la mise en veille et le suspendre du système"
 desactiver_hibernation_mise_en_veille
 
 #=====

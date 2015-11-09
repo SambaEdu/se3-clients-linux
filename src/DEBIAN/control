@@ -1,14 +1,13 @@
 Package: se3-clients-linux
-Version: 1.1.8.2
+Version: 2.0
 Section: misc
 Priority: optional
 Architecture: all
 Depends: se3-domain, se3-logonpy (>>2.3.7216)
-Maintainer: François Lafont <francois.lafont@crdp.ac-versailles.fr>
-Homepage: http://francois-lafont.ac-versailles.fr/sedu-linux/doc.pdf
-Description: Pour l'intégration de clients sous Linux
- Ce paquet permet, dans un domaine SambaÉdu3, d'intégrer des clients
- Linux "Debian Squeeze", "Debian Wheezy", "Ubuntu Precise Pangolin"
- et "Xubuntu Precise Pangolin".
-
+Maintainer: François Lafont <francois.lafont@ac-versailles.fr>
+Homepage: https://github.com/flaf/se3-clients-linux
+Description: To support Linux clients integration in a Se3 domain
+ To support Linux clients integration in a SambaEdu3 domain.
+ The goal is to support Debian distributions and LTS Ubuntu
+ distributions.
 

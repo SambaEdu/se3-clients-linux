@@ -41,6 +41,16 @@ fi
 ########################################################################
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
+echo " Verification de la version de Debian																							"
+VERSION_DEBIAN=$(cat /etc/debian_version | cut -d "." -f 1)
+if [ "$VERSION_DEBIAN" != "7" ]; then
+	echo " Installation interrompue																									"
+	echo " Ce script doit être lancé sur Debian Wheezy et votre version de Debian n est pas Wheezy ... 								"
+	exit 1;
+fi
+echo "------------------------------------------------------------------------------------------------------------------------------"
+
+echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " Votre serveur LTSP doit avoir une adresse IP statique																		"
 echo " L'est-elle ? ou avez-vous réservé son adresse IP dans le module dhcp du se3 ? o ou n ? 										"
 read REPONSE
