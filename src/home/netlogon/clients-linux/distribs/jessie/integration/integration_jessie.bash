@@ -4,7 +4,7 @@
 # script d'intégration des clients Jessie à un domaine géré par un se3
 #
 #
-# version : 20151102
+# version : 20151109
 #
 #
 #
@@ -1310,53 +1310,48 @@ modifier_fichiers_pam()
     #####
 }
 
-# Jessie - Modification pour "ldapiser" tous les processus utilisant les common-*
+
 modifier_fichiers_pam_bis()
 {
+    # Jessie - Modification pour "ldapiser" tous les processus utilisant les common-*
     # On modifie le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
-    #
-    # Buts :
-    # 1) il fasse appel à la bibliothèque pam_script.so.
-    # 2) il y ait des « includes » des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
+    # pour faire appel à la bibliothèque pam_script.so.
     #
     if [ "$gdm" = "gdm3" ]
     then
         # le nom du fichier gdm3 a changé avec Jessie
         # Ensuite (cas gdm3), dans le fichier "/etc/pam.d/gdm-password" et lui seul, on va
-        # changer les instructions « @include » pour importer les fichiers
-        # "/etc/pam.d/common-*.AVEC-LDAP". Ainsi, gdm3 sera la seule application
+        # incorporer le script pam_script.so. Ainsi, gdm3 sera la seule application
         # utilisant PAM qui tiendra compte de LDAP. Par exemple, les comptes
         # LDAP ne pourront pas se connecter au système via la console ou via ssh.
         fichier_gdm="gdm-password"
     fi
     if [ "$gdm" = "lightdm" ]
     then
-        # non testé avec Jessie (20151026)
+        # cas lightdm : même explication
         fichier_gdm="lightdm"
     fi
+    # → est-il nécessaire de restaurer ? Peut-on utiliser sans problème le fichier existant ?
     restaurer_via_save "/etc/pam.d/${fichier_gdm}"
     # Insertion de la ligne « auth    optional    pam_script.so ».
     awk '{ print $0 }  /^\-?auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
     "${REP_SAVE_LOCAL}/etc/pam.d/${fichier_gdm}" > "/etc/pam.d/${fichier_gdm}"
     
-    #####
-    # Modification de pam pour Jessie :
     # L'installation de libpam-script a ajouté des appels à pam_script.so
+    # → est-ce un bug ou est-ce voulu par les concepteurs de libpam-script ?
     # Or cet appel ne doit se faire que dans le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
-    # dans tous les fichiers common-*.AVEC-LDAP, on les met donc en commentaire
-    # → inutile pour les autres puisqu'ils ont été restaurer via la fonction "restaurer_via_save"
-    sed -i '/pam_script/ s/^/#/g'     /etc/pam.d/common-session \
-                                    /etc/pam.d/common-session-noninteractive \
-                                    /etc/pam.d/common-account \
-                                    /etc/pam.d/common-auth \
-                                    /etc/pam.d/common-password
-    # Fin de la modification de pam pour Jessie
-    #####
-}
+    # dans tous les fichiers common-*, on les met donc en commentaire
+    sed -i '/pam_script/ s/^/#/g' /etc/pam.d/common-session \
+                                  /etc/pam.d/common-session-noninteractive \
+                                  /etc/pam.d/common-account \
+                                  /etc/pam.d/common-auth \
+                                  /etc/pam.d/common-password
+} 
 
 creation_fichier_pam()
 {
     # Création du fichier PAM_SCRIPT_AUTH.
+    # but de cette création à expliquer…
     #
     echo '#! /bin/bash
 
@@ -1516,6 +1511,7 @@ modifier_fichier_user_dirs()
     restaurer_via_save "/etc/xdg/user-dirs.defaults"
     
     # On édite carrément le fichier de A à Z.
+    # → quel est alors l'intérêt de le restaurer ?
     echo "
 # Le bureau sera le seul répertoire créé par défaut
 # dans le /home de l'utilisateur.
@@ -1527,19 +1523,35 @@ DESKTOP=Desktop
 
 desactiver_hibernation_mise_en_veille()
 {
-    # Ce fichier permet de désactiver l'hibernation et la mise en veille et le "suspendre"
-    # qui mettent souvent la pagaille sous Linux.    # 
+    # Ce fichier permet de désactiver l'hibernation et la mise en veille et le verrouillage
+    # qui mettent souvent la pagaille sous Linux.
     #
-    # Sous Jessie, le fichier polkit à modifier est "org.freedesktop.login1.policy" (et non plus "org.freedesktop.upower.policy" comme sous Squeeze ...)
-    # Le fichier déjà modifié pour désactiver l'hibernation, la mise en veille et le suspendre est déposé directement dans le dossier save/
+    # Sous Jessie, le fichier polkit à modifier est "org.freedesktop.login1.policy"
+    # (et non plus "org.freedesktop.upower.policy" comme sous Squeeze ou Wheezy...)
+    # Le fichier déjà modifié pour désactiver l'hibernation, la mise en veille et le verrouillage
+    # est déposé directement dans le dossier save/
     # De la sorte, il n'y a plus qu'à le restaurer ...
-    
+    #
     restaurer_via_save "/usr/share/polkit-1/actions/org.freedesktop.login1.policy"
     
-    # Sous Xfce, on désinstalle l'économiseur d'écran "xscreensaver" (l'onglet "Verrouillage de l'écran" devient de ce fait caduque ...) 
-    # afin d'éviter qu'un PC soit vérouillé par un utilisateur et nécessite de ce fait un redémarrage pour être déverrouiller ...
-    # Et sous Gnome et lxde, est-ce xscreensaver ?
-    apt-get purge -y xscreensaver
+    # le test avec le gm est-il le bon ?
+    if [ "$gdm" = "gdm3" ]
+    then
+        # Sous Gnome, ce n'est pas xsreensaver et le problème est géré par le fichier polkit
+        true
+    fi
+    if [ "$gdm" = "lightdm" ]
+    then
+        # Sous Xfce, on désinstalle l'économiseur d'écran "xscreensaver"
+        #(l'onglet "Verrouillage de l'écran" devient de ce fait caduque ...) 
+        # afin d'éviter qu'un PC soit vérouillé par un utilisateur et ne nécessite, de ce fait,
+        # un redémarrage pour être déverrouiller…
+        # 
+        # Et sous lxde, est-ce xscreensaver ?
+        afficher "purge du paquet xscreensaver" \
+                 "pour rendre caduque l'onglet « vérouillage de l'écran »"
+        apt-get purge -y xscreensaver
+    fi
 }
 
 decompte_10s()
@@ -1814,7 +1826,6 @@ afficher "configuration de PAM afin que seul le gestionnaire de connexion" \
          "Une authentification via ssh (par exemple) ne sera possible" \
          "qu'avec un compte local"
 
-
 # ###########################################################################################
 # Jessie - Modification pour "ldapiser" tous les processus utilisant les common-*
 # On se ramène à l'installation "par défaut" fait par le paquet de pam/ldap
@@ -1876,8 +1887,8 @@ modifier_fichier_user_dirs
 #=====
 # Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.login1.policy
 #=====
-#afficher "modification du fichier /usr/share/polkit-1/actions/org.freedesktop.login1.policy" \
-#         "afin de désactiver l'hibernation, la mise en veille et le suspendre du système"
+afficher "modification du fichier /usr/share/polkit-1/actions/org.freedesktop.login1.policy" \
+         "afin de désactiver l'hibernation, la mise en veille et le verrouillage du système"
 desactiver_hibernation_mise_en_veille
 
 #=====
