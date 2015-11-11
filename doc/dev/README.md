@@ -33,12 +33,12 @@ Vous trouverez toutes les explications nécessaires à [cette page](build-packag
 Il existe un dépôt Debian APT de test qui vous permet de
 tester le paquet dans sa dernière version. Le dépôt est mis
 à jour toutes les 5 minutes. Évidemment c'est pour du test,
-aucune stabilité n'est garantie. Vous trouvez toutes les
+aucune stabilité n'est garantie. Vous trouverez toutes les
 explications nécessaires à [cette page](apt-repository.md).
 
 
 ## Envoyer une notification de ses commits sur la liste `gnu-linux_et_se3`
 
-Vous trouverez toutes les explications nécessaires à [cette page](notifications.md).
+Vous trouverez toutes les explications nécessaires à [cette page](notification.md).
 
 
