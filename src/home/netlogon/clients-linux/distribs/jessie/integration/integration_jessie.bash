@@ -1041,13 +1041,13 @@ afficher_info_carte_reseau_client()
         afficher "vous avez choisi d'ignorer la vérification LDAP, le script" \
                  "d'intégration continue son exécution"
     else
-        afficher "D'après les informations ci-dessus, voulez-vous continuer" \
+        afficher "d'après les informations ci-dessus, voulez-vous continuer" \
                  "l'exécution du script d'intégration ? Si oui, alors répondez" \
                  "« oui » (en minuscules), sinon répondez autre chose :"
         read -r reponse
         if [ "$reponse" != "oui" ]
         then
-            afficher "Fin du script."
+            afficher "fin du script."
             exit 1
         fi
     fi
@@ -1456,9 +1456,9 @@ modifier_fichier_smb()
     #
     if [ -f "/etc/samba/smb.conf" ]
     then
-        afficher "Modification du fichier /etc/samba/smb.conf afin d'indiquer" \
+        afficher "modification du fichier /etc/samba/smb.conf afin d'indiquer" \
                  "à la machine cliente que le serveur SambaÉdu est le" \
-                 "serveur WINS du domaine."
+                 "serveur WINS du domaine"
         sed -i -r -e "s/^.*wins +server +=.*$/wins server = $SE3/" "/etc/samba/smb.conf"
         #invoke-rc.d samba restart > $SORTIE 2>&1
         service samba restart > $SORTIE 2>&1
@@ -1569,7 +1569,7 @@ decompte_10s()
         reboot
         exit 0
     else
-        afficher "Pour pour que le système soit opérationnel, vous devez le redémarrer."
+        afficher "pour pour que le système soit opérationnel, vous devez le redémarrer."
         exit 0
     fi
 }
