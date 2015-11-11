@@ -20,7 +20,7 @@ Comme vous pouvez le constater, le projet est sous Git.
 L'utilisation de Git pour des tâches courante est beaucoup
 plus simple qu'il n'y paraît. Il existe de nombreux
 tutoriels sur Git dans le Web. Nous vous proposons également
-un petit memo [ici](memo-git.md).
+un [petit memo ici](memo-git.md).
 
 
 ## Comment construire le package `.deb` ?
