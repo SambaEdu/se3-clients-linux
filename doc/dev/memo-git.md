@@ -407,6 +407,7 @@ En fait, tout est parfaitement résumé
 [ici](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 mais voici quelques syntaxes fondamentales ci-dessous.
 
+
 ## Mise en forme de base
 
 * Pour faire un titre : `# Titre` (en début de ligne).
@@ -417,6 +418,37 @@ mais voici quelques syntaxes fondamentales ci-dessous.
 * Pour faire un lien : `Consultez [cette page](<url relative ou absolue>)`,
 si la cible du lien est un fichier interne au dépôt, il faut
 toujours privilégier une url relative.
+
+
+## Les liens vers une page markdown avec une ancre
+
+Concernant les liens vers des pages markdown, il peut être
+pratique parfois de créer un lien vers un titre en
+particulier d'une page markdown (notamment si la page est
+longe, afin d'avoir le lien le plus précis possible). Pour
+ce faire, allez sur la page en question avec votre
+navigateur Web et faites survoler le curseur de la souris au
+niveau du titre sur lequel vous voulez faire un lien. Vous
+verrez apparaître une ancre sur le côté gauche du titre. Si
+vous cliquez dessus (via un simple clic gauche), vous aurez
+alors dans la barre d'adresses de votre navigateur l'url
+complet correspondant au titre. Toute la partie de l'url
+située *après* le caractère `#` correspond à l'identifiant
+de l'ancre. Grâce à cet identifiant, vous pouvez créer un
+lien non seulement vers la page mais précisément vers un
+titre en particulier de la page. Voici deux exemples :
+
+* Avec le code `un résumé se trouve [ici](../README.md#résumé-et-avertissement).`,
+vous obtenez « un résumé se trouve [ici](../README.md#résumé-et-avertissement). »
+
+* Le lien peut parfaitement pointer vers le titre de la
+page sur laquelle vous vous trouvez déjà. Par exemple avec
+le code `pour l'installation de Git, voir [ici](#installation).`,
+vous obtenez « pour l'installation de Git, voir [ici](#installation). »
+Comme vous pouvez voir, dans ce cas particulier de lien
+relatif, seul l'identifiant de l'ancre est indiqué (avec le
+caractère `#` inclus).
+
 
 ## Insérer du code
 
