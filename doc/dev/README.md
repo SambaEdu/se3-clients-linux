@@ -25,7 +25,7 @@ un [petit memo ici](memo-git.md).
 
 ## Comment construire le package `.deb` ?
 
-Vous trouvez toutes les explications nécessaires à [cette page](build-package.md).
+Vous trouverez toutes les explications nécessaires à [cette page](build-package.md).
 
 
 ## Dépôt APT de test et branche Git
@@ -37,6 +37,8 @@ aucune stabilité n'est garantie. Vous trouvez toutes les
 explications nécessaires à [cette page](apt-repository.md).
 
 
+## Envoyer une notification de ses commits sur la liste `gnu-linux_et_se3`
 
+Vous trouverez toutes les explications nécessaires à [cette page](notifications.md).
 
 
