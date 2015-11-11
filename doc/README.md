@@ -51,6 +51,8 @@ exclure.
 ## Table des matières
 
 * [Pour les impatients qui veulent tester rapidement](impatients.md)
+* [Visite rapide du répertoire clients-linux/ du serveur](visite_rapide.md)
+* [Les options des scripts d’intégration](optiond_scripts.md)
 * [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
 
 ## Annexes
