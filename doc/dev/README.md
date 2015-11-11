@@ -20,9 +20,7 @@ Comme vous pouvez le constater, le projet est sous Git.
 L'utilisation de Git pour des tâches courante est beaucoup
 plus simple qu'il n'y paraît. Il existe de nombreux
 tutoriels sur Git dans le Web. Nous vous proposons également
-un petit memo.
-
-[Memo sur Git](memo-git.md)
+un petit memo [ici](memo-git.md).
 
 
 ## Comment construire le package `.deb` ?
@@ -37,8 +35,6 @@ tester le paquet dans sa dernière version. Le dépôt est mis
 à jour toutes les 5 minutes. Évidemment c'est pour du test,
 aucune stabilité n'est garantie. Vous trouvez toutes les
 explications nécessaires à [cette page](apt-repository.md).
-
-
 
 
 
