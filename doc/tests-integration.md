@@ -26,7 +26,6 @@ par exemple, abrunet (→ élève) puis abrune2 (→ prof) et enfin abrune3 (→
 → une session ouverte
 → aucune session ouverte
 
-
 # Compte-rendu de test
 
 - dater le compte-rendu
