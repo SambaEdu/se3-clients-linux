@@ -57,7 +57,7 @@ exclure.
 * [Les partages des utilisateurs](partages_utilisateurs.md)
 * [La gestion des profils](gestion_profils.md)
 * [Le répertoire unefois/](repertoire_unfois.md)
-    * [Des variables et des fonctions prêtes à l’emploi](variables_fontions.md)
+    * [Des variables et des fonctions prêtes à l’emploi](variables_fonctions.md)
 * [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
 
 ## Annexes
