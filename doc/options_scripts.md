@@ -24,17 +24,13 @@ que en local sur chaque client GNU/Linux à intégrer, utilisent exactement le m
 
     Si l’option `--mg` n’est pas spécifiée, alors la configuration de Grub est inchangée et a priori la faille de sécurité sera toujours présente. Si l’option est spécifié sans paramètre, alors le script d’intégration stoppera son exécution pour vous demander de saisir (deux fois) le futur mot de passe Grub (votre saisie ne s’affichera pas à l’écran). Si l’option est spécifiée avec un paramètre comme dans :
 
-```
-    ./integration_squeeze.bash --mdp-grub="1234"
-```
+    `./integration_squeeze.bash --mdp-grub="1234"`
 
     alors le script ne stoppera pas son exécution et effectuera directement le changement de configuration de Grub en prenant comme mot de passe le paramètre fourni (ici `1234`).
 
 * L’option `--mdp-root` ou `--mr` : cette option vous permet de modifier le mot de passe du compte `root`. Si vous ne spécifiez pas cette option, le mot de passe du compte `root` sera inchangé. Si vous spécifiez cette option sans paramètre, alors le script d’intégration stoppera son exécution pour vous demander de saisir (deux fois) le futur mot de passe du compte `root` (votre saisie ne s’affichera pas sur l’écran). Si l’option est spécifiée avec un paramètre comme dans :
 
-```
-    ./integration_squeeze.bash --mdp-root="abcd"
-```
+    `./integration_squeeze.bash --mdp-root="abcd"`
 
     alors le script ne stoppera pas son exécution et effectuera directement le changement de mot de passe en utilisant la valeur fournie en paramètre (ici `abcd`).
 
@@ -52,6 +48,6 @@ que en local sur chaque client GNU/Linux à intégrer, utilisent exactement le m
 
 * L’option `--redemarrer-client` ou `--rc` : cette option permet de lancer automatiquement un redémarrage du client GNU/Linux à la fin de l’exécution du script d’intégration. Si vous ne spécifiez pas cette option, il n’y aura pas de redémarrage à la fin de l’exécution du script. Sachez que le redémarrage après intégration est nécessaire pour avoir un système opérationnel. Si les intégrations se déroulent sans erreur sur vos machines Linux, vous aurez donc tout intérêt à spécifier à chaque fois l’option `--rc`.
 
-Précisons enfin que, quel que soit le jeu d’options que vous aurez choisi, **aucun enregistrement dans l’annuaire du serveur ne sera effectué par le script d’intégration**. Par conséquent, si vous souhaitez que votre client GNU/Linux fraîchement intégré figure dans l’annuaire du serveur, il faudra passer par une réservation d’adresse IP de la carte réseau du client via le module DHCP du serveur.
+Précisons enfin que, quel que soit le jeu d’options que vous aurez choisi, *aucun enregistrement dans l’annuaire du serveur ne sera effectué par le script d’intégration*. Par conséquent, si vous souhaitez que votre client GNU/Linux fraîchement intégré figure dans l’annuaire du serveur, il faudra passer par une réservation d’adresse IP de la carte réseau du client via le module DHCP du serveur.
 
 **Important :** Une fois un client intégré au domaine, évitez de monter un disque ou un partage dans le répertoire `/mnt/`. En effet, le répertoire `/mnt/` est utilisé constamment par le client GNU/Linux (une fois que celui-ci est intégré au domaine) pour y effectuer des montages de partages, notamment au moment de l’ouverture de session d’un utilisateur du domaine, et ce répertoire est aussi constamment nettoyé , notamment juste après une fermeture de session. Afin d’éviter le nettoyage intempestif d’un de vos disques ou d’un partage réseau de votre cru, utilisez un autre répertoire pour procéder au montage. Utilisez par exemple le répertoire `/media/` à la place. En fait, utilisez ce que vous voulez sauf `/mnt/`.
