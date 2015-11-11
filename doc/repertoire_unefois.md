@@ -108,7 +108,7 @@ Si jamais vous utilisez le langage Bash pour écrire des script de la forme `*.u
 | 3 Online      |        3        |      value |
 
 | Nom | Commentaire |
-| - | - |
+| --- | --- |
 | SE3 | Cette variable stocke l’adresse IP du serveur récupérée automatiquement lors de l’installation du paquet `se3-clients-linux`. |
  NOM_DE_CODE | Cette variable stocke ce qu’on appelle le « nom de code » de la distribution (`squeeze` dans le cas d’une Debian Squeeze, `precise` dans le cas d’une Ubuntu Precise Pangolin etc). |
 
