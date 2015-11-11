@@ -10,7 +10,7 @@ Rien de plus simple, il suffit de vous créer un compte
 [Github](https://github.com) (cela prend environ 5 minutes)
 et de faire savoir que vous voulez devenir membre du projet
 en écrivant à l'adresse mail indiquée dans [ce
-fichier](../src/DEBIAN/control) (au niveau du champ
+fichier](../../src/DEBIAN/control) (au niveau du champ
 `Maintainer:`).
 
 
