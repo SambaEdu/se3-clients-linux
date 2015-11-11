@@ -101,6 +101,12 @@ celui-ci hériterait de la locale du système, qui est très probablement `fr_FR
 
 Si jamais vous utilisez le langage Bash pour écrire des script de la forme `*.unefois`, vous pouvez alors utiliser certaines variables ou fonctions prédéfinies qui pourront peut-être vous faciliter le travail d’écriture des scripts. Voici tableau listant toutes ces variables et fonctions :
 
+| Header 1      |     2 header    |   header 3 |
+| ------------- |: -------------: | ---------: |
+| 1 Online      |        1        |      value |
+| Line 2        |        2        |      value |
+| 3 Online      |        3        |      value |
+
 | Nom | Commentaire |
 | - | - |
 | SE3 | Cette variable stocke l’adresse IP du serveur récupérée automatiquement lors de l’installation du paquet `se3-clients-linux`. |
