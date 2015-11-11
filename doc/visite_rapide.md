@@ -1,6 +1,8 @@
 #Visite rapide du répertoire clients-linux/ du serveur
 
-Afin de faire un rapide tour d’horizon du paquet `se3-clients-linux`, voici ci-dessous un schéma du contenu du répertoire `/home/netlogon/clients-linux/` du serveur. Les noms des répertoires possèdent un slash à la fin, sinon il s’agit de fichiers standards. Certains fichiers ou répertoires, dont vous n’avez pas à vous préoccuper, ont été omis afin d’alléger le schéma et les explications qui vont avec. Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter à vos besoins sont en gras. À l’inverse, vous ne devez pas modifier tous les autres fichiers ou répertoires[^1].
+Afin de faire un rapide tour d’horizon du paquet `se3-clients-linux`, voici ci-dessous un schéma du contenu du répertoire `/home/netlogon/clients-linux/` du serveur. Les noms des répertoires possèdent un slash à la fin, sinon il s’agit de fichiers standards. Certains fichiers ou répertoires, dont vous n’avez pas à vous préoccuper, ont été omis afin d’alléger le schéma et les explications qui vont avec. Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter à vos besoins sont en gras. À l’inverse, vous ne devez pas modifier tous les autres fichiers ou répertoires.
+
+**Note :** En fait, vous pouvez le faire bien sûr car vous êtes `root` sur le serveur. Mais les modifications effectuées sur les fichiers/répertoires qui ne sont pas en vert sur le schéma ne survivront pas à une réinstallation ou à une mise à jour du `paquet se3-clients-linux`.
 
 ```
     -- clients-linux/
@@ -41,5 +43,3 @@ Voici quelques commentaires rapides :
 * Le répertoire `divers/` ne contient pas grand chose par défaut et vous pourrez à priori y mettre ce que vous voulez. L’intérêt de ce répertoire est que, si vous y placez des fichiers (ou des répertoires), ceux-ci seront accessibles uniquement par le compte `root` local de chaque client GNU/Linux et par le compte `admin` du domaine. En particulier, vous aurez accès au contenu du répertoire `divers/` à travers le script de logon et à travers les scripts unefois (évoqués ci-dessous) qui sont tous les deux exécutés par le compte local de chaque client GNU/Linux. Vous trouverez un exemple d’utilisation possible de ce répertoire dans la section [imprimante].
 
 * Le répertoire `unefois/` sert à exécuter des scripts une seule fois sur toute une famille de clients GNU/Linux intégrés au domaine. Ce répertoire peut s’avérer utile pour effectuer des tâches administratives sur les clients GNU/Linux. Toutes les explications nécessaires sur ce répertoire se trouvent dans la section [unefois].
-
-[^1]: En fait, vous pouvez le faire bien sûr car vous êtes `root` sur le serveur. Mais les modifications effectuées sur les fichiers/répertoires qui ne sont pas en vert sur le schéma ne survivront pas à une réinstallation ou à une mise à jour du `paquet se3-clients-linux`.

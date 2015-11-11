@@ -10,7 +10,7 @@ que en local sur chaque client GNU/Linux à intégrer, utilisent exactement le m
 
     alors le script ne stoppera pas son exécution et effectuera directement le changement de nom en prenant comme nom le paramètre fourni (ici `toto-04`). Les caractères autorisés pour le choix du nom sont :
 
-    * les 26 lettres de l’alphabet en minuscules ou en majuscules, *sans accents* ;
+    * les 26 lettres de l’alphabet en minuscules ou en majuscules, **sans accents** ;
     * les chiffres ;
     * le tiret du 6 (-) ;
     * et c’est tout !
@@ -37,14 +37,14 @@ que en local sur chaque client GNU/Linux à intégrer, utilisent exactement le m
 * L’option `--ignorer-verification-ldap` ou `--ivl` : cette option, qui ne prend aucun paramètre, vous permet de continuer l’intégration sans faire de pause après la vérification LDAP. En effet, lors de l’exécution du script d’intégration, quel que soit le jeu d’options choisi, une recherche dans l’annuaire du serveur est effectuée. Le script lancera une recherche de toutes les entrées dans l’annuaire correspondant à des machines susceptibles d’avoir un lien avec la machine qui est en train d’exécuter le script d’intégration au domaine. Plus précisément la recherche porte sur toutes les entrées dans l’annuaire correspondant à des machines qui ont :
 
     * même nom que la machine exécutant le script ;
-    * *ou* même adresse IP que la carte réseau de la machine exécutant le script ;
-    * *ou* même adresse MAC que la carte réseau de la machine exécutant le script.
+    * **ou** même adresse IP que la carte réseau de la machine exécutant le script ;
+    * **ou** même adresse MAC que la carte réseau de la machine exécutant le script.
 
     Dans tous les cas, le résultat de cette recherche sera affiché. Si vous n’avez pas spécifié l’option `--ivl`, alors le script s’arrêtera à ce moment là et vous demandera si vous voulez continuer l’intégration. Si par exemple vous vous apercevez que le nom d’hôte que vous avez choisi pour votre client GNU/Linux existe déjà dans l’annuaire du serveur, il faudra peut-être arrêter l’intégration (sauf si le système GNU/Linux est installé en dual boot avec Windows sur la machine et que le système Windows, lui, a déjà été intégré au domaine avec ce même nom). Mais si vous avez spécifié l’option `--ivl`, alors après avoir affiché le résultat de la recherche LDAP, le script continuera automatiquement l’intégration sans vous demander de confirmation.
 
 * L’option `--installer-samba` ou `--is` : cette option, qui ne prend aucun paramètre, provoquera l’installation de Samba sur le client GNU/Linux. Si vous ne spécifiez pas cette option, alors Samba ne sera pas installé sur le client GNU/Linux. Actuellement, il est conseillé de spécifier cette option. En effet, lorsqu’un client GNU/Linux essaye de monter un partage Samba du serveur (notamment le partage `homes`), des scripts sont exécutés en amont côté serveur et le montage ne sera effectué qu’une fois ces scripts terminés. Or, l’un d’entre eux peut mettre un certain temps (environ 4 ou 5 secondes) à se terminer si Samba n’est pas installé sur la machine cliente. Par conséquent, si vous ne spécifiez pas l’option , vous risquez d’avoir des ouvertures de sessions un peu lentes (lors du montage des partages Samba). Donc pour l’instant, utilisez cette option lors de vos intégrations.
 
-    *Pour l’instant, il faut utiliser l’option systématiquement.*
+    **Pour l’instant, il faut utiliser l’option systématiquement.**
 
 * L’option `--redemarrer-client` ou `--rc` : cette option permet de lancer automatiquement un redémarrage du client GNU/Linux à la fin de l’exécution du script d’intégration. Si vous ne spécifiez pas cette option, il n’y aura pas de redémarrage à la fin de l’exécution du script. Sachez que le redémarrage après intégration est nécessaire pour avoir un système opérationnel. Si les intégrations se déroulent sans erreur sur vos machines Linux, vous aurez donc tout intérêt à spécifier à chaque fois l’option `--rc`.
 
