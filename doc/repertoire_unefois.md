@@ -108,17 +108,17 @@ Si jamais vous utilisez le langage Bash pour écrire des script de la forme `*.u
 | ARCHITECTURE | Cette variable stocke l’architecture du système. Par exemple, si le système repose sur une architecture 64 bits, alors la variable stockera la chaîne de caractères `x86_64`|
 | BASE_DN | Cette variable contient le suffixe de base LDAP de l’annuaire du serveur. Elle pourra vous être utile si vous souhaitez faire vous-même des requêtes LDAP particulières sur les clients à l’aide de la commande `ldapsearch`.|
 | NOM_HOTE | Cette variable stocke le nom du client GNU/Linux (celui qui se trouve dans le fichier de configuration `/etc/hostname`). Par exemple, si vous avez pris l’habitude de choisir des noms de machines de la forme `<salle>-xxx` (comme dans `S121-PC04` ou même comme dans `S18-DELL-02`), alors vous pourrez récupérer le nom de la salle où se trouve le client GNU/Linux par l’intermédiaire de la variable `NOM_HOTE` comme ceci : ```sh
-SALLE=$(echo "$NOM_HOTE" | cut -d’-’ -f1)
+SALLE=$(echo "$NOM_HOTE" | cut -d’-’ -f1)\
+\
+if [ "$SALLE" = "S121" ]; then\
+    # Les trucs à faire si on est dans la salle 121.\
+fi\
+\
+if [ "$SALLE" = "S18" ]; then\
+    # Les trucs à faire si on est dans la salle 18.\
+fi\
+# etc.``` |
 
-if [ "$SALLE" = "S121" ]; then
-    # Les trucs à faire si on est dans la salle 121.
-fi
-
-if [ "$SALLE" = "S18" ]; then
-    # Les trucs à faire si on est dans la salle 18.
-fi
-# etc.
-```|
 | appartient_au_parc |  |
 | afficher_liste_parcs |  |
 | est_dans_liste |  |
