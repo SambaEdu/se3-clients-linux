@@ -17,11 +17,12 @@ apt-get install se3-clients-linux
 * ou bien faire l'installation en passant par l'interface d'administration Web du serveur via les menus `Configuration générale` puis `Modules`. Dans le tableau des modules, le paquet `se3-clients-linux` correspond à la ligne avec l'intitulé `Support des clients linux`.
 
 **Si votre serveur est sous Wheezy**, vous pouvez :
+
 TODO
 
 **Attention**, dans les versions précédentes du paquet, il fallait éditer le fichier `/etc/apt/sources.list` mais désormais ce n'est plus nécessaire. Le paquet est maintenant inclus dans le dépôt officiel du projet SambaÉdu.
 
-Mais si vous souhaitez utiliser la toute dernière version disponible du paquet**, alors il faudra dans ce cas utiliser le dépôt <http://francois-lafont.ac-versailles.fr> comme indiqué ci-dessus.
+**Mais si vous souhaitez utiliser la toute dernière version disponible du paquet**, alors il faudra dans ce cas utiliser le dépôt <http://francois-lafont.ac-versailles.fr> comme indiqué ci-dessus.
 
 L’installation ne fait rien de bien méchant sur votre serveur. Vous pouvez parfaitement désinstaller le paquet du serveur afin que celui-ci retrouve très exactement le même état qu’avant l’installation (voir la section [desinstallation] page ). L’installation se borne uniquement à effectuer les tâches suivantes :
 
@@ -33,15 +34,13 @@ L’installation ne fait rien de bien méchant sur votre serveur. Vous pouvez pa
     2. le suffixe de base de l’annuaire LDAP ;
     3. l’adresse du serveur de temps NTP.
 
-**Important : Lors de l’installation du paquet, si jamais vous obtenez un message vous indiquant que le serveur NTP ne semble pas fonctionner, avant de passer à la suite, vous devez vous rendre sur la console d’administration Web de votre serveur (dans Configuration générale → Paramètres serveur) afin de spécifier l’adresse d’un serveur de temps qui fonctionne correctement (chose que l’on peut vérifier ensuite dans la page de diagnostic du serveur). Une fois le paramétrage effectué il vous suffit de reconfigurer le paquet en lançant, en tant que root sur une console du serveur, la commande suivante `dpkg-reconfigure se3-clients-linux`.
-
-Si tout se passe bien, vous ne devriez plus obtenir d’avertissement à propos du serveur NTP.**
+**Important :** Lors de l’installation du paquet, si jamais vous obtenez un message vous indiquant que le serveur NTP ne semble pas fonctionner, avant de passer à la suite, vous devez vous rendre sur la console d’administration Web de votre serveur (dans Configuration générale → Paramètres serveur) afin de spécifier l’adresse d’un serveur de temps qui fonctionne correctement (chose que l’on peut vérifier ensuite dans la page de diagnostic du serveur). Une fois le paramétrage effectué il vous suffit de reconfigurer le paquet en lançant, en tant que root sur une console du serveur, la commande suivante `dpkg-reconfigure se3-clients-linux`. Si tout se passe bien, vous ne devriez plus obtenir d’avertissement à propos du serveur NTP.
 
 Votre serveur Samba possède donc un nouveau partage CIFS qui, au passage, ne sera pas visible par les machines clientes sous Windows. Attention, le nom du partage CIFS n’est pas le même que le nom du répertoire correspondant dans l’arborescence locale du serveur :
 
-Nom du partage | Chemin réseau | Chemin dans l’arborescence locale du serveur
--|-|-
-netlogon-linux  |//SERVEUR/netlogon-linux |/home/netlogon/clients-linux/
+| Nom du partage | Chemin réseau | Chemin dans l’arborescence locale du serveur |
+|-|-|-|
+| netlogon-linux | //SERVEUR/netlogon-linux | /home/netlogon/clients-linux/ |
 
 Au niveau de l’installation du paquet proprement dite, côté serveur, plus aucune manipulation supplémentaire n’est nécessaire désormais.
 
@@ -53,7 +52,8 @@ Le répertoire `/home/netlogon/clients-linux/` de votre serveur contient un scri
 
 *Remarque :* pour copier en local sur un client GNU/Linux le script d’intégration qui se trouve sur le serveur, on pourra utiliser la bonne vieille clé USB des familles, mais on pourra aussi user et abuser de la commande (très pratique) qui permet d’effectuer très simplement des copies entre deux machines (sous GNU/Linux) distantes. Par exemple, sur le terminal d’un client Debian Squeeze, vous pourriez exécuter les commandes suivantes :
 
-```# Chemin du fichier sur le serveur. Le joker * nous permet simplement 
+```
+   # Chemin du fichier sur le serveur. Le joker * nous permet simplement 
    # d'économiser la saisie de quelques touches sur le clavier (à
    # condition d'en saisir suffisamment pour éviter toute ambiguïté 
    # sur le nom du fichier).
@@ -88,4 +88,4 @@ Supposons par exemple que vous avez copié le script d’intégration sur une De
 
 Les explications sur les options se trouvent plus loin dans le document à la section [options-integration] page . Si tout se passe bien, le client finira par lancer un redémarrage. Une fois celui-ci terminé, vous devriez être en mesure d’ouvrir une session avec un compte du domaine (comme le compte ou un compte de type professeur ou de type élève).
 
-**Important : Il est préférable qu’aucun compte local du client n’ait le même login qu’un compte du domaine. Or, lorsqu’on installe un client GNU/Linux, on est en général amené à créer au moins un compte local (en plus du compte `root`). Si cela vous arrive, arrangez-vous pour que le login de ce compte ne risque pas de rentrer en conflit avec le login d’un compte du domaine. Vous pouvez utiliser `userlocal` comme login par exemple, ou autre chose…**
+**Important :** Il est préférable qu’aucun compte local du client n’ait le même login qu’un compte du domaine. Or, lorsqu’on installe un client GNU/Linux, on est en général amené à créer au moins un compte local (en plus du compte `root`). Si cela vous arrive, arrangez-vous pour que le login de ce compte ne risque pas de rentrer en conflit avec le login d’un compte du domaine. Vous pouvez utiliser `userlocal` comme login par exemple, ou autre chose…
