@@ -56,11 +56,17 @@ exclure.
 * [La "désintégration"](desintegration.md)
 * [Les partages des utilisateurs](partages_utilisateurs.md)
 * [La gestion des profils](gestion_profils.md)
+* [Le répertoire unefois/](repertoire_unefois.md)
+    * [Des variables et des fonctions prêtes à l’emploi](variables_fonctions.md)
 * [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
 
 ## Annexes
 
 * [Installer un miroir local APT de cache avec apt-cacher-ng](apt-cacher-ng.md)
 
+
+## Documentation pour le (futur?) contributeur/développeur
+
+Vous trouverez de la documentation pour le contributeur/développeur [ici](dev/README.md).
 
 
