@@ -53,3 +53,78 @@ liste_parcs=$(afficher_liste_parcs "S121-LS-P")
 ```
 
 Dans cet exemple, la fonction effectue une requête LDAP auprès du serveur afin de connaître le nom de tous les parcs auxquels appartient la machine `S121-LS-P`. Si la machine `S121-LS-P` appartient aux parcs `S121` et `PostesProfs`, alors la variable `liste_parcs` contiendra deux lignes, la première contenant `S121` et la deuxième contenant PostesProfs. L’idée est de stocker tous les parcs d’une machine dans une variable, le tout en une seule requête LDAP. Enfin, à la place de `S121-LS-P` comme argument de la fonction, on aurait pu utiliser `$NOM_HOTE`, comme dans l’exemple ci-dessous qui sera plus éclairant sur la manière dont on peut exploiter de telles listes.
+
+##`est_dans_liste`
+
+Là aussi, illustrons cette fonction par un exemple :
+
+```sh
+# On récupère la liste des parcs auxquels
+# appartient la machine cliente.
+liste_parcs=$(afficher_liste_parcs "$NOM_HOTE")
+
+if est_dans_liste "$liste_parcs" "PostesProfs"; then
+    # Si la machine est dans le parc "PostesProfs"
+    # alors faire ceci...
+elif est_dans_liste "$liste_parcs" "CDI"; then
+    # Si la machine est dans le parc "CDI"
+    # alors faire ceci...
+else
+    # Sinon faire cela...
+fi
+```
+
+L’idée ici est qu’une seule requête LDAP est effectuée (lors de la première instruction). Ensuite, les tests `if` ne sollicitent pas le réseau puisque la liste des parcs est déjà stockée dans la variable `liste_parcs`.
+
+----
+
+Les fonctions suivantes sont moins pertinentes dans les scripts `*.unefois` qui, rappelons-le, sont exécutés juste après le démarrage du système. Mais elles restent toutefois disponibles également et donc figurent quand même dans ce tableau.
+En revanche, nous verrons plus loin [TODO] que ces fonctions sont également disponibles à des moments beaucoup plus pertinents, comme par exemple au moment de l’ouverture de session d’un utilisateur sur le système.
+
+----
+
+##`appartient_au_groupe`
+
+Cette fonction permet de savoir si le login d’un utilisateur correspond à un compte qui appartient à un groupe donné. Pour ce faire, la fonction `appartient_au_groupe` interroge l’annuaire du serveur via une requête LDAP. Voici un exemple :
+
+```sh
+if appartient_au_groupe "Classe_1ES2" "toto"; then
+    # Le compte toto appartient à la classe 1ES2.
+else
+    # Le compte toto n’appartient pas à la classe 1ES2.
+fi
+```
+
+#`afficher_liste_groupes`
+Un exemple vaudra mieux qu’un long discours :
+```sh
+liste_groupes_toto=$(afficher_liste_groupes "toto")
+if est_dans_liste "$liste_groupes_toto" "Eleves"; then
+    # toto est un élève alors faire ceci...
+fi
+```
+
+Dans cet exemple, la fonction effectue une requête LDAP auprès du serveur afin de connaître le nom des groupes auxquels compte utilisateur `toto` appartient. Si par exemple ce compte appartient aux groupes `Eleves` et `Classe_1ES2`, alors la variable `liste_groupes_toto` contiendra deux lignes, la première contenant `Eleves` et la deuxième contenant `Classe_1ES2`. L’idée est de stocker tous les groupes d’un compte donné dans une variable, le tout en une seule requête LDAP.
+
+#`est_utilisateur_local`
+Cette fonction permet de tester si un compte est local (c’est-à-dire contenu dans le fichier `/etc/passwd` du client GNU/Linux) ou non (c’est-à-dire un compte du domaine contenu dans l’annuaire du serveur).
+
+```sh
+if est_utilisateur_local "toto"; then
+    # toto est un compte local, alors faire ceci...
+fi
+```
+
+#`est_connecte`
+Cette fonction permet de tester si un compte est actuellement connecté au système (c’est-à-dire s’il a ouvert une session).
+
+```sh
+if est_connecte "toto"; then
+    # toto est actuellement connecté au système,
+    # alors faire ceci...
+fi
+```
+
+#`activer_pave_numerique`
+
+Cette fonction, qui ne prend pas d’argument, permet simplement d’activer le pavé numérique du client GNU/Linux.
