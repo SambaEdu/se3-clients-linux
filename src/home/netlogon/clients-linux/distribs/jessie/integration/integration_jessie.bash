@@ -1284,7 +1284,7 @@ modifier_fichiers_pam()
     fi
     if [ "$gdm" = "lightdm" ]
     then
-        # non testé avec Jessie (20151026)
+        # toujours le même nom avec ligthdm
         fichier_gdm="lightdm"
     fi
     restaurer_via_save "/etc/pam.d/${fichier_gdm}"
@@ -1810,8 +1810,8 @@ mise_en_place_mot_de_passe_root
 #=====
 afficher "installation des paquets nécessaires à l'intégration : $PAQUETS_AUTRES"
 installer_paquets_integration
-# Cas particulier. Sur Squeeze, on a besoin du paquet sudo
-# Est-ce toujours le cas avec Jessie ?
+# Cas particulier : sur Debian, on a besoin du paquet sudo
+# Cela sert dans le fichier logon plusieurs fois.
 installer_paquet_sudo
 afficher "installation des paquets terminée"
 

@@ -65,4 +65,8 @@ exclure.
 * [Installer un miroir local APT de cache avec apt-cacher-ng](apt-cacher-ng.md)
 
 
+## Documentation pour le (futur?) contributeur/développeur
+
+Vous trouverez de la documentation pour le contributeur/développeur [ici](dev/README.md).
+
 
