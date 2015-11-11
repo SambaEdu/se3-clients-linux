@@ -1,4 +1,4 @@
-#Les options des scripts d’intégration {#options-integration}
+#Les options des scripts d’intégration
 
 Les deux scripts d’intégration `integration_squeeze.bash` et `integration_precise.bash`, qui doivent être exécutés en tant `root`
 que en local sur chaque client GNU/Linux à intégrer, utilisent exactement le même jeu d’options. En voici la liste.
