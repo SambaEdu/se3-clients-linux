@@ -6,7 +6,7 @@ que en local sur chaque client GNU/Linux à intégrer, utilisent exactement le m
 * L’option `--nom-client` ou `--nc` : cette option vous permet de modifier le nom d’hôte[^1] du client. Si l’option n’est pas spécifiée, alors le client gardera le nom d’hôte qu’il possède déjà. Si l’option est spécifiée sans paramètre, alors le script d’intégration stoppera son exécution pour vous demander de saisir le nom de la machine. Si l’option est spécifiée avec un paramètre, comme dans :
 
 
-    ```./integration_squeeze.bash --nom-client="toto-04"```
+    `./integration_squeeze.bash --nom-client="toto-04"`
 
     alors le script ne stoppera pas son exécution et effectuera directement le changement de nom en prenant comme nom le paramètre fourni (ici `toto-04`). Les caractères autorisés pour le choix du nom sont :
 
