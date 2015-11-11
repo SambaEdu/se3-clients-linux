@@ -48,9 +48,9 @@ Sachez enfin que si, pour une raison ou pour une autre, il vous est nécessaire 
 
 ##Intégration d’un client GNU/Linux
 
-Le répertoire `/home/netlogon/clients-linux/` de votre serveur contient un script d’intégration par type de distribution GNU/Linux. Par exemple, le script d’intégration pour des Debian Squeeze se trouve dans le répertoire `/home/netlogon/clients-linux/distribs/squeeze/integration/` et il s’appelle `integration_squeeze.bash`. Il faudra exécuter l’un de ces scripts, en tant que `root`, *en local* sur le client GNU/Linux que vous souhaitez intégrer.
+Le répertoire `/home/netlogon/clients-linux/` de votre serveur contient un script d’intégration par type de distribution GNU/Linux. Par exemple, le script d’intégration pour des Debian Squeeze se trouve dans le répertoire `/home/netlogon/clients-linux/distribs/squeeze/integration/` et il s’appelle `integration_squeeze.bash`. Il faudra exécuter l’un de ces scripts, en tant que `root`, **en local** sur le client GNU/Linux que vous souhaitez intégrer.
 
-*Remarque :* pour copier en local sur un client GNU/Linux le script d’intégration qui se trouve sur le serveur, on pourra utiliser la bonne vieille clé USB des familles, mais on pourra aussi user et abuser de la commande (très pratique) qui permet d’effectuer très simplement des copies entre deux machines (sous GNU/Linux) distantes. Par exemple, sur le terminal d’un client Debian Squeeze, vous pourriez exécuter les commandes suivantes :
+**Remarque :** pour copier en local sur un client GNU/Linux le script d’intégration qui se trouve sur le serveur, on pourra utiliser la bonne vieille clé USB des familles, mais on pourra aussi user et abuser de la commande (très pratique) qui permet d’effectuer très simplement des copies entre deux machines (sous GNU/Linux) distantes. Par exemple, sur le terminal d’un client Debian Squeeze, vous pourriez exécuter les commandes suivantes :
 
 ```sh
    # Chemin du fichier sur le serveur. Le joker * nous permet simplement 
@@ -69,7 +69,7 @@ Le répertoire `/home/netlogon/clients-linux/` de votre serveur contient un scri
    scp root@IP-SERVEUR:"$SOURCE" "$DESTINATION"
 ```
 
-*Remarque :* si jamais vous avez un doute sur le type de distribution de votre client GNU/Linux, vous pouvez lancer dans un terminal la commande suivante (pas forcément en tant que `root`) : `lsb_release --codename`.
+**Remarque :** si jamais vous avez un doute sur le type de distribution de votre client GNU/Linux, vous pouvez lancer dans un terminal la commande suivante (pas forcément en tant que `root`) : `lsb_release --codename`.
 
 Le résultat vous affichera le nom de code de la distribution ( ou etc.) ce qui vous indiquera le script d’intégration à utiliser.
 

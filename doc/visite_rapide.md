@@ -1,6 +1,8 @@
 #Visite rapide du répertoire clients-linux/ du serveur
 
-Afin de faire un rapide tour d’horizon du paquet `se3-clients-linux`, voici ci-dessous un schéma du contenu du répertoire `/home/netlogon/clients-linux/` du serveur. Les noms des répertoires possèdent un slash à la fin, sinon il s’agit de fichiers standards. Certains fichiers ou répertoires, dont vous n’avez pas à vous préoccuper, ont été omis afin d’alléger le schéma et les explications qui vont avec. Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter à vos besoins sont en gras. À l’inverse, vous ne devez pas modifier tous les autres fichiers ou répertoires[^1].
+Afin de faire un rapide tour d’horizon du paquet `se3-clients-linux`, voici ci-dessous un schéma du contenu du répertoire `/home/netlogon/clients-linux/` du serveur. Les noms des répertoires possèdent un slash à la fin, sinon il s’agit de fichiers standards. Certains fichiers ou répertoires, dont vous n’avez pas à vous préoccuper, ont été omis afin d’alléger le schéma et les explications qui vont avec. Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter à vos besoins sont en gras. À l’inverse, vous ne devez pas modifier tous les autres fichiers ou répertoires.
+
+**Note : **En fait, vous pouvez le faire bien sûr car vous êtes `root` sur le serveur. Mais les modifications effectuées sur les fichiers/répertoires qui ne sont pas en vert sur le schéma ne survivront pas à une réinstallation ou à une mise à jour du `paquet se3-clients-linux`.
 
 ```
     -- clients-linux/
@@ -45,5 +47,3 @@ Voici quelques commentaires rapides :
 * Le répertoire `doc/` contient un fichier texte qui vous indiquera l’adresse URL de la documentation en ligne que vous êtes en train de lire actuellement ainsi que l’adresse URL des sources au format LaTeX de cette documentation. **OBSOLETE ?**
 
 * Le répertoire `unefois/` sert à exécuter des scripts une seule fois sur toute une famille de clients GNU/Linux intégrés au domaine. Ce répertoire peut s’avérer utile pour effectuer des tâches administratives sur les clients GNU/Linux. Toutes les explications nécessaires sur ce répertoire se trouvent dans la section [unefois].
-
-[^1]: En fait, vous pouvez le faire bien sûr car vous êtes `root` sur le serveur. Mais les modifications effectuées sur les fichiers/répertoires qui ne sont pas en vert sur le schéma ne survivront pas à une réinstallation ou à une mise à jour du `paquet se3-clients-linux`.
