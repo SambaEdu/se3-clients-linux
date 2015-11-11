@@ -21,8 +21,6 @@ Afin de faire un rapide tour d’horizon du paquet `se3-clients-linux`, voici ci
        |       |   `-- integration_squeeze.bash
        |       `-- *skel*/
        |-- *divers*/
-       |-- doc/
-       |   `-- LISEZMOI.TXT
        `-- *unefois*/
 ```
 
@@ -41,8 +39,6 @@ Voici quelques commentaires rapides :
     * Un dossier `skel/` qui contient le profil par défaut (c’est-à-dire le home par défaut) de tous les utilisateurs du domaine sur la distribution concernée. Si vous voulez modifier la page d’accueil du navigateur de tous les utilisateurs du domaine ou bien si vous voulez ajouter des icônes sur le bureau, c’est dans ce dossier qu’il faudra faire des modifications. Vous trouverez toutes les explications nécessaires dans la section [profils].
 
 * Le répertoire `divers/` ne contient pas grand chose par défaut et vous pourrez à priori y mettre ce que vous voulez. L’intérêt de ce répertoire est que, si vous y placez des fichiers (ou des répertoires), ceux-ci seront accessibles uniquement par le compte `root` local de chaque client GNU/Linux et par le compte `admin` du domaine. En particulier, vous aurez accès au contenu du répertoire `divers/` à travers le script de logon et à travers les scripts unefois (évoqués ci-dessous) qui sont tous les deux exécutés par le compte local de chaque client GNU/Linux. Vous trouverez un exemple d’utilisation possible de ce répertoire dans la section [imprimante].
-
-* Le répertoire `doc/` contient un fichier texte qui vous indiquera l’adresse URL de la documentation en ligne que vous êtes en train de lire actuellement ainsi que l’adresse URL des sources au format LaTeX de cette documentation. **OBSOLETE ?**
 
 * Le répertoire `unefois/` sert à exécuter des scripts une seule fois sur toute une famille de clients GNU/Linux intégrés au domaine. Ce répertoire peut s’avérer utile pour effectuer des tâches administratives sur les clients GNU/Linux. Toutes les explications nécessaires sur ce répertoire se trouvent dans la section [unefois].
 
