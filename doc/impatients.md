@@ -52,7 +52,7 @@ Le répertoire `/home/netlogon/clients-linux/` de votre serveur contient un scri
 
 *Remarque :* pour copier en local sur un client GNU/Linux le script d’intégration qui se trouve sur le serveur, on pourra utiliser la bonne vieille clé USB des familles, mais on pourra aussi user et abuser de la commande (très pratique) qui permet d’effectuer très simplement des copies entre deux machines (sous GNU/Linux) distantes. Par exemple, sur le terminal d’un client Debian Squeeze, vous pourriez exécuter les commandes suivantes :
 
-```
+```sh
    # Chemin du fichier sur le serveur. Le joker * nous permet simplement 
    # d'économiser la saisie de quelques touches sur le clavier (à
    # condition d'en saisir suffisamment pour éviter toute ambiguïté 
@@ -75,7 +75,7 @@ Le résultat vous affichera le nom de code de la distribution ( ou etc.) ce qui 
 
 Supposons par exemple que vous avez copié le script d’intégration sur une Debian Squeeze et que celui-ci se trouve sur votre bureau. Alors, **en tant que **, vous pouvez lancer l’intégration ainsi :
 
-```
+```sh
    # D'abord, on se place sur le bureau (ici, il s'agit du bureau de toto).
    cd /home/toto/Bureau
 
