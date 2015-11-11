@@ -54,6 +54,8 @@ exclure.
 * [Visite rapide du répertoire clients-linux/ du serveur](visite_rapide.md)
 * [Les options des scripts d’intégration](options_scripts.md)
 * [La "désintégration"](desintegration.md)
+* [Les partages des utilisateurs](partages_utilisateurs.md)
+* [La gestion des profils](gestion_profils.md)
 * [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
 
 ## Annexes
