@@ -425,7 +425,7 @@ toujours privilégier une url relative.
 Concernant les liens vers des pages markdown, il peut être
 pratique parfois de créer un lien vers un titre en
 particulier d'une page markdown (notamment si la page est
-longe, afin d'avoir le lien le plus précis possible). Pour
+longue, afin d'avoir le lien le plus précis possible). Pour
 ce faire, allez sur la page en question avec votre
 navigateur Web et faites survoler le curseur de la souris au
 niveau du titre sur lequel vous voulez faire un lien. Vous
