@@ -59,6 +59,8 @@ exclure.
 * [Le répertoire unefois/](repertoire_unefois.md)
     * [Des variables et des fonctions prêtes à l’emploi](variables_fonctions.md)
 * [Le script de logon](script_logon.md)
+    * [Des variables et des fonctions prêtes à l’emploi](variables_fonctions_logon.md)
+    * [Les logs pour détecter un problème](logs_detecter_probleme.md)
 * [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
 
 ## Annexes
