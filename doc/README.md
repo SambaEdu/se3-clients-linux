@@ -4,7 +4,7 @@
 
 Le but de cette documentation est de décrire un mode opératoire
 d'intégration de stations clientes Debian ou Ubuntu dans un domaine
-SambaÉdu (avec un serveur en version Lenny ou Squeeze) par
+SambaÉdu (avec un serveur en version Squeeze ou Wheezy) par
 l'intermédiaire du paquet `se3-clients-linux`. Les distributions
 GNU/Linux qui ont été testées sont :
 
@@ -42,11 +42,12 @@ bien le cas.
 Si jamais vous tenez à changer de « display manager » sur
 votre distribution, il est quasiment certain que vous devrez
 modifier le script d'intégration de la distribution parce
-que celui-ci ne fonctionnera pas en l'état. Si vous tenez à
+que celui-ci ne fonctionnera pas en l'état (à partir de Jessie
+et Trusty, une vérification est faite). Si vous tenez à
 changer uniquement l'environnement de bureau, il est
 possible que le script d'intégration fonctionne en l'état
 malgré tout mais nous ne pouvons en rien vous garantir le
-résultat final. L'apparition de régressions ici ou là par
+résultat final et l'apparition de régressions ici ou là par
 rapport à ce qui est annoncé dans ce document n'est pas à
 exclure.
 
