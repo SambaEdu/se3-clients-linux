@@ -23,9 +23,10 @@ Dans le tableau ci-dessous, les trois « adresses » suivantes
 désignent finalement la même zone de stockage qui se trouve
 sur le serveur :
 
-| Chemin réseau | Chemin local sur le serveur | Chemin local sur un client GNU/Linux |
-| - | - | - |
-| `//SE3/netlogon-linux` | `/home/netlogon/clients-linux/` | `/mnt/netlogon/` |
+Chemin réseau          | Chemin local sur le serveur     | Chemin local sur un client GNU/Linux
+---------------------- | ------------------------------- | ------------------------------------
+`//SE3/netlogon-linux` | `/home/netlogon/clients-linux/` | `/mnt/netlogon/`
+
 
 ## Les différentes copies du profil par défaut
 
