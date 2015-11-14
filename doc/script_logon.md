@@ -213,13 +213,160 @@ au même.). Ensuite, le deuxième argument et les suivants (autant qu’on veut)
 
 ##Quelques bricoles pour les perfectionnistes
 
-###Quelques bricoles pour les perfectionnistes
+###Changer les icônes représentants les liens pour faire plus joli
+
+C’est quand même plus joli quand on a des icônes évocateurs 19 comme ci-dessous pour nos liens vers les partages, non ?
+
+![Jolies icônes](/images/icones_jolies1.png)
+
+Et bien ça tombe bien car c’est facile à faire avec la fonction `changer_icone`. Voici un exemple :
+
+```sh
+function ouverture_perso ()
+{
+    # On suppose que le partage "Classe" est déjà monté et qu’un
+    # lien vers ce partage a déjà été créé sur le bureau...
+    changer_icone "$REP_HOME/Bureau/Classes sur le réseau" "$REP_HOME/.mes_icones/classe.jpg"
+}
+```
+
+La fonction prend toujours deux arguments. Le premier est le chemin absolu du fichier dont on veut changer l’icône. Cela peut être n’importe quel fichier (ce n’est pas forcément un des raccourcis qu’on a créé), mais par contre il doit impérativement se trouver dans le home de l’utilisateur qui se connecte (donc il devra toujours commencer par `"$REP_HOME/..."`). Ensuite, le deuxième argument est le chemin absolu de n’importe quel fichier image (du moment que le compte qui se connecte peut y avoir accès en lecture).
+
+Une idée possible (parmi d’autres) est de modifier le profil par défaut des d’utilisateurs et d’y placer un répertoire `.mes_icones/` dans lequel vous mettez tous les icônes dont vous avez besoin pour habiller vos liens. Ensuite, vous pourrez aller chercher vos icônes dans le home de l’utilisateur qui se connecte (dans `"$REP_HOME/.mes_icones/"` précisément) de manière similaire à ce qui est fait dans exemple ci-dessus.
+
+Attention, la fonction `changer_icone` n’a aucun effet sous la distribution Xubuntu qui utilise l’environnement de bureau Xfce. Cela vient du fait que personnellement je ne sais pas changer l’image d’un icône en ligne de commandes sous Xfce. Si vous savez, n’hésitez pas à me donner l’information par mail [TODO] car je pourrais ainsi étendre la fonction `changer_icone` à l’environnement de bureau Xfce.
 
 ###Changer le papier peint en fonction des utilisateurs
 
+Ça pourrait être sympathique d’avoir un papier différent suivant le type de compte... Et bien c’est possible avec la fonction `changer_papier_peint`. Voici un exemple :
+
+```sh
+function ouverture_perso ()
+{
+    if [ "$LOGIN" = "admin" ]; then
+        changer_papier_peint "$REP_HOME/.backgrounds/admin.jpg"
+    fi
+}
+```
+
+Le seul et unique argument de cette fonction est le chemin absolu (sur la machine cliente) du fichier image servant pour le fond d’écran. Il faut bien sûr que ce fichier image soit au moins accessible en lecture pour l’utilisateur qui se connecte.
+
+Là aussi, comme pour les icônes, l’idée est de placer dans le profil par défaut distant un répertoire `.backgrounds/` (par exemple) qui contiendra les deux ou trois fichiers images dont vous avez besoin pour faire vos fonds d’écran. Voici un exemple dans le cas d’un compte professeur :
+
+![Exemple bureau prof](/images/bureau-message.png)
+
+En plus du changement de fond d’écran, il y a un petit message personnalisé qui s’affiche en haut à droite du bureau. Pour mettre en place ce genre de message, voir la section 9.6.4 [TODO].
+
 ###L’activation du pavé numérique
+
+Pour activer le pavé numérique du client GNU/Linux au moment de l’affichage de la fenêtre de connexion du système, en principe ceci devrait fonctionner :
+
+```sh
+function initialisation_perso ()
+{
+    # On active le pavé numérique au moment de la phase d’initialisation.
+    activer_pave_numerique
+}
+```
+
+Vous pouvez remarquer que, cette fois-ci, c’est le contenu de la fonction `initialisation_perso` qui a été édité.
+
+En revanche, pour activer le pavé numérique au moment de l’ouverture de session, procéder exactement de la même façon à l’intérieur de la fonction `ouverture_perso` risque de ne pas fonctionner, et cela pour une raison de timing. En effet, au moment où la fonction `ouverture_perso` sera lancée, l’ouverture de session ne sera pas complètement terminée (Et c’est normal qu’il en soit ainsi puisque l’ouverture de session de termine après l’exécution du script de logon,
+même pas immédiatement après mais 1 ou 2 secondes après selon la rapidité de la machine hôte) et l’activation du pavé numérique risque d’être annulée lors de la fin de l’ouverture de session. L’idée est donc de programmer l’appel de la fonction `activer_pave_numerique` **après** l’exécution du script de logon, seulement au bout de quelques secondes (par exemple 5), afin de lancer l’activation du pavé numérique une fois l’ouverture de session achevée :
+
+function ouverture_perso ()
+{
+    #On ajoute un argument à l’appel de la fonction activer_pave_numerique.
+    #Ici, cela signifie que l’activation du pavé numérique sera lancée 5
+    #secondes après que le script de logon soit terminé, ce qui laissera
+    #le temps à l’ouverture de session de se terminer.
+    activer_pave_numerique "5"
+}
 
 ###Incruster un message sur le bureau des utilisateurs pour faire classe
 
+Pour incruster un message sur le bureau des utilisateurs, il faudra d’abord que le paquet `conky` soit installé sur le client GNU/Linux.
+
+Vous pouvez par exemple lancer l’installation via un script `*.unefois` qui contiendrait à peu de choses près l’instruction `apt-get install --yes conky`.
+
+Ensuite, tentez de mettre ceci dans la fonction `ouverture_perso` :
+
+```sh
+function ouverture_perso ()
+{
+    # On crée un fichier de configuration .conkyrc dans le home de l’utilisateur.
+    # précisant le contenu du message ainsi que certains paramètres (comme la
+    # taille de la police par exemple).
+    cat > "$REP_HOME/.conkyrc" <<FIN
+use_xft yes
+xftfont Arial:size=10
+double_buffer yes
+alignment top_right
+update_interval 1
+own_window yes
+own_window_transparent yes
+override_utf8_locale yes
+text_buffer_size 1024
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+TEXT
+Bonjour $NOM_COMPLET_LOGIN,
+Pensez bien à enregistrer vos données personnelles
+dans le dossier :
+
+    Documents de $LOGIN sur le réseau
+
+qui se trouve sur le bureau, et uniquement dans ce
+dossier, sans quoi vos données seront perdues une
+fois votre session fermée.
+
+    Cordialement.
+    Les administrateurs du réseau pédagogique.
+
+FIN
+
+    # On fait de "$LOGIN" le propriétaire du fichier .conkyrc.
+    chown "$LOGIN:" "$REP_HOME/.conkyrc"
+    chmod 644 "$REP_HOME/.conkyrc"
+
+    #On lancera conky à la fin, une fois l’exécution du script logon terminée.
+    #Pour être sûr que l’ouverture de session est achevée, on laisse un délai
+    #de 5 secondes entre la fin du script de logon et le lancement de la
+    #commande conky (avec ses arguments).
+    executer_a_la_fin "5" conky --config "$REP_HOME/.conkyrc"
+}
+```
+
+En principe, vous devriez voir apparaître un message incrusté sur le bureau des utilisateurs en haut à droite. Ce message sera légèrement personnalisé puisqu’il contiendra le nom de l’utilisateur connecté.
+
 ###Exécuter des commandes au démarrage tous les 30 jours
 
+Toutes les commandes que vous mettrez à l’intérieur de la fonction `initialisation_perso` du fichier `logon_perso` seront exécutées à chaque phase d’initialisation du système ce qui peut parfois s’avérer un peu trop fréquent à votre goût. Voici un exemple de fonction `initialisation_perso` qui vous permettra d’exécuter des commandes (peu importe lesquelles ici) au démarrage du système tous les 30 jours (pour peu que le système ne reste pas éteint indéfiniment bien sûr) :
+
+```sh
+function initialisation_perso ()
+{
+    local indicateur
+    indicateur="/etc/se3/action_truc"
+    # Si le fichier n’existe pas alors il faut le créer.
+    [ ! -e "$indicateur" ] && touch "$indicateur"
+
+    # On teste si la phase d’initialisation correspond à un démarrage du système.
+    if "$DEMARRAGE"; then
+        # On teste si la date de dernière modification du fichier est > 29 jours.
+        if find "$indicateur" -mtime +29 | grep -q "^$indicateur$"; then
+            echo "Les conditions sont vérifiées, on lance les actions souhaitées."
+            action1
+            action2
+            # etc.
+
+            # Si tout s’est bien déroulé, alors on peut mettre à jour la date
+            # de dernière modification du fichier avec la commande touch.
+            if [ "$?" = "0" ]; then
+                touch "$indicateur"
+            fi
+        fi
+    fi
+}
+```
+
+L’idée de ce code est plus simple qu’il n’y paraît. Chaque client GNU/Linux intégré au domaine possède un répertoire local `/etc/se3/` (accessible en lecture et en écriture au compte `root` uniquement). Dans ce répertoire, le script y place un fichier texte vide qui se nomme `action_truc` (c’est un exemple) et dont le seul but est de fournir une date de dernière modification. Au départ, cette date de dernière modification coïncide au moment où le fichier est créé. Si, lors d’un prochain démarrage, cette date de dernière modification est vieille de 30 jours ou plus, alors les actions sont exécutées et la date de dernière modification du fichier `action_truc` est modifiée artificiellement en la date du jour avec la commande `touch`.
