@@ -1,12 +1,12 @@
 # Le cas des classes nomades
 
 Utiliser GNU/Linux sur des ordinateurs portables dans un
-domaine Se3 présente un atout extraordinaire : le mécanisme
-des profils (voir section 7.3 [TODO]) limite au maximum les
-échanges entre le serveur et le client une fois la session
-ouverte. Autrement dit, il n'y a aucun risque de voir la
-session ouverte « planter » en raison d'une micro-coupure
-wifi.
+domaine Se3 présente un atout extraordinaire : [le mécanisme
+des profils](gestion_profils.md#le-mécanisme-des-profils)
+limite au maximum les échanges entre le serveur et le client
+une fois la session ouverte. Autrement dit, il n'y a aucun
+risque de voir la session ouverte « planter » en raison
+d'une micro-coupure wifi.
 
 L'intégration au domaine d'un ordinateur issu d'une classe
 nomade ne présente qu'une spécificité : le client doit,
