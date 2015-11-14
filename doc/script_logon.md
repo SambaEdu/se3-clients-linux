@@ -1,43 +1,43 @@
 #Le script de logon
 
-##Phases d’exécution du script de logon
+##Phases d'exécution du script de logon
 
 Le script de logon est un script bash qui est exécuté par les clients GNU/Linux lors de trois phases différentes. Pour plus de commodité dans les explications, nous allons donner un nom à chacune de ces trois phases une bonne fois pour toutes :
 
-1. **L’initialisation :** cette phase se produit juste avant l’affichage de la fenêtre de connexion. Attention, cela correspond en particulier au démarrage du système, certes, mais pas seulement. L’initialisation se produit aussi juste après la fermeture de session d’un utilisateur, avant que la fenêtre de connexion n’apparaisse à nouveau (sauf si, bien sûr, l’utilisateur a choisi d’éteindre ou de redémarrer la machine).
+1. **L'initialisation :** cette phase se produit juste avant l'affichage de la fenêtre de connexion. Attention, cela correspond en particulier au démarrage du système, certes, mais pas seulement. L'initialisation se produit aussi juste après la fermeture de session d'un utilisateur, avant que la fenêtre de connexion n'apparaisse à nouveau (sauf si, bien sûr, l'utilisateur a choisi d'éteindre ou de redémarrer la machine).
 
-    **Description rapide des tâches exécutées par le script lors de cette phase :** le script efface les homes (s’il en existe) de tous utilisateurs qui ne correspondent pas à des comptes locaux , vérifie si le partage CIFS `//SERVEUR/netlgon-linux` du serveur est bien monté sur le répertoire `/mnt/netlogon/` du client GNU/Linux et, si ce n’est pas le cas, le script exécute ce montage. Ensuite, le cas écheant, le script procède à la synchronisation du profil par défaut local sur le profil par défaut distant et lance les exécutions des `*.unefois` si l’initialisation correspond en fait à un redémarrage du système.
+    **Description rapide des tâches exécutées par le script lors de cette phase :** le script efface les homes (s'il en existe) de tous utilisateurs qui ne correspondent pas à des comptes locaux , vérifie si le partage CIFS `//SERVEUR/netlgon-linux` du serveur est bien monté sur le répertoire `/mnt/netlogon/` du client GNU/Linux et, si ce n'est pas le cas, le script exécute ce montage. Ensuite, le cas écheant, le script procède à la synchronisation du profil par défaut local sur le profil par défaut distant et lance les exécutions des `*.unefois` si l'initialisation correspond en fait à un redémarrage du système.
 
     **Note :** Un compte local est un compte figurant dans le fichier /etc/passwd du client GNU/Linux.
 
-2. **L’ouverture :** cette phase se produit à l’ouverture de session d’un utilisateur juste après que celui-ci ait saisi ses identifiants.
+2. **L'ouverture :** cette phase se produit à l'ouverture de session d'un utilisateur juste après que celui-ci ait saisi ses identifiants.
 
-    **Description rapide des tâches exécutées par le script lors de cette phase :** le script procède à la création du home de l’utilisateur qui se connecte (via une copie du profil par défaut local), exécute le montage de certains partages du serveur auxquels l’utilisateur peut prétendre (comme par exemple le partage correspondant aux données personnelles de l’utilisateur).
+    **Description rapide des tâches exécutées par le script lors de cette phase :** le script procède à la création du home de l'utilisateur qui se connecte (via une copie du profil par défaut local), exécute le montage de certains partages du serveur auxquels l'utilisateur peut prétendre (comme par exemple le partage correspondant aux données personnelles de l'utilisateur).
 
-3. **La fermeture :** cette phase se produit à la fermeture de session d’un utilisateur.
+3. **La fermeture :** cette phase se produit à la fermeture de session d'un utilisateur.
 
-    **Description rapide des tâches exécutées par le script lors de cette phase :** le script ne fait rien qui mérite d’être signalé dans cette documentation.
+    **Description rapide des tâches exécutées par le script lors de cette phase :** le script ne fait rien qui mérite d'être signalé dans cette documentation.
 
-Comme vous pouvez le constater, le script de logon est un peu le « chef d’orchestre » de chacun des clients GNU/Linux.
+Comme vous pouvez le constater, le script de logon est un peu le « chef d'orchestre » de chacun des clients GNU/Linux.
 
 ##Emplacement du script de logon
 
-À la base, le script de logon se trouve localement à l’adresse `/etc/se3/bin/logon` de chaque client GNU/Linux. Mais il existe une version centralisée de ce script sur le serveur à l’adresse :
+À la base, le script de logon se trouve localement à l'adresse `/etc/se3/bin/logon` de chaque client GNU/Linux. Mais il existe une version centralisée de ce script sur le serveur à l'adresse :
 
 1. `/home/netlogon/clients-linux/bin/logon` si on est sur le serveur
 2. `/mnt/netlogon/bin/logon` si on est sur un client GNU/Linux
 
-Nous avons donc, comme pour le profil par défaut, des versions locales du script de logon (sur chaque client GNU/Linux) et une unique version distante (sur le serveur). Et au niveau de la synchronisation, les choses fonctionnent de manière très similaire aux profils par défaut. **Lors de l’initialisation d’un client GNU/Linux :**
+Nous avons donc, comme pour le profil par défaut, des versions locales du script de logon (sur chaque client GNU/Linux) et une unique version distante (sur le serveur). Et au niveau de la synchronisation, les choses fonctionnent de manière très similaire aux profils par défaut. **Lors de l'initialisation d'un client GNU/Linux :**
 
-* Si le contenu du script de logon local est identique au contenu du script de logon distant, alors c’est le script de logon local qui est exécuté par le client GNU/Linux.
-* Si en revanche les contenus diffèrent (ne serait-ce que d’un seul caractère), alors c’est le script de logon distant qui est exécuté. Mais dans la foulée, le script de logon local est écrasé puis remplacé par une copie de la version distante. Du coup, il est très probable qu’à la prochaine initialisation du client GNU/Linux ce soit à nouveau le script de logon local qui soit exécuté parce que identique à la version distante (on retombe dans le cas précédent).
+* Si le contenu du script de logon local est identique au contenu du script de logon distant, alors c'est le script de logon local qui est exécuté par le client GNU/Linux.
+* Si en revanche les contenus diffèrent (ne serait-ce que d'un seul caractère), alors c'est le script de logon distant qui est exécuté. Mais dans la foulée, le script de logon local est écrasé puis remplacé par une copie de la version distante. Du coup, il est très probable qu'à la prochaine initialisation du client GNU/Linux ce soit à nouveau le script de logon local qui soit exécuté parce que identique à la version distante (on retombe dans le cas précédent).
 
-À priori, cela signifie donc que, pour peu que vous sachiez parler (et écrire) le langage du script de logon (il s’agit du Bash), vous pouvez modifier uniquement le script de logon distant (celui du serveur donc) afin de l’adapter à vos besoins. Vos modifications seraient alors impactées sur tous les clients GNU/Linux dès la prochaine phase d’initialisation. Seulement, il ne faudra pas procéder ainsi et cela pour une raison simple : après la moindre mise à jour du paquet `se3-clients-linux` ou éventuellement après une réinstallation, toutes vos modifications sur le script de logon seront effacées. Pour pouvoir modifier le comportement du script de logon de manière pérenne, il faudra utiliser le fichier `logon_perso` qui se trouve dans le même répertoire que le script de logon.
+À priori, cela signifie donc que, pour peu que vous sachiez parler (et écrire) le langage du script de logon (il s'agit du Bash), vous pouvez modifier uniquement le script de logon distant (celui du serveur donc) afin de l'adapter à vos besoins. Vos modifications seraient alors impactées sur tous les clients GNU/Linux dès la prochaine phase d'initialisation. Seulement, il ne faudra pas procéder ainsi et cela pour une raison simple : après la moindre mise à jour du paquet `se3-clients-linux` ou éventuellement après une réinstallation, toutes vos modifications sur le script de logon seront effacées. Pour pouvoir modifier le comportement du script de logon de manière pérenne, il faudra utiliser le fichier `logon_perso` qui se trouve dans le même répertoire que le script de logon.
 
 ##Personnaliser le script de logon
 
 
-Le fichier `logon_perso` va vous permettre d’affiner le comportement du script de logon afin de l’adapter à vos besoins, et cela de manière pérenne dans le temps (les modifications persisteront notamment après une mise à jour du paquet `se3-clients-linux`). À la base, le fichier `logon_perso` est un fichier texte encodé en UTF-8 avec des fins de ligne de type Unix . Il contient du code bash et possède, par défaut, la structure suivante :
+Le fichier `logon_perso` va vous permettre d'affiner le comportement du script de logon afin de l'adapter à vos besoins, et cela de manière pérenne dans le temps (les modifications persisteront notamment après une mise à jour du paquet `se3-clients-linux`). À la base, le fichier `logon_perso` est un fichier texte encodé en UTF-8 avec des fins de ligne de type Unix . Il contient du code bash et possède, par défaut, la structure suivante :
 
 ```sh
 function initialisation_perso ()
@@ -55,28 +55,28 @@ function fermeture_perso ()
     # ...
 }
 ```
-**Note :** Attention d’utiliser un éditeur de texte respectueux de l’encodage et des fins de ligne lorsque vous modifierez le fichier logon_perso.
+**Note :** Attention d'utiliser un éditeur de texte respectueux de l'encodage et des fins de ligne lorsque vous modifierez le fichier logon_perso.
 
 Revenons au contenu du fichier `logon_perso` pour comprendre de quelle manière il permet de modifier le comportement du script `logon`. Dans le fichier `logon_perso`, on peut distinguer trois fonctions :
 
-1. Tout le code que vous mettrez dans la fonction initialisation_perso sera exécuté lors de la phase d’initialisation des clients, en dernier, c’est-à-dire après que le script de logon ait effectué toutes les tâches liées à la phase d’initialisation qui sont décrites brièvement au point 1 de la section 9.1 [TODO].
+1. Tout le code que vous mettrez dans la fonction initialisation_perso sera exécuté lors de la phase d'initialisation des clients, en dernier, c'est-à-dire après que le script de logon ait effectué toutes les tâches liées à la phase d'initialisation qui sont décrites brièvement au point 1 de la section 9.1 [TODO].
 
-2. Tout le code que vous mettrez dans la fonction `ouverture_perso` sera exécuté lors de la phase d’ouverture des clients uniquement lorsqu’un utilisateur du domaine se connecte. Le code est exécuté **juste après** la création du « home » de l’utilisateur qui se connecte. Typiquement, c’est dans cette fonction que vous allez gérer les montages de partages réseau en fonction du type de compte qui se connecte (son appartenance à tel ou tel groupe etc).
+2. Tout le code que vous mettrez dans la fonction `ouverture_perso` sera exécuté lors de la phase d'ouverture des clients uniquement lorsqu'un utilisateur du domaine se connecte. Le code est exécuté **juste après** la création du « home » de l'utilisateur qui se connecte. Typiquement, c'est dans cette fonction que vous allez gérer les montages de partages réseau en fonction du type de compte qui se connecte (son appartenance à tel ou tel groupe etc).
 
-    Pour la gestion des montages de partages réseau à l’ouverture de session, tout se trouve à la section 9.5 page 31 [TODO].
+    Pour la gestion des montages de partages réseau à l'ouverture de session, tout se trouve à la section 9.5 page 31 [TODO].
 
-3. Tout le code que vous mettrez dans la fonction `fermeture_perso` sera exécuté lors de la phase de fermeture des clients, en dernier, c’est-à-dire après que le script de logon ait effectué toutes les tâches liées à la phase de fermeture qui sont décrites brièvement au point 3 de la section 9.1 [TODO].
+3. Tout le code que vous mettrez dans la fonction `fermeture_perso` sera exécuté lors de la phase de fermeture des clients, en dernier, c'est-à-dire après que le script de logon ait effectué toutes les tâches liées à la phase de fermeture qui sont décrites brièvement au point 3 de la section 9.1 [TODO].
 
-Vous pouvez bien sûr définir dans le fichier `logon_perso` des fonctions supplémentaires, mais, pour que celles-ci soient au bout du compte exécutées par le script de logon, il faudra les appeler dans le corps d’une des trois fonctions `initialisation_perso`, `ouverture_perso` ou `fermeture_perso`.
+Vous pouvez bien sûr définir dans le fichier `logon_perso` des fonctions supplémentaires, mais, pour que celles-ci soient au bout du compte exécutées par le script de logon, il faudra les appeler dans le corps d'une des trois fonctions `initialisation_perso`, `ouverture_perso` ou `fermeture_perso`.
 
 Il faut bien avoir en tête que le contenu de `logon_perso` est ni plus ni moins inséré dans le script `logon` et donc, après modification de `logon_perso`, il faut toujours mettre à jour le fichier `logon` via la commande « `dpkg-reconfigure se3-clients-linux` ».
 
-##Quelques variables et fonctions prêtes à l’emploi
+##Quelques variables et fonctions prêtes à l'emploi
 
 [Voici la liste des variables et des fonctions que vous pourrez utiliser dans le fichier `logon_perso`](variables_fonctions_logon.md) et qui seront susceptibles de vous aider à affiner le comportement du script de logon.
 
 ##Gestion du montage des partages réseau
-Comme cela a déjà été expliqué, c’est vous qui allez gérer les montages de partages réseau en éditant le contenu de la fonction `ouverture_perso` qui se trouve dans le fichier `logon_perso`. Évidemment, si la gestion par défaut des montages vous convient telle quelle, alors vous n’avez pas besoin de toucher à ce fichier. Commençons par un exemple simple :
+Comme cela a déjà été expliqué, c'est vous qui allez gérer les montages de partages réseau en éditant le contenu de la fonction `ouverture_perso` qui se trouve dans le fichier `logon_perso`. Évidemment, si la gestion par défaut des montages vous convient telle quelle, alors vous n'avez pas besoin de toucher à ce fichier. Commençons par un exemple simple :
 
 ```sh
 function ouverture_perso ()
@@ -87,21 +87,21 @@ function ouverture_perso ()
 
 Ici la fonction `monter_partage` possède trois **arguments qui devront être délimités par des doubles quotes** (`"`) :
 
-1. Le premier représente le chemin UNC du partage à monter. Vous reconnaissez sans doute la variable `SE3` qui stocke l’adresse IP du serveur. Par exemple si l’adresse IP du serveur est `172.20.0.2`, alors le premier argument sera automatiquement développé en :
+1. Le premier représente le chemin UNC du partage à monter. Vous reconnaissez sans doute la variable `SE3` qui stocke l'adresse IP du serveur. Par exemple si l'adresse IP du serveur est `172.20.0.2`, alors le premier argument sera automatiquement développé en :
 
 `//172.20.0.2/Classes`.
 
-    Cela signifie que c’est le partage `Classes` du serveur `172.20.0.2` qui va être monté sur le clients GNU/Linux. Attention, sous GNU/Linux un chemin UNC de partage s’écrit avec des slashs (`/`) et non avec des antislashs (`\`) comme c’est le cas sous Windows.
+    Cela signifie que c'est le partage `Classes` du serveur `172.20.0.2` qui va être monté sur le clients GNU/Linux. Attention, sous GNU/Linux un chemin UNC de partage s'écrit avec des slashs (`/`) et non avec des antislashs (`\`) comme c'est le cas sous Windows.
 
-2. Maintenant, il faut un répertoire local pour monter un partage. C’est le rôle du deuxième argument. Quoi qu’il arrive (vous n’avez pas le choix sur ce point), le partage sera monté dans un sous-répertoire du répertoire `/mnt/_$LOGIN/`. Par exemple si c’est `toto` qui se connecte sur le poste client, le montage sera fait dans un sous répertoire de `/mnt/_toto/`. Le deuxième argument spécifie le nom de ce sous-répertoire. Ici nous avons décidé assez logiquement de l’appeler `Classes`. Par conséquent, en visitant le répertoire `/mnt/_toto/Classes/` sur le poste client, notre cher `toto` aura accès au contenu du partage `Classes` du serveur.
+2. Maintenant, il faut un répertoire local pour monter un partage. C'est le rôle du deuxième argument. Quoi qu'il arrive (vous n'avez pas le choix sur ce point), le partage sera monté dans un sous-répertoire du répertoire `/mnt/_$LOGIN/`. Par exemple si c'est `toto` qui se connecte sur le poste client, le montage sera fait dans un sous répertoire de `/mnt/_toto/`. Le deuxième argument spécifie le nom de ce sous-répertoire. Ici nous avons décidé assez logiquement de l'appeler `Classes`. Par conséquent, en visitant le répertoire `/mnt/_toto/Classes/` sur le poste client, notre cher `toto` aura accès au contenu du partage `Classes` du serveur.
 
-    Attention, dans le choix du nom de ce sous-répertoire, vous êtes limité(e) aux **caractères a-z, A-Z, 0-9, le tiret (`-`) et le tiret bas (`_`)**. C’est tout. En particulier **pas d’espace ni accent**. Si vous ne respectez pas cette consigne le partage ne sera tout simplement pas monté et une fenêtre d’erreur s’affichera à l’ouverture de session.
+    Attention, dans le choix du nom de ce sous-répertoire, vous êtes limité(e) aux **caractères a-z, A-Z, 0-9, le tiret (`-`) et le tiret bas (`_`)**. C'est tout. En particulier **pas d'espace ni accent**. Si vous ne respectez pas cette consigne le partage ne sera tout simplement pas monté et une fenêtre d'erreur s'affichera à l'ouverture de session.
 
-    Vous serez sans doute amené(e) à monter plusieurs partages réseau pour un même utilisateur (via plusieurs appels de la fonction `monter_partage` au sein de la fonction `ouverture_perso`). Donc il y aura plusieurs sous-répertoires dans `/mnt/_$LOGIN/`. Charge à vous d’éviter les doublons dans les noms des sous-répertoires, sans quoi certains partages ne seront pas montés.
+    Vous serez sans doute amené(e) à monter plusieurs partages réseau pour un même utilisateur (via plusieurs appels de la fonction `monter_partage` au sein de la fonction `ouverture_perso`). Donc il y aura plusieurs sous-répertoires dans `/mnt/_$LOGIN/`. Charge à vous d'éviter les doublons dans les noms des sous-répertoires, sans quoi certains partages ne seront pas montés.
 
-3. À ce stade, notre cher `toto` pourra accéder au partage `Classes` du serveur en passant par `/mnt/_toto/Classes/`. Mais cela n’est pas très pratique. L’idéal serait d’avoir accès à ce partage directement via un dossier sur le bureau de `toto`. C’est exactement ce que fait le troisième argument. Si `toto` ouvre une session, l’argument `"$REP_HOME/Bureau/Répertoire Classes"` va se développer en `"/home/toto/Bureau/Répertoire Classes"` si bien qu’un raccourci (sous GNU/Linux on appelle ça un lien symbolique) portant le nom `Répertoire Classes` sera créé sur le bureau de `toto`. Donc en double-cliquant sur ce raccourci (vous pouvez voir [TODO] via une capture d’écran que ce genre de raccourci ressemble à un simple dossier), sans même le savoir, `toto` visitera le répertoire `/mnt/_toto/Classes/` qui correspondra au contenu du partage `Classes` du serveur. Vous n’êtes pas limité(e) dans le choix du nom de ce raccourci. Les espaces et les accents sont parfaitement autorisés (évitez par contre le caractère double-quote). En revanche, ce raccourci doit forcément être créé dans le home de l’utilisateur qui se connecte. **Donc ce troisième argument devra toujours commencer par `"$REP_HOME/..."`** sans quoi le lien ne sera tout simplement pas créé.
+3. À ce stade, notre cher `toto` pourra accéder au partage `Classes` du serveur en passant par `/mnt/_toto/Classes/`. Mais cela n'est pas très pratique. L'idéal serait d'avoir accès à ce partage directement via un dossier sur le bureau de `toto`. C'est exactement ce que fait le troisième argument. Si `toto` ouvre une session, l'argument `"$REP_HOME/Bureau/Répertoire Classes"` va se développer en `"/home/toto/Bureau/Répertoire Classes"` si bien qu'un raccourci (sous GNU/Linux on appelle ça un lien symbolique) portant le nom `Répertoire Classes` sera créé sur le bureau de `toto`. Donc en double-cliquant sur ce raccourci (vous pouvez voir [TODO] via une capture d'écran que ce genre de raccourci ressemble à un simple dossier), sans même le savoir, `toto` visitera le répertoire `/mnt/_toto/Classes/` qui correspondra au contenu du partage `Classes` du serveur. Vous n'êtes pas limité(e) dans le choix du nom de ce raccourci. Les espaces et les accents sont parfaitement autorisés (évitez par contre le caractère double-quote). En revanche, ce raccourci doit forcément être créé dans le home de l'utilisateur qui se connecte. **Donc ce troisième argument devra toujours commencer par `"$REP_HOME/..."`** sans quoi le lien ne sera tout simplement pas créé.
 
-Tout n’a pas encore été dévoilé concernant cette fonction `monter_partage`. En fait, vous pouvez créer autant de raccourcis que vous voulez. Il suffit pour cela d’ajouter un quatrième argument, puis un cinquième , puis un sixième etc. Voici un exemple :
+Tout n'a pas encore été dévoilé concernant cette fonction `monter_partage`. En fait, vous pouvez créer autant de raccourcis que vous voulez. Il suffit pour cela d'ajouter un quatrième argument, puis un cinquième , puis un sixième etc. Voici un exemple :
 
 ```sh
 function ouverture_perso ()
@@ -112,9 +112,9 @@ function ouverture_perso ()
 }
 ```
 
-**Remarque :** normalement il faut mettre une fonction avec ses arguments sur une même ligne car un saut de ligne signifie la fin d’une instruction aux yeux de l’interpréteur Bash. Mais ici la ligne serait bien longue à écrire et dépasserait la largeur de la page de ce document. La combinaison antislash (`\`) puis ENTRÉE permet simplement de passer à la ligne tout en signifiant à l’interpréteur Bash que l’instruction entamée n’est pas terminée et qu’elle se prolonge sur la ligne suivante.
+**Remarque :** normalement il faut mettre une fonction avec ses arguments sur une même ligne car un saut de ligne signifie la fin d'une instruction aux yeux de l'interpréteur Bash. Mais ici la ligne serait bien longue à écrire et dépasserait la largeur de la page de ce document. La combinaison antislash (`\`) puis ENTRÉE permet simplement de passer à la ligne tout en signifiant à l'interpréteur Bash que l'instruction entamée n'est pas terminée et qu'elle se prolonge sur la ligne suivante.
 
-Le premier argument correspond toujours au chemin UNC du partage réseau et le deuxième argument au nom du sous-répertoire dans `/mnt/_$LOGIN/` associé à ce partage. Ensuite, nous avons cette fois-ci un troisième **et un quatrième argument** qui correspondent aux raccourcis pointant vers le partage : l’un est créé sur le bureau et l’autre est créé à la racine du home de l’utilisateur qui se connecte. Il est possible de créer autant de raccourcis que l’on souhaite, il suffit d’empiler les arguments 3, 4, 5 etc. les uns à la suite des autres.
+Le premier argument correspond toujours au chemin UNC du partage réseau et le deuxième argument au nom du sous-répertoire dans `/mnt/_$LOGIN/` associé à ce partage. Ensuite, nous avons cette fois-ci un troisième **et un quatrième argument** qui correspondent aux raccourcis pointant vers le partage : l'un est créé sur le bureau et l'autre est créé à la racine du home de l'utilisateur qui se connecte. Il est possible de créer autant de raccourcis que l'on souhaite, il suffit d'empiler les arguments 3, 4, 5 etc. les uns à la suite des autres.
 
 La syntaxe de la fonction `monter_partage` est donc la suivante :
 
@@ -124,25 +124,25 @@ monter_partage "<partage>" "<répertoire>" ["<raccourci>"]...
 
 où seuls les deux premiers arguments sont obligatoires :
 
-* `<partage>` est le chemin UNC du partage à monter. Il est possible de se limiter à un sous-répertoire du partage, par exemple comme dans `//$SE3//administration/docs` où l’on montera uniquement le sous-répertoire `docs/` du partage administration du serveur.
+* `<partage>` est le chemin UNC du partage à monter. Il est possible de se limiter à un sous-répertoire du partage, par exemple comme dans `//$SE3//administration/docs` où l'on montera uniquement le sous-répertoire `docs/` du partage administration du serveur.
 * `<répertoire>` est le nom du sous-répertoire de `/mnt/_$LOGIN/` qui sera créé et sur lequel le partage sera monté. Seuls les caractères `-_a-zA-Z0-9` sont autorisés.
-* Les arguments `<raccourci>` sont optionnels. Ils représentent les chemins absolus des raccourcis qui seront créés et qui pointeront vers le partage. Ils doivent toujours se situer dans le home de l’utilisateur qui se connecte, donc ils doivent toujours commencer par `"$REP_HOME/..."`. Si ces arguments ne sont pas présents, alors le partage sera monté mais aucun raccourci ne sera créé.
+* Les arguments `<raccourci>` sont optionnels. Ils représentent les chemins absolus des raccourcis qui seront créés et qui pointeront vers le partage. Ils doivent toujours se situer dans le home de l'utilisateur qui se connecte, donc ils doivent toujours commencer par `"$REP_HOME/..."`. Si ces arguments ne sont pas présents, alors le partage sera monté mais aucun raccourci ne sera créé.
 
-**Attention :** le montage du partage réseau se fait avec les droits de l’utilisateur qui est en train de se connecter. Si l’utilisateur n’a pas les droits suffisants pour accéder à ce partage, ce dernier ne sera tout simplement pas monté.
+**Attention :** le montage du partage réseau se fait avec les droits de l'utilisateur qui est en train de se connecter. Si l'utilisateur n'a pas les droits suffisants pour accéder à ce partage, ce dernier ne sera tout simplement pas monté.
 
-**Remarque :** au final, si vous placez bien vos raccourcis, l’utilisateur n’aura que faire du répertoire `"/mnt/_$LOGIN/"`. Il utilisera uniquement les raccourcis qui se trouvent dans son home. Peu importe pour lui de savoir qu’ils pointent en réalité vers un sous-répertoire de `"/mnt/_$LOGIN/"`, il n’a pas à s’en préoccuper.
+**Remarque :** au final, si vous placez bien vos raccourcis, l'utilisateur n'aura que faire du répertoire `"/mnt/_$LOGIN/"`. Il utilisera uniquement les raccourcis qui se trouvent dans son home. Peu importe pour lui de savoir qu'ils pointent en réalité vers un sous-répertoire de `"/mnt/_$LOGIN/"`, il n'a pas à s'en préoccuper.
 
-**Remarque :** je vous conseille de toujours créer au moins un raccourci à la racine du home de l’utilisateur qui se connecte. En effet, lorsqu’un utilisateur souhaite enregistrer un fichier via une application quelconque, très souvent l’explorateur de fichiers s’ouvre au départ à la racine de son home. C’est donc un endroit privilégié pour placer les raccourcis vers les partages réseau. Il me semble que doubler les raccourcis à la fois à la racine du home et sur le bureau de l’utilisateur est une bonne chose. Mais bien sûr, tout cela est une question de goût...
+**Remarque :** je vous conseille de toujours créer au moins un raccourci à la racine du home de l'utilisateur qui se connecte. En effet, lorsqu'un utilisateur souhaite enregistrer un fichier via une application quelconque, très souvent l'explorateur de fichiers s'ouvre au départ à la racine de son home. C'est donc un endroit privilégié pour placer les raccourcis vers les partages réseau. Il me semble que doubler les raccourcis à la fois à la racine du home et sur le bureau de l'utilisateur est une bonne chose. Mais bien sûr, tout cela est une question de goût...
 
-Étant donné que le montage d’un partage se fait avec les droits de l’utilisateur qui se connecte, certains partages devront être montés uniquement dans certains cas. Prenons l’exemple du partage `netlogon-linux` du serveur. Celui-ci n’est accessible qu’au compte `admin` du domaine. Pour pouvoir monter ce partage seulement quand c’est le compte admin qui se connecte, il va falloir ajouter ce bout de code dans la fonction `ouverture_perso` du fichier `logon_perso` :
+Étant donné que le montage d'un partage se fait avec les droits de l'utilisateur qui se connecte, certains partages devront être montés uniquement dans certains cas. Prenons l'exemple du partage `netlogon-linux` du serveur. Celui-ci n'est accessible qu'au compte `admin` du domaine. Pour pouvoir monter ce partage seulement quand c'est le compte admin qui se connecte, il va falloir ajouter ce bout de code dans la fonction `ouverture_perso` du fichier `logon_perso` :
 
 ```sh
 function ouverture_perso ()
 {
     # Montage du partage "netlogon-linux" seulement dans le cas
-    # où c’est le compte "admin" qui se connecte.
+    # où c'est le compte "admin" qui se connecte.
     if [ "$LOGIN" = "admin" ]; then
-        # Cette partie là ne sera exécutée qui si c’est admin qui se connecte.
+        # Cette partie là ne sera exécutée qui si c'est admin qui se connecte.
         monter_partage "//$SE3/netlogon-linux" "clients-linux" \<Touche ENTRÉE>
             "$REP_HOME/clients-linux" \<Touche ENTRÉE>
             "$REP_HOME/Bureau/clients-linux"
@@ -150,15 +150,15 @@ function ouverture_perso ()
 }
 ```
 
-**Remarque :** attention, en Bash, le crochet ouvrant au niveau du if doit absolument être précédé et suivi d’un espace et le crochet fermant doit absolument être précédé d’un espace.
+**Remarque :** attention, en Bash, le crochet ouvrant au niveau du if doit absolument être précédé et suivi d'un espace et le crochet fermant doit absolument être précédé d'un espace.
 
-Autre cas très classique, celui d’un partage **accessible uniquement à un groupe**. Là aussi, une structure avec un `if` s’impose :
+Autre cas très classique, celui d'un partage **accessible uniquement à un groupe**. Là aussi, une structure avec un `if` s'impose :
 
 ```sh
 function ouverture_perso ()
 {
     # On décide que le montage du partage "administration" sera seulement effectué si
-    # c’est un compte qui appartient au groupe "Profs" qui se connecte.
+    # c'est un compte qui appartient au groupe "Profs" qui se connecte.
     if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"; then
         monter_partage "//$SE3/administration" "administration" \<Touche ENTRÉE>
         "$REP_HOME/administration sur le réseau" \<Touche ENTRÉE>
@@ -167,9 +167,9 @@ function ouverture_perso ()
 }
 ```
 
-L’instruction « `if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"; then` » doit s’interpréter ainsi : « si dans la liste des groupes dont est membre le compte qui se connecte actuellement il y a le groupe `Profs`, autrement dit si le compte qui se connecte actuellement appartient au groupe `Profs`, alors... »
+L'instruction « `if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"; then` » doit s'interpréter ainsi : « si dans la liste des groupes dont est membre le compte qui se connecte actuellement il y a le groupe `Profs`, autrement dit si le compte qui se connecte actuellement appartient au groupe `Profs`, alors... »
 
-**Attention :** le test `if` ci-dessus est sensible à la casse si bien que le résultat ne sera pas le même si vous mettez `"Profs"` ou `"profs"`. Par conséquent, prenez bien la peine de regarder le nom du groupe qui vous intéresse avant de l’insérer dans un test `if` comme ci-dessus afin de bien respecter les minuscules et les majuscules.
+**Attention :** le test `if` ci-dessus est sensible à la casse si bien que le résultat ne sera pas le même si vous mettez `"Profs"` ou `"profs"`. Par conséquent, prenez bien la peine de regarder le nom du groupe qui vous intéresse avant de l'insérer dans un test `if` comme ci-dessus afin de bien respecter les minuscules et les majuscules.
 
 Si vous voulez savoir le nom des partages disponibles pour un utilisateur donné, par exemple toto, il vous suffit de lancer la commande suivante sur le serveur en tant que root :
 
@@ -178,7 +178,7 @@ smbclient --list localhost -U toto
 # Il faudra alors saisir le mot de passe de toto.
 ```
 
-Parmi la liste des partages, l’un d’eux est affiché sous le nom de `home`. Il correspond au home de `toto` sur le serveur. Ce partage est un peu particulier car il pointera vers un répertoire différent en fonction du compte qui tente d’y accéder. Par exemple, si `titi` veut accéder à ce partage, alors il sera rédirigé vers le répertoire `/home/titi/` du serveur. Chaque utilisateur a le droit de monter ce partage, mais attention le chemin UNC est en fait `//SERVEUR/homes` (avec un « s » à la fin et d’ailleurs dans le fichier de configuration Samba ce partage est bien défini par la section `homes`). A priori, on pourra monter ce partage pour tous les comptes du domaine donc pas besoin de structure `if` pour ce partage :
+Parmi la liste des partages, l'un d'eux est affiché sous le nom de `home`. Il correspond au home de `toto` sur le serveur. Ce partage est un peu particulier car il pointera vers un répertoire différent en fonction du compte qui tente d'y accéder. Par exemple, si `titi` veut accéder à ce partage, alors il sera rédirigé vers le répertoire `/home/titi/` du serveur. Chaque utilisateur a le droit de monter ce partage, mais attention le chemin UNC est en fait `//SERVEUR/homes` (avec un « s » à la fin et d'ailleurs dans le fichier de configuration Samba ce partage est bien défini par la section `homes`). A priori, on pourra monter ce partage pour tous les comptes du domaine donc pas besoin de structure `if` pour ce partage :
 
 ```sh
 function ouverture_perso ()
@@ -190,9 +190,9 @@ function ouverture_perso ()
 }
 ```
 
-Dans l’exemple ci-dessus, on ne monte pas le partage `homes` mais uniquement le sous-répertoire `Docs` de ce partage. Comme d’habitude sous GNU/Linux, respectez bien la casse des noms de partages et de répertoires.
+Dans l'exemple ci-dessus, on ne monte pas le partage `homes` mais uniquement le sous-répertoire `Docs` de ce partage. Comme d'habitude sous GNU/Linux, respectez bien la casse des noms de partages et de répertoires.
 
-Pour l’instant, de par la manière dont la fonction `monter_partage` est définie, on peut créer uniquement des liens qui pointent vers la racine du partage associé. Mais on peut vouloir par exemple monter un partage et créer des liens uniquement vers des sous-répertoires de ce partage (et non vers sa racine). C’est tout à fait possible avec la fonction `creer_lien`. Voici un exemple :
+Pour l'instant, de par la manière dont la fonction `monter_partage` est définie, on peut créer uniquement des liens qui pointent vers la racine du partage associé. Mais on peut vouloir par exemple monter un partage et créer des liens uniquement vers des sous-répertoires de ce partage (et non vers sa racine). C'est tout à fait possible avec la fonction `creer_lien`. Voici un exemple :
 
 ```sh
 function ouverture_perso ()
@@ -208,37 +208,37 @@ function ouverture_perso ()
 }
 ```
 
-Le premier argument de la fonction `creer_lien` est la cible du ou des liens à créer. Cette cible peut s’écrire sous la forme d’un chemin absolu, c’est-a-dire un chemin qui commence par un antislash (ce qui n’est pas le cas ci-dessus). Si le chemin ne commence pas par un antislash, alors la fonction part du principe que c’est un chemin relatif qui part de `/mnt/_$LOGIN/`. (Du coup, mettre `"home/Docs"` ou mettre `/mnt/_$LOGIN/home/Docs` comme premier argument revient exactement
-au même.). Ensuite, le deuxième argument et les suivants (autant qu’on veut) sont les chemins absolus du ou des liens qui seront créés. Ces chemins doivent impérativement tous commencer par `"$REP_HOME/..."`.
+Le premier argument de la fonction `creer_lien` est la cible du ou des liens à créer. Cette cible peut s'écrire sous la forme d'un chemin absolu, c'est-a-dire un chemin qui commence par un antislash (ce qui n'est pas le cas ci-dessus). Si le chemin ne commence pas par un antislash, alors la fonction part du principe que c'est un chemin relatif qui part de `/mnt/_$LOGIN/`. (Du coup, mettre `"home/Docs"` ou mettre `/mnt/_$LOGIN/home/Docs` comme premier argument revient exactement
+au même.). Ensuite, le deuxième argument et les suivants (autant qu'on veut) sont les chemins absolus du ou des liens qui seront créés. Ces chemins doivent impérativement tous commencer par `"$REP_HOME/..."`.
 
 ##Quelques bricoles pour les perfectionnistes
 
 ###Changer les icônes représentants les liens pour faire plus joli
 
-C’est quand même plus joli quand on a des icônes évocateurs 19 comme ci-dessous pour nos liens vers les partages, non ?
+C'est quand même plus joli quand on a des icônes évocateurs 19 comme ci-dessous pour nos liens vers les partages, non ?
 
 ![Jolies icônes](/images/icones_jolies1.png)
 
-Et bien ça tombe bien car c’est facile à faire avec la fonction `changer_icone`. Voici un exemple :
+Et bien ça tombe bien car c'est facile à faire avec la fonction `changer_icone`. Voici un exemple :
 
 ```sh
 function ouverture_perso ()
 {
-    # On suppose que le partage "Classe" est déjà monté et qu’un
+    # On suppose que le partage "Classe" est déjà monté et qu'un
     # lien vers ce partage a déjà été créé sur le bureau...
     changer_icone "$REP_HOME/Bureau/Classes sur le réseau" "$REP_HOME/.mes_icones/classe.jpg"
 }
 ```
 
-La fonction prend toujours deux arguments. Le premier est le chemin absolu du fichier dont on veut changer l’icône. Cela peut être n’importe quel fichier (ce n’est pas forcément un des raccourcis qu’on a créé), mais par contre il doit impérativement se trouver dans le home de l’utilisateur qui se connecte (donc il devra toujours commencer par `"$REP_HOME/..."`). Ensuite, le deuxième argument est le chemin absolu de n’importe quel fichier image (du moment que le compte qui se connecte peut y avoir accès en lecture).
+La fonction prend toujours deux arguments. Le premier est le chemin absolu du fichier dont on veut changer l'icône. Cela peut être n'importe quel fichier (ce n'est pas forcément un des raccourcis qu'on a créé), mais par contre il doit impérativement se trouver dans le home de l'utilisateur qui se connecte (donc il devra toujours commencer par `"$REP_HOME/..."`). Ensuite, le deuxième argument est le chemin absolu de n'importe quel fichier image (du moment que le compte qui se connecte peut y avoir accès en lecture).
 
-Une idée possible (parmi d’autres) est de modifier le profil par défaut des d’utilisateurs et d’y placer un répertoire `.mes_icones/` dans lequel vous mettez tous les icônes dont vous avez besoin pour habiller vos liens. Ensuite, vous pourrez aller chercher vos icônes dans le home de l’utilisateur qui se connecte (dans `"$REP_HOME/.mes_icones/"` précisément) de manière similaire à ce qui est fait dans exemple ci-dessus.
+Une idée possible (parmi d'autres) est de modifier le profil par défaut des d'utilisateurs et d'y placer un répertoire `.mes_icones/` dans lequel vous mettez tous les icônes dont vous avez besoin pour habiller vos liens. Ensuite, vous pourrez aller chercher vos icônes dans le home de l'utilisateur qui se connecte (dans `"$REP_HOME/.mes_icones/"` précisément) de manière similaire à ce qui est fait dans exemple ci-dessus.
 
-Attention, la fonction `changer_icone` n’a aucun effet sous la distribution Xubuntu qui utilise l’environnement de bureau Xfce. Cela vient du fait que personnellement je ne sais pas changer l’image d’un icône en ligne de commandes sous Xfce. Si vous savez, n’hésitez pas à me donner l’information par mail [TODO] car je pourrais ainsi étendre la fonction `changer_icone` à l’environnement de bureau Xfce.
+Attention, la fonction `changer_icone` n'a aucun effet sous la distribution Xubuntu qui utilise l'environnement de bureau Xfce. Cela vient du fait que personnellement je ne sais pas changer l'image d'un icône en ligne de commandes sous Xfce. Si vous savez, n'hésitez pas à me donner l'information par mail [TODO] car je pourrais ainsi étendre la fonction `changer_icone` à l'environnement de bureau Xfce.
 
 ###Changer le papier peint en fonction des utilisateurs
 
-Ça pourrait être sympathique d’avoir un papier différent suivant le type de compte... Et bien c’est possible avec la fonction `changer_papier_peint`. Voici un exemple :
+Ça pourrait être sympathique d'avoir un papier différent suivant le type de compte... Et bien c'est possible avec la fonction `changer_papier_peint`. Voici un exemple :
 
 ```sh
 function ouverture_perso ()
@@ -249,52 +249,52 @@ function ouverture_perso ()
 }
 ```
 
-Le seul et unique argument de cette fonction est le chemin absolu (sur la machine cliente) du fichier image servant pour le fond d’écran. Il faut bien sûr que ce fichier image soit au moins accessible en lecture pour l’utilisateur qui se connecte.
+Le seul et unique argument de cette fonction est le chemin absolu (sur la machine cliente) du fichier image servant pour le fond d'écran. Il faut bien sûr que ce fichier image soit au moins accessible en lecture pour l'utilisateur qui se connecte.
 
-Là aussi, comme pour les icônes, l’idée est de placer dans le profil par défaut distant un répertoire `.backgrounds/` (par exemple) qui contiendra les deux ou trois fichiers images dont vous avez besoin pour faire vos fonds d’écran. Voici un exemple dans le cas d’un compte professeur :
+Là aussi, comme pour les icônes, l'idée est de placer dans le profil par défaut distant un répertoire `.backgrounds/` (par exemple) qui contiendra les deux ou trois fichiers images dont vous avez besoin pour faire vos fonds d'écran. Voici un exemple dans le cas d'un compte professeur :
 
 ![Exemple bureau prof](/images/bureau-message.png)
 
-En plus du changement de fond d’écran, il y a un petit message personnalisé qui s’affiche en haut à droite du bureau. Pour mettre en place ce genre de message, voir la section 9.6.4 [TODO].
+En plus du changement de fond d'écran, il y a un petit message personnalisé qui s'affiche en haut à droite du bureau. Pour mettre en place ce genre de message, voir la section 9.6.4 [TODO].
 
-###L’activation du pavé numérique
+###L'activation du pavé numérique
 
-Pour activer le pavé numérique du client GNU/Linux au moment de l’affichage de la fenêtre de connexion du système, en principe ceci devrait fonctionner :
+Pour activer le pavé numérique du client GNU/Linux au moment de l'affichage de la fenêtre de connexion du système, en principe ceci devrait fonctionner :
 
 ```sh
 function initialisation_perso ()
 {
-    # On active le pavé numérique au moment de la phase d’initialisation.
+    # On active le pavé numérique au moment de la phase d'initialisation.
     activer_pave_numerique
 }
 ```
 
-Vous pouvez remarquer que, cette fois-ci, c’est le contenu de la fonction `initialisation_perso` qui a été édité.
+Vous pouvez remarquer que, cette fois-ci, c'est le contenu de la fonction `initialisation_perso` qui a été édité.
 
-En revanche, pour activer le pavé numérique au moment de l’ouverture de session, procéder exactement de la même façon à l’intérieur de la fonction `ouverture_perso` risque de ne pas fonctionner, et cela pour une raison de timing. En effet, au moment où la fonction `ouverture_perso` sera lancée, l’ouverture de session ne sera pas complètement terminée (Et c’est normal qu’il en soit ainsi puisque l’ouverture de session de termine après l’exécution du script de logon,
-même pas immédiatement après mais 1 ou 2 secondes après selon la rapidité de la machine hôte) et l’activation du pavé numérique risque d’être annulée lors de la fin de l’ouverture de session. L’idée est donc de programmer l’appel de la fonction `activer_pave_numerique` **après** l’exécution du script de logon, seulement au bout de quelques secondes (par exemple 5), afin de lancer l’activation du pavé numérique une fois l’ouverture de session achevée :
+En revanche, pour activer le pavé numérique au moment de l'ouverture de session, procéder exactement de la même façon à l'intérieur de la fonction `ouverture_perso` risque de ne pas fonctionner, et cela pour une raison de timing. En effet, au moment où la fonction `ouverture_perso` sera lancée, l'ouverture de session ne sera pas complètement terminée (Et c'est normal qu'il en soit ainsi puisque l'ouverture de session de termine après l'exécution du script de logon,
+même pas immédiatement après mais 1 ou 2 secondes après selon la rapidité de la machine hôte) et l'activation du pavé numérique risque d'être annulée lors de la fin de l'ouverture de session. L'idée est donc de programmer l'appel de la fonction `activer_pave_numerique` **après** l'exécution du script de logon, seulement au bout de quelques secondes (par exemple 5), afin de lancer l'activation du pavé numérique une fois l'ouverture de session achevée :
 
 function ouverture_perso ()
 {
-    #On ajoute un argument à l’appel de la fonction activer_pave_numerique.
-    #Ici, cela signifie que l’activation du pavé numérique sera lancée 5
+    #On ajoute un argument à l'appel de la fonction activer_pave_numerique.
+    #Ici, cela signifie que l'activation du pavé numérique sera lancée 5
     #secondes après que le script de logon soit terminé, ce qui laissera
-    #le temps à l’ouverture de session de se terminer.
+    #le temps à l'ouverture de session de se terminer.
     activer_pave_numerique "5"
 }
 
 ###Incruster un message sur le bureau des utilisateurs pour faire classe
 
-Pour incruster un message sur le bureau des utilisateurs, il faudra d’abord que le paquet `conky` soit installé sur le client GNU/Linux.
+Pour incruster un message sur le bureau des utilisateurs, il faudra d'abord que le paquet `conky` soit installé sur le client GNU/Linux.
 
-Vous pouvez par exemple lancer l’installation via un script `*.unefois` qui contiendrait à peu de choses près l’instruction `apt-get install --yes conky`.
+Vous pouvez par exemple lancer l'installation via un script `*.unefois` qui contiendrait à peu de choses près l'instruction `apt-get install --yes conky`.
 
 Ensuite, tentez de mettre ceci dans la fonction `ouverture_perso` :
 
 ```sh
 function ouverture_perso ()
 {
-    # On crée un fichier de configuration .conkyrc dans le home de l’utilisateur.
+    # On crée un fichier de configuration .conkyrc dans le home de l'utilisateur.
     # précisant le contenu du message ainsi que certains paramètres (comme la
     # taille de la police par exemple).
     cat > "$REP_HOME/.conkyrc" <<FIN
@@ -328,29 +328,29 @@ FIN
     chown "$LOGIN:" "$REP_HOME/.conkyrc"
     chmod 644 "$REP_HOME/.conkyrc"
 
-    #On lancera conky à la fin, une fois l’exécution du script logon terminée.
-    #Pour être sûr que l’ouverture de session est achevée, on laisse un délai
+    #On lancera conky à la fin, une fois l'exécution du script logon terminée.
+    #Pour être sûr que l'ouverture de session est achevée, on laisse un délai
     #de 5 secondes entre la fin du script de logon et le lancement de la
     #commande conky (avec ses arguments).
     executer_a_la_fin "5" conky --config "$REP_HOME/.conkyrc"
 }
 ```
 
-En principe, vous devriez voir apparaître un message incrusté sur le bureau des utilisateurs en haut à droite. Ce message sera légèrement personnalisé puisqu’il contiendra le nom de l’utilisateur connecté.
+En principe, vous devriez voir apparaître un message incrusté sur le bureau des utilisateurs en haut à droite. Ce message sera légèrement personnalisé puisqu'il contiendra le nom de l'utilisateur connecté.
 
 ###Exécuter des commandes au démarrage tous les 30 jours
 
-Toutes les commandes que vous mettrez à l’intérieur de la fonction `initialisation_perso` du fichier `logon_perso` seront exécutées à chaque phase d’initialisation du système ce qui peut parfois s’avérer un peu trop fréquent à votre goût. Voici un exemple de fonction `initialisation_perso` qui vous permettra d’exécuter des commandes (peu importe lesquelles ici) au démarrage du système tous les 30 jours (pour peu que le système ne reste pas éteint indéfiniment bien sûr) :
+Toutes les commandes que vous mettrez à l'intérieur de la fonction `initialisation_perso` du fichier `logon_perso` seront exécutées à chaque phase d'initialisation du système ce qui peut parfois s'avérer un peu trop fréquent à votre goût. Voici un exemple de fonction `initialisation_perso` qui vous permettra d'exécuter des commandes (peu importe lesquelles ici) au démarrage du système tous les 30 jours (pour peu que le système ne reste pas éteint indéfiniment bien sûr) :
 
 ```sh
 function initialisation_perso ()
 {
     local indicateur
     indicateur="/etc/se3/action_truc"
-    # Si le fichier n’existe pas alors il faut le créer.
+    # Si le fichier n'existe pas alors il faut le créer.
     [ ! -e "$indicateur" ] && touch "$indicateur"
 
-    # On teste si la phase d’initialisation correspond à un démarrage du système.
+    # On teste si la phase d'initialisation correspond à un démarrage du système.
     if "$DEMARRAGE"; then
         # On teste si la date de dernière modification du fichier est > 29 jours.
         if find "$indicateur" -mtime +29 | grep -q "^$indicateur$"; then
@@ -359,7 +359,7 @@ function initialisation_perso ()
             action2
             # etc.
 
-            # Si tout s’est bien déroulé, alors on peut mettre à jour la date
+            # Si tout s'est bien déroulé, alors on peut mettre à jour la date
             # de dernière modification du fichier avec la commande touch.
             if [ "$?" = "0" ]; then
                 touch "$indicateur"
@@ -369,4 +369,4 @@ function initialisation_perso ()
 }
 ```
 
-L’idée de ce code est plus simple qu’il n’y paraît. Chaque client GNU/Linux intégré au domaine possède un répertoire local `/etc/se3/` (accessible en lecture et en écriture au compte `root` uniquement). Dans ce répertoire, le script y place un fichier texte vide qui se nomme `action_truc` (c’est un exemple) et dont le seul but est de fournir une date de dernière modification. Au départ, cette date de dernière modification coïncide au moment où le fichier est créé. Si, lors d’un prochain démarrage, cette date de dernière modification est vieille de 30 jours ou plus, alors les actions sont exécutées et la date de dernière modification du fichier `action_truc` est modifiée artificiellement en la date du jour avec la commande `touch`.
+L'idée de ce code est plus simple qu'il n'y paraît. Chaque client GNU/Linux intégré au domaine possède un répertoire local `/etc/se3/` (accessible en lecture et en écriture au compte `root` uniquement). Dans ce répertoire, le script y place un fichier texte vide qui se nomme `action_truc` (c'est un exemple) et dont le seul but est de fournir une date de dernière modification. Au départ, cette date de dernière modification coïncide au moment où le fichier est créé. Si, lors d'un prochain démarrage, cette date de dernière modification est vieille de 30 jours ou plus, alors les actions sont exécutées et la date de dernière modification du fichier `action_truc` est modifiée artificiellement en la date du jour avec la commande `touch`.

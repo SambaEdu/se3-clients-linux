@@ -6,12 +6,12 @@ Attention, cette liste (décrite ci-dessous) est une liste proposée **par défa
 
     **Avertissement valable uniquement pour ceux qui ont déjà installé uneversion n du paquet avec n < 1.1**
 
-    Attention, depuis la version $1.1$ du paquet, la gestion des partages accessibles se fait exclusivement dans le fichier `logon_perso`. Cela a une conséquence importante si une version antérieure à la version $1.1$ du paquet est déjà installée sur votre serveur. En effet, lors de la mise à jour du paquet vers une version $\geq 1.1$, plus aucun partage réseau ne devrait être monté à l’ouverture de session sur vos clients GNU/Linux et cela pour tout utilisateur du domaine.
+    Attention, depuis la version $1.1$ du paquet, la gestion des partages accessibles se fait exclusivement dans le fichier `logon_perso`. Cela a une conséquence importante si une version antérieure à la version $1.1$ du paquet est déjà installée sur votre serveur. En effet, lors de la mise à jour du paquet vers une version $\geq 1.1$, plus aucun partage réseau ne devrait être monté à l'ouverture de session sur vos clients GNU/Linux et cela pour tout utilisateur du domaine.
 
-    C’est parfaitement normal car, lors de la mise à jour du paquet, votre fichier `logon_perso` a été conservé et c’est désormais dans ce fichier que les
+    C'est parfaitement normal car, lors de la mise à jour du paquet, votre fichier `logon_perso` a été conservé et c'est désormais dans ce fichier que les
 commandes de montage des partages sont effectuées. Or, a priori, votre fichier `logon_perso` ne contient pas encore ces commandes de montage.
 
-    Il est cependant très facile de retrouver le comportement par défaut (comme décrit ci-dessous) au niveau du montage des partages réseau à l’ouverture de session. Sur une console du serveur, en tant que `root`, il vous suffit de faire :
+    Il est cependant très facile de retrouver le comportement par défaut (comme décrit ci-dessous) au niveau du montage des partages réseau à l'ouverture de session. Sur une console du serveur, en tant que `root`, il vous suffit de faire :
 
     ```sh
 # On se place dans le répertoire bin/.
@@ -28,29 +28,29 @@ mv logon_perso logon_perso.SAVE
 dpkg-reconfigure se3-clients-linux
 ```
 
-    Vous retrouverez un comportement par défaut dès que les clients GNU/Linux auront mis à jour leur script de logon local, c’est-à-dire au plus tard après un redémarrage des clients (en fait, après une simple fermeture de session, la mise à jour devrait se produire).
+    Vous retrouverez un comportement par défaut dès que les clients GNU/Linux auront mis à jour leur script de logon local, c'est-à-dire au plus tard après un redémarrage des clients (en fait, après une simple fermeture de session, la mise à jour devrait se produire).
 
-Voici la liste, par défaut, des partages accessibles en fonction du type de compte lors d’une session.
+Voici la liste, par défaut, des partages accessibles en fonction du type de compte lors d'une session.
 
 1. **Un compte élève** aura accès :
 
-    * Au partage `//SERVEUR/homes/Docs/` via deux liens symboliques. Tous les deux possèdent le même nom : « `Documents de <login> sur le réseau` ». L’un se trouve dans le répertoire `/home/<login>/` et l’autre dans le répertoire `/home/<login>/Bureau/`.
-    * Au partage `//SERVEUR/Classes/` via deux liens symboliques. Tous les deux possèdent le même nom : « `Classes sur le réseau` ». L’un se trouve dans le répertoire `/home/<login>/` et l’autre dans le répertoire `/home/<login>/Bureau/`.
+    * Au partage `//SERVEUR/homes/Docs/` via deux liens symboliques. Tous les deux possèdent le même nom : « `Documents de <login> sur le réseau` ». L'un se trouve dans le répertoire `/home/<login>/` et l'autre dans le répertoire `/home/<login>/Bureau/`.
+    * Au partage `//SERVEUR/Classes/` via deux liens symboliques. Tous les deux possèdent le même nom : « `Classes sur le réseau` ». L'un se trouve dans le répertoire `/home/<login>/` et l'autre dans le répertoire `/home/<login>/Bureau/`.
 
 2. **Un compte professeur** aura accès :
 
-    * Aux mêmes partages qu’un compte élève.
-    * Mais il aura accès en plus au partage `//SERVEUR/Docs/` via deux liens symboliques. Tous les deux possèdent le même nom : « `Public sur le réseau` ». L’un se trouve dans le répertoire `/home/<login>/` et l’autre dans le répertoire `/home/<login>/Bureau/`.
+    * Aux mêmes partages qu'un compte élève.
+    * Mais il aura accès en plus au partage `//SERVEUR/Docs/` via deux liens symboliques. Tous les deux possèdent le même nom : « `Public sur le réseau` ». L'un se trouve dans le répertoire `/home/<login>/` et l'autre dans le répertoire `/home/<login>/Bureau/`.
 
 3. **Le compte `admin`** aura accès :
 
-    * Aux mêmes partages qu’un compte professeur.
-    * Mais il aura accès en plus au partage `//SERVEUR/admhomes/` via deux liens symboliques. Tous les deux possèdent le même nom : « `admhomes` ». L’un se trouve dans le répertoire `/home/admin/` et l’autre dans le répertoire `/home/admin/Bureau/`.
-    * Et il aura accès en plus au partage `//SERVEUR/netlogon-linux/` via deux liens symboliques. Tous les deux possèdent le même nom : « `clients-linux` ». L’un se trouve dans le répertoire `/home/admin/` et l’autre dans le répertoire `/home/admin/Bureau/`.
+    * Aux mêmes partages qu'un compte professeur.
+    * Mais il aura accès en plus au partage `//SERVEUR/admhomes/` via deux liens symboliques. Tous les deux possèdent le même nom : « `admhomes` ». L'un se trouve dans le répertoire `/home/admin/` et l'autre dans le répertoire `/home/admin/Bureau/`.
+    * Et il aura accès en plus au partage `//SERVEUR/netlogon-linux/` via deux liens symboliques. Tous les deux possèdent le même nom : « `clients-linux` ». L'un se trouve dans le répertoire `/home/admin/` et l'autre dans le répertoire `/home/admin/Bureau/`.
 
 ##Le lien symbolique clients-linux
 
-Rien de nouveau donc au niveau des partages disponibles, à part le partage `netlogon-linux` accessible via le compte `admin` du domaine à travers le lien symbolique clients-linux situé sur le bureau. Ce lien symbolique vous permet d’avoir accès, en lecture et en écriture, au répertoire `/home/netlogon/clients-linux/` du serveur. Techniquement, une modification de ce répertoire est aussi possible via le lien symbolique `admhomes` puisque celui-ci donne accès à tout le répertoire `/home/` du serveur.
+Rien de nouveau donc au niveau des partages disponibles, à part le partage `netlogon-linux` accessible via le compte `admin` du domaine à travers le lien symbolique clients-linux situé sur le bureau. Ce lien symbolique vous permet d'avoir accès, en lecture et en écriture, au répertoire `/home/netlogon/clients-linux/` du serveur. Techniquement, une modification de ce répertoire est aussi possible via le lien symbolique `admhomes` puisque celui-ci donne accès à tout le répertoire `/home/` du serveur.
 
 **Avertissement : toujours reconfigurer les droits après modifications du contenu du répertoire clients-linux/**
 
@@ -59,12 +59,12 @@ Rien de nouveau donc au niveau des partages disponibles, à part le partage `net
         * soit via une console sur le serveur si vous êtes un(e) adepte de la ligne de commandes ;
         * soit via le lien symbolique `clients-linux` situé sur le bureau du compte `admin` lorsque vous est connecté(e) sur un client GNU/Linux intégré au domaine.
 
-    Dans un cas comme dans l’autre, une fois vos modifications terminées, il faudra **TOUJOURS** reconfigurer les droits du paquet sans quoi vous risquez ensuite de rencontrer des erreurs incompréhensibles. Pour ce faire il faudra :
+    Dans un cas comme dans l'autre, une fois vos modifications terminées, il faudra **TOUJOURS** reconfigurer les droits du paquet sans quoi vous risquez ensuite de rencontrer des erreurs incompréhensibles. Pour ce faire il faudra :
 
         * ou bien, **si vous êtes connecté(e) en mode console sur le serveur**, exécuter en tant que `root` la commande :
 
         `dpkg-reconfigure se3-clients-linux`
 
-        * ou bien, **si vous êtes connecté(e) en tant qu’`admin` sur un client GNU/Linux**, double-cliquer sur le fichier `reconfigure.bash` accessible en passant par le lien symbolique `clients-linux` sur le bureau puis par le répertoire `bin/`(le mot de passe `root` du serveur sera demandé).
+        * ou bien, **si vous êtes connecté(e) en tant qu'`admin` sur un client GNU/Linux**, double-cliquer sur le fichier `reconfigure.bash` accessible en passant par le lien symbolique `clients-linux` sur le bureau puis par le répertoire `bin/`(le mot de passe `root` du serveur sera demandé).
 
-    **Remarque :** en réalité, ces deux procédures ne font pas que reconfigurer les droits sur les fichiers, elles permettent aussi d’injecter le contenu du fichier `logon_perso` dans le fichier `logon`. Ce point sera abordé dans la section [personnalisation].
+    **Remarque :** en réalité, ces deux procédures ne font pas que reconfigurer les droits sur les fichiers, elles permettent aussi d'injecter le contenu du fichier `logon_perso` dans le fichier `logon`. Ce point sera abordé dans la section [personnalisation].
