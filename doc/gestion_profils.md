@@ -298,7 +298,7 @@ configuration diffère de celle à laquelle accèdent les
 élèves (extensions particulières, favoris différents, etc.).
 
 **Note :** Le fonctionnement du script de logon est décrit
-dans la section 9, page 26.
+[à cette page](script_logon.md#le-script-de-logon).
 
 Dans ce cas, vous copierez sur le répertoire `/skel` du
 serveur le répertoire `/home/toto/.mozilla` après l'avoir
