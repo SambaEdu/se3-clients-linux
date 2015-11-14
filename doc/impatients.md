@@ -15,7 +15,7 @@ apt-get update
 apt-get install se3-clients-linux
 ```
 
-**Si votre serveur est sous Squeeze**, vous pouvez :
+**Si votre serveur est sous Squeeze ou Wheezy**, vous pouvez :
 
 * ou bien faire l'installation comme sur un serveur Lenny
 (en mode console donc);
@@ -24,20 +24,6 @@ d'administration Web du serveur via les menus `Configuration
 générale` puis `Modules`. Dans le tableau des modules, le
 paquet `se3-clients-linux` correspond à la ligne avec
 l'intitulé `Support des clients linux`.
-
-**Si votre serveur est sous Wheezy**, vous pouvez :
-
-TODO
-
-**Attention**, dans les versions précédentes du paquet, il
-fallait éditer le fichier `/etc/apt/sources.list` mais
-désormais ce n'est plus nécessaire. Le paquet est maintenant
-inclus dans le dépôt officiel du projet SambaÉdu.
-
-**Mais si vous souhaitez utiliser la toute dernière version
-disponible du paquet**, alors il faudra dans ce cas utiliser
-le dépôt <http://francois-lafont.ac-versailles.fr> comme
-indiqué ci-dessus.
 
 L'installation ne fait rien de bien méchant sur votre
 serveur. Vous pouvez parfaitement désinstaller le paquet du
