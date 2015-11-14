@@ -68,19 +68,19 @@ client GNU/Linux va comparer le contenu de deux fichiers :
 
     2. le fichier `/mnt/netlogon/distribs/squeeze/skel/.VERSION` du profil par défaut **distant**.
 
-Si ces deux fichiers ont un contenu totalement identique,
-alors le client GNU/Linux ne fait rien car il estime que son
-profil par défaut **local** et le profil par défaut
-**distant** sont identiques. Si en revanche les deux
-fichiers ont un contenu différent, alors le client va
-modifier son profil par défaut **local** afin qu’il soit
-identique au profil par défaut **distant**. Autrement dit,
-il va synchroniser 3 son profil par défaut **local** par
-rapport au profil par défaut **distant**.
+    Si ces deux fichiers ont un contenu totalement identique,
+    alors le client GNU/Linux ne fait rien car il estime que son
+    profil par défaut **local** et le profil par défaut
+    **distant** sont identiques. Si en revanche les deux
+    fichiers ont un contenu différent, alors le client va
+    modifier son profil par défaut **local** afin qu’il soit
+    identique au profil par défaut **distant**. Autrement dit,
+    il va synchroniser 3 son profil par défaut **local** par
+    rapport au profil par défaut **distant**.
 
-**Note :** Le terme de synchronisation est bien adapté car
-c’est justement la commande `rsync` qui est utilisée pour
-effectuer cette tâche.
+    **Note :** Le terme de synchronisation est bien adapté car
+    c’est justement la commande `rsync` qui est utilisée pour
+    effectuer cette tâche.
 
 2. **Au moment de l’ouverture de session** d’un compte du
 domaine, c’est-à-dire juste après une saisie correcte du
