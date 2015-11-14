@@ -66,10 +66,11 @@ exclure.
 * [Le cas des classes nomades](classes_nomades.md)
 * [Un mot sur les imprimantes](imprimantes.md)
 * [Désinstallation/réinstalationdu paquet se3-clients-linux](desinstall_reinstall_paquet.md)
-* [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
+
 
 ## Annexes
 
+* [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
 * [Installer un miroir local APT de cache avec apt-cacher-ng](apt-cacher-ng.md)
 
 
