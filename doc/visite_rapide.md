@@ -13,33 +13,33 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
        |-- bin/
        |   |-- connexion_ssh_serveur.bash
        |   |-- logon
-       |   |-- `**logon_perso**`
+       |   |-- **logon_perso**
        |   `-- reconfigure.bash
        |-- distribs/
        |   |-- jessie/
        |   |   |-- integration/
        |   |   |   |-- integration_jessie.bash
-       |   |   `-- **skel**`/
+       |   |   `-- **skel**/
        |   |-- precise/
        |   |   |-- integration/
        |   |   |   |-- desintegration_precise.bash
        |   |   |   |-- integration_precise.bash
-       |   |   `--  **skel**`/
+       |   |   `--  **skel**/
        |   `-- squeeze/
        |       |-- integration/
        |       |   |-- desintegration_squeeze.bash
        |       |   `-- integration_squeeze.bash
-       |       `-- **skel**`/
+       |       `-- **skel**/
        |   |-- trusty/
        |   |   |-- integration/
        |   |   |   `-- integration_trusty.bash
-       |   |   `-- **skel**`/
+       |   |   `-- **skel**/
        |   |-- wheezy/
        |   |   |-- integration/
        |   |   |   `-- integration_wheezy.bash
-       |   |   `-- **skel**`/
-       |-- `**divers**`/
-       `-- **unefois**`/
+       |   |   `-- **skel**/
+       |-- `**divers**/
+       `-- **unefois**/
 ```
 
 Voici quelques commentaires rapides :
