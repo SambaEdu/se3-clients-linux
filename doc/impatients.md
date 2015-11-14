@@ -28,9 +28,10 @@ l'intitulé `Support des clients linux`.
 L'installation ne fait rien de bien méchant sur votre
 serveur. Vous pouvez parfaitement désinstaller le paquet du
 serveur afin que celui-ci retrouve très exactement le même
-état qu'avant l'installation (voir la
-section [desinstallation] page). L'installation se borne
-uniquement à effectuer les tâches suivantes :
+état qu'avant l'installation (voir la page concernant
+[la désinstallation](desinstall_reinstall_paquet.md)).
+L'installation se borne uniquement à effectuer les tâches
+suivantes :
 
 * Création d'un nouveau répertoire : le répertoire
 `/home/netlogon/clients-linux/`.
