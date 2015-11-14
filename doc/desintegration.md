@@ -1,4 +1,18 @@
-# La désintégration
+**Avertissement :** en fait, la désintégration **n'est plus
+supportée** depuis Ubuntu Trusty inclus pour les OS Ubuntu
+et depuis Debian Wheezy inclus pour les OS Debian. Pour
+effectuer une désintégration, nous vous invitons donc
+désormais à réinstaller l'OS à partir de zéro (c'est en
+général assez rapide à faire et cela a le mérite d'être
+fiable à 100%). Nous laissons malgré tout cette partie de la
+documentation en l'état ci-dessous car elle reste valable
+pour des OS plus anciens comme Squeeze et Precise (même s'il
+y a peu de chances que vous procédiez à l'installation de
+ces OS à l'heure où ces lignes sont écrites).
+
+---
+
+# La désintégration (dépréciée)
 
 Une fois un client GNU/Linux intégré au domaine, celui-ci
 possédera *localement* un script permettant de le faire
