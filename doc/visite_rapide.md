@@ -12,6 +12,10 @@ Afin de faire un rapide tour d'horizon du paquet `se3-clients-linux`, voici ci-d
        |   |-- *logon_perso*
        |   `-- reconfigure.bash
        |-- distribs/
+       |   |-- jessie/
+       |   |   |-- integration/
+       |   |   |   `-- integration_jessie.bash
+       |   |   `-- *skel*/
        |   |-- precise/
        |   |   |-- integration/
        |   |   |   |-- desintegration_precise.bash
@@ -22,6 +26,14 @@ Afin de faire un rapide tour d'horizon du paquet `se3-clients-linux`, voici ci-d
        |       |   |-- desintegration_squeeze.bash
        |       |   `-- integration_squeeze.bash
        |       `-- *skel*/
+       |   |-- trusty/
+       |   |   |-- integration/
+       |   |   |   `-- integration_trusty.bash
+       |   |   `-- *skel*/
+       |   |-- wheezy/
+       |   |   |-- integration/
+       |   |   |   `-- integration_wheezy.bash
+       |   |   `-- *skel*/
        |-- *divers*/
        `-- *unefois*/
 ```
