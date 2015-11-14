@@ -62,7 +62,10 @@ exclure.
     * [Des variables et des fonctions prêtes à l’emploi](variables_fonctions.md)
 * [Le script de logon](script_logon.md)
     * [Des variables et des fonctions prêtes à l’emploi](variables_fonctions_logon.md)
-    * [Les logs pour détecter un problème](logs_detecter_probleme.md)
+* [Les logs pour détecter un problème](logs_detecter_probleme.md)
+* [Le cas des classes nomades](classes_nomades.md)
+* [Un mot sur les imprimantes](imprimantes.md)
+* [Désinstallation/réinstalationdu paquet se3-clients-linux](desinstall_reinstall_paquet.md)
 * [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
 
 ## Annexes
