@@ -55,7 +55,7 @@ exclure.
 * [Pour les impatients qui veulent tester rapidement](impatients.md)
 * [Visite rapide du répertoire clients-linux/ du serveur](visite_rapide.md)
 * [Les options des scripts d’intégration](options_scripts.md)
-* [La "désintégration"](desintegration.md)
+* [La "désintégration" (fonctionalité dépréciée)](desintegration.md)
 * [Les partages des utilisateurs](partages_utilisateurs.md)
 * [La gestion des profils](gestion_profils.md)
 * [Le répertoire unefois/](repertoire_unefois.md)
