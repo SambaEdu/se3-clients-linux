@@ -5,6 +5,9 @@
 Si jamais vous souhaitez désinstaller complètement le paquet `se3-clients-linux` de votre serveur, rien de plus simple. En tant que `root` sur le serveur, il suffit de lancer la commande suivante :
 
 ```sh
+# Attention, nous vous conseillons tout de même vivement de
+# procéder à une désinstallation partielle comme indiquée
+# ci-dessous dans la section suivante.
 apt-get purge se3-clients-linux
 ```
 
