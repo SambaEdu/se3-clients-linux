@@ -116,8 +116,8 @@ domaine (que ce soit les comptes professeur ou les comptes
 élève) possèdent exactement le même profil par défaut.
 
 **Note :** Cette restriction pourra, dans une certaine
-mesure, être levée lorsqu'on abordera la personnalisation du
-script de logon à la section [TODO].
+mesure, être levée lorsqu'on abordera [la personnalisation du
+script de logon](script_logon.md#personnaliser-le-script-de-logon).
 
 Seule la liste des partages réseau accessibles sera
 différente d'un compte à l'autre. Mais ceci étant dit, cette
