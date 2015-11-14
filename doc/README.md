@@ -10,10 +10,10 @@ GNU/Linux qui ont été testées sont :
 
 * Debian Squeeze (version 6)
 * Debian Wheezy (version 7)
+* Debian Jessie (version 8)
 * Ubuntu Precise Pangolin (version 12.04)
 * Xubuntu Precise Pangolin (version 12.04)
 * Ubuntu Trusty Tahr (version 14.04)
-* Debian Jessie (version 8)
 
 En pratique, l'objectif est de pouvoir ouvrir une session
 sur un client Linux avec un compte du domaine et d'avoir
