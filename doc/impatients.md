@@ -149,7 +149,7 @@ chmod u+x integration_squeeze.bash
 ```
 
 Les explications sur les options se trouvent plus loin dans
-le document à la section [options-integration] page . Si
+le document (à [cette page](options_scripts.md)). Si
 tout se passe bien, le client finira par lancer un
 redémarrage. Une fois celui-ci terminé, vous devriez être en
 mesure d'ouvrir une session avec un compte du domaine (comme
