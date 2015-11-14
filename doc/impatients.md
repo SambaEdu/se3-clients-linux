@@ -83,9 +83,9 @@ clientes sous Windows. Attention, le nom du partage CIFS
 n’est pas le même que le nom du répertoire correspondant
 dans l’arborescence locale du serveur :
 
-| Nom du partage | Chemin réseau | Chemin dans l’arborescence locale du serveur |
-|-|-|-|
-| netlogon-linux | //SERVEUR/netlogon-linux | /home/netlogon/clients-linux/ |
+Nom du partage | Chemin réseau              | Chemin dans l’arborescence locale du serveur
+---------------|----------------------------|---------------------------------------------
+netlogon-linux | `//SERVEUR/netlogon-linux` | `/home/netlogon/clients-linux/`
 
 Au niveau de l’installation du paquet proprement dite, côté
 serveur, plus aucune manipulation supplémentaire n’est
