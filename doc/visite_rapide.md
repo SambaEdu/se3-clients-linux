@@ -25,11 +25,11 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
        |   |   |   |-- desintegration_precise.bash
        |   |   |   |-- integration_precise.bash
        |   |   `--  **skel**/
-       |   `-- squeeze/
-       |       |-- integration/
-       |       |   |-- desintegration_squeeze.bash
-       |       |   `-- integration_squeeze.bash
-       |       `-- **skel**/
+       |   |-- squeeze/
+       |   |   |-- integration/
+       |   |   |   |-- desintegration_squeeze.bash
+       |   |   |   `-- integration_squeeze.bash
+       |   |   `-- **skel**/
        |   |-- trusty/
        |   |   |-- integration/
        |   |   |   `-- integration_trusty.bash
