@@ -13,7 +13,7 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
        |-- bin/
        |   |-- connexion_ssh_serveur.bash
        |   |-- logon
-       |   |-- **logon_perso**
+       |   |-- ```**logon_perso**```
        |   +-- reconfigure.bash
        |-- distribs/
        |   |-- jessie/
