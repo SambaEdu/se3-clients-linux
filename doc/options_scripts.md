@@ -8,11 +8,7 @@ Les deux scripts d'intégration `integration_squeeze.bash` et `integration_preci
 
     * Si l'option est spécifiée sans paramètre, alors le script d'intégration stoppera son exécution pour vous demander de saisir le nom de la machine.
 
-    * Si l'option est spécifiée avec un paramètre, comme dans :
-
-    `./integration_squeeze.bash --nom-client="toto-04"`
-
-alors le script ne stoppera pas son exécution et effectuera directement le changement de nom en prenant comme nom le paramètre fourni (ici `toto-04`).
+    * Si l'option est spécifiée avec un paramètre, comme dans : `./integration_squeeze.bash --nom-client="toto-04"` alors le script ne stoppera pas son exécution et effectuera directement le changement de nom en prenant comme nom le paramètre fourni (ici `toto-04`).
 
 **Les caractères autorisés pour le choix du nom sont :**
 
@@ -21,7 +17,7 @@ alors le script ne stoppera pas son exécution et effectuera directement le chan
     * le tiret du 6 (-) ;
     * et c'est tout !
     
-*De plus, le nom de la machine ne soit pas faire plus de 15 caractères*.
+**NB :** *De plus, le nom de la machine ne soit pas faire plus de 15 caractères*.
 
 [^1]: celui qui se trouve dans le fichier `/etc/hostname`. Ce n’est pas un nom DNS pleinement qualifié.
 
@@ -50,11 +46,7 @@ alors le script ne stoppera pas son exécution et effectuera directement le chan
 
     * Si vous spécifiez cette option sans paramètre, alors le script d'intégration stoppera son exécution pour vous demander de saisir (*deux fois*) le futur mot de passe du compte `root` (votre saisie ne s'affichera pas sur l'écran).
 
-    * Si l'option est spécifiée avec un paramètre comme dans :
-
-    `./integration_squeeze.bash --mdp-root="abcd"`
-
-alors le script ne stoppera pas son exécution et effectuera directement le changement de mot de passe en utilisant la valeur fournie en paramètre (ici `abcd`).
+    * Si l'option est spécifiée avec un paramètre comme dans : `./integration_squeeze.bash --mdp-root="abcd"` alors le script ne stoppera pas son exécution et effectuera directement le changement de mot de passe en utilisant la valeur fournie en paramètre (ici `abcd`).
 
 * L'option `--ignorer-verification-ldap` ou `--ivl` : cette option, qui ne prend aucun paramètre, vous permet de continuer l'intégration sans faire de pause après la vérification LDAP.
 
