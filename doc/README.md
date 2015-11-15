@@ -1,5 +1,6 @@
 # Intégration de stations de travail Debian ou Ubuntu dans un domaine SambaÉdu avec le paquet se3-clients-linux
 
+
 ## Résumé et avertissement
 
 Le but de cette documentation est de décrire un mode opératoire
@@ -51,6 +52,7 @@ résultat final et l'apparition de régressions ici ou là par
 rapport à ce qui est annoncé dans ce document n'est pas à
 exclure.
 
+
 ## Table des matières
 
 * [Pour les impatients qui veulent tester rapidement](impatients.md)
@@ -73,10 +75,13 @@ exclure.
 
 * [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
 * [Installer un miroir local APT de cache avec apt-cacher-ng](apt-cacher-ng.md)
+* [Documentation pour le (futur) contributeur/développeur](dev/README.md)
 
 
-## Documentation pour le (futur?) contributeur/développeur
+## Ressources externes
 
-Vous trouverez de la documentation pour le contributeur/développeur [ici](dev/README.md).
+* [Installation de clients Debian Wheezy via Se3 avec intégration automatique](http://www-annexe.ac-rouen.fr/productions/tice/SE3_install_wheezy_pxe_web_gen_web/co/SE3_install_wheezy_pxe_web.html)
+
+
 
 
