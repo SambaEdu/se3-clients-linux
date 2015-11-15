@@ -12,10 +12,10 @@ Les deux scripts d'intégration `integration_squeeze.bash` et `integration_preci
 
 **Les caractères autorisés pour le choix du nom sont :**
 
-  - les 26 lettres de l'alphabet en minuscules ou en majuscules, **sans accents** ;
-  - les chiffres ;
-  - le tiret du 6 (-) ;
-  - et c'est tout !
+  → les 26 lettres de l'alphabet en minuscules ou en majuscules, **sans accents**
+  → les chiffres
+  → le tiret du 6 (-)
+  → et c'est tout !
 
 **NB :** *De plus, le nom de la machine ne soit pas faire plus de 15 caractères*.
 
@@ -27,8 +27,8 @@ En effet, en général, sur un système GNU/Linux fraîchement installé et util
 
 Avec l'option `--mg` , quand l'utilisateur voudra éditer un des items du menu `Grub`, il devra saisir les identifiants suivants :
 
-  - login : `admin`
-  - mot de passe : celui spécifié avec l'option `--mg`
+  → login : `admin`
+  → mot de passe : celui spécifié avec l'option `--mg`
 
     * Si l'option `--mg` n'est pas spécifiée, alors la configuration de `Grub` est inchangée et a priori la faille de sécurité sera toujours présente.
 
@@ -50,9 +50,9 @@ En effet, lors de l'exécution du script d'intégration, quel que soit le jeu d'
 
 Plus précisément la recherche porte sur toutes les entrées dans l'annuaire correspondant à des machines qui ont :
 
-  - même nom que la machine exécutant le script
-  - **ou** même adresse IP que la carte réseau de la machine exécutant le script
-    - **ou** même adresse MAC que la carte réseau de la machine exécutant le script
+  → même nom que la machine exécutant le script
+  → **ou** même adresse IP que la carte réseau de la machine exécutant le script
+  → **ou** même adresse MAC que la carte réseau de la machine exécutant le script
 
 Dans tous les cas, le résultat de cette recherche sera affiché.
 
@@ -76,7 +76,7 @@ En effet, lorsqu'un client GNU/Linux essaye de monter un partage Samba du serveu
 
     * Si vous ne spécifiez pas cette option, il n'y aura pas de redémarrage à la fin de l'exécution du script.
 
-Sachez que le redémarrage après intégration est nécessaire pour avoir un système opérationnel. Si les intégrations se déroulent sans erreur sur vos machines Linux, vous aurez donc tout intérêt à spécifier à chaque fois l'option `--rc`.
+**Redémarrage :** sachez que le redémarrage après intégration est nécessaire pour avoir un système opérationnel. Si les intégrations se déroulent sans erreur sur vos machines Linux, vous aurez donc tout intérêt à spécifier à chaque fois l'option `--rc`.
 
 
 **Précision :** quel que soit le jeu d'options que vous aurez choisi, *aucun enregistrement dans l'annuaire du serveur ne sera effectué par le script d'intégration*.
