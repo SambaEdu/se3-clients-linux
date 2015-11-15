@@ -3,12 +3,12 @@
 Les deux scripts d'intégration `integration_squeeze.bash` et `integration_precise.bash`, qui doivent être exécutés en tant que `root` en local sur chaque client GNU/Linux à intégrer, utilisent exactement le même jeu d'options.
 
 ##Liste des différentes options
-* [le nom d'hôte du client](###L'option `--nom-client` ou `--nc`)
-* [le mote de passe pour `Grub`](###L'option `--mdp-grub` ou `--mg`)
-* [le mot de passe pour le compte `root`]le mot de passe pour le compte `root`(###L'option `--mdp-root` ou `--mr`)
-* ignorer la vérification de l'annuaire
-* installer le paquet `samba`
-* redémarrer le client-linux à la fin de l'intégration
+* [le nom d'hôte du client](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---nom-client-ou---nc)
+* [le mote de passe pour `Grub`](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---mdp-grub-ou---mg)
+* [le mot de passe pour le compte `root`](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---mdp-root-ou---mr)
+* [ignorer la vérification de l'annuaire](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---ignorer-verification-ldap-ou---ivl)
+* [installer le paquet `samba`](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---installer-samba-ou---is)
+* [redémarrer le client-linux à la fin de l'intégration](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---redemarrer-client-ou---rc)
 
 
 ##Détails des options
