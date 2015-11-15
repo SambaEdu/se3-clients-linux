@@ -25,7 +25,7 @@ cette option vous permet de modifier le nom d'hôte[1][nomhote] du client.
 
 [nomhote]: *Le nom d'hôte du client* est celui qui se trouve dans le fichier `/etc/hostname`. Ce n’est pas un nom DNS pleinement qualifié.
 
-**Les caractères autorisés pour le choix du nom d'hôte sont :**
+**Les caractères autorisés pour le choix du nom d'hôte sont :**  
   → les 26 lettres de l'alphabet en minuscules ou en majuscules, **sans accents**  
   → les chiffres  
   → le tiret du 6 (-)  
@@ -46,7 +46,7 @@ Cette option vous permet d'ajouter un mot de passe dès qu'un utilisateur souhai
 
 En effet, en général, sur un système GNU/Linux fraîchement installé et utilisant `Grub` comme chargeur de boot, il est possible de sélectionner un des items du menu `Grub` et de l'éditer en appuyant sur la touche `e` sans devoir saisir le moindre mot de passe. Cela constitue une faille de sécurité potentielle car, dans ce cas, l'utilisateur peut très facilement éditer un des items du menu `Grub` et démarrer ensuite via cet item modifié de manière à devenir `root` sur la machine *sans avoir à saisir le moindre mot de passe*.
 
-Avec l'option `--mg` , quand l'utilisateur voudra éditer un des items du menu `Grub`, il devra saisir les identifiants suivants :
+Avec l'option `--mg` , quand l'utilisateur voudra éditer un des items du menu `Grub`, il devra saisir les identifiants suivants :  
   → login : `admin`  
   → mot de passe : celui spécifié avec l'option `--mg`  
 
@@ -72,7 +72,7 @@ Cette option, qui ne prend aucun paramètre, vous permet de continuer l'intégra
     
 En effet, lors de l'exécution du script d'intégration, quel que soit le jeu d'options choisi, une recherche dans `l'annuaire Ldap` du serveur est effectuée. Le script lancera une recherche de toutes les entrées dans l'annuaire correspondant à des machines susceptibles d'avoir un lien avec la machine qui est en train d'exécuter le script d'intégration au domaine.
 
-Plus précisément la recherche porte sur toutes les entrées dans l'annuaire correspondant à des machines qui ont :
+Plus précisément la recherche porte sur toutes les entrées dans l'annuaire correspondant à des machines qui ont :  
   → même nom que la machine exécutant le script  
   → **ou** même adresse IP que la carte réseau de la machine exécutant le script  
   → **ou** même adresse MAC que la carte réseau de la machine exécutant le script  
