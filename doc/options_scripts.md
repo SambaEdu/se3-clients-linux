@@ -2,7 +2,7 @@
 
 Les deux scripts d'intégration `integration_squeeze.bash` et `integration_precise.bash`, qui doivent être exécutés en tant `root` en local sur chaque client GNU/Linux à intégrer, utilisent exactement le même jeu d'options. En voici la liste.
 
-*   L'option `--nom-client` ou `--nc` : cette option vous permet de modifier le nom d'hôte[^1] du client.
+*   L'option `--nom-client` ou `--nc` : cette option vous permet de modifier le nom d'hôte [^1] du client.
 
 *Si l'option n'est pas spécifiée*, alors le client gardera le nom d'hôte qu'il possède déjà.
 
