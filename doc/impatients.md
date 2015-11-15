@@ -4,7 +4,9 @@ La mise en place de clients-linux commence par l'installation
 du paquet `se3-clients-linux` sur le serveur.
 
 Ensuite, sur chaque client-linux, sera exécuté le script correspondant
-à sa version. Par exemple Jessie ou Trusty.
+à sa version (Jessie ou Trusty, par exemple).
+
+**Recommendation :** Le script d'intégration sera exécuté sur un client-linux qui vient d'être installé.
 
 ## Installation du paquet `se3-clients-linux` sur le serveur
 
@@ -173,4 +175,7 @@ login de ce compte ne risque pas de rentrer en conflit avec
 le login d'un compte du domaine. Vous pouvez utiliser
 `userlocal` comme login par exemple, ou autre chose…
 
-
+**Remarque :** On peut enchâiner les différentes commandes de récupération du script d'intégration et de préparation de la façon suivante :
+```sh
+SOURCE="/home/netlogon/clients-linux/dist*/jes*/int*/int*" && DESTINATION="/home/toto/Bureau" && scp root@IP-SERVEUR:"$SOURCE" "$DESTINATION" && cd /home/toto/Bureau && chmod u+x integration_jessie.bash
+```
