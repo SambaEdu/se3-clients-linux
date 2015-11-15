@@ -10,11 +10,11 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
 
 
 -- clients-linux/  
-    |-- bin/  
-    |    |-- connexion_ssh_serveur.bash  
-   |   |-- logon
-   |   |-- **logon_perso**
-   |   +-- reconfigure.bash
+   |-- bin/  
+   |   |-- connexion_ssh_serveur.bash  
+   |   |-- logon  
+   |   |-- **logon_perso**  
+   |   +-- reconfigure.bash  
    |-- distribs/
    |   |-- jessie/
    |   |   |-- integration/
