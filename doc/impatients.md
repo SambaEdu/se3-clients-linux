@@ -1,5 +1,11 @@
 # Pour les impatients qui veulent tester rapidement
 
+La mise en place de clients-linux commence par l'installation
+du paquet `se3-clients-linux` sur le serveur.
+
+Ensuite, sur chaque client-linux, sera exécuté le script correspondant
+à sa version. Par exemple Jessie ou Trusty.
+
 ## Installation du paquet `se3-clients-linux` sur le serveur
 
 Il faut que votre réseau local dispose d'une connexion
@@ -57,18 +63,21 @@ devez vous rendre sur la console d'administration Web de
 votre serveur (dans Configuration générale → Paramètres
 serveur) afin de spécifier l'adresse d'un serveur de temps
 qui fonctionne correctement (chose que l'on peut vérifier
-ensuite dans la page de diagnostic du serveur). Une fois le
-paramétrage effectué il vous suffit de reconfigurer le
-paquet en lançant, en tant que root sur une console du
-serveur, la commande suivante `dpkg-reconfigure
-se3-clients-linux`. Si tout se passe bien, vous ne devriez
-plus obtenir d'avertissement à propos du serveur NTP.
+ensuite dans la page de diagnostic du serveur).
+
+Une fois le paramétrage effectué il vous suffit de reconfigurer
+le paquet en lançant, en tant que root sur une console du
+serveur, la commande suivante : `dpkg-reconfigure se3-clients-linux`.
+Si tout se passe bien, vous ne devriez plus obtenir
+d'avertissement à propos du serveur NTP.
 
 Votre serveur Samba possède donc un nouveau partage CIFS
 qui, au passage, ne sera pas visible par les machines
-clientes sous Windows. Attention, le nom du partage CIFS
-n'est pas le même que le nom du répertoire correspondant
-dans l'arborescence locale du serveur :
+clientes sous Windows.
+
+**Attention :** le nom du partage CIFS n'est pas le même que
+le nom du répertoire correspondant dans l'arborescence locale
+du serveur :
 
 Nom du partage | Chemin réseau              | Chemin dans l'arborescence locale du serveur
 ---------------|----------------------------|---------------------------------------------
@@ -83,7 +92,7 @@ vous est nécessaire de reconfigurer le paquet pour restaurer
 des droits corrects sur les fichiers, ou bien pour réadapter
 les scripts à l'environnement de votre serveur (parce que
 par exemple son IP a changé), il vous suffit de lancer la
-commande suivante en tant que sur une console du serveur
+commande suivante en tant que root sur une console du serveur
 `dpkg-reconfigure se3-clients-linux`.
 
 ## Intégration d'un client GNU/Linux
@@ -91,9 +100,9 @@ commande suivante en tant que sur une console du serveur
 Le répertoire `/home/netlogon/clients-linux/` de votre
 serveur contient un script d'intégration par type de
 distribution GNU/Linux. Par exemple, le script d'intégration
-pour des Debian Squeeze se trouve dans le répertoire
-`/home/netlogon/clients-linux/distribs/squeeze/integration/`
-et il s'appelle `integration_squeeze.bash`. Il faudra
+pour des Debian Jessie se trouve dans le répertoire
+`/home/netlogon/clients-linux/distribs/jessie/integration/`
+et il s'appelle `integration_jessie.bash`. Il faudra
 exécuter l'un de ces scripts, en tant que `root`, **en
 local** sur le client GNU/Linux que vous souhaitez intégrer.
 
@@ -103,7 +112,7 @@ pourra utiliser la bonne vieille clé USB des familles, mais
 on pourra aussi user et abuser de la commande (très
 pratique) qui permet d'effectuer très simplement des copies
 entre deux machines (sous GNU/Linux) distantes. Par exemple,
-sur le terminal d'un client Debian Squeeze, vous pourriez
+sur le terminal d'un client Debian Jessie, vous pourriez
 exécuter les commandes suivantes :
 
 ```sh
@@ -111,7 +120,7 @@ exécuter les commandes suivantes :
 # d'économiser la saisie de quelques touches sur le clavier (à
 # condition d'en saisir suffisamment pour éviter toute ambiguïté 
 # sur le nom du fichier).
-SOURCE="/home/netlogon/clients-linux/dist*/squ*/int*/int*"
+SOURCE="/home/netlogon/clients-linux/dist*/jes*/int*/int*"
 
 # Répertoire de destination sur le client GNU/Linux en local. Par
 # exemple le bureau, histoire de voir apparaître le fichier
@@ -129,12 +138,12 @@ dans un terminal la commande suivante (pas forcément en tant
 que `root`) : `lsb_release --codename`.
 
 Le résultat vous affichera le nom de code de la distribution
-( ou etc.) ce qui vous indiquera le script d'intégration à
-utiliser.
+(jessie ou trusty par exemple) ce qui vous indiquera le script
+d'intégration à utiliser.
 
 Supposons par exemple que vous avez copié le script
-d'intégration sur une Debian Squeeze et que celui-ci se
-trouve sur votre bureau. Alors, **en tant que **, vous
+d'intégration sur une Debian Jessie et que celui-ci se
+trouve sur votre bureau. Alors, **en tant que root**, vous
 pouvez lancer l'intégration ainsi :
 
 ```sh
@@ -142,10 +151,10 @@ pouvez lancer l'intégration ainsi :
 cd /home/toto/Bureau
 
 # Ensuite, on rend le script exécutable.
-chmod u+x integration_squeeze.bash
+chmod u+x integration_jessie.bash
 
 # Enfin, on lance l'intégration.
-./integration_squeeze.bash --nom-client="toto-04" --is --ivl --rc
+./integration_jessie.bash --nom-client="toto-04" --is --ivl --rc
 ```
 
 Les explications sur les options se trouvent plus loin dans
