@@ -8,12 +8,12 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
 
 **Note :** En fait, vous pouvez le faire bien sûr car vous êtes `root` sur le serveur. Mais les modifications effectuées sur les fichiers/répertoires qui ne sont pas en vert sur le schéma ne survivront pas à une réinstallation ou à une mise à jour du `paquet se3-clients-linux`.
 
-```
+
     -- clients-linux/
        |-- bin/
        |   |-- connexion_ssh_serveur.bash
        |   |-- logon
-       |   |-- ```**logon_perso**```
+       |   |-- **logon_perso**
        |   +-- reconfigure.bash
        |-- distribs/
        |   |-- jessie/
@@ -40,7 +40,7 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
        |   |   `-- **skel**/
        |-- `**divers**/
        `-- **unefois**/
-```
+
 
 Voici quelques commentaires rapides :
 
