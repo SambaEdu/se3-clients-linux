@@ -15,7 +15,7 @@ Les deux scripts d'intégration `integration_squeeze.bash` et `integration_preci
 
 ###L'option `--nom-client` ou `--nc`
 
-cette option vous permet de modifier le nom d'hôte[1][nomhote] du client.
+cette option vous permet de modifier le nom d'hôte du client.
 
 * Si l'option n'est pas spécifiée, alors le client gardera le nom d'hôte qu'il possède déjà.
 
@@ -23,7 +23,7 @@ cette option vous permet de modifier le nom d'hôte[1][nomhote] du client.
 
 * Si l'option est spécifiée avec un paramètre, comme dans : `./integration_squeeze.bash --nom-client="toto-04"` alors le script ne stoppera pas son exécution et effectuera directement le changement de nom en prenant comme nom le paramètre fourni (ici `toto-04`).
 
-[nomhote]: *Le nom d'hôte du client* est celui qui se trouve dans le fichier `/etc/hostname`. Ce n’est pas un nom DNS pleinement qualifié.
+`*Le nom d'hôte du client*` est celui qui se trouve dans le fichier `/etc/hostname`. Ce n’est pas un nom DNS pleinement qualifié.
 
 **Les caractères autorisés pour le choix du nom d'hôte sont :**  
   → les 26 lettres de l'alphabet en minuscules ou en majuscules, **sans accents**  
