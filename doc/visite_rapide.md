@@ -14,32 +14,39 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
        |   |-- connexion_ssh_serveur.bash
        |   |-- logon
        |   |-- **logon_perso**
-       |   +-- reconfigure.bash
+       |   └-- reconfigure.bash
+       |
        |-- distribs/
        |   |-- jessie/
        |   |   |-- integration/
-       |   |   |   |-- integration_jessie.bash
-       |   |   +-- **skel**/
+       |   |   |   └-- integration_jessie.bash
+       |   |   └-- **skel**/
+       |   |
        |   |-- precise/
        |   |   |-- integration/
        |   |   |   |-- desintegration_precise.bash
-       |   |   |   |-- integration_precise.bash
-       |   |   `--  **skel**/
+       |   |   |   └-- integration_precise.bash
+       |   |   └--  **skel**/
+       |   |
        |   |-- squeeze/
        |   |   |-- integration/
        |   |   |   |-- desintegration_squeeze.bash
-       |   |   |   `-- integration_squeeze.bash
-       |   |   `-- **skel**/
+       |   |   |   └-- integration_squeeze.bash
+       |   |   └-- **skel**/
+       |   |
        |   |-- trusty/
        |   |   |-- integration/
        |   |   |   `-- integration_trusty.bash
-       |   |   `-- **skel**/
-       |   |-- wheezy/
-       |   |   |-- integration/
-       |   |   |   `-- integration_wheezy.bash
-       |   |   `-- **skel**/
-       |-- `**divers**/
-       `-- **unefois**/
+       |   |   +-- **skel**/
+       |   |
+       |   +-- wheezy/
+       |       |-- integration/
+       |       |   `-- integration_wheezy.bash
+       |       `-- **skel**/
+       |
+      │├── `**divers**/
+       │
+       └── **unefois**/
 ```
 
 Voici quelques commentaires rapides :
