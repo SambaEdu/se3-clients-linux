@@ -16,7 +16,7 @@ Les deux scripts d'intégration `integration_squeeze.bash` et `integration_preci
     * les chiffres ;
     * le tiret du 6 (-) ;
     * et c'est tout !
-    
+
 **NB :** *De plus, le nom de la machine ne soit pas faire plus de 15 caractères*.
 
 [^1]: celui qui se trouve dans le fichier `/etc/hostname`. Ce n’est pas un nom DNS pleinement qualifié.
@@ -27,18 +27,14 @@ En effet, en général, sur un système GNU/Linux fraîchement installé et util
 
 Avec l'option `--mg` , quand l'utilisateur voudra éditer un des items du menu `Grub`, il devra saisir les identifiants suivants :
 
-    * login : `admin` ;
-    * mot de passe : celui spécifié avec l'option `--mg`.
+    - login : `admin`
+    - mot de passe : celui spécifié avec l'option `--mg`
 
     * Si l'option `--mg` n'est pas spécifiée, alors la configuration de `Grub` est inchangée et a priori la faille de sécurité sera toujours présente.
 
     * Si l'option est spécifié sans paramètre, alors le script d'intégration stoppera son exécution pour vous demander de saisir (*deux fois*) le futur mot de passe `Grub` (votre saisie ne s'affichera pas à l'écran).
 
-    * Si l'option est spécifiée avec un paramètre comme dans :
-
-    `./integration_squeeze.bash --mdp-grub="1234"`
-
-alors le script ne stoppera pas son exécution et effectuera directement le changement de configuration de `Grub` en prenant comme mot de passe le paramètre fourni (ici `1234`).
+    * Si l'option est spécifiée avec un paramètre comme dans : `./integration_squeeze.bash --mdp-grub="1234"` alors le script ne stoppera pas son exécution et effectuera directement le changement de configuration de `Grub` en prenant comme mot de passe le paramètre fourni (ici `1234`).
 
 * L'option `--mdp-root` ou `--mr` : cette option vous permet de modifier le mot de passe du compte `root`.
 
@@ -54,9 +50,9 @@ En effet, lors de l'exécution du script d'intégration, quel que soit le jeu d'
 
 Plus précisément la recherche porte sur toutes les entrées dans l'annuaire correspondant à des machines qui ont :
 
-    * même nom que la machine exécutant le script ;
-    * **ou** même adresse IP que la carte réseau de la machine exécutant le script ;
-    * **ou** même adresse MAC que la carte réseau de la machine exécutant le script.
+    - même nom que la machine exécutant le script
+    - **ou** même adresse IP que la carte réseau de la machine exécutant le script
+    - **ou** même adresse MAC que la carte réseau de la machine exécutant le script
 
 Dans tous les cas, le résultat de cette recherche sera affiché.
 
