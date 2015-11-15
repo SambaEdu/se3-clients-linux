@@ -14,14 +14,14 @@ Les deux scripts d'intégration `integration_squeeze.bash` et `integration_preci
 
 alors le script ne stoppera pas son exécution et effectuera directement le changement de nom en prenant comme nom le paramètre fourni (ici `toto-04`).
 
-    Les caractères autorisés pour le choix du nom sont :
+**Les caractères autorisés pour le choix du nom sont :**
 
     * les 26 lettres de l'alphabet en minuscules ou en majuscules, **sans accents** ;
     * les chiffres ;
     * le tiret du 6 (-) ;
     * et c'est tout !
-
-    De plus, *le nom de la machine ne soit pas faire plus de 15 caractères*.
+    
+*De plus, le nom de la machine ne soit pas faire plus de 15 caractères*.
 
 [^1]: celui qui se trouve dans le fichier `/etc/hostname`. Ce n’est pas un nom DNS pleinement qualifié.
 
