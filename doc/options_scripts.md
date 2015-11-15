@@ -2,16 +2,18 @@
 
 Les deux scripts d'intégration `integration_squeeze.bash` et `integration_precise.bash`, qui doivent être exécutés en tant que `root` en local sur chaque client GNU/Linux à intégrer, utilisent exactement le même jeu d'options.
 
-Voici les différentes options :
-* `--nom-client` ou `--nc`
-* `--mdp-grub` ou `--mg`
-* `--mdp-root` ou `--mr`
-* `--ignorer-verification-ldap` ou `--ivl`
-* `--installer-samba` ou `--is`
-* `--installer-samba` ou `--is`
+##Liste des différentes options :
+* le nom d'hôte du client
+* le mote de passe pour `Grub`
+* le mot de passe pour le compte `root`
+* ignorer la vérification de l'annuaire
+* installer le paquet `samba`
+* redémarrer le client-linux à la fin de l'intégration
 
 
-* L'option `--nom-client` ou `--nc` : cette option vous permet de modifier le nom d'hôte[^1](celui qui se trouve dans le fichier `/etc/hostname`. Ce n’est pas un nom DNS pleinement qualifié.) du client.
+##Détails des options
+
+* L'option `--nom-client` ou `--nc` : cette option vous permet de modifier le nom d'hôte du client.
 
     * Si l'option n'est pas spécifiée, alors le client gardera le nom d'hôte qu'il possède déjà.
 
@@ -19,8 +21,9 @@ Voici les différentes options :
 
     * Si l'option est spécifiée avec un paramètre, comme dans : `./integration_squeeze.bash --nom-client="toto-04"` alors le script ne stoppera pas son exécution et effectuera directement le changement de nom en prenant comme nom le paramètre fourni (ici `toto-04`).
 
-**Les caractères autorisés pour le choix du nom sont :**
+*Le nom d'hôte du client* est celui qui se trouve dans le fichier `/etc/hostname`. Ce n’est pas un nom DNS pleinement qualifié.
 
+**Les caractères autorisés pour le choix du nom d'hôte sont :**
   → les 26 lettres de l'alphabet en minuscules ou en majuscules, **sans accents**  
   → les chiffres  
   → le tiret du 6 (-)  
@@ -40,7 +43,6 @@ Voici les différentes options :
 En effet, en général, sur un système GNU/Linux fraîchement installé et utilisant `Grub` comme chargeur de boot, il est possible de sélectionner un des items du menu `Grub` et de l'éditer en appuyant sur la touche `e` sans devoir saisir le moindre mot de passe. Cela constitue une faille de sécurité potentielle car, dans ce cas, l'utilisateur peut très facilement éditer un des items du menu `Grub` et démarrer ensuite via cet item modifié de manière à devenir `root` sur la machine *sans avoir à saisir le moindre mot de passe*.
 
 Avec l'option `--mg` , quand l'utilisateur voudra éditer un des items du menu `Grub`, il devra saisir les identifiants suivants :
-
   → login : `admin`  
   → mot de passe : celui spécifié avec l'option `--mg`  
 
@@ -63,7 +65,6 @@ Avec l'option `--mg` , quand l'utilisateur voudra éditer un des items du menu `
 En effet, lors de l'exécution du script d'intégration, quel que soit le jeu d'options choisi, une recherche dans `l'annuaire Ldap` du serveur est effectuée. Le script lancera une recherche de toutes les entrées dans l'annuaire correspondant à des machines susceptibles d'avoir un lien avec la machine qui est en train d'exécuter le script d'intégration au domaine.
 
 Plus précisément la recherche porte sur toutes les entrées dans l'annuaire correspondant à des machines qui ont :
-
   → même nom que la machine exécutant le script  
   → **ou** même adresse IP que la carte réseau de la machine exécutant le script  
   → **ou** même adresse MAC que la carte réseau de la machine exécutant le script  
