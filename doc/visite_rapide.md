@@ -10,10 +10,10 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
 
 
 -- clients-linux/  
-<span style="color: #ffffff;">1234</span>|-- bin/  
+<span style="color: #000000;">1234</span>|-- bin/  
 <span style="color: #ffffff;">1234</span>|<span style="color: #ffffff;">123</span>|-- connexion_ssh_serveur.bash  
 <span style="color: #ffffff;">1234</span>|<span style="color: #ffffff;">123</span>|-- logon  
-<span style="color: #ffffff;">1234</span>|<span style="color: #ffffff;">123</span>|-- **logon_perso**  
+<span style="color: #ffffff;">1234</span>|<span style="color: #ffffff;">123</span>|-- <B>logon_perso</B>  
 <span style="color: #ffffff;">1234</span>|   +-- reconfigure.bash  
    |-- distribs/
    |   |-- jessie/
