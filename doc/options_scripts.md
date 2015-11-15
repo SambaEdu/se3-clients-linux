@@ -1,9 +1,17 @@
 #Les options des scripts d'intégration
 
-Les deux scripts d'intégration `integration_squeeze.bash` et `integration_precise.bash`, qui doivent être exécutés en tant `root` en local sur chaque client GNU/Linux à intégrer, utilisent exactement le même jeu d'options. En voici la liste.
+Les deux scripts d'intégration `integration_squeeze.bash` et `integration_precise.bash`, qui doivent être exécutés en tant que `root` en local sur chaque client GNU/Linux à intégrer, utilisent exactement le même jeu d'options.
+
+Voici les différentes options :
+* `--nom-client` ou `--nc`
+* `--mdp-grub` ou `--mg`
+* `--mdp-root` ou `--mr`
+* `--ignorer-verification-ldap` ou `--ivl`
+* `--installer-samba` ou `--is`
+* `--installer-samba` ou `--is`
 
 
-* L'option `--nom-client` ou `--nc` : cette option vous permet de modifier le nom d'hôte[^1] du client.
+* L'option `--nom-client` ou `--nc` : cette option vous permet de modifier le nom d'hôte[^1](celui qui se trouve dans le fichier `/etc/hostname`. Ce n’est pas un nom DNS pleinement qualifié.) du client.
 
     * Si l'option n'est pas spécifiée, alors le client gardera le nom d'hôte qu'il possède déjà.
 
@@ -19,8 +27,6 @@ Les deux scripts d'intégration `integration_squeeze.bash` et `integration_preci
   → et c'est tout !  
 
 **NB :** *De plus, le nom de la machine ne soit pas faire plus de 15 caractères*.
-
-[^1]: celui qui se trouve dans le fichier `/etc/hostname`. Ce n’est pas un nom DNS pleinement qualifié.
 
 
 * L'option `--mdp-grub` ou `--mg` : cette option vous permet d'ajouter un mot de passe dès qu'un utilisateur souhaite éditer un des items du menu `Grub` au démarrage.
