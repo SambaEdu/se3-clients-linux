@@ -66,7 +66,7 @@ qui fonctionne correctement (chose que l'on peut vérifier
 ensuite dans la page de diagnostic du serveur).
 
 Une fois le paramétrage effectué il vous suffit de reconfigurer
-le paquet en lançant, en tant que root sur une console du
+le paquet en lançant, en tant que `root` sur une console du
 serveur, la commande suivante : `dpkg-reconfigure se3-clients-linux`.
 Si tout se passe bien, vous ne devriez plus obtenir
 d'avertissement à propos du serveur NTP.
@@ -92,7 +92,7 @@ vous est nécessaire de reconfigurer le paquet pour restaurer
 des droits corrects sur les fichiers, ou bien pour réadapter
 les scripts à l'environnement de votre serveur (parce que
 par exemple son IP a changé), il vous suffit de lancer la
-commande suivante en tant que root sur une console du serveur
+commande suivante en tant que `root` sur une console du serveur
 `dpkg-reconfigure se3-clients-linux`.
 
 ## Intégration d'un client GNU/Linux
@@ -128,7 +128,7 @@ SOURCE="/home/netlogon/clients-linux/dist*/jes*/int*/int*"
 DESTINATION="/home/toto/Bureau/"
 
 # Et enfin la copie du fichier du serveur vers le client GNU/Linux en local.
-# Il faudra alors saisir le mot de passe du compte root du serveur.
+# Il faudra alors saisir le mot de passe du compte `root` du serveur.
 scp root@IP-SERVEUR:"$SOURCE" "$DESTINATION"
 ```
 
