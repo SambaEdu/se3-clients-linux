@@ -10,46 +10,46 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
 
 ```
     -- clients-linux/
-       |-- bin/
-       |   |-- connexion_ssh_serveur.bash
-       |   |-- logon
-       |   |-- **logon_perso**
-       |   └-- reconfigure.bash
-       |
-       |-- distribs/
-       |   |-- jessie/
-       |   |   |-- integration/
-       |   |   |   └-- integration_jessie.bash
-       |   |   └-- **skel**/
-       |   |
-       |   |-- precise/
-       |   |   |-- integration/
-       |   |   |   |-- desintegration_precise.bash
-       |   |   |   └-- integration_precise.bash
-       |   |   └--  **skel**/
-       |   |
-       |   |-- squeeze/
-       |   |   |-- integration/
-       |   |   |   |-- desintegration_squeeze.bash
-       |   |   |   └-- integration_squeeze.bash
-       |   |   └-- **skel**/
-       |   |
-       |   |-- trusty/
-       |   |   |-- integration/
-       |   |   |   `-- integration_trusty.bash
-       |   |   +-- **skel**/
-       |   |
-       |   +-- wheezy/
-       |       |-- integration/
-       |       |   `-- integration_wheezy.bash
-       |       `-- **skel**/
-       |
-      │├── `**divers**/
+       ├── bin/
+       │   ├── connexion_ssh_serveur.bash
+       │   ├── logon
+       │   ├── **logon_perso**
+       │   └── reconfigure.bash
+       │
+       ├── distribs/
+       │   ├── jessie/
+       │   │   ├── integration/
+       │   │   │   └── integration_jessie.bash
+       │   │   └── **skel**/
+       │   │
+       │   ├── precise/
+       │   │   ├── integration/
+       │   │   │   ├── desintegration_precise.bash
+       │   │   │   └── integration_precise.bash
+       │   │   └──  **skel**/
+       │   │
+       │   ├── squeeze/
+       │   │   ├── integration/
+       │   │   │   ├── desintegration_squeeze.bash
+       │   │   │   └── integration_squeeze.bash
+       │   │   └── **skel**/
+       │   │
+       │   ├── trusty/
+       │   │   ├── integration/
+       │   │   │   └── integration_trusty.bash
+       │   │   └── **skel**/
+       │   │
+       │   └── wheezy/
+       │       ├── integration/
+       │       │   └── integration_wheezy.bash
+       │       └── **skel**/
+       │
+       ├── **divers**/
        │
        └── **unefois**/
 ```
 
-Voici quelques commentaires rapides :
+**Voici quelques commentaires rapides :**
 
 * Le répertoire `bin/` contient en premier lieu le fichier qui est le script de `logon`. Ce script est véritablement le chef d'orchestre de tous les clients GNU/Linux intégrés au domaine. C'est lui qui contient les instructions exécutées systématiquement par les clients GNU/Linux juste avant l'affichage de la fenêtre de connexion, au moment de l'ouverture de session et au moment de la fermeture de session. Ce script de logon sera expliqué à la section [logon-script](script_logon.md). En principe, vous ne devez pas modifier ce fichier. En revanche, vous pourrez modifier le fichier `logon_perso` juste à côté. Ce fichier vous permettra d'affiner le comportement du script `logon` afin de l'adapter à vos besoins. Vous trouverez toutes les explications nécessaires dans la section [personnalisation](https://github.com/flaf/se3-clients-linux/blob/master/doc/script_logon.md#personnaliser-le-script-de-logon).
 
