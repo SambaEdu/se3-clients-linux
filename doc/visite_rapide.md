@@ -14,12 +14,12 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
        |   |-- connexion_ssh_serveur.bash
        |   |-- logon
        |   |-- **logon_perso**
-       |   `-- reconfigure.bash
+       |   +-- reconfigure.bash
        |-- distribs/
        |   |-- jessie/
        |   |   |-- integration/
        |   |   |   |-- integration_jessie.bash
-       |   |   `-- **skel**/
+       |   |   +-- **skel**/
        |   |-- precise/
        |   |   |-- integration/
        |   |   |   |-- desintegration_precise.bash
