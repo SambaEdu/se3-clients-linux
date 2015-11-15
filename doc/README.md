@@ -34,21 +34,23 @@ proposée par défaut**, notamment au niveau du « display
 manager », c'est-à-dire le programme qui se lance au
 démarrage et qui affiche une fenêtre de connexion permettant
 d'ouvrir une session après authentification via un
-identifiant et un mot de passe. Sous Squeeze par exemple, le
-programme par défaut remplissant cette fonction s'appelle
-Gdm3 et sous Precise il s'agit de Lightdm etc..
-Tout au long de la documentation, il est supposé que c'est
-bien le cas.
+identifiant et un mot de passe.
+
+Sous Jessie par exemple, le « display manager » par défaut
+remplissant cette fonction s'appelle `Gdm3` et sous Trusty
+il s'agit de `Lightdm`. Tout au long de la documentation,
+il est supposé que c'est bien le cas.
 
 Si jamais vous tenez à changer de « display manager » sur
 votre distribution, il est quasiment certain que vous devrez
 modifier le script d'intégration de la distribution parce
-que celui-ci ne fonctionnera pas en l'état (à partir de Jessie
-et Trusty, une vérification est faite). Si vous tenez à
-changer uniquement l'environnement de bureau, il est
-possible que le script d'intégration fonctionne en l'état
-malgré tout mais nous ne pouvons en rien vous garantir le
-résultat final et l'apparition de régressions ici ou là par
+que celui-ci ne fonctionnera pas en l'état : à partir de Jessie
+et Trusty, une vérification est faite aussi sur le « display manager ».
+
+Si vous tenez à changer uniquement l'environnement de bureau,
+il est possible que le script d'intégration fonctionne en l'état
+malgré tout, mais nous ne pouvons en rien vous garantir le
+résultat final, et l'apparition de régressions ici ou là par
 rapport à ce qui est annoncé dans ce document n'est pas à
 exclure.
 
