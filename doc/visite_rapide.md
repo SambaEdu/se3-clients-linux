@@ -6,9 +6,9 @@ Certains fichiers ou répertoires, dont vous n'avez pas à vous préoccuper, ont
 
 Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter à vos besoins sont mis en évidence ci-dessous par des `**...**`. À l'inverse, vous ne devez pas modifier tous les autres fichiers ou répertoires.
 
-**Note :** En fait, vous pouvez le faire bien sûr car vous êtes `root` sur le serveur. Mais les modifications effectuées sur les fichiers/répertoires qui ne sont pas en vert sur le schéma ne survivront pas à une réinstallation ou à une mise à jour du `paquet se3-clients-linux`.
+**Note :** En fait, vous pouvez le faire bien sûr car vous êtes `root` sur le serveur. Mais les modifications effectuées sur les fichiers/répertoires qui ne sont pas mis en évidence ci-dessous par des `**...**` sur le schéma ne survivront pas à une réinstallation ou à une mise à jour du `paquet se3-clients-linux`.
 
-
+```sh
     -- clients-linux/
        |-- bin/
        |   |-- connexion_ssh_serveur.bash
@@ -40,7 +40,7 @@ Les fichiers ou répertoires que vous avez le droit de modifier pour les adapter
        |   |   `-- **skel**/
        |-- `**divers**/
        `-- **unefois**/
-
+```
 
 Voici quelques commentaires rapides :
 
