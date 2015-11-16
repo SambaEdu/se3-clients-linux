@@ -60,9 +60,9 @@ Techniquement, une modification de ce répertoire est aussi possible via le lien
 
 Lors de certains paramétrages du paquet `se3-clients-linux`, vous serez parfois amené(e) à modifier le contenu du répertoire `/home/netlogon/clients-linux/` du serveur :
 
-    * soit via une console sur le serveur si vous êtes un(e) adepte de la ligne de commandes ;
-    * soit via le lien symbolique `clients-linux` situé sur le bureau du compte `admin`  
-     lorsque vous est connecté(e) sur un client GNU/Linux intégré au domaine.  
+* soit via une console sur le serveur si vous êtes un(e) adepte de la ligne de commandes ;
+* soit via le lien symbolique `clients-linux` situé sur le bureau du compte `admin`  
+lorsque vous est connecté(e) sur un client GNU/Linux intégré au domaine.  
 
 Dans un cas comme dans l'autre, une fois vos modifications terminées, il faudra **TOUJOURS reconfigurer les droits du paquet** sans quoi vous risquez ensuite de rencontrer des erreurs incompréhensibles.
 
