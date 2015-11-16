@@ -42,8 +42,9 @@
 Le but de cette documentation est de décrire un mode opératoire
 d'intégration de stations clientes Debian ou Ubuntu dans un domaine
 SambaÉdu (avec un serveur en version Squeeze ou Wheezy) par
-l'intermédiaire du paquet `se3-clients-linux`. Les distributions
-GNU/Linux qui ont été testées sont :
+l'intermédiaire du paquet `se3-clients-linux`.
+
+**Les distributions GNU/Linux qui ont été testées sont :**
 
 * Debian Squeeze (version 6)
 * Debian Wheezy (version 7)
