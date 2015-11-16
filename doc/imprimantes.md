@@ -4,23 +4,25 @@ Ne disposant personnellement d'aucune imprimante réseau, je n'ai jamais pu test
 
 **Note :** Si vous avez du code bash à me proposer pour automatiser l'installation des imprimantes sur les clients GNU/Linux via par exemple la fonction initialisation_perso, je suis preneur (francois.lafont@crdp.ac-versailles.fr).
 
-* [Le répertoire `/mnt/netlogon/divers/imprimantes/`]()
-* [Installation d'une imprimante réseau]()
-* [Imprimante par défaut]()
-* [Suppression d'une imprimante]()
-* [CUPS]()
-* [Références]()
+* [Le répertoire `/mnt/netlogon/divers/imprimantes/`](#le-répertoire-mntnetlogondiversimprimantes)
+* [Installation d'une imprimante réseau](#installation-dune-imprimante-réseau)
+* [Imprimante par défaut](#imprimante-par-défaut)
+* [Suppression d'une imprimante](#suppression-dune-imprimante)
+* [CUPS](#cups)
+* [Références](#références)
 
 
 ## Le répertoire `/mnt/netlogon/divers/imprimantes/`
 
 Sur un client GNU/Linux, le répertoire `/mnt/netlogon/divers/` contient un sous-répertoire nommé `imprimantes/`.
 
-Ce répertoire vous permettra de stocker de manière centralisée des fichiers .ppd (pour « PostScript Printer Description ») qui sont des sortes de drivers permettant d'installer des imprimantes sur les clients GNU/Linux.
+Ce répertoire vous permettra de stocker de manière centralisée des fichiers `.ppd` (pour « PostScript Printer Description ») qui sont des sortes de drivers permettant d'installer des imprimantes sur les clients GNU/Linux.
 
-Vous pouvez télécharger de tels fichiers (qui dépendent du modèle de l'imprimante) sur ce site par exemple :
-
+Vous pouvez télécharger de tels fichiers (qui dépendent du modèle de l'imprimante) sur ce site par exemple :  
 [http://www.openprinting.org/printers](http://www.openprinting.org/printers)
+
+
+Certains constructeurs proposent des fichiers `.ppd` sur leurs sites.
 
 
 ## Installation d'une imprimante réseau
