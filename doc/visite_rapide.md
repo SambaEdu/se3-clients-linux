@@ -103,7 +103,7 @@ Le répertoire `distribs/` contient un sous-répertoire par distribution GNU/Lin
 
 Ce répertoire contient le `script d'intégration`.
 
-C'est ce script qu'il faudra exécuter en tant que `root` sur chaque client que l'on souhaite intégrer au domaine du serveur. Pour l'utilisation de ce script, voir la section [Intégration d'un client GNU/Linux](../impatients.md#int%C3%A9gration-dun-client-gnulinux).
+C'est ce script qu'il faudra exécuter en tant que `root` sur chaque client que l'on souhaite intégrer au domaine du serveur. Pour l'utilisation de ce script, voir la section [Intégration d'un client GNU/Linux](../impatients.md#intégration-dun-client-gnulinux).
 
 Les options disponibles dans ce script d'intégration sont décrites dans la section [options-integration](options_scripts.md).
 
