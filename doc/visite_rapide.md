@@ -4,7 +4,7 @@ Afin de faire un rapide tour d'horizon du paquet `se3-clients-linux`, voici ci-d
 
 Les noms des répertoires possèdent un slash à la fin, sinon il s'agit de fichiers standards.
 
-* [Arborescence du répertoire clients-linux/](#arborescence-du-r%C3%A9pertoire-clients-linux)
+* [Arborescence du répertoire clients-linux/](#arborescence-du-répertoire-clients-linux)
 * [Quelques commentaires rapides](#quelques-commentaires-rapides)
     * [Le répertoire `bin/`](#le-r%C3%A9pertoire-bin)
     * [Le répertoire `distribs/`](#le-r%C3%A9pertoire-distribs)
