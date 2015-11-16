@@ -2,18 +2,27 @@
 
 Les deux scripts d'intégration `integration_squeeze.bash` et `integration_precise.bash`, qui doivent être exécutés en tant que `root` en local sur chaque client GNU/Linux à intégrer, utilisent exactement le même jeu d'options.
 
-##Liste des différentes options
-* [le nom d'hôte du client](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---nom-client-ou---nc)
-* [le mote de passe pour `Grub`](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---mdp-grub-ou---mg)
-* [le mot de passe pour le compte `root`](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---mdp-root-ou---mr)
-* [ignorer la vérification de l'annuaire](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---ignorer-verification-ldap-ou---ivl)
-* [installer le paquet `samba`](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---installer-samba-ou---is)
-* [redémarrer le client-linux à la fin de l'intégration](https://github.com/flaf/se3-clients-linux/blob/master/doc/options_scripts.md#loption---redemarrer-client-ou---rc)
 
 
-##Détails des options
+## Liste des différentes options
 
-###L'option `--nom-client` ou `--nc`
+* [le nom d'hôte du client](#loption---nom-client-ou---nc)
+* [le mote de passe pour `Grub`](#loption---mdp-grub-ou---mg)
+* [le mot de passe pour le compte `root`](#loption---mdp-root-ou---mr)
+* [ignorer la vérification de l'annuaire](#loption---ignorer-verification-ldap-ou---ivl)
+* [installer le paquet `samba`](#loption---installer-samba-ou---is)
+* [redémarrer le client-linux à la fin de l'intégration](#loption---redemarrer-client-ou---rc)
+
+
+## Remarques importantes
+
+* [Enregistrement du client-linux dans l'annuaire]()
+* [Le répertoire `/mnt/`]()
+
+
+## Détails des options
+
+### L'option `--nom-client` ou `--nc`
 
 cette option vous permet de modifier le nom d'hôte du client.
 
@@ -34,7 +43,7 @@ cette option vous permet de modifier le nom d'hôte du client.
 **NB :** *De plus, le nom de la machine ne soit pas faire plus de 15 caractères*.
 
 
-###L'option `--mdp-grub` ou `--mg`
+### L'option `--mdp-grub` ou `--mg`
 
 Cette option vous permet d'ajouter un mot de passe dès qu'un utilisateur souhaite éditer un des items du menu `Grub` au démarrage.
 
@@ -62,7 +71,7 @@ Cette option vous permet de modifier le mot de passe du compte `root`.
 * Si l'option est spécifiée avec un paramètre comme dans : `./integration_squeeze.bash --mdp-root="abcd"` alors le script ne stoppera pas son exécution et effectuera directement le changement de mot de passe en utilisant la valeur fournie en paramètre (ici `abcd`).
 
 
-###L'option `--ignorer-verification-ldap` ou `--ivl`
+### L'option `--ignorer-verification-ldap` ou `--ivl`
 
 Cette option, qui ne prend aucun paramètre, vous permet de continuer l'intégration sans faire de pause après la vérification LDAP.
 
@@ -82,7 +91,7 @@ Dans tous les cas, le résultat de cette recherche sera affiché.
 Si par exemple vous vous apercevez que le nom d'hôte que vous avez choisi pour votre client GNU/Linux existe déjà dans l'annuaire du serveur, il faudra peut-être arrêter l'intégration (sauf si le système GNU/Linux est installé en dual boot avec Windows sur la machine et que le système Windows, lui, a déjà été intégré au domaine avec ce même nom).
 
 
-###L'option `--installer-samba` ou `--is`
+### L'option `--installer-samba` ou `--is`
 
 Cette option, qui ne prend aucun paramètre, provoquera l'installation de Samba sur le client GNU/Linux.
 
@@ -93,24 +102,30 @@ Cette option, qui ne prend aucun paramètre, provoquera l'installation de Samba 
 En effet, lorsqu'un client GNU/Linux essaye de monter un partage Samba du serveur (notamment le partage `homes`), des scripts sont exécutés en amont côté serveur et le montage ne sera effectué qu'une fois ces scripts terminés. Or, l'un d'entre eux peut mettre un certain temps (environ 4 ou 5 secondes) à se terminer si Samba n'est pas installé sur la machine cliente. Par conséquent, si vous ne spécifiez pas l'option , vous risquez d'avoir des ouvertures de sessions un peu lentes (lors du montage des partages Samba). Donc pour l'instant, utilisez cette option lors de vos intégrations.
 
 
-###L'option `--redemarrer-client` ou `--rc`
+### L'option `--redemarrer-client` ou `--rc`
 
 Cette option permet de lancer automatiquement un redémarrage du client GNU/Linux à la fin de l'exécution du script d'intégration.
 
 * Si vous ne spécifiez pas cette option, il n'y aura pas de redémarrage à la fin de l'exécution du script.
 
 
-**Redémarrage :** sachez que le redémarrage après intégration est nécessaire pour avoir un système opérationnel. Si les intégrations se déroulent sans erreur sur vos machines Linux, vous aurez donc tout intérêt à spécifier à chaque fois l'option `--rc`.
+**Redémarrage :** sachez que le redémarrage après intégration est nécessaire pour avoir un système opérationnel. Si les intégrations se déroulent sans erreur sur vos machines Linux, vous aurez donc tout intérêt à spécifier à chaque fois l'option `--rc` pour qu'il se fasse automatiquement.
 
 
-**Précision :** quel que soit le jeu d'options que vous aurez choisi, *aucun enregistrement dans l'annuaire du serveur ne sera effectué par le script d'intégration*.
+## Enregistrement du client-linux dans l'annuaire
+
+Quel que soit le jeu d'options que vous aurez choisi, **aucun enregistrement dans l'annuaire du serveur ne sera effectué par le script d'intégration**.
 
 
-**Conséquence :** si vous souhaitez que votre client GNU/Linux fraîchement intégré figure dans l'annuaire du serveur, il faudra passer par une réservation d'adresse IP de la carte réseau du client via le module DHCP du serveur.
+**Conséquence :** si vous souhaitez que votre client GNU/Linux fraîchement intégré figure dans l'annuaire du serveur, il faudra passer par **une réservation d'adresse IP de la carte réseau du client via le module DHCP du serveur**.
 
 
-**Important :** Une fois un client intégré au domaine, évitez de monter un disque ou un partage dans le répertoire `/mnt/`.
+## Le répertoire `/mnt/`
+
+Une fois un client intégré au domaine, **évitez de monter un disque ou un partage dans le répertoire `/mnt/`**.
 
 En effet, le répertoire `/mnt/` est utilisé constamment par le client GNU/Linux (une fois que celui-ci est intégré au domaine) pour y effectuer des montages de partages, notamment au moment de l'ouverture de session d'un utilisateur du domaine, et ce répertoire est aussi constamment nettoyé , notamment juste après une fermeture de session.
 
-Afin d'éviter le nettoyage intempestif d'un de vos disques ou d'un partage réseau de votre cru, utilisez un autre répertoire pour procéder au montage. Utilisez par exemple le répertoire `/media/` à la place. En fait, utilisez ce que vous voulez sauf `/mnt/`.
+Afin d'éviter le nettoyage intempestif d'un de vos disques ou d'un partage réseau de votre cru, utilisez un autre répertoire pour procéder au montage.
+
+**Utilisez par exemple le répertoire `/media/` à la place**. En fait, utilisez ce que vous voulez sauf `/mnt/`.
