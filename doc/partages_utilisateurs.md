@@ -62,7 +62,7 @@ Lors de certains paramétrages du paquet `se3-clients-linux`, vous serez parfois
 
 * soit via une console sur le serveur si vous êtes un(e) adepte de la ligne de commandes ;
 * soit via le lien symbolique `clients-linux` situé sur le bureau du compte `admin`  
-lorsque vous est connecté(e) sur un client GNU/Linux intégré au domaine.  
+lorsque vous êtes connecté(e) sur un client GNU/Linux intégré au domaine.  
 
 Dans un cas comme dans l'autre, une fois vos modifications terminées, il faudra **TOUJOURS reconfigurer les droits du paquet** sans quoi vous risquez ensuite de rencontrer des erreurs incompréhensibles.
 
