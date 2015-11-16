@@ -6,10 +6,10 @@ Les noms des répertoires possèdent un slash à la fin, sinon il s'agit de fich
 
 * [Arborescence du répertoire clients-linux/](#arborescence-du-répertoire-clients-linux)
 * [Quelques commentaires rapides](#quelques-commentaires-rapides)
-    * [Le répertoire `bin/`](#le-r%C3%A9pertoire-bin)
-    * [Le répertoire `distribs/`](#le-r%C3%A9pertoire-distribs)
-    * [Le répertoire `divers/`](#le-r%C3%A9pertoire-divers)
-    * [Le répertoire `unefois/`](#le-r%C3%A9pertoire-unefois)
+    * [Le répertoire `bin/`](#le-répertoire-bin)
+    * [Le répertoire `distribs/`](#le-répertoire-distribs)
+    * [Le répertoire `divers/`](#le-répertoire-divers)
+    * [Le répertoire `unefois/`](#le-répertoire-unefois)
 
 Certains fichiers ou répertoires, dont vous n'avez pas à vous préoccuper, ont été omis afin d'alléger le schéma et les explications qui vont avec. Notamment le répertoire `save` dont le contenu est essentiel lors de l'intégration des clients-linux.
 
