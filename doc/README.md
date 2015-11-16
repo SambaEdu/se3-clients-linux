@@ -70,7 +70,7 @@ exclure.
 * [Les logs pour détecter un problème](logs_detecter_probleme.md)
 * [Le cas des classes nomades](classes_nomades.md)
 * [Un mot sur les imprimantes](imprimantes.md)
-* [Désinstallation/réinstalationdu paquet se3-clients-linux](desinstall_reinstall_paquet.md)
+* [Désinstallation/réinstallationdu paquet se3-clients-linux](desinstall_reinstall_paquet.md)
 
 
 ## Annexes
