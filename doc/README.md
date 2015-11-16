@@ -7,7 +7,7 @@
 ## Table des matières
 
 * [Objectifs](https://github.com/flaf/se3-clients-linux/blob/master/doc/README.md#objectifs)
-* [Distributions GNU/Linux testées]()
+* [Distributions GNU/Linux testées](https://github.com/flaf/se3-clients-linux/blob/master/doc/README.md#distributions-gnulinux-test%C3%A9es)
 * [Avertissements](https://github.com/flaf/se3-clients-linux/blob/master/doc/README.md#avertissements)
 * [Pour les impatients qui veulent tester rapidement](impatients.md)
 * [Visite rapide du répertoire clients-linux/ du serveur](visite_rapide.md)
