@@ -66,11 +66,31 @@ Les fichiers ou répertoires que vous êtes libre de modifier pour les adapter �
 
 ### Le répertoire `bin/`
 
-* Le répertoire `bin/` contient en premier lieu le fichier qui est le script de `logon`. Ce script est véritablement le chef d'orchestre de tous les clients GNU/Linux intégrés au domaine. C'est lui qui contient les instructions exécutées systématiquement par les clients GNU/Linux juste avant l'affichage de la fenêtre de connexion, au moment de l'ouverture de session et au moment de la fermeture de session. Ce script de logon sera expliqué à la section [logon-script](script_logon.md). En principe, vous ne devez pas modifier ce fichier. En revanche, vous pourrez modifier le fichier `logon_perso` juste à côté. Ce fichier vous permettra d'affiner le comportement du script `logon` afin de l'adapter à vos besoins. Vous trouverez toutes les explications nécessaires dans la section [personnalisation](https://github.com/flaf/se3-clients-linux/blob/master/doc/script_logon.md#personnaliser-le-script-de-logon).
+* Le répertoire `bin/` contient en premier lieu le fichier qui est le script de `logon`.
 
-    Le répertoire `bin/` contient également le fichier `connexion_ssh_serveur.bash`. Il s'agit simplement d'un petit script exécutable qui, lorsque sous serez connecté(e) avec le compte `admin` sur un client GNU/Linux et que vous double-cliquerez dessus, vous permettra d'ouvrir une connexion SSH sur le serveur en tant que `root` (autrement dit une console à distance sur le serveur en tant que `root`). C'est une simple commodité. Bien sûr, il vous sera demandé de fournir le mot de passe du compte sur le serveur. Pour fermer proprement la connexion SSH, il vous suffira de taper sur la console la commande `exit`.
+Ce script `logon` est véritablement le chef d'orchestre de tous les clients GNU/Linux intégrés au domaine. C'est lui qui contient les instructions exécutées systématiquement par les clients GNU/Linux juste avant l'affichage de la fenêtre de connexion, au moment de l'ouverture de session et au moment de la fermeture de session.
 
-    Enfin, le répertoire `bin/` contient le fichier `reconfigure.bash`. Il s'agit d'un fichier exécutable très pratique qui vous permettra de remettre les droits par défaut sur l'ensemble des fichiers du paquet `se3-clients-linux` se trouvant sur le serveur et d'insérer le contenu du fichier `logon_perso` (votre fichier personnel que vous pouvez modifier afin d'ajuster le comportement des clients GNU/Linux selon vos préférences) à l'intérieur du fichier `logon` qui est le seul fichier lu par les clients GNU/Linux. Vous pourrez lancer cet exécutable à partir du compte `admin` du domaine sur un client GNU/Linux intégré. Cet exécutable utilise une connexion SSH en tant que `root` et à chaque fois il faudra donc saisir le mot de passe `root` du serveur.
+Ce fichier `logon` sera expliqué à la section [logon-script](script_logon.md).
+
+En principe, vous ne devez pas modifier ce fichier `logon`. En revanche, vous pourrez modifier le fichier `logon_perso` juste à côté.
+
+Ce fichier `logon_perso` vous permettra d'affiner le comportement du script `logon` afin de l'adapter à vos besoins. Vous trouverez toutes les explications nécessaires dans la section [personnalisation](https://github.com/flaf/se3-clients-linux/blob/master/doc/script_logon.md#personnaliser-le-script-de-logon).
+
+* Le répertoire `bin/` contient également le fichier `connexion_ssh_serveur.bash`.
+
+Il s'agit simplement d'un petit script exécutable qui, lorsque sous serez connecté(e) avec le compte `admin` sur un client GNU/Linux et que vous double-cliquerez dessus, vous permettra d'ouvrir une connexion SSH sur le serveur en tant que `root` (autrement dit une console à distance sur le serveur en tant que `root`).
+
+C'est une simple commodité. Bien sûr, il vous sera demandé de fournir le mot de passe du compte `root` sur le serveur.
+
+Pour fermer proprement la connexion SSH, il vous suffira de taper sur la console la commande `exit`.
+
+* Enfin, le répertoire `bin/` contient le fichier `reconfigure.bash`.
+
+Il s'agit d'un fichier exécutable très pratique qui vous permettra de remettre les droits par défaut sur l'ensemble des fichiers du paquet `se3-clients-linux` se trouvant sur le serveur et d'insérer le contenu du fichier `logon_perso` (votre fichier personnel que vous pouvez modifier afin d'ajuster le comportement des clients GNU/Linux selon vos préférences) à l'intérieur du fichier `logon` qui est le seul fichier lu par les clients GNU/Linux.
+
+Vous pourrez lancer cet exécutable `reconfigure.bash` à partir du compte `admin` du domaine sur un client GNU/Linux intégré.
+
+Cet exécutable utilise une connexion SSH en tant que `root` et à chaque fois il faudra donc saisir le mot de passe `root` du serveur.
 
 
 ## Le répertoire `distribs/`
