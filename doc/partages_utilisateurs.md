@@ -61,7 +61,8 @@ Techniquement, une modification de ce répertoire est aussi possible via le lien
 Lors de certains paramétrages du paquet `se3-clients-linux`, vous serez parfois amené(e) à modifier le contenu du répertoire `/home/netlogon/clients-linux/` du serveur :
 
     * soit via une console sur le serveur si vous êtes un(e) adepte de la ligne de commandes ;
-    * soit via le lien symbolique `clients-linux` situé sur le bureau du compte `admin` lorsque vous est connecté(e) sur un client GNU/Linux intégré au domaine.
+    * soit via le lien symbolique `clients-linux` situé sur le bureau du compte `admin`  
+     lorsque vous est connecté(e) sur un client GNU/Linux intégré au domaine.  
 
 Dans un cas comme dans l'autre, une fois vos modifications terminées, il faudra **TOUJOURS reconfigurer les droits du paquet** sans quoi vous risquez ensuite de rencontrer des erreurs incompréhensibles.
 
@@ -80,14 +81,14 @@ Dans ce cas, exécutez en tant que `root` la commande suivante:
 
 Dans ce cas, double-cliquer sur le fichier `reconfigure.bash` accessible en passant par le lien symbolique `clients-linux` sur le bureau puis par le répertoire `bin/`(le mot de passe `root` du serveur se3 sera demandé).
 
-**Remarque :** en réalité, ces deux procédures ne font pas que reconfigurer les droits sur les fichiers, elles permettent aussi d'injecter le contenu du fichier `logon_perso` dans le fichier `logon`. Ce point sera abordé dans la section [personnalisation].
+**Remarque :** en réalité, ces deux procédures ne font pas que reconfigurer les droits sur les fichiers, elles permettent aussi d'injecter le contenu du fichier `logon_perso` dans le fichier `logon`. Ce point est abordé dans la section [personnalisation](https://github.com/flaf/se3-clients-linux/blob/master/doc/script_logon.md#personnaliser-le-script-de-logon).
 
 
 ## Cas des paquets dont la version est antérieure à 1.1
 
 **Avertissement valable uniquement pour ceux qui ont déjà installé une version n du paquet avec n < 1.1**
 
-**Attention**, **depuis la version $1.1$ du paquet**, la gestion des partages accessibles se fait exclusivement dans le fichier `logon_perso`.
+**Attention**, **depuis la version 1.1 du paquet**, la gestion des partages accessibles se fait exclusivement dans le fichier `logon_perso`.
 
 Cela a une conséquence importante si une version antérieure à la version $1.1$ du paquet est déjà installée sur votre serveur se3.
 
@@ -97,7 +98,7 @@ C'est parfaitement normal car, lors de la mise à jour du paquet, votre fichier 
 
 Il est cependant très facile de retrouver le comportement par défaut (comme décrit ci-dessous) au niveau du montage des partages réseau à l'ouverture de session. Sur une console du serveur, en tant que `root`, il vous suffit de faire :
 
-    ```sh
+```sh
 # On se place dans le répertoire `bin/`.
 cd /home/netlogon/clients-linux/bin/
 
