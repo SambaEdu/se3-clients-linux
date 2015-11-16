@@ -2,12 +2,12 @@
 
 Afin de faire un rapide tour d'horizon du paquet `se3-clients-linux`, voici ci-dessous un schéma du contenu du répertoire `/home/netlogon/clients-linux/` du serveur. Les noms des répertoires possèdent un slash à la fin, sinon il s'agit de fichiers standards.
 
-* [Arborescence du répertoire clients-linux/]()
-* [Quelques commentaires rapides]()
-    * [Le répertoire `bin/`]()
-    * [Le répertoire `distribs/`]()
-    * [Le répertoire `divers/`]()
-    * [Le répertoire `unefois/`]()
+* [Arborescence du répertoire clients-linux/](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#arborescence-du-r%C3%A9pertoire-clients-linux)
+* [Quelques commentaires rapides](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#quelques-commentaires-rapides)
+    * [Le répertoire `bin/`](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#le-r%C3%A9pertoire-bin)
+    * [Le répertoire `distribs/`](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#le-r%C3%A9pertoire-distribs)
+    * [Le répertoire `divers/`](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#le-r%C3%A9pertoire-divers)
+    * [Le répertoire `unefois/`](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#le-r%C3%A9pertoire-unefois)
 
 Certains fichiers ou répertoires, dont vous n'avez pas à vous préoccuper, ont été omis afin d'alléger le schéma et les explications qui vont avec. Notamment le répertoire `save` dont le contenu est essentiel lors de l'intégration des clients-linux.
 
