@@ -3,19 +3,19 @@
 La mise en place de clients-linux commence par l'installation
 du paquet `se3-clients-linux` sur le serveur.
 
-* [Installation du paquet `se3-clients-linux` sur le serveur](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#installation-du-paquet-se3-clients-linux-sur-le-serveur)
-    * [En ligne de commande](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#en-ligne-de-commande)
-    * [Par l'interface Web du serveur se3](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#par-linterface-web-du-serveur-se3)
-    * [Quelques précisions](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#quelques-pr%C3%A9cisions)
+* [Installation du paquet `se3-clients-linux` sur le serveur](#installation-du-paquet-se3-clients-linux-sur-le-serveur)
+    * [En ligne de commande](#en-ligne-de-commande)
+    * [Par l'interface Web du serveur se3](#par-linterface-web-du-serveur-se3)
+    * [Quelques précisions](#quelques-pr%C3%A9cisions)
 
 
 Ensuite, sur chaque client-linux, sera exécuté le script correspondant
 à sa version (Jessie ou Trusty, par exemple).
 
-* [Intégration d'un client GNU/Linux](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#int%C3%A9gration-dun-client-gnulinux)
-    * [Copier le script d'intégration sur le client-linux](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#copier-le-script-dint%C3%A9gration-sur-le-client-linux)
-    * [Rendre exécutable le script d'intégration](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#rendre-ex%C3%A9cutable-le-script-dint%C3%A9gration)
-    * [Lancer le script d'intégration](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#lancer-le-script-dint%C3%A9gration)
+* [Intégration d'un client GNU/Linux](#int%C3%A9gration-dun-client-gnulinux)
+    * [Copier le script d'intégration sur le client-linux](#copier-le-script-dint%C3%A9gration-sur-le-client-linux)
+    * [Rendre exécutable le script d'intégration](#rendre-ex%C3%A9cutable-le-script-dint%C3%A9gration)
+    * [Lancer le script d'intégration](#lancer-le-script-dint%C3%A9gration)
 
 
 **Recommendation :** Le script d'intégration sera exécuté sur un client-linux qui vient d'être installé. Si le client-linux *a déjà servi*, il se peut qu'apparaissent des effets de bords…
