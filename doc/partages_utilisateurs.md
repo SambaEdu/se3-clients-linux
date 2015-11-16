@@ -2,18 +2,18 @@
 
 Cette liste de partages est une liste proposée **par défaut** par le paquet `se3-clients-linux`.
 
-Vous verrez plus loin, à la section [gestion-montage]() [TODO], que vous pourrez définir vous-même
+Vous verrez plus loin, à la section [gestion du montage des partages](script_logon.md#gestion-du-montage-des-partages-réseau), que vous pourrez définir vous-même
 la liste des partages disponibles en fonction du compte qui se connecte ou en fonction de son appartenance à tel ou tel groupe.
 
 **Cette liste est donc tout à fait modifiable**.
 
-* [Liste par défaut des partages accessibles suivant le type de compte](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#liste-par-d%C3%A9faut-des-partages-accessibles-suivant-le-type-de-compte)
-    * [Partages pour un compte `élève`](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#partages-pour-un-compte-%C3%A9l%C3%A8ve)
-    * [Partages pour un compte `professeur`](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#partages-pour-un-compte-professeur)
-    * [Partages pour le compte `admin`](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#partages-pour-le-compte-admin)
-* [Le lien symbolique clients-linux](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#le-lien-symbolique-clients-linux)
-* [Reconfiguration des droits du paquet `se3-clients-linux`](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#reconfiguration-des-droits-du-paquet-se3-clients-linux)
-* [Cas des paquets dont la version est antérieure à 1.1](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#cas-des-paquets-dont-la-version-est-ant%C3%A9rieure-%C3%A0-11)
+* [Liste par défaut des partages accessibles suivant le type de compte](#liste-par-défaut-des-partages-accessibles-suivant-le-type-de-compte)
+    * [Partages pour un compte `élève`](#partages-pour-un-compte-élève)
+    * [Partages pour un compte `professeur`](#partages-pour-un-compte-professeur)
+    * [Partages pour le compte `admin`](#partages-pour-le-compte-admin)
+* [Le lien symbolique clients-linux](#le-lien-symbolique-clients-linux)
+* [Reconfiguration des droits du paquet `se3-clients-linux`](#reconfiguration-des-droits-du-paquet-se3-clients-linux)
+* [Cas des paquets dont la version est antérieure à 1.1](#cas-des-paquets-dont-la-version-est-antérieure-à-11)
 
 
 
@@ -81,7 +81,7 @@ Dans ce cas, exécutez en tant que `root` la commande suivante:
 
 Dans ce cas, double-cliquer sur le fichier `reconfigure.bash` accessible en passant par le lien symbolique `clients-linux` sur le bureau puis par le répertoire `bin/`(le mot de passe `root` du serveur se3 sera demandé).
 
-**Remarque :** en réalité, ces deux procédures ne font pas que reconfigurer les droits sur les fichiers, elles permettent aussi d'injecter le contenu du fichier `logon_perso` dans le fichier `logon`. Ce point est abordé dans la section [personnalisation](https://github.com/flaf/se3-clients-linux/blob/master/doc/script_logon.md#personnaliser-le-script-de-logon).
+**Remarque :** en réalité, ces deux procédures ne font pas que reconfigurer les droits sur les fichiers, elles permettent aussi d'injecter le contenu du fichier `logon_perso` dans le fichier `logon`. Ce point est abordé dans la section [personnalisation](script_logon.md#personnaliser-le-script-de-logon).
 
 
 ## Cas des paquets dont la version est antérieure à 1.1
