@@ -76,7 +76,7 @@ Ce fichier `logon` est expliqué à la section [logon-script](script_logon.md).
 
 En principe, vous ne devez pas modifier ce fichier `logon`. En revanche, vous pourrez modifier le fichier `logon_perso` juste à côté.
 
-Ce fichier `logon_perso` vous permettra d'affiner le comportement du script `logon` afin de l'adapter à vos besoins. Vous trouverez toutes les explications nécessaires dans la section [personnalisation](../script_logon.md#personnaliser-le-script-de-logon).
+Ce fichier `logon_perso` vous permettra d'affiner le comportement du script `logon` afin de l'adapter à vos besoins. Vous trouverez toutes les explications nécessaires dans la section [personnalisation](script_logon.md#personnaliser-le-script-de-logon).
 
 * **Le répertoire `bin/` contient également le fichier `connexion_ssh_serveur.bash`**
 
