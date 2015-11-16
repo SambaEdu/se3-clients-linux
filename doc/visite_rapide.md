@@ -68,17 +68,17 @@ Les fichiers ou répertoires que vous êtes libre de modifier pour les adapter �
 
 ### Le répertoire `bin/`
 
-**Le répertoire `bin/` contient en premier lieu le fichier qui est le script de `logon`**
+* Le répertoire `bin/` contient en premier lieu **le fichier `logon`** qui est le script de logon
 
-Ce script `logon` est véritablement le chef d'orchestre de tous les clients GNU/Linux intégrés au domaine. C'est lui qui contient les instructions exécutées systématiquement par les clients GNU/Linux juste avant l'affichage de la fenêtre de connexion, au moment de l'ouverture de session et au moment de la fermeture de session.
+Ce fichier `logon` est véritablement le chef d'orchestre de tous les clients GNU/Linux intégrés au domaine. C'est lui qui contient les instructions exécutées systématiquement par les clients GNU/Linux juste avant l'affichage de la fenêtre de connexion, au moment de l'ouverture de session et au moment de la fermeture de session.
 
-Ce fichier `logon` sera expliqué à la section [logon-script](script_logon.md).
+Ce fichier `logon` est expliqué à la section [logon-script](script_logon.md).
 
 En principe, vous ne devez pas modifier ce fichier `logon`. En revanche, vous pourrez modifier le fichier `logon_perso` juste à côté.
 
 Ce fichier `logon_perso` vous permettra d'affiner le comportement du script `logon` afin de l'adapter à vos besoins. Vous trouverez toutes les explications nécessaires dans la section [personnalisation](https://github.com/flaf/se3-clients-linux/blob/master/doc/script_logon.md#personnaliser-le-script-de-logon).
 
-**Le répertoire `bin/` contient également le fichier `connexion_ssh_serveur.bash`**
+* Le répertoire `bin/` contient également **le fichier `connexion_ssh_serveur.bash`**
 
 Il s'agit simplement d'un petit script exécutable qui, lorsque sous serez connecté(e) avec le compte `admin` sur un client GNU/Linux et que vous double-cliquerez dessus, vous permettra d'ouvrir une connexion SSH sur le serveur en tant que `root` (autrement dit une console à distance sur le serveur en tant que `root`).
 
@@ -86,18 +86,18 @@ C'est une simple commodité. Bien sûr, il vous sera demandé de fournir le mot 
 
 Pour fermer proprement la connexion SSH, il vous suffira de taper sur la console la commande `exit`.
 
-**Enfin, le répertoire `bin/` contient le fichier `reconfigure.bash`**
+* Enfin, le répertoire `bin/` contient **le fichier `reconfigure.bash`**
 
 Il s'agit d'un fichier exécutable très pratique qui vous permettra de remettre les droits par défaut sur l'ensemble des fichiers du paquet `se3-clients-linux` se trouvant sur le serveur et d'insérer le contenu du fichier `logon_perso` (votre fichier personnel que vous pouvez modifier afin d'ajuster le comportement des clients GNU/Linux selon vos préférences) à l'intérieur du fichier `logon` qui est le seul fichier lu par les clients GNU/Linux.
 
 Vous pourrez lancer cet exécutable `reconfigure.bash` à partir du compte `admin` du domaine sur un client GNU/Linux intégré.
 
-Cet exécutable utilise une connexion SSH en tant que `root` et à chaque fois il faudra donc saisir le mot de passe `root` du serveur.
+Cet exécutable utilise une connexion SSH en tant que `root` et à chaque fois il faudra donc saisir le mot de passe `root` du serveur se3.
 
 
 ## Le répertoire `distribs/`
 
-**Le répertoire `distribs/` contient un sous-répertoire par distribution GNU/Linux prise en charge par le paquet**
+Le répertoire `distribs/` contient un sous-répertoire par distribution GNU/Linux prise en charge par le paquet et, dans chacun d'eux, il y a notamment un répertoire `integration/` et un répertoire `skel/`.
 
 Par exemple, dans le sous-répertoire `jessie/`, il y a les dossiers suivants :
 
@@ -127,7 +127,7 @@ En particulier, vous aurez accès au contenu du répertoire `divers/` à travers
 
 ### Le répertoire `unefois/`
 
-Le répertoire `unefois/` sert à exécuter des scripts une seule fois sur toute une famille de clients GNU/Linux intégrés au domaine.
+Le répertoire `unefois/` sert à gérer l'exécution de scripts une seule fois sur toute une famille de clients GNU/Linux intégrés au domaine.
 
 Ce répertoire peut s'avérer utile pour effectuer des tâches administratives sur les clients GNU/Linux. Toutes les explications nécessaires sur ce répertoire se trouvent dans la section [unefois](repertoire_unefois.md).
 
