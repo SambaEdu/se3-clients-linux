@@ -68,7 +68,7 @@ Les fichiers ou répertoires que vous êtes libre de modifier pour les adapter �
 
 ### Le répertoire `bin/`
 
-* Le répertoire `bin/` contient en premier lieu **le fichier `logon`** qui est le script de logon
+* **Le répertoire `bin/` contient en premier lieu le fichier `logon` qui est le script de logon**
 
 Ce fichier `logon` est véritablement le chef d'orchestre de tous les clients GNU/Linux intégrés au domaine. C'est lui qui contient les instructions exécutées systématiquement par les clients GNU/Linux juste avant l'affichage de la fenêtre de connexion, au moment de l'ouverture de session et au moment de la fermeture de session.
 
@@ -78,7 +78,7 @@ En principe, vous ne devez pas modifier ce fichier `logon`. En revanche, vous po
 
 Ce fichier `logon_perso` vous permettra d'affiner le comportement du script `logon` afin de l'adapter à vos besoins. Vous trouverez toutes les explications nécessaires dans la section [personnalisation](https://github.com/flaf/se3-clients-linux/blob/master/doc/script_logon.md#personnaliser-le-script-de-logon).
 
-* Le répertoire `bin/` contient également **le fichier `connexion_ssh_serveur.bash`**
+* **Le répertoire `bin/` contient également le fichier `connexion_ssh_serveur.bash`**
 
 Il s'agit simplement d'un petit script exécutable qui, lorsque sous serez connecté(e) avec le compte `admin` sur un client GNU/Linux et que vous double-cliquerez dessus, vous permettra d'ouvrir une connexion SSH sur le serveur en tant que `root` (autrement dit une console à distance sur le serveur en tant que `root`).
 
@@ -86,7 +86,7 @@ C'est une simple commodité. Bien sûr, il vous sera demandé de fournir le mot 
 
 Pour fermer proprement la connexion SSH, il vous suffira de taper sur la console la commande `exit`.
 
-* Enfin, le répertoire `bin/` contient **le fichier `reconfigure.bash`**
+* **Enfin, le répertoire `bin/` contient le fichier `reconfigure.bash`**
 
 Il s'agit d'un fichier exécutable très pratique qui vous permettra de remettre les droits par défaut sur l'ensemble des fichiers du paquet `se3-clients-linux` se trouvant sur le serveur et d'insérer le contenu du fichier `logon_perso` (votre fichier personnel que vous pouvez modifier afin d'ajuster le comportement des clients GNU/Linux selon vos préférences) à l'intérieur du fichier `logon` qui est le seul fichier lu par les clients GNU/Linux.
 
@@ -99,21 +99,21 @@ Cet exécutable utilise une connexion SSH en tant que `root` et à chaque fois i
 
 Le répertoire `distribs/` contient un sous-répertoire par distribution GNU/Linux prise en charge par le paquet et, dans chacun d'eux, il y a notamment un répertoire `integration/` et un répertoire `skel/`.
 
-Par exemple, dans le sous-répertoire `jessie/`, il y a les dossiers suivants :
+* Le dossier `integration/`
 
-* Un dossier `integration/`
+Ce répertoire contient le `script d'intégration`.
 
-Ce répertoire contient notamment le script d'intégration.
+C'est ce script qu'il faudra exécuter en tant que `root` sur chaque client que l'on souhaite intégrer au domaine du serveur. Pour l'utilisation de ce script, voir la section [Intégration d'un client GNU/Linux](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#int%C3%A9gration-dun-client-gnulinux).
 
-C'est ce script qu'il faudra exécuter en tant que `root` sur chaque client `Jessie` que l'on souhaite intégrer au domaine du serveur. Pour l'utilisation de ce script, voir la section [Intégration d'un client GNU/Linux](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#int%C3%A9gration-dun-client-gnulinux).
+Les options disponibles dans ce script d'intégration sont décrites dans la section [options-integration](options_scripts.md).
 
-Les options disponibles dans ce scripts sont décrites dans la section [options-integration](options_scripts.md).
+* Le dossier `skel/`
 
-* Un dossier `skel/`
+Ce répertoire contient **le profil par défaut** de tous les utilisateurs du domaine sur la distribution concernée.
 
-Ce répertoire contient le profil par défaut (c'est-à-dire le home par défaut) de tous les utilisateurs du domaine sur la distribution concernée.
+**Note :** Certains fichiers et répertoires de ce dossier sont cachés. Pour les afficher, vous pouvez utiliser la combianiason de touches `Ctrl+h`.
 
-Si vous voulez modifier la page d'accueil du navigateur de tous les utilisateurs du domaine ou bien si vous voulez ajouter des icônes sur le bureau, c'est dans ce dossier qu'il faudra faire des modifications. Vous trouverez toutes les explications nécessaires dans la section [profils](gestion_profils.md).
+Si vous voulez modifier la page d'accueil du navigateur de tous les utilisateurs du domaine ou bien si vous voulez ajouter des icônes sur le bureau, c'est dans ce dossier `skel/` qu'il faudra faire des modifications. Vous trouverez toutes les explications nécessaires dans la section [profils](gestion_profils.md).
 
 
 ### Le répertoire `divers/`
@@ -122,7 +122,7 @@ Le répertoire `divers/` ne contient pas grand chose par défaut et vous pourrez
 
 L'intérêt de ce répertoire est que, si vous y placez des fichiers (ou des répertoires), ceux-ci seront accessibles uniquement par le compte `root` local de chaque client GNU/Linux et par le compte `admin` du domaine.
 
-En particulier, vous aurez accès au contenu du répertoire `divers/` à travers le script de logon et à travers les scripts unefois (évoqués ci-dessous) qui sont tous les deux exécutés par le compte local de chaque client GNU/Linux. Vous trouverez un exemple d'utilisation possible de ce répertoire dans la section [imprimante](imprimantes.md).
+En particulier, vous aurez accès au contenu du répertoire `divers/` à travers le script de logon et à travers les scripts `unefois` (évoqués ci-dessous) qui sont tous les deux exécutés par le compte `root` local de chaque client GNU/Linux. Vous trouverez un exemple d'utilisation possible de ce répertoire dans la section [imprimante](imprimantes.md).
 
 
 ### Le répertoire `unefois/`
