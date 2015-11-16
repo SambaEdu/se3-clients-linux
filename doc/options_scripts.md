@@ -16,8 +16,8 @@ Les deux scripts d'intégration `integration_squeeze.bash` et `integration_preci
 
 ## Remarques importantes
 
-* [Enregistrement du client-linux dans l'annuaire]()
-* [Le répertoire `/mnt/`]()
+* [Enregistrement du client-linux dans l'annuaire](#enregistrement-du-client-linux-dans-lannuaire)
+* [Le répertoire `/mnt/`](#le-répertoire-mnt)
 
 
 ## Détails des options
