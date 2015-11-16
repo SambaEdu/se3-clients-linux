@@ -3,14 +3,22 @@
 La mise en place de clients-linux commence par l'installation
 du paquet `se3-clients-linux` sur le serveur.
 
+* [Installation du paquet `se3-clients-linux` sur le serveur](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#installation-du-paquet-se3-clients-linux-sur-le-serveur)
+    * [En ligne de commande]()
+    * [Par l'interface Web du serveur se3]()
+    * [Quelques précisions]()
+
+
 Ensuite, sur chaque client-linux, sera exécuté le script correspondant
 à sa version (Jessie ou Trusty, par exemple).
 
-**Recommendation :** Le script d'intégration sera exécuté sur un client-linux qui vient d'être installé. Si le client-linux *a déjà servi*, il se peut qu'apparaissent des effets de bords…
-
-
-* [Installation du paquet `se3-clients-linux` sur le serveur](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#installation-du-paquet-se3-clients-linux-sur-le-serveur)
 * [Intégration d'un client GNU/Linux](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#int%C3%A9gration-dun-client-gnulinux)
+    * [Copier le script d'intégration sur le client-linux]()
+    * [Rendre exécutable le script d'intégration]()
+    * [Lancer le script d'intégration]()
+
+
+**Recommendation :** Le script d'intégration sera exécuté sur un client-linux qui vient d'être installé. Si le client-linux *a déjà servi*, il se peut qu'apparaissent des effets de bords…
 
 
 ## Installation du paquet `se3-clients-linux` sur le serveur
