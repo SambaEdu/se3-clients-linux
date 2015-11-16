@@ -2,18 +2,18 @@
 
 Cette liste de partages est une liste proposée **par défaut** par le paquet.
 
-Vous verrez plus loin, à la section [gestion-montage](), que vous pourrez définir vous-même
+Vous verrez plus loin, à la section [gestion-montage]() [TODO], que vous pourrez définir vous-même
 la liste des partages disponibles en fonction du compte qui se connecte ou en fonction de son appartenance à tel ou tel groupe.
 
 **Cette liste est donc tout à fait modifiable**.
 
-* [Liste par défaut des partages accessibles suivant le type de compte]()
-    * [Partages pour un compte `élève`]()
-    * [Partages pour un compte `professeur`]()
-    * [Partages pour le compte `admin`]()
-* [Le lien symbolique clients-linux]()
-* [Reconfiguration des droits du paquet `se3-clients-linux`]()
-* [Cas des paquets dont la version est antérieure à 1.1]()
+* [Liste par défaut des partages accessibles suivant le type de compte](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#liste-par-d%C3%A9faut-des-partages-accessibles-suivant-le-type-de-compte)
+    * [Partages pour un compte `élève`](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#partages-pour-un-compte-%C3%A9l%C3%A8ve)
+    * [Partages pour un compte `professeur`](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#partages-pour-un-compte-professeur)
+    * [Partages pour le compte `admin`](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#partages-pour-le-compte-admin)
+* [Le lien symbolique clients-linux](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#le-lien-symbolique-clients-linux)
+* [Reconfiguration des droits du paquet `se3-clients-linux`](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#reconfiguration-des-droits-du-paquet-se3-clients-linux)
+* [Cas des paquets dont la version est antérieure à 1.1](https://github.com/flaf/se3-clients-linux/blob/master/doc/partages_utilisateurs.md#cas-des-paquets-dont-la-version-est-ant%C3%A9rieure-%C3%A0-11)
 
 
 
