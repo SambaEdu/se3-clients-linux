@@ -6,8 +6,8 @@
 
 ## Table des matières
 
-* [Objectifs]()
-* [Avertissements]()
+* [Objectifs](https://github.com/flaf/se3-clients-linux/blob/master/doc/README.md#objectifs)
+* [Avertissements](https://github.com/flaf/se3-clients-linux/blob/master/doc/README.md#avertissements)
 * [Pour les impatients qui veulent tester rapidement](impatients.md)
 * [Visite rapide du répertoire clients-linux/ du serveur](visite_rapide.md)
 * [Les options des scripts d'intégration](options_scripts.md)
