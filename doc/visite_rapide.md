@@ -4,12 +4,12 @@ Afin de faire un rapide tour d'horizon du paquet `se3-clients-linux`, voici ci-d
 
 Les noms des répertoires possèdent un slash à la fin, sinon il s'agit de fichiers standards.
 
-* [Arborescence du répertoire clients-linux/](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#arborescence-du-r%C3%A9pertoire-clients-linux)
-* [Quelques commentaires rapides](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#quelques-commentaires-rapides)
-    * [Le répertoire `bin/`](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#le-r%C3%A9pertoire-bin)
-    * [Le répertoire `distribs/`](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#le-r%C3%A9pertoire-distribs)
-    * [Le répertoire `divers/`](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#le-r%C3%A9pertoire-divers)
-    * [Le répertoire `unefois/`](https://github.com/flaf/se3-clients-linux/blob/master/doc/visite_rapide.md#le-r%C3%A9pertoire-unefois)
+* [Arborescence du répertoire clients-linux/](#arborescence-du-r%C3%A9pertoire-clients-linux)
+* [Quelques commentaires rapides](#quelques-commentaires-rapides)
+    * [Le répertoire `bin/`](#le-r%C3%A9pertoire-bin)
+    * [Le répertoire `distribs/`](#le-r%C3%A9pertoire-distribs)
+    * [Le répertoire `divers/`](#le-r%C3%A9pertoire-divers)
+    * [Le répertoire `unefois/`](#le-r%C3%A9pertoire-unefois)
 
 Certains fichiers ou répertoires, dont vous n'avez pas à vous préoccuper, ont été omis afin d'alléger le schéma et les explications qui vont avec. Notamment le répertoire `save` dont le contenu est essentiel lors de l'intégration des clients-linux.
 
@@ -76,7 +76,7 @@ Ce fichier `logon` est expliqué à la section [logon-script](script_logon.md).
 
 En principe, vous ne devez pas modifier ce fichier `logon`. En revanche, vous pourrez modifier le fichier `logon_perso` juste à côté.
 
-Ce fichier `logon_perso` vous permettra d'affiner le comportement du script `logon` afin de l'adapter à vos besoins. Vous trouverez toutes les explications nécessaires dans la section [personnalisation](https://github.com/flaf/se3-clients-linux/blob/master/doc/script_logon.md#personnaliser-le-script-de-logon).
+Ce fichier `logon_perso` vous permettra d'affiner le comportement du script `logon` afin de l'adapter à vos besoins. Vous trouverez toutes les explications nécessaires dans la section [personnalisation](../script_logon.md#personnaliser-le-script-de-logon).
 
 * **Le répertoire `bin/` contient également le fichier `connexion_ssh_serveur.bash`**
 
@@ -103,7 +103,7 @@ Le répertoire `distribs/` contient un sous-répertoire par distribution GNU/Lin
 
 Ce répertoire contient le `script d'intégration`.
 
-C'est ce script qu'il faudra exécuter en tant que `root` sur chaque client que l'on souhaite intégrer au domaine du serveur. Pour l'utilisation de ce script, voir la section [Intégration d'un client GNU/Linux](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#int%C3%A9gration-dun-client-gnulinux).
+C'est ce script qu'il faudra exécuter en tant que `root` sur chaque client que l'on souhaite intégrer au domaine du serveur. Pour l'utilisation de ce script, voir la section [Intégration d'un client GNU/Linux](../impatients.md#int%C3%A9gration-dun-client-gnulinux).
 
 Les options disponibles dans ce script d'intégration sont décrites dans la section [options-integration](options_scripts.md).
 
