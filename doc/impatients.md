@@ -9,8 +9,8 @@ Ensuite, sur chaque client-linux, sera exécuté le script correspondant
 **Recommendation :** Le script d'intégration sera exécuté sur un client-linux qui vient d'être installé. Si le client-linux *a déjà servi*, il se peut qu'apparaissent des effets de bords…
 
 
-* [Installation du paquet `se3-clients-linux` sur le serveur]()
-* [Intégration d'un client GNU/Linux]()
+* [Installation du paquet `se3-clients-linux` sur le serveur](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#installation-du-paquet-se3-clients-linux-sur-le-serveur)
+* [Intégration d'un client GNU/Linux](https://github.com/flaf/se3-clients-linux/blob/master/doc/impatients.md#int%C3%A9gration-dun-client-gnulinux)
 
 
 ## Installation du paquet `se3-clients-linux` sur le serveur
