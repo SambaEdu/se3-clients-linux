@@ -30,6 +30,7 @@
 * [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
 * [Installer un miroir local APT de cache avec apt-cacher-ng](apt-cacher-ng.md)
 * [Documentation pour le (futur) contributeur/développeur](dev/README.md)
+* [Installer et tester en toute sécurité la version du paquet issue de la branche `se3testing`](upgrade-via-se3testing.md)
 
 
 ## Ressources externes
