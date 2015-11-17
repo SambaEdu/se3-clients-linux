@@ -54,9 +54,9 @@ haut à droite, un menu s'affiche, cliquez alors sur `Settings`.
 le bouton `Add SSH key`.
 4. Un formulaire s'affiche en bas de page. Dans le champ `Title`
 mettre le titre que vous voulez (par exemple `public key in
-my personal desktop`) et dans le champ `Key` copiez-coller
+my personal desktop`) et dans le champ `Key` copier-coller
 simplement le contenu de votre fichier `~/.ssh/id_rsa.pub`
-(contenu affiché avec la commande `cat` ci-dessous. Bien
+(contenu affiché avec la commande `cat` ci-dessus). Bien
 sûr, vous validez en cliquant avec `Add key`.
 
 
@@ -115,14 +115,15 @@ local comme ceci (soyer sans crainte, ça n'aura absolument aucune incidence
 sur le dépôt distant, ie le dépôt sur GitHub) :
 
 ```sh
-# Adieu Git et adieu mon cruel... ;)
+# Adieu Git et adieu monde cruel... ;)
 rm -rf se3-clients-linux/
 ```
 
 
 ### Update dépôt local
 
-À faire régulièrement. Avec cette commande, on récupère toutes les
+**À faire régulièrement**, notamment avant de procéder soi-même à des
+modification du projet. Avec cette commande, on récupère toutes les
 modifications (on appelle ça des commits) que les autres membres du
 projet ont éventuellement poussées sur le dépôt distant. Bref, cela
 permet d'avoir un dépôt local à jour par rapport au dépôt distant
@@ -130,7 +131,7 @@ permet d'avoir un dépôt local à jour par rapport au dépôt distant
 
 ```sh
 # Les modifications que les autres membres du projet ont
-# effectués et qu'ils ont propagés sur le dépôt Github
+# effectuées et qu'ils ont propagées sur le dépôt Github
 # distant, je veux les récupérer sur le dépôt local de ma
 # machine :
 git pull
@@ -143,6 +144,9 @@ placer. En supposant que le répertoire `se3-clients-linux`
 est dans le votre répertoire personnel, cela donnerait :
 
 ```sh
+# Ça marchera aussi si vous êtes dans un sous-répertoire de
+# votre dépôt local, ou même dans un sous-sous-répertoire
+# etc. etc.
 cd ~/se3-clients-linux/
 ```
 
