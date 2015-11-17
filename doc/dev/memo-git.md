@@ -1,5 +1,18 @@
 # Memo Git
 
+On suppose ici que vous avez déjà procédé à la création d'un
+compte Github et que vous êtes déjà membre du projet
+`se3-clients-linux`. Si ce n'est pas le cas, avant de lire
+la suite, procédez aux démarches expliquées
+[ici](README.md#devenir-contributeurdéveloppeur-du-projet).
+Maintenant, nous allons tenter de vous expliquer comment
+contribuer en pratique au projet à travers d'utilisation du
+programme Git en ligne de commandes (en fait le programme
+Git est éclaté en plusieurs commandes). On suppose que vous
+vous trouvez sur une distribution (pas trop ancienne) Debian
+ou Ubuntu.
+
+
 ## Installation
 
 Installation du minimum pour faire du git en ligne de
@@ -12,8 +25,9 @@ apt-get install openssl ca-certificates git
 
 ## Mise en place de sa clé publique/privé d'accès
 
-Pour ne pas avoir à se connecter/déconnecter à chaque fois,
-on peut utiliser un jeu de clés publique/privée. Voici comment
+Pour ne pas avoir à donner ses identifiants Github à chaque
+fois que l'on souhaite modifier le dépôt du projet, on peut
+utiliser un jeu de clés ssh publique/privée. Voici comment
 les mettre en place :
 
 Les créer :
@@ -22,7 +36,7 @@ Les créer :
 ssh-keygen -t rsa
 ```
 
-On vous pose des questions : `Entrée` 3 fois
+On vous pose des questions : appuyer sur `Entrée` 3 fois.
 
 Afficher la clé publique :
 
@@ -31,7 +45,22 @@ cat ~/.ssh/id_rsa.pub
 ```
 
 Puis l'ajouter, par un copier/coller, dans son profil sur le
-site du Git via son butineur préféré. Tout cela avant de lancer
+site du Github via son butineur préféré :
+
+1. Identifiez-vous sur Github [à cette page](https://github.com/login).
+2. Cliquez une fois sur l'icône correspondant à votre avatar tout en
+haut à droite, un menu s'affiche, cliquez alors sur `Settings`.
+3. Dans le menu de gauche, cliquez sur `SSH keys` et ensuite sur
+le bouton `Add SSH key`.
+4. Un formulaire s'affiche en bas de page. Dans le champ `Title`
+mettre le titre que vous voulez (par exemple `public key in
+my personal desktop`) et dans le champ `Key` copiez-coller
+simplement le contenu de votre fichier `~/.ssh/id_rsa.pub`
+(contenu affiché avec la commande `cat` ci-dessous. Bien
+sûr, vous validez en cliquant avec `Add key`.
+
+
+Tout cela doit être fait avant de lancer
 la commande `git clone git@github.com:flaf/se3-clients-linux.git`
 (voir ci-dessous). Ensuite, les différentes commandes de gestion
 se font en étant dans le répertoire `se3-clients-linux` (voir
@@ -54,7 +83,7 @@ fichier (texte) de configuration `~/.gitconfig` (fichier de
 configuration dans le home de utilisateur).
 
 Il est important de bien paramétrer les éléments ci-dessous,
-notamment l'adresse mail qui doit coïncider avec son adresse
+notamment l'adresse mail qui **doit** coïncider avec son adresse
 mail sur GitHub :
 
 ```sh
@@ -82,12 +111,14 @@ git clone git@github.com:flaf/se3-clients-linux.git
 À partir de là, on a un répertoire `se3-clients-linux` qui vient de se
 créer au niveau du répertoire courant et qui contient tout le projet (en
 local donc). Le jour où on veut tout abandonner, on supprime le dépôt
-local comme ceci (ça n'aura absolument aucune incidence sur le dépôt
-distant, ie le dépôt sur GitHub) :
+local comme ceci (soyer sans crainte, ça n'aura absolument aucune incidence
+sur le dépôt distant, ie le dépôt sur GitHub) :
 
 ```sh
+# Adieu Git et adieu mon cruel... ;)
 rm -rf se3-clients-linux/
 ```
+
 
 ### Update dépôt local
 
@@ -98,6 +129,10 @@ permet d'avoir un dépôt local à jour par rapport au dépôt distant
 (pull = tirer en anglais) :
 
 ```sh
+# Les modifications que les autres membres du projet ont
+# effectués et qu'ils ont propagés sur le dépôt Github
+# distant, je veux les récupérer sur le dépôt local de ma
+# machine :
 git pull
 ```
 
