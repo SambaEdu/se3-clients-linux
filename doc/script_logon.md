@@ -10,7 +10,7 @@ Une partie importante de ce script est gérée par le `logon_perso` qui permettr
     * [fermeture](#la-fermeture)
 * [Emplacement du script de `logon`](#emplacement-du-script-de-logon)
 * [Personnaliser à l'aide du `logon_perso`](#personnaliser-le-script-de-logon)
-* []()
+* [Variables et fonctions utiles pour le `logon_perso`](#quelques-variables-et-fonctions-prêtes-à-lemploi)
 * [Gérer les profils pour `Iceweasel`](#gérer-les-profils-pour-iceweasel)
     * [à l'aide de `rsync`](#méthode-à-laide-de-rsync)
     * [à l'aide d'un montage](#méthode-à-laide-dun-montage)
