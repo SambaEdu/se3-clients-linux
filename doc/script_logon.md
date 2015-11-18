@@ -4,13 +4,14 @@ Comme vous pourrez le constater, le script de `logon` est un peu le « chef d'or
 
 Une partie importante de ce script est gérée par le `logon_perso` qui permettra d'aptater son fonctionnement aux besoins des utilisateurs.
 
-* [Les 3 phases d'exécution du script de `logon`]()
+* [Les 3 phases d'exécution du script de `logon`](#les-3-phases-dexécution-du-script-de-logon)
     * [initialisation]()
     * [ouverture]()
     * [fermeture]()
-* [Emplacement du script de logon]()
-* [Personnaliser le script de logon]()
-* [Quelques bricoles pour les perfectionnistes]()
+* [Emplacement du script de `logon`](#emplacement-du-script-de-logon)
+* [Personnaliser à l'aide du `logon_perso`](#personnaliser-le-script-de-logon)
+* []()
+* [Quelques bricoles pour les perfectionnistes](#quelques-bricoles-pour-les-perfectionnistes)
     * [Changer les icônes]()
     * [Changer le papier peint]()
     * [L'activation du pavé numérique]()
