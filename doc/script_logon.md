@@ -5,18 +5,18 @@ Comme vous pourrez le constater, le script de `logon` est un peu le « chef d'or
 Une partie importante de ce script est gérée par le `logon_perso` qui permettra d'aptater son fonctionnement aux besoins des utilisateurs.
 
 * [Les 3 phases d'exécution du script de `logon`](#les-3-phases-dexécution-du-script-de-logon)
-    * [initialisation]()
-    * [ouverture]()
-    * [fermeture]()
+    * [initialisation](#linitialisation)
+    * [ouverture](#louverture)
+    * [fermeture](#la-fermeture)
 * [Emplacement du script de `logon`](#emplacement-du-script-de-logon)
 * [Personnaliser à l'aide du `logon_perso`](#personnaliser-le-script-de-logon)
 * []()
 * [Quelques bricoles pour les perfectionnistes](#quelques-bricoles-pour-les-perfectionnistes)
-    * [Changer les icônes]()
-    * [Changer le papier peint]()
-    * [L'activation du pavé numérique]()
-    * [Incruster un message sur le bureau]()
-    * [Exécuter des commandes au démarrage]()
+    * [Changer les icônes](#changer-les-icônes-représentants-les-liens-pour-faire-plus-joli)
+    * [Changer le papier peint](#changer-le-papier-peint-en-fonction-des-utilisateurs)
+    * [L'activation du pavé numérique](#lactivation-du-pavé-numérique)
+    * [Incruster un message sur le bureau](#incruster-un-message-sur-le-bureau-des-utilisateurs-pour-faire-classe)
+    * [Exécuter des commandes au démarrage](#exécuter-des-commandes-au-démarrage-tous-les-30-jours)
     * [Gérer les profils pour Iceweasel]()
 
 
@@ -427,3 +427,7 @@ function initialisation_perso ()
 ```
 
 L'idée de ce code est plus simple qu'il n'y paraît. Chaque client GNU/Linux intégré au domaine possède un répertoire local `/etc/se3/` (accessible en lecture et en écriture au compte `root` uniquement). Dans ce répertoire, le script y place un fichier texte vide qui se nomme `action_truc` (c'est un exemple) et dont le seul but est de fournir une date de dernière modification. Au départ, cette date de dernière modification coïncide au moment où le fichier est créé. Si, lors d'un prochain démarrage, cette date de dernière modification est vieille de 30 jours ou plus, alors les actions sont exécutées et la date de dernière modification du fichier `action_truc` est modifiée artificiellement en la date du jour avec la commande `touch`.
+
+### Gérer les profils pour Iceweasel
+
+… doc à venir …
