@@ -11,12 +11,14 @@ Une partie importante de ce script est gérée par le `logon_perso` qui permettr
 * [Emplacement du script de `logon`](#emplacement-du-script-de-logon)
 * [Personnaliser à l'aide du `logon_perso`](#personnaliser-le-script-de-logon)
 * []()
-* [Gérer les profils pour Iceweasel](#gérer-les-profils-pour-iceweasel)
+* [Gérer les profils pour `Iceweasel`](#gérer-les-profils-pour-iceweasel)
+    * [à l'aide de `rsync`](#méthode-à-laide-de-rsync)
+    * [à l'aide d'un montage](#méthode-à-laide-dun-montage)
 * [Quelques bricoles pour les perfectionnistes](#quelques-bricoles-pour-les-perfectionnistes)
     * [Changer les icônes](#changer-les-icônes-représentants-les-liens-pour-faire-plus-joli)
     * [Changer le papier peint](#changer-le-papier-peint-en-fonction-des-utilisateurs)
     * [L'activation du pavé numérique](#lactivation-du-pavé-numérique)
-    * [Incruster un message sur le bureau](#incruster-un-message-sur-le-bureau-des-utilisateurs-pour-faire-classe)
+    * [Incruster un message sur le Bureau](#incruster-un-message-sur-le-bureau-des-utilisateurs-pour-faire-classe)
     * [Exécuter des commandes au démarrage](#exécuter-des-commandes-au-démarrage-tous-les-30-jours)
 
 
