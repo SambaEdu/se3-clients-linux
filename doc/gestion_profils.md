@@ -7,11 +7,11 @@ Dans cette documentation, on appellera « profil » le contenu
 Par exemple, le profil de `toto` est le contenu du répertoire
 `/home/toto/`).
 
-* [Le partage `netlogon-linux`]()
-* [Les différentes copies du profil par défaut]()
-* [Le mécanisme des profils]()
-* [Exemple de modification du profil par défaut avec Firefox]()
-* [Personnaliser le profil en fonction de l'utilisateur]()
+* [Le partage `netlogon-linux`](#le-partage-netlogon-linux)
+* [Les différentes copies du profil par défaut](#les-différentes-copies-du-profil-par-défaut)
+* [Le mécanisme des profils](#le-mécanisme-des-profils)
+* [Exemple de modification du profil par défaut avec Firefox](#exemple-de-modification-du-profil-par-défaut-avec-firefox)
+* [Personnaliser le profil en fonction de l'utilisateur](#personnaliser-le-profil-en-fonction-de-lutilisateur)
 
 
 ## Le partage `netlogon-linux`
