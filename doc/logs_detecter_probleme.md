@@ -17,8 +17,8 @@ selon les phases d'exécution du script de `logon`. :
     * [logon local](#2ouverturelog)
     * [logon perso](#2ouverture_persolog)
 * **phase de fermeture**
-    * [logon local](#3ouverturelog)
-    * [logon perso](#3ouverture_persolog)
+    * [logon local](#3fermeturelog)
+    * [logon perso](#3fermeture_persolog)
 
 **Note :** les différentes phases d'exécution du script de `logon` sont détaillées à la page dédiée au [script de logon](script_logon.md).
 
