@@ -8,7 +8,7 @@ Voici la liste des fichiers log disponibles
 selon les phases d'exécution du script de `logon`. :
 
 * **synchronisation d'un logon local avec le logon distant**
-    [mise à jour du logon local]()`0.maj_logon.log`
+    * [mise à jour du logon local]()`0.maj_logon.log`
 * **phase d'initialisation**
     * [logon local]()
     * [logon distant]()
