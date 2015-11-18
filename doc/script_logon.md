@@ -340,7 +340,7 @@ Ensuite, le deuxième argument et les suivants (autant qu'on veut) sont les chem
 
 ### Méthode à l'aide de `rsync`
 
-J'ai testé la solution via rsync dans le `logon_perso` en rajoutant les lignes suivantes dans le `logon_perso` :
+J'ai testé une solution via rsync, proposée par Frédéric Sauvage sur la liste de discusion de Cæn, en rajoutant les lignes suivantes dans le `logon_perso` :
 
 * dans la fonction ouverture_perso :
 ```sh
@@ -363,7 +363,7 @@ J'ai testé la solution via rsync dans le `logon_perso` en rajoutant les lignes 
     rsync -az --delete /home/$LOGIN/.mozilla/ /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/
 ```
 
-Cela fonctionne à condition d'avoir créé auparavant le répertoire .profile-linux dans le home de l'utilisateur.
+**Une condition :** avoir créé auparavant le répertoire .profile-linux/ dans le home de l'utilisateur.
 
 Cette méthode fonctionne bien mais il peut y avoir *des effets de bord* lors de la transition entre le .mozilla du skel et celui de l'utilisateur. Pour l'instant je n'ai eu qu'un seul cas dont la gestion s'est faite *à la mano*.
 
