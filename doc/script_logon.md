@@ -349,6 +349,8 @@ J'ai testé la solution via rsync dans le `logon_perso` en rajoutant les lignes 
     # ce répertoire est stocké dans le répertoire Documents de la session de l'utilisateur.
     # On utilise rsync pour des questions de droits. (Voir page de manuel de rsync pour les options)
     # Récupération serveur → home local
+    # NB : il faudrait tester que .profile-linux/ existe et n'est pas vide
+    # afin d'éviter des effets indésirables…
     rsync -az --delete /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/ /home/$LOGIN/.mozilla/
     chown -R $LOGIN:5005 /home/$LOGIN/.mozilla
 ```
