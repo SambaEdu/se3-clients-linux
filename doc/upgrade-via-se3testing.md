@@ -24,10 +24,10 @@ serveur Se3 sous une autre distribution.
 
 Voici les étapes que nous vous proposons :
 
-* [passer en branche `se3testing`](Édition-du-fichier-etcaptsourceslistdse3list)
-* [mettre à jour la liste des paquets](mise-à-jour-du-cache-apt)
-* [mettre à jour le paquet `se3-clients-linux`](mise-à-jour-du-paquet-se3-clients-linux)
-* [retourner en branche stable `se3`](retour-à-la-branche-stable-se3)
+* [passer en branche `se3testing`](#Édition-du-fichier-etcaptsourceslistdse3list)
+* [mettre à jour la liste des paquets](#mise-à-jour-du-cache-apt)
+* [mettre à jour le paquet `se3-clients-linux`](#mise-à-jour-du-paquet-se3-clients-linux)
+* [retourner en branche stable `se3`](#retour-à-la-branche-stable-se3)
 
 
 ## Édition du fichier `/etc/apt/sources.list.d/se3.list`
@@ -70,7 +70,6 @@ apt-get update
 
 Ensuite, vous pouvez alors passer à la mise à jour du paquet
 `se3-clients-linux` **et de lui seulement** avec la commande :
-
 ```sh
 # Et oui, c'est curieux mais `apt-get install` permet de
 # mettre à jour un paquet (et de l'installer s'il ne l'est
@@ -95,14 +94,12 @@ pointer notre serveur à nouveau vers la branche stable
 Vous éditez donc à nouveau le fichier `/etc/apt/sources.list.d/se3.list`
 (voir ci-dessus) afin de remettre la ligne modifiée précédemment
 dans son état initial, à savoir comme ceci :
-
 ```
 deb http://wawadeb.crdp.ac-caen.fr/debian squeeze se3
 ```
 
 Pensez bien à enregistrer la modification (à l'aide des combinaisons de
 touches `Ctrl+o` puis `Ctrl+x`) puis lancez ensuite la commande :
-
 ```sh
 # Mise à jour du cache APT pour qu'il s'aligne à nouveau sur
 # les versions des paquets de la branche stable se3.
