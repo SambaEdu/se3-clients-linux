@@ -148,9 +148,13 @@ Vous pouvez bien sûr définir dans le fichier `logon_perso` des fonctions suppl
 
 Il faut bien avoir en tête que le contenu de `logon_perso` doit être ni plus ni moins inséré dans le script `logon` pour qu'il soit pris en compte.
 
-En conséquence, après modification de `logon_perso`, **il faut toujours mettre à jour le fichier `logon`** via la commande « `dpkg-reconfigure se3-clients-linux` » en console `root` sur le serveur se3.
+En conséquence, après modification de `logon_perso`, **il faut toujours mettre à jour le fichier `logon`**
 
-Cependant, vous trouverez un lien vers cette commande à l'aide du script 
+Cette mise à jour peut se faire de 2 façons :
+
+* via  la commande « `dpkg-reconfigure se3-clients-linux` » en console `root` sur le serveur se3.
+
+* via le fichier `reconfigure.bash` : **si vous avez ouvert une session sur un client-linux avec le compte `admin`**, vous pourrez double-cliquer sur le fichier `reconfigure.bash` accessible en passant par le lien symbolique `clients-linux` sur le bureau puis par le répertoire `bin/` (le mot de passe root du serveur se3 sera demandé). Voir le schéma de [l'arborescence du répertoire `clients-linux/`](#arborescence-du-répertoire-clients-linux).
 
 
 ## Quelques variables et fonctions prêtes à l'emploi
