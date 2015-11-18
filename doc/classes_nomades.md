@@ -1,6 +1,6 @@
 # Le cas des classes nomades
 
-**Note :** pour les clients Jessie et Trusty, la gestion de l'interface réseau ayant changée, il faudra retester les indications données dans cette partie.
+**Note :** pour les clients-linux `Jessie` et `Trusty`, la gestion de l'interface réseau ayant changée, il faudra retester les indications données dans cette partie.
 
 Utiliser GNU/Linux sur des ordinateurs portables dans un
 domaine Se3 présente un atout extraordinaire : [le mécanisme
