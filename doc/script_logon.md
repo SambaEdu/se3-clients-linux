@@ -11,13 +11,14 @@ Une partie importante de ce script est gérée par le `logon_perso` qui permettr
 * [Emplacement du script de `logon`](#emplacement-du-script-de-logon)
 * [Personnaliser à l'aide du `logon_perso`](#personnaliser-le-script-de-logon)
 * []()
+* [Gérer les profils pour Iceweasel](#gérer-les-profils-pour-iceweasel)
 * [Quelques bricoles pour les perfectionnistes](#quelques-bricoles-pour-les-perfectionnistes)
     * [Changer les icônes](#changer-les-icônes-représentants-les-liens-pour-faire-plus-joli)
     * [Changer le papier peint](#changer-le-papier-peint-en-fonction-des-utilisateurs)
     * [L'activation du pavé numérique](#lactivation-du-pavé-numérique)
     * [Incruster un message sur le bureau](#incruster-un-message-sur-le-bureau-des-utilisateurs-pour-faire-classe)
     * [Exécuter des commandes au démarrage](#exécuter-des-commandes-au-démarrage-tous-les-30-jours)
-    * [Gérer les profils pour Iceweasel](#gérer-les-profils-pour-iceweasel)
+
 
 
 ## Les 3 phases d'exécution du script de `logon`
@@ -268,6 +269,55 @@ Le premier argument de la fonction `creer_lien` est la cible du ou des liens à 
 au même.). Ensuite, le deuxième argument et les suivants (autant qu'on veut) sont les chemins absolus du ou des liens qui seront créés. Ces chemins doivent impérativement tous commencer par `"$REP_HOME/..."`.
 
 
+## Gérer les profils pour Iceweasel
+
+### Méthode à l'aide de `rsync`
+
+J'ai testé la solution via rsync dans le `logon_perso` en rajoutant les lignes suivantes dans le `logon_perso` :
+
+* dans la fonction ouverture_perso :
+```sh
+    # Synchronisation des préférences, favoris, historique... des applis
+    # Le tout est enregistré dans un répertoire caché appelé .profile-linux
+    # ce répertoire est stocké dans le répertoire Documents de la session de l'utilisateur.
+    # On utilise rsync pour des questions de droits. (Voir page de manuel de rsync pour les options)
+    # Récupération serveur → home local
+    rsync -az --delete /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/ /home/$LOGIN/.mozilla/
+    chown -R $LOGIN:5005 /home/$LOGIN/.mozilla
+```
+
+* dans la fonction fermeture perso :
+```sh
+    # Synchronisation des préférences, favoris, historique... des a
+    # Le tout est enregistré dans un répertoire caché appelé .profile-linux
+    # Sauvegarde home local → serveur
+    rsync -az --delete /home/$LOGIN/.mozilla/ /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/
+```
+
+Cela fonctionne à condition d'avoir créé auparavant le répertoire .profile-linux dans le home de l'utilisateur.
+
+Cette méthode fonctionne bien mais il peut y avoir *des effets de bord* lors de la transition entre le .mozilla du skel et celui de l'utilisateur. Pour l'instant je n'ai eu qu'un seul cas dont la gestion s'est faite *à la mano*.
+
+
+### Méthode à l'aide d'un montage
+
+J'avais gardé en mémoire une autre méthode. Je crois me souvenir qu'elle avait été proposée par Stéphane Boiron (À confirmer…). Elle permet d'utiliser le même profil entre les différents clients.
+
+La voici :
+
+* ajouter un montage dans le logon_perso, uniquement pour les profs :
+
+```sh
+    if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"
+    then
+        monter_partage "//$SE3/homes/profil/appdata/Mozilla/Firefox" "ProfilFirefox" \
+            "$REP_HOME/.mozilla/firefox"
+    fi
+```
+
+Si vous avez testé cette méthode, dites-le nous :-)
+
+
 ## Quelques bricoles pour les perfectionnistes
 
 ### Changer les icônes représentants les liens pour faire plus joli
@@ -428,6 +478,3 @@ function initialisation_perso ()
 
 L'idée de ce code est plus simple qu'il n'y paraît. Chaque client GNU/Linux intégré au domaine possède un répertoire local `/etc/se3/` (accessible en lecture et en écriture au compte `root` uniquement). Dans ce répertoire, le script y place un fichier texte vide qui se nomme `action_truc` (c'est un exemple) et dont le seul but est de fournir une date de dernière modification. Au départ, cette date de dernière modification coïncide au moment où le fichier est créé. Si, lors d'un prochain démarrage, cette date de dernière modification est vieille de 30 jours ou plus, alors les actions sont exécutées et la date de dernière modification du fichier `action_truc` est modifiée artificiellement en la date du jour avec la commande `touch`.
 
-### Gérer les profils pour Iceweasel
-
-… doc à venir …
