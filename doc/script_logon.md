@@ -302,10 +302,12 @@ A priori, on pourra monter ce partage pour tous les comptes du domaine donc pas 
 ```sh
 function ouverture_perso ()
 {
+    …
     # Montage du sous-répertoire "Docs" du partage "homes" pour tout le monde.
     monter_partage "//$SE3/homes/Docs" "Docs" \<Touche ENTRÉE>
         "$REP_HOME/Documents de $LOGIN sur le réseau" \<Touche ENTRÉE>
         "$REP_HOME/Bureau/Documents de $LOGIN sur le réseau"
+    …
 }
 ```
 
