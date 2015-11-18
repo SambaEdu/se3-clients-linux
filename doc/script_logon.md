@@ -17,7 +17,7 @@ Une partie importante de ce script est gérée par le `logon_perso` qui permettr
     * [L'activation du pavé numérique](#lactivation-du-pavé-numérique)
     * [Incruster un message sur le bureau](#incruster-un-message-sur-le-bureau-des-utilisateurs-pour-faire-classe)
     * [Exécuter des commandes au démarrage](#exécuter-des-commandes-au-démarrage-tous-les-30-jours)
-    * [Gérer les profils pour Iceweasel]()
+    * [Gérer les profils pour Iceweasel](#gérer-les-profils-pour-iceweasel)
 
 
 ## Les 3 phases d'exécution du script de `logon`
