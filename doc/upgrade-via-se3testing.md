@@ -24,9 +24,10 @@ serveur Se3 sous une autre distribution.
 
 Voici les étapes que nous vous proposons :
 
-* [passer en branche `se3testing`]()
+* [passer en branche `se3testing`](Édition-du-fichier-etcaptsourceslistdse3list)
+* [mettre à jour la liste des paquets]()
 * [mettre à jour le paquet `se3-clients-linux`]()
-* [retourner en branche stable `se3`]()
+* [retourner en branche stable `se3`](retour-à-la-branche-stable-se3)
 
 
 ## Édition du fichier `/etc/apt/sources.list.d/se3.list`
@@ -53,17 +54,19 @@ Vous fermez ensuite votre éditeur en prenant bien soin
 d'enregistrer la modification (à l'aide des combinaisons de touches `Ctrl+o` puis `Ctrl+x`).
 
 
-## Mise à jour du cache APT et mise à jour du paquet
+## Mise à jour du cache APT
 
 Ensuite, vous mettez à jour votre cache APT pour que votre
 Se3 soit bien « informé » des versions des paquets disponibles
 dans la branche `se3testing`.
 
 Pour ce faire, il suffit de lancer la commande :
-
 ```sh
 apt-get update
 ```
+
+
+## Mise à jour du paquet `se3-clients-linux`
 
 Ensuite, vous pouvez alors passer à la mise à jour du paquet
 `se3-clients-linux` **et de lui seulement** avec la commande :
