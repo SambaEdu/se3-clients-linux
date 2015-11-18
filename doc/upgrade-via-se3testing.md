@@ -25,8 +25,8 @@ serveur Se3 sous une autre distribution.
 Voici les étapes que nous vous proposons :
 
 * [passer en branche `se3testing`](Édition-du-fichier-etcaptsourceslistdse3list)
-* [mettre à jour la liste des paquets]()
-* [mettre à jour le paquet `se3-clients-linux`]()
+* [mettre à jour la liste des paquets](mise-à-jour-du-cache-apt)
+* [mettre à jour le paquet `se3-clients-linux`](mise-à-jour-du-paquet-se3-clients-linux)
 * [retourner en branche stable `se3`](retour-à-la-branche-stable-se3)
 
 
