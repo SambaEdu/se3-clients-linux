@@ -9,6 +9,7 @@ Une partie importante de ce script est gérée par le `logon_perso` qui permettr
     * [ouverture](#louverture)
     * [fermeture](#la-fermeture)
 * [Emplacement du script de `logon`](#emplacement-du-script-de-logon)
+* [Synchronisation entre un `logon` local et le `logon` distant]()
 * [Personnaliser à l'aide du `logon_perso`](#personnaliser-le-script-de-logon)
     * [Structure du `logon_perso`](#structure-du-fichier-logon_perso)
     * [Conséquences sur le comportement du `logon`](#conséquences-du-logon_perso-sur-le-comportement-du-script-de-logon)
@@ -81,7 +82,10 @@ Le script ne fait rien qui mérite d'être signalé dans cette documentation. Ce
 
 Nous avons donc, comme pour le profil par défaut, des versions locales du script de `logon` (sur chaque client GNU/Linux) et une unique version distante (sur le serveur se3).
 
-Au niveau de la synchronisation, les choses fonctionnent de manière très similaire aux profils par défaut.
+
+## Synchronisation entre un `logon` local et le `logon` distant
+
+Au niveau de la synchronisation entre un `logon` local et le `logon` distant, les choses fonctionnent de manière très similaire aux profils par défaut.
 
 **Lors de l'initialisation d'un client GNU/Linux :**
 
