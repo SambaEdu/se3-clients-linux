@@ -2,7 +2,7 @@
 
 * [Principe de base](#principe-de-base)
 * [Détails du mécanisme](#le-mécanisme-en-détail)
-* [La locale lors de l'exécution des scripts](#réglage-de-la-locale-durant-lexécution-des-scripts-unefois)
+* [La locale lors de l'exécution des scripts](#réglage-de-la-locale-durant-lexécution-des-scripts--unefois-)
 * [Des variables et des fonctions](#des-variables-et-des-fonctions-prêtes-à-lemploi)
 
 
