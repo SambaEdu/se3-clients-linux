@@ -461,7 +461,7 @@ En revanche, pour activer le pavé numérique au moment de l'ouverture de sessio
 En effet, au moment où la fonction `ouverture_perso` sera lancée, l'ouverture de session ne sera pas complètement terminée (Et c'est normal qu'il en soit ainsi puisque l'ouverture de session de termine après l'exécution du script de logon, même pas immédiatement après, mais 1 ou 2 secondes après selon la rapidité de la machine hôte) et l'activation du pavé numérique risque d'être annulée lors de la fin de l'ouverture de session.
 
 L'idée est donc de programmer l'appel de la fonction `activer_pave_numerique` **après** l'exécution du script de `logon`, seulement au bout de quelques secondes (par exemple 5 s), afin de lancer l'activation du pavé numérique une fois l'ouverture de session achevée :
-
+```sh
 function ouverture_perso ()
 {
     #On ajoute un argument à l'appel de la fonction activer_pave_numerique.
@@ -470,6 +470,7 @@ function ouverture_perso ()
     #le temps à l'ouverture de session de se terminer.
     activer_pave_numerique "5"
 }
+```
 
 
 ### Incruster un message sur le bureau des utilisateurs pour faire classe
@@ -550,7 +551,7 @@ function initialisation_perso ()
             action1
             action2
             # etc.
-
+            
             # Si tout s'est bien déroulé, alors on peut mettre à jour la date
             # de dernière modification du fichier avec la commande touch.
             if [ "$?" = "0" ]; then
