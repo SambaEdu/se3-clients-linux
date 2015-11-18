@@ -8,17 +8,17 @@ Voici la liste des fichiers log disponibles
 selon les phases d'exécution du script de `logon`. :
 
 * **synchronisation d'un logon local avec le logon distant**
-    * [mise à jour du logon local](#0maj_logonlog)
+    * [mise à jour du logon local](#fichier-0maj_logonlog)
 * **phase d'initialisation**
-    * [logon local](#1initialisationlog)
-    * [logon distant](#1initialisation_distantlog)
-    * [logon perso](#1initialisation_persolog)
+    * [logon local](#fichier-1initialisationlog)
+    * [logon distant](#fichier-1initialisation_distantlog)
+    * [logon perso](#fichier-1initialisation_persolog)
 * **phase d'ouverture**
-    * [logon local](#2ouverturelog)
-    * [logon perso](#2ouverture_persolog)
+    * [logon local](#fichier-2ouverturelog)
+    * [logon perso](#fichier-2ouverture_persolog)
 * **phase de fermeture**
-    * [logon local](#3fermeturelog)
-    * [logon perso](#3fermeture_persolog)
+    * [logon local](#fichier-3fermeturelog)
+    * [logon perso](#fichier-3fermeture_persolog)
 
 **Note :** les différentes phases d'exécution du script de `logon` sont détaillées à la page dédiée au [script de logon](script_logon.md).
 
@@ -31,7 +31,7 @@ aurez des informations portant uniquement sur la dernière phase d'initialisatio
 
 
 
-## `0.maj_logon.log`
+## Fichier `0.maj_logon.log`
 
 La mise à jour du script de logon local (via son remplacement par une copie de
 la version distante) est un moment important et ce fichier indiquera si cette mise à jour a marché
@@ -40,13 +40,13 @@ ou non.
 La date de la mise à jour y est indiquée.
 
 
-## `1.initialisation.log`
+## Fichier `1.initialisation.log`
 
 Ce fichier contiendra tous les messages (d'erreur ou non) suite à l'exé-
 cution du script de logon **local** lors de la phase d'initialisation.
 
 
-## `1.initialisation_distant.log`
+## Fichier `1.initialisation_distant.log`
 
 Ce fichier contiendra tous les messages (d'erreur ou non) suite
 à l'exécution, lors de la phase d'initialisation, du script de logon **distant** (celui qui se trouve sur le serveur) et non celui qui se trouve en local sur le client GNU/Linux.
@@ -54,31 +54,31 @@ Ce fichier contiendra tous les messages (d'erreur ou non) suite
 Rappelez-vous que cela se produit quand les deux versions du script de logon (la version locale et la version et distante) sont différentes (ce qui est censé se produire ponctuellement seulement puisque la version locale est ensuite mise à jour).
 
 
-## `1.initialisation_perso.log`
+## Fichier `1.initialisation_perso.log`
 
 Ce fichier contiendra tous les messages (d'erreur ou non) suite
 à l'exécution, lors de la phase d'initialisation, de votre fonction `initialisation_perso`.
 
 
-## `2.ouverture.log`
+## Fichier `2.ouverture.log`
 
 Ce fichier contiendra tous les messages (d'erreur ou non) suite à l'exécution
 du script de logon local lors de la phase d'ouverture.
 
 
-## `2.ouverture_perso.log`
+## Fichier `2.ouverture_perso.log`
 
 Ce fichier contiendra tous les messages (d'erreur ou non) suite à l'exé-
 cution, lors de la phase d'ouverture, de votre fonction `ouverture_perso`.
 
 
-## `3.fermeture.log`
+## Fichier `3.fermeture.log`
 
 Ce fichier contiendra tous les messages (d'erreur ou non) suite à l'exécution
 du script de logon local lors de la phase de fermeture.
 
 
-## `3.fermeture_perso.log`
+## Fichier `3.fermeture_perso.log`
 
 Ce fichier contiendra tous les messages (d'erreur ou non) suite à l'exé-
 cution, lors de la phase de fermeture, de votre fonction `fermeture_perso`.
