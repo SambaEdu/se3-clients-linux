@@ -18,7 +18,7 @@
 * [Le répertoire unefois/](repertoire_unefois.md)
 * [Des variables et des fonctions prêtes à l'emploi](variables_fonctions.md)
 * [Le script de `logon`](script_logon.md)
-* [Personnaliser avec le 'logon_perso`'](script_logon.md#personnaliser-le-script-de-logon)
+* [Personnaliser avec le 'logon_perso`](script_logon.md#personnaliser-le-script-de-logon)
 * [Des variables et des fonctions utiles pour le `logon_perso`](variables_fonctions_logon.md)
 * [Les logs pour détecter un problème](logs_detecter_probleme.md)
 * [Le cas des classes nomades](classes_nomades.md)
