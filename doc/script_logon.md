@@ -115,17 +115,17 @@ Et, très important, **cette adaptation sera pérenne dans le temps** (les modif
 ```sh
 function initialisation_perso ()
 {
-    # ...
+    # …
 }
 
 function ouverture_perso ()
 {
-    # ...
+    # …
 }
 
 function fermeture_perso ()
 {
-    # ...
+    # …
 }
 ```
 **Note importante :** Attention d'utiliser un éditeur de texte respectueux de l'encodage et des fins de ligne lorsque vous modifierez le fichier `logon_perso`.
@@ -177,7 +177,9 @@ Commençons par un exemple simple :
 ```sh
 function ouverture_perso ()
 {
+    …
     monter_partage "//$SE3/Classes" "Classes" "$REP_HOME/Bureau/Répertoire Classes"
+    …
 }
 ```
 
@@ -216,9 +218,11 @@ Voici un exemple :
 ```sh
 function ouverture_perso ()
 {
+    …
     monter_partage "//$SE3/Classes" "Classes" \<Touche ENTRÉE>
         "$REP_HOME/Bureau/Lecteur réseau Classes" \<Touche ENTRÉE>
         "$REP_HOME/Lecteur réseau Classes"
+    …
 }
 ```
 
@@ -253,6 +257,7 @@ Prenons l'exemple du partage `netlogon-linux` du serveur. Celui-ci n'est accessi
 ```sh
 function ouverture_perso ()
 {
+    …
     # Montage du partage "netlogon-linux" seulement dans le cas
     # où c'est le compte "admin" qui se connecte.
     if [ "$LOGIN" = "admin" ]; then
@@ -261,6 +266,7 @@ function ouverture_perso ()
             "$REP_HOME/clients-linux" \<Touche ENTRÉE>
             "$REP_HOME/Bureau/clients-linux"
     fi
+    …
 }
 ```
 
@@ -270,6 +276,7 @@ Autre cas très classique, celui d'un partage **accessible uniquement à un grou
 ```sh
 function ouverture_perso ()
 {
+    …
     # On décide que le montage du partage "administration" sera seulement effectué si
     # c'est un compte qui appartient au groupe "Profs" qui se connecte.
     if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"; then
@@ -277,6 +284,7 @@ function ouverture_perso ()
         "$REP_HOME/administration sur le réseau" \<Touche ENTRÉE>
         "$REP_HOME/Bureau/administration sur le réseau"
     fi
+    …
 }
 ```
 
@@ -321,6 +329,7 @@ Voici un exemple :
 ```sh
 function ouverture_perso ()
 {
+    …
     # Montage du partage "homes" pour tout le monde, mais ici on ne créé pas de
     # lien vers la racine de ce partage (appel de la fonction avec seulement deux
     # arguments).
@@ -329,6 +338,7 @@ function ouverture_perso ()
     # Ensuite on crée des liens mais ceux-ci ne pointent pas à la racine du partage.
     creer_lien "home/Docs" "$REP_HOME/Documents de $LOGIN sur le réseau"
     creer_lien "home/Bureau" "$REP_HOME/Bureau de $LOGIN sous Windows"
+    …
 }
 ```
 
@@ -346,6 +356,9 @@ J'ai testé une solution via rsync, proposée par Frédéric Sauvage sur la list
 
 * dans la fonction ouverture_perso :
 ```sh
+function ouverture_perso ()
+{
+    …
     # Synchronisation des préférences, favoris, historique... des applis
     # Le tout est enregistré dans un répertoire caché appelé .profile-linux
     # ce répertoire est stocké dans le répertoire Documents de la session de l'utilisateur.
@@ -355,14 +368,21 @@ J'ai testé une solution via rsync, proposée par Frédéric Sauvage sur la list
     # afin d'éviter des effets indésirables…
     rsync -az --delete /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/ /home/$LOGIN/.mozilla/
     chown -R $LOGIN:5005 /home/$LOGIN/.mozilla
+    …
+}
 ```
 
 * dans la fonction fermeture perso :
 ```sh
+function fermeture_perso ()
+{
+    …
     # Synchronisation des préférences, favoris, historique... des a
     # Le tout est enregistré dans un répertoire caché appelé .profile-linux
     # Sauvegarde home local → serveur
     rsync -az --delete /home/$LOGIN/.mozilla/ /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/
+    …
+}
 ```
 
 **Une condition :** avoir créé auparavant le répertoire .profile-linux/ dans le home de l'utilisateur.
@@ -379,11 +399,16 @@ La voici :
 * ajouter un montage dans le logon_perso, uniquement pour les profs :
 
 ```sh
+function ouverture_perso ()
+{
+    …
     if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"
     then
         monter_partage "//$SE3/homes/profil/appdata/Mozilla/Firefox" "ProfilFirefox" \
             "$REP_HOME/.mozilla/firefox"
     fi
+    …
+}
 ```
 
 Si vous avez testé cette méthode, dites-le nous :-)
@@ -403,9 +428,11 @@ Voici un exemple :
 ```sh
 function ouverture_perso ()
 {
+    …
     # On suppose que le partage "Classe" est déjà monté et qu'un
     # lien vers ce partage a déjà été créé sur le bureau...
     changer_icone "$REP_HOME/Bureau/Classes sur le réseau" "$REP_HOME/.mes_icones/classe.jpg"
+    …
 }
 ```
 
@@ -428,9 +455,11 @@ Voici un exemple :
 ```sh
 function ouverture_perso ()
 {
+    …
     if [ "$LOGIN" = "admin" ]; then
         changer_papier_peint "$REP_HOME/.backgrounds/admin.jpg"
     fi
+    …
 }
 ```
 
@@ -451,8 +480,10 @@ Pour activer le pavé numérique du client GNU/Linux au moment de l'affichage de
 ```sh
 function initialisation_perso ()
 {
+    …
     # On active le pavé numérique au moment de la phase d'initialisation.
     activer_pave_numerique
+    …
 }
 ```
 
@@ -466,11 +497,13 @@ L'idée est donc de programmer l'appel de la fonction `activer_pave_numerique` *
 ```sh
 function ouverture_perso ()
 {
+    …
     #On ajoute un argument à l'appel de la fonction activer_pave_numerique.
     #Ici, cela signifie que l'activation du pavé numérique sera lancée 5
     #secondes après que le script de logon soit terminé, ce qui laissera
     #le temps à l'ouverture de session de se terminer.
     activer_pave_numerique "5"
+    …
 }
 ```
 
@@ -486,6 +519,7 @@ Ensuite, tentez de mettre ceci dans la fonction `ouverture_perso` :
 ```sh
 function ouverture_perso ()
 {
+    …
     # On crée un fichier de configuration .conkyrc dans le home de l'utilisateur.
     # précisant le contenu du message ainsi que certains paramètres (comme la
     # taille de la police par exemple).
@@ -525,6 +559,7 @@ FIN
     #de 5 secondes entre la fin du script de logon et le lancement de la
     #commande conky (avec ses arguments).
     executer_a_la_fin "5" conky --config "$REP_HOME/.conkyrc"
+    …
 }
 ```
 
@@ -540,11 +575,12 @@ Voici un exemple de fonction `initialisation_perso` qui vous permettra d'exécut
 ```sh
 function initialisation_perso ()
 {
+    …
     local indicateur
     indicateur="/etc/se3/action_truc"
     # Si le fichier n'existe pas alors il faut le créer.
     [ ! -e "$indicateur" ] && touch "$indicateur"
-
+    
     # On teste si la phase d'initialisation correspond à un démarrage du système.
     if "$DEMARRAGE"; then
         # On teste si la date de dernière modification du fichier est > 29 jours.
@@ -561,6 +597,7 @@ function initialisation_perso ()
             fi
         fi
     fi
+    …
 }
 ```
 
