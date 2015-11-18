@@ -8,17 +8,17 @@ Voici la liste des fichiers log disponibles
 selon les phases d'exécution du script de `logon`. :
 
 * **synchronisation d'un logon local avec le logon distant**
-    * [mise à jour du logon local]()`0.maj_logon.log`
+    * [mise à jour du logon local](#0maj_logonlog)
 * **phase d'initialisation**
-    * [logon local]()
-    * [logon distant]()
-    * [logon perso]()
+    * [logon local](#1initialisationlog)
+    * [logon distant](#1initialisation_distantlog)
+    * [logon perso](#1initialisation_persolog)
 * **phase d'ouverture**
-    * [logon local]()
-    * [logon perso]()
+    * [logon local](#2ouverturelog)
+    * [logon perso](#2ouverture_persolog)
 * **phase de fermeture**
-    * [logon local]()
-    * [logon perso]()
+    * [logon local](#3ouverturelog)
+    * [logon perso](#3ouverture_persolog)
 
 **Note :** les différentes phases d'exécution du script de `logon` sont détaillées à la page dédiée au [script de logon](script_logon.md).
 
