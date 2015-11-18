@@ -1,41 +1,96 @@
 #Le script de logon
 
-##Phases d'exécution du script de logon
+Comme vous pourrez le constater, le script de `logon` est un peu le « chef d'orchestre » de chacun des clients GNU/Linux.
 
-Le script de logon est un script bash qui est exécuté par les clients GNU/Linux lors de trois phases différentes. Pour plus de commodité dans les explications, nous allons donner un nom à chacune de ces trois phases une bonne fois pour toutes :
+Une partie importante de ce script est gérée par le `logon_perso` qui permettra d'aptater son fonctionnement aux besoins des utilisateurs.
 
-1. **L'initialisation :** cette phase se produit juste avant l'affichage de la fenêtre de connexion. Attention, cela correspond en particulier au démarrage du système, certes, mais pas seulement. L'initialisation se produit aussi juste après la fermeture de session d'un utilisateur, avant que la fenêtre de connexion n'apparaisse à nouveau (sauf si, bien sûr, l'utilisateur a choisi d'éteindre ou de redémarrer la machine).
+* [Les 3 phases d'exécution du script de `logon`]()
+    * [initialisation]()
+    * [ouverture]()
+    * [fermeture]()
+* [Emplacement du script de logon]()
+* [Personnaliser le script de logon]()
+* [Quelques bricoles pour les perfectionnistes]()
+    * [Changer les icônes]()
+    * [Changer le papier peint]()
+    * [L'activation du pavé numérique]()
+    * [Incruster un message sur le bureau]()
+    * [Exécuter des commandes au démarrage]()
+    * [Gérer les profils pour Iceweasel]()
 
-    **Description rapide des tâches exécutées par le script lors de cette phase :** le script efface les homes (s'il en existe) de tous utilisateurs qui ne correspondent pas à des comptes locaux , vérifie si le partage CIFS `//SERVEUR/netlogon-linux` du serveur est bien monté sur le répertoire `/mnt/netlogon/` du client GNU/Linux et, si ce n'est pas le cas, le script exécute ce montage. Ensuite, le cas écheant, le script procède à la synchronisation du profil par défaut local sur le profil par défaut distant et lance les exécutions des `*.unefois` si l'initialisation correspond en fait à un redémarrage du système.
 
-    **Note :** Un compte local est un compte figurant dans le fichier /etc/passwd du client GNU/Linux.
+## Les 3 phases d'exécution du script de `logon`
 
-2. **L'ouverture :** cette phase se produit à l'ouverture de session d'un utilisateur juste après que celui-ci ait saisi ses identifiants.
+Le script de logon est un script `bash` qui est exécuté par les clients GNU/Linux lors de trois phases différentes.
 
-    **Description rapide des tâches exécutées par le script lors de cette phase :** le script procède à la création du home de l'utilisateur qui se connecte (via une copie du profil par défaut local), exécute le montage de certains partages du serveur auxquels l'utilisateur peut prétendre (comme par exemple le partage correspondant aux données personnelles de l'utilisateur).
+Pour plus de commodité dans les explications, nous allons donner un nom à chacune de ces trois phases une bonne fois pour toutes :
 
-3. **La fermeture :** cette phase se produit à la fermeture de session d'un utilisateur.
+* l'initialisation
+* l'ouverture
+* la fermeture
 
-    **Description rapide des tâches exécutées par le script lors de cette phase :** le script ne fait rien qui mérite d'être signalé dans cette documentation.
 
-Comme vous pouvez le constater, le script de logon est un peu le « chef d'orchestre » de chacun des clients GNU/Linux.
+### L'initialisation
 
-##Emplacement du script de logon
+Cette phase se produit **juste avant l'affichage de la fenêtre de connexion**.
+
+Attention, cela correspond en particulier au démarrage du système, certes, mais *pas seulement*. L'initialisation se produit aussi juste après la fermeture de session d'un utilisateur, avant que la fenêtre de connexion n'apparaisse à nouveau (sauf si, bien sûr, l'utilisateur a choisi d'éteindre ou de redémarrer la machine).
+
+**Description rapide des tâches exécutées par le script lors de cette phase :**
+
+* le script efface les homes (s'il en existe) de tous utilisateurs qui ne correspondent pas à des comptes locaux
+* le script vérifie si le partage CIFS `//SERVEUR/netlogon-linux` du serveur est bien monté sur le répertoire `/mnt/netlogon/` du client GNU/Linux et, si ce n'est pas le cas, le script exécute ce montage.
+* le script procède, **le cas écheant**, à la synchronisation du profil par défaut local sur le profil par défaut distant
+* le script lance les exécutions des `*.unefois` si l'initialisation correspond en fait à un redémarrage du système.
+
+**Note :** Un compte local est un compte figurant dans le fichier /etc/passwd du client GNU/Linux.
+
+
+### L'ouverture
+
+Cette phase se produit **à l'ouverture de session d'un utilisateur** juste après que celui-ci ait saisi ses identifiants.
+
+**Description rapide des tâches exécutées par le script lors de cette phase :**
+
+* le script procède à la création du home de l'utilisateur qui se connecte (via une copie du profil par défaut local)
+* le script exécute le montage de certains partages du serveur auxquels l'utilisateur peut prétendre (comme par exemple le partage correspondant aux données personnelles de l'utilisateur).
+
+
+### La fermeture
+
+Cette phase se produit **à la fermeture de session d'un utilisateur**.
+
+**Description rapide des tâches exécutées par le script lors de cette phase :**
+
+Le script ne fait rien qui mérite d'être signalé dans cette documentation. Cependant, on pourra l'utiliser en fonction des besoins des utilisateurs.
+
+
+## Emplacement du script de `logon`
 
 À la base, le script de logon se trouve localement à l'adresse `/etc/se3/bin/logon` de chaque client GNU/Linux. Mais il existe une version centralisée de ce script sur le serveur à l'adresse :
 
 1. `/home/netlogon/clients-linux/bin/logon` si on est sur le serveur
 2. `/mnt/netlogon/bin/logon` si on est sur un client GNU/Linux
 
-Nous avons donc, comme pour le profil par défaut, des versions locales du script de logon (sur chaque client GNU/Linux) et une unique version distante (sur le serveur). Et au niveau de la synchronisation, les choses fonctionnent de manière très similaire aux profils par défaut. **Lors de l'initialisation d'un client GNU/Linux :**
+Nous avons donc, comme pour le profil par défaut, des versions locales du script de `logon` (sur chaque client GNU/Linux) et une unique version distante (sur le serveur se3).
+
+Au niveau de la synchronisation, les choses fonctionnent de manière très similaire aux profils par défaut.
+
+**Lors de l'initialisation d'un client GNU/Linux :**
 
 * Si le contenu du script de logon local est identique au contenu du script de logon distant, alors c'est le script de logon local qui est exécuté par le client GNU/Linux.
 * Si en revanche les contenus diffèrent (ne serait-ce que d'un seul caractère), alors c'est le script de logon distant qui est exécuté. Mais dans la foulée, le script de logon local est écrasé puis remplacé par une copie de la version distante. Du coup, il est très probable qu'à la prochaine initialisation du client GNU/Linux ce soit à nouveau le script de logon local qui soit exécuté parce que identique à la version distante (on retombe dans le cas précédent).
 
-À priori, cela signifie donc que, pour peu que vous sachiez parler (et écrire) le langage du script de logon (il s'agit du Bash), vous pouvez modifier uniquement le script de logon distant (celui du serveur donc) afin de l'adapter à vos besoins. Vos modifications seraient alors impactées sur tous les clients GNU/Linux dès la prochaine phase d'initialisation. Seulement, il ne faudra pas procéder ainsi et cela pour une raison simple : après la moindre mise à jour du paquet `se3-clients-linux` ou éventuellement après une réinstallation, toutes vos modifications sur le script de logon seront effacées. Pour pouvoir modifier le comportement du script de logon de manière pérenne, il faudra utiliser le fichier `logon_perso` qui se trouve dans le même répertoire que le script de logon.
+À priori, cela signifie donc que, pour peu que vous sachiez parler (et écrire) le langage du script de logon (il s'agit du Bash), vous pouvez modifier uniquement le script de logon distant (celui du serveur donc) afin de l'adapter à vos besoins.
 
-##Personnaliser le script de logon
+Vos modifications seraient alors impactées sur tous les clients GNU/Linux dès la prochaine phase d'initialisation.
 
+Seulement, **il ne faudra pas procéder ainsi** et cela pour une raison simple : après la moindre mise à jour du paquet `se3-clients-linux` ou éventuellement après une réinstallation, toutes vos modifications sur le script de logon seront effacées.
+
+Pour pouvoir modifier le comportement du script de `logon` de manière pérenne, il faudra utiliser le fichier `logon_perso` qui se trouve dans le même répertoire que le script de logon.
+
+
+## Personnaliser le script de logon
 
 Le fichier `logon_perso` va vous permettre d'affiner le comportement du script de logon afin de l'adapter à vos besoins, et cela de manière pérenne dans le temps (les modifications persisteront notamment après une mise à jour du paquet `se3-clients-linux`). À la base, le fichier `logon_perso` est un fichier texte encodé en UTF-8 avec des fins de ligne de type Unix . Il contient du code bash et possède, par défaut, la structure suivante :
 
@@ -211,9 +266,10 @@ function ouverture_perso ()
 Le premier argument de la fonction `creer_lien` est la cible du ou des liens à créer. Cette cible peut s'écrire sous la forme d'un chemin absolu, c'est-a-dire un chemin qui commence par un antislash (ce qui n'est pas le cas ci-dessus). Si le chemin ne commence pas par un antislash, alors la fonction part du principe que c'est un chemin relatif qui part de `/mnt/_$LOGIN/`. (Du coup, mettre `"home/Docs"` ou mettre `/mnt/_$LOGIN/home/Docs` comme premier argument revient exactement
 au même.). Ensuite, le deuxième argument et les suivants (autant qu'on veut) sont les chemins absolus du ou des liens qui seront créés. Ces chemins doivent impérativement tous commencer par `"$REP_HOME/..."`.
 
-##Quelques bricoles pour les perfectionnistes
 
-###Changer les icônes représentants les liens pour faire plus joli
+## Quelques bricoles pour les perfectionnistes
+
+### Changer les icônes représentants les liens pour faire plus joli
 
 C'est quand même plus joli quand on a des icônes évocateurs 19 comme ci-dessous pour nos liens vers les partages, non ?
 
@@ -236,7 +292,7 @@ Une idée possible (parmi d'autres) est de modifier le profil par défaut des d'
 
 Attention, la fonction `changer_icone` n'a aucun effet sous la distribution Xubuntu qui utilise l'environnement de bureau Xfce. Cela vient du fait que personnellement je ne sais pas changer l'image d'un icône en ligne de commandes sous Xfce. Si vous savez, n'hésitez pas à me donner l'information par mail [TODO] car je pourrais ainsi étendre la fonction `changer_icone` à l'environnement de bureau Xfce.
 
-###Changer le papier peint en fonction des utilisateurs
+### Changer le papier peint en fonction des utilisateurs
 
 Ça pourrait être sympathique d'avoir un papier différent suivant le type de compte... Et bien c'est possible avec la fonction `changer_papier_peint`. Voici un exemple :
 
@@ -257,7 +313,7 @@ Là aussi, comme pour les icônes, l'idée est de placer dans le profil par déf
 
 En plus du changement de fond d'écran, il y a un petit message personnalisé qui s'affiche en haut à droite du bureau. Pour mettre en place ce genre de message, voir la section 9.6.4 [TODO].
 
-###L'activation du pavé numérique
+### L'activation du pavé numérique
 
 Pour activer le pavé numérique du client GNU/Linux au moment de l'affichage de la fenêtre de connexion du système, en principe ceci devrait fonctionner :
 
@@ -283,7 +339,7 @@ function ouverture_perso ()
     activer_pave_numerique "5"
 }
 
-###Incruster un message sur le bureau des utilisateurs pour faire classe
+### Incruster un message sur le bureau des utilisateurs pour faire classe
 
 Pour incruster un message sur le bureau des utilisateurs, il faudra d'abord que le paquet `conky` soit installé sur le client GNU/Linux.
 
@@ -338,7 +394,7 @@ FIN
 
 En principe, vous devriez voir apparaître un message incrusté sur le bureau des utilisateurs en haut à droite. Ce message sera légèrement personnalisé puisqu'il contiendra le nom de l'utilisateur connecté.
 
-###Exécuter des commandes au démarrage tous les 30 jours
+### Exécuter des commandes au démarrage tous les 30 jours
 
 Toutes les commandes que vous mettrez à l'intérieur de la fonction `initialisation_perso` du fichier `logon_perso` seront exécutées à chaque phase d'initialisation du système ce qui peut parfois s'avérer un peu trop fréquent à votre goût. Voici un exemple de fonction `initialisation_perso` qui vous permettra d'exécuter des commandes (peu importe lesquelles ici) au démarrage du système tous les 30 jours (pour peu que le système ne reste pas éteint indéfiniment bien sûr) :
 
