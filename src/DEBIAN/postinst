@@ -72,11 +72,11 @@ function restaurer_droits ()
     chown -R "admin:admins" "$REPERTOIRE_INSTALLATION"
     find "$REPERTOIRE_INSTALLATION" -regextype posix-extended        \
         ! -regex "^$REPERTOIRE_INSTALLATION/distribs/[a-z]+/skel/.*" \
-        ! -type l -exec chmod "u=rwx,g=rx,o=rx,u-s,g-s,o-t" "{}" \+
+        ! -type l -exec chmod "u=rwx,g=rx,o=rx,u-s,g-s,o-t" "{}" \+ 2>/dev/null || true
     # Pour les fichiers, on enlève le droit x pour tout le monde.
     find "$REPERTOIRE_INSTALLATION" -regextype posix-extended         \
          ! -regex "^$REPERTOIRE_INSTALLATION/distribs/[a-z]+/skel/.*" \
-        -type f -exec chmod "a-x" "{}" \+
+        -type f -exec chmod "a-x" "{}" \+ 2>/dev/null || true
     setfacl -m u:www-data:rx "$REPERTOIRE_INSTALLATION"
     setfacl -m d:u:www-data:rx "$REPERTOIRE_INSTALLATION"
 
