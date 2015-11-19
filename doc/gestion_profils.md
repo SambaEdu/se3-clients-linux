@@ -320,10 +320,10 @@ pour les Ubuntu Precise Pangolin.
 
 La rigidité de la gestion du profil telle qu'elle est
 décrite à la section précédente peut cependant être
-contournée en modifiant le script de logon.
+contournée en modifiant le script de `logon`.
 
 Pour comprendre cela, poursuivons avec l'exemple de la modification du
-profil par défaut de Mozilla.
+profil par défaut de `Mozilla`.
 
 Imaginons que vous souhaitiez
 que les enseignants disposent d'un navigateur dont la

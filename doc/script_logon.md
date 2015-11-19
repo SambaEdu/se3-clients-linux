@@ -137,13 +137,13 @@ Revenons au contenu du fichier `logon_perso` pour comprendre de quelle manière 
 
 Dans le fichier `logon_perso`, on peut distinguer trois fonctions :
 
-1. Tout le code que vous mettrez dans la fonction `initialisation_perso` sera exécuté lors de la phase d'initialisation des clients, **en dernier**, c'est-à-dire après que le script de logon ait effectué toutes les tâches liées à la phase d'initialisation qui sont décrites brièvement au point 1 de la section 9.1 [TODO].
+1. Tout le code que vous mettrez dans la fonction `initialisation_perso` sera exécuté lors de la phase d'initialisation des clients, **en dernier**, c'est-à-dire après que le script de logon ait effectué toutes les tâches liées à la phase d'initialisation qui sont décrites brièvement [ci-dessus](#linitialisation).
 
 2. Tout le code que vous mettrez dans la fonction `ouverture_perso` sera exécuté lors de la phase d'ouverture des clients uniquement lorsqu'un utilisateur du domaine se connecte. Le code est exécuté **juste après** la création du « home » de l'utilisateur qui se connecte. Typiquement, c'est dans cette fonction que vous allez gérer les montages de partages réseau en fonction du type de compte qui se connecte (son appartenance à tel ou tel groupe etc).
 
     Vous pourrez consulter avec profit la partie de cette documentation dédiée à [la gestion des montages de partages réseau à l'ouverture de session](#gestion-du-montage-des-partages-réseau).
 
-3. Tout le code que vous mettrez dans la fonction `fermeture_perso` sera exécuté lors de la phase de fermeture des clients, **en dernier**, c'est-à-dire après que le script de logon ait effectué toutes les tâches liées à la phase de fermeture qui sont décrites brièvement au point 3 de la section 9.1 [TODO].
+3. Tout le code que vous mettrez dans la fonction `fermeture_perso` sera exécuté lors de la phase de fermeture des clients, **en dernier**, c'est-à-dire après que le script de logon ait effectué toutes les tâches liées à la phase de fermeture qui sont décrites brièvement [ci-dessus](#la-fermeture).
 
 Vous pouvez bien sûr définir dans le fichier `logon_perso` des fonctions supplémentaires, mais, pour que celles-ci soient au bout du compte exécutées par le script de `logon`, il faudra les appeler dans le corps d'une des trois fonctions `initialisation_perso`, `ouverture_perso` ou `fermeture_perso`.
 
@@ -208,7 +208,7 @@ Ici la fonction `monter_partage` possède trois **arguments qui devront être d�
 
     Si `toto` ouvre une session, l'argument `"$REP_HOME/Bureau/Répertoire Classes"` va se développer en `"/home/toto/Bureau/Répertoire Classes"` si bien qu'un raccourci (sous GNU/Linux on appelle ça un lien symbolique) portant le nom `Répertoire Classes` sera créé sur le bureau de `toto`.
     
-    Donc en double-cliquant sur ce raccourci (vous pouvez voir [TODO] via une capture d'écran que ce genre de raccourci ressemble à un simple dossier), sans même le savoir, `toto` visitera le répertoire `/mnt/_toto/Classes/` qui correspondra au contenu du partage `Classes` du serveur.
+    Donc en double-cliquant sur ce raccourci (ce genre de raccourci ressemble à un simple dossier), sans même le savoir, `toto` visitera le répertoire `/mnt/_toto/Classes/` qui correspondra au contenu du partage `Classes` du serveur.
     
     Vous n'êtes pas limité(e) dans le choix du nom de ce raccourci. Les espaces et les accents sont parfaitement autorisés (**évitez par contre le caractère double-quote**). En revanche, ce raccourci doit forcément être créé dans le home de l'utilisateur qui se connecte. **Donc ce troisième argument devra toujours commencer par `"$REP_HOME/..."`** sans quoi le lien ne sera tout simplement pas créé.
 
@@ -444,7 +444,7 @@ Ensuite, le deuxième argument est le chemin absolu de n'importe quel fichier im
 
 Une idée possible (parmi d'autres) est de modifier le profil par défaut des d'utilisateurs et d'y placer un répertoire `.mes_icones/` dans lequel vous mettez tous les icônes dont vous avez besoin pour habiller vos liens. Ensuite, vous pourrez aller chercher vos icônes dans le home de l'utilisateur qui se connecte (dans `"$REP_HOME/.mes_icones/"` précisément) de manière similaire à ce qui est fait dans exemple ci-dessus.
 
-**Attention :** la fonction `changer_icone` n'a aucun effet sous la distribution **Xubuntu** qui utilise l'environnement de bureau Xfce. Cela vient du fait que personnellement je ne sais pas changer l'image d'un icône en ligne de commandes sous Xfce. Si vous savez, n'hésitez pas à me donner l'information par mail [TODO] car je pourrais ainsi étendre la fonction `changer_icone` à l'environnement de bureau Xfce.
+**Attention :** la fonction `changer_icone` n'a aucun effet sous la distribution **Xubuntu** qui utilise l'environnement de bureau Xfce. Cela vient du fait que personnellement je ne sais pas changer l'image d'un icône en ligne de commandes sous Xfce. Si vous savez, n'hésitez pas à me donner l'information par l'intermédiaire des forums' (`l-samba-edu@ac-caen.fr` ou `news://news.ac-versailles.fr/ac-versailles.assistance-technique.samba-edu` ) car je pourrais ainsi étendre la fonction `changer_icone` à l'environnement de bureau Xfce.
 
 
 ### Changer le papier peint en fonction des utilisateurs
@@ -471,7 +471,7 @@ Voici un exemple dans le cas d'un compte professeur :
 
 ![Exemple bureau prof](/images/bureau-message.png)
 
-En plus du changement de fond d'écran, il y a un petit message personnalisé qui s'affiche en haut à droite du bureau. Pour mettre en place ce genre de message, voir la section 9.6.4 [TODO].
+En plus du changement de fond d'écran, il y a un petit message personnalisé qui s'affiche en haut à droite du bureau. Pour mettre en place ce genre de message, voir la section [incruster un message sur le Bureau](#incruster-un-message-sur-le-bureau-des-utilisateurs-pour-faire-classe).
 
 
 ### L'activation du pavé numérique
