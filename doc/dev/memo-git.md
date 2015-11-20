@@ -22,9 +22,9 @@ ou Ubuntu.
 * [Commandes de base](#commandes-de-base)
     * [Clonage d'un dépôt distant](#clonage-dun-dépôt-distant)
     * [Update dépôt local](#update-dépôt-local)
-    * [Vérification des modifications locales et commit](#vérification des-modifications-locales-et-commit)
-    * [Remonter les modifications sur le dépôt distant](#remonter les modifications sur le dépôt distant)
-    * [Ajout de fichiers/répertoires au projet](#ajout de fichiers/répertoires au projet)
+    * [Vérification des modifications locales et commit](#vérification-des-modifications-locales-et-commit)
+    * [Remonter les modifications sur le dépôt distant](#remonter-les-modifications-sur-le-dépôt-distant)
+    * [Ajout de fichiers/répertoires au projet](#ajout-de-fichiers/répertoires au projet)
     * [Le renommage d'un fichier/répertoire](#le-renommage-dun-fichierrépertoire)
     * [Suppression d'un fichier/répertoire](#suppression-dun-fichierrépertoire)
     * [Manipulation de branches](#manipulation-de-branches)
@@ -32,7 +32,7 @@ ou Ubuntu.
 
 **Memo sur le formatage markdown (fichiers `.md`)**
 * [Mise en forme de base](#mise-en-forme-de-base)
-* [Les liens vers une page markdown avec une ancre](#Les-liens-vers-une-page-markdown-avec-une-ancre)
+* [Les liens vers une page markdown avec une ancre](#les-liens-vers-une-page-markdown-avec-une-ancre)
 * [Insérer du code](#insérer-du-code)
 * [Insérer une image](#insérer-une-image)
 
