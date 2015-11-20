@@ -2,15 +2,39 @@
 
 On suppose ici que vous avez déjà procédé à la création d'un
 compte Github et que vous êtes déjà membre du projet
-`se3-clients-linux`. Si ce n'est pas le cas, avant de lire
+`se3-clients-linux`.
+
+Si ce n'est pas le cas, avant de lire
 la suite, procédez aux démarches expliquées
 [ici](README.md#devenir-contributeurdéveloppeur-du-projet).
+
 Maintenant, nous allons tenter de vous expliquer comment
 contribuer en pratique au projet à travers d'utilisation du
 programme Git en ligne de commandes (en fait le programme
 Git est éclaté en plusieurs commandes). On suppose que vous
 vous trouvez sur une distribution (pas trop ancienne) Debian
 ou Ubuntu.
+
+**Mémo Git**
+* [Installation](#installation)
+* [Mise en place de sa clé publique/privé d'accès](#mise-en-place-de-sa-clé-publiqueprivé-daccès)
+* [Configuration du fichier `~/.gitconfig`](#configuration-du-fichier-gitconfig)
+* [Commandes de base](#commandes-de-base)
+    * [Clonage d'un dépôt distant](#clonage-dun-dépôt-distant)
+    * [Update dépôt local](#update-dépôt-local)
+    * [Vérification des modifications locales et commit](#vérification des-modifications-locales-et-commit)
+    * [Remonter les modifications sur le dépôt distant](#remonter les modifications sur le dépôt distant)
+    * [Ajout de fichiers/répertoires au projet](#ajout de fichiers/répertoires au projet)
+    * [Le renommage d'un fichier/répertoire](#le-renommage-dun-fichierrépertoire)
+    * [Suppression d'un fichier/répertoire](#suppression-dun-fichierrépertoire)
+    * [Manipulation de branches](#manipulation-de-branches)
+* [Voir les pushs des autres avec Git et Gihub](#voir-les-pushs-des-autres-avec-git-et-gihub)
+
+**Memo sur le formatage markdown (fichiers `.md`)**
+* [Mise en forme de base](#mise-en-forme-de-base)
+* [Les liens vers une page markdown avec une ancre](#Les-liens-vers-une-page-markdown-avec-une-ancre)
+* [Insérer du code](#insérer-du-code)
+* [Insérer une image](#insérer-une-image)
 
 
 ## Installation
