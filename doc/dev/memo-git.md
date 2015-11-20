@@ -24,7 +24,7 @@ ou Ubuntu.
     * [Update dépôt local](#update-dépôt-local)
     * [Vérification des modifications locales et commit](#vérification-des-modifications-locales-et-commit)
     * [Remonter les modifications sur le dépôt distant](#remonter-les-modifications-sur-le-dépôt-distant)
-    * [Ajout de fichiers/répertoires au projet](#ajout-de-fichiers/répertoires au projet)
+    * [Ajout de fichiers/répertoires au projet](#ajout-de-fichiersrépertoires-au-projet)
     * [Le renommage d'un fichier/répertoire](#le-renommage-dun-fichierrépertoire)
     * [Suppression d'un fichier/répertoire](#suppression-dun-fichierrépertoire)
     * [Manipulation de branches](#manipulation-de-branches)
