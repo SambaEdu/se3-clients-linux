@@ -96,3 +96,10 @@ Le 15 mars 2015 version 1.1.8
 Le 20 mars 2015 version 1.1.8.2
 - Ajout fonction unefois/TousLesParcs.
 
+le 20 novembre 2015 version 2.0.1
+- Nouvelle version majeure
+Passage sur github
+https://github.com/flaf/se3-clients-linux/blob/master/README.md
+Nouveau support de Debian Jessie (version 8)
+(x)Ubuntu Trusty Tahr (version 14.04) 
+
