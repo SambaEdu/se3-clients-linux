@@ -467,7 +467,7 @@ Le seul et unique argument de cette fonction est le chemin absolu (sur la machin
 
 Là aussi, comme pour les icônes, l'idée est de placer dans le profil par défaut distant un répertoire `.backgrounds/` (par exemple) qui contiendra les deux ou trois fichiers images dont vous avez besoin pour faire vos fonds d'écran.
 
-Ci-dessus, vous avez un exemple pour le compte `admin`, voici un exemple dans le cas d'un compte de type `professeur` :
+Ci-dessus, vous avez un exemple, dans le cas de `Debian/Jessie` pour le compte `admin`, voici un exemple dans le cas d'un compte de type `professeur` et pour `Ubuntu` :
 
 ![Exemple bureau prof](/doc/images/bureau-message.png)
 
