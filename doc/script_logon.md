@@ -469,7 +469,7 @@ Là aussi, comme pour les icônes, l'idée est de placer dans le profil par déf
 
 Voici un exemple dans le cas d'un compte professeur :
 
-![Exemple bureau prof](/images/bureau-message.png)
+![Exemple bureau prof](/doc/images/bureau-message.png)
 
 En plus du changement de fond d'écran, il y a un petit message personnalisé qui s'affiche en haut à droite du bureau. Pour mettre en place ce genre de message, voir la section [incruster un message sur le Bureau](#incruster-un-message-sur-le-bureau-des-utilisateurs-pour-faire-classe).
 
