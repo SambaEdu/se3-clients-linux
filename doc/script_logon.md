@@ -531,6 +531,7 @@ alignment top_right
 update_interval 1
 own_window yes
 own_window_transparent yes
+own_window_argb_visual yes
 override_utf8_locale yes
 text_buffer_size 1024
 own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
