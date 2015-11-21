@@ -420,7 +420,7 @@ Si vous avez testé cette méthode, dites-le nous :-)
 
 C'est quand même plus joli quand on a des icônes évocateurs comme ci-dessous pour nos liens vers les partages, non ?
 
-![Jolies icônes](/doc/images/icones_jolies1.png)
+![Jolies icônes](/doc/images/jessie_01.png)
 
 Et bien, ça tombe bien, car c'est facile à faire avec la fonction `changer_icone`.
 
