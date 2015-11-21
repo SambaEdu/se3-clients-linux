@@ -363,9 +363,11 @@ function ouverture_perso ()
     # Le tout est enregistré dans un répertoire caché appelé .profile-linux
     # ce répertoire est stocké dans le répertoire Documents de la session de l'utilisateur.
     # On utilise rsync pour des questions de droits. (Voir page de manuel de rsync pour les options)
-    # Récupération serveur → home local
-    # NB : il faudrait tester que .profile-linux/ existe et n'est pas vide
+    # On crée (s'il n'existe pas) le répertoire .profile-linux/.mozilla
     # afin d'éviter des effets indésirables…
+    # Récupération serveur → home local
+    
+    mkdir -p /mnt/_$LOGIN/Docs/.profile-linux/.mozilla
     rsync -az --delete /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/ /home/$LOGIN/.mozilla/
     chown -R $LOGIN:5005 /home/$LOGIN/.mozilla
     …
@@ -377,15 +379,13 @@ function ouverture_perso ()
 function fermeture_perso ()
 {
     …
-    # Synchronisation des préférences, favoris, historique... des a
+    # Synchronisation des préférences, favoris, historique... des applis
     # Le tout est enregistré dans un répertoire caché appelé .profile-linux
     # Sauvegarde home local → serveur
     rsync -az --delete /home/$LOGIN/.mozilla/ /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/
     …
 }
 ```
-
-**Une condition :** avoir créé auparavant le répertoire .profile-linux/ dans le home de l'utilisateur.
 
 Cette méthode fonctionne bien mais il peut y avoir *des effets de bord* lors de la transition entre le .mozilla du skel et celui de l'utilisateur. Pour l'instant je n'ai eu qu'un seul cas dont la gestion s'est faite *à la mano*.
 
