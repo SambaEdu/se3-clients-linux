@@ -510,16 +510,15 @@ function ouverture_perso ()
 
 ### Incruster un message sur le bureau des utilisateurs pour faire classe
 
-Pour incruster un message sur le bureau des utilisateurs, il faudra d'abord que le paquet `conky` soit installé sur le client GNU/Linux.
+Pour incruster un message sur le bureau des utilisateurs, il faudra d'abord que **le paquet `conky` soit installé** sur le client GNU/Linux.
 
 Pour installer `conky`, vous pouvez par exemple lancer l'installation via un script `*.unefois` qui contiendrait à peu de choses près l'instruction `apt-get install --yes conky`.
 
-Ensuite, tentez de mettre ceci dans la fonction `ouverture_perso` :
+Ensuite, vous créerez une fonction `lancer_conky` dans le fichier `logon_perso` :
 
 ```sh
-function ouverture_perso ()
+function lancer_conky ()
 {
-    …
     # On crée un fichier de configuration .conkyrc dans le home de l'utilisateur.
     # précisant le contenu du message ainsi que certains paramètres (comme la
     # taille de la police par exemple).
@@ -550,7 +549,7 @@ fois votre session fermée.
     Les administrateurs du réseau pédagogique.
 
 FIN
-
+    
     # On fait de "$LOGIN" le propriétaire du fichier .conkyrc.
     chown "$LOGIN:" "$REP_HOME/.conkyrc"
     chmod 644 "$REP_HOME/.conkyrc"
@@ -560,6 +559,17 @@ FIN
     #de 5 secondes entre la fin du script de logon et le lancement de la
     #commande conky (avec ses arguments).
     executer_a_la_fin "5" conky --config "$REP_HOME/.conkyrc"
+}
+```
+
+Enfin, vous rajouterai l'appel de cette fonction dans la fonction `ouverture_perso` :
+
+```sh
+function ouverture_perso ()
+{
+    …
+    # Incruster un message sur le bureau des utilisateurs pour faire "classe" :
+    lancer_conky
     …
 }
 ```
