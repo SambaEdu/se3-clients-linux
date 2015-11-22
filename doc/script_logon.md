@@ -15,6 +15,7 @@ Une partie importante de ce script est gérée par le `logon_perso` qui permettr
     * [Conséquences sur le comportement du `logon`](#conséquences-du-logon_perso-sur-le-comportement-du-script-de-logon)
     * [Incorporer le `logon_perso` au `logon`](#incorporer-le-logon_perso-dans-le-logon)
 * [Variables et fonctions utiles pour le `logon_perso`](#quelques-variables-et-fonctions-prêtes-à-lemploi)
+* [Gestion du montage des partages réseau](#gestion-du-montage-des-partages-réseau)
 * [Gérer les profils pour `Iceweasel`](#gérer-les-profils-pour-iceweasel)
     * [à l'aide de `rsync`](#méthode-à-laide-de-rsync)
     * [à l'aide d'un montage](#méthode-à-laide-dun-montage)
@@ -367,7 +368,7 @@ function ouverture_perso ()
     # afin d'éviter des effets indésirables…
     # Récupération serveur → home local
     
-    mkdir -p /mnt/_$LOGIN/Docs/.profile-linux/.mozilla
+    [ ! -d /mnt/_$LOGIN/Docs/.profile-linux/.mozilla ] && mkdir -p /mnt/_$LOGIN/Docs/.profile-linux/.mozilla
     rsync -az --delete /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/ /home/$LOGIN/.mozilla/
     chown -R $LOGIN:5005 /home/$LOGIN/.mozilla
     …
