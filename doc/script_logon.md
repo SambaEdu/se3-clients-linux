@@ -18,11 +18,11 @@ Une partie importante de ce script est gérée par le `logon_perso` qui permettr
 * [Gestion du montage des partages réseau](#gestion-du-montage-des-partages-réseau)
     * [Un exemple](#un-exemple)
     * [Un autre exemple](#un-autre-exemple)
-    * [Syntaxe de la fonction `monter_partage`](#syntaxe-de-la-fonction-monter_partage-)
+    * [Syntaxe de la fonction `monter_partage`](#syntaxe-de-la-fonction-monter_partage)
     * [Montage limité à un utilisateur](#montage-limité-à-un-utilisateur)
     * [Montage limité à un groupe](#montage-limité-à-un-groupe)
     * [Le montage `home` d'un utilisateur](#le-montage-home-dun-utilisateur)
-    * [La fonction creer_lien](#la-fonction-creer_lien)
+    * [La fonction `creer_lien`](#la-fonction-creer_lien)
 * [Gérer les profils pour `Iceweasel`](#gérer-les-profils-pour-iceweasel)
     * [à l'aide de `rsync`](#méthode-à-laide-de-rsync)
     * [à l'aide d'un montage](#méthode-à-laide-dun-montage)
@@ -363,7 +363,7 @@ Dans l'exemple ci-dessus, on ne monte pas le partage `homes` mais uniquement le 
 **Note :** Comme d'habitude sous GNU/Linux, respectez bien la casse des noms de partages et de répertoires.
 
 
-### La fonction creer_lien
+### La fonction `creer_lien`
 
 Pour l'instant, de par la manière dont la fonction `monter_partage` est définie, on peut créer uniquement des liens qui pointent vers la racine du partage associé. Mais on peut vouloir par exemple monter un partage et créer des liens uniquement vers des sous-répertoires de ce partage (et non vers sa racine). C'est tout à fait possible avec la fonction `creer_lien`.
 
