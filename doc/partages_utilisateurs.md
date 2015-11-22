@@ -33,11 +33,11 @@ Un compte `élève` aura accès :
 Un compte `professeur` aura accès :
 
 * Aux mêmes partages qu'un compte `élève`.
-* Mais il aura accès en plus au partage `//SERVEUR/Docs/` via deux liens symboliques. Tous les deux possèdent le même nom : « `Public sur le réseau` ». L'un se trouve dans le répertoire `/home/<login>/` et l'autre dans le répertoire `/home/<login>/Bureau/`.
+* Mais il aura accès en plus au partage `//SERVEUR/Docs/` via deux liens symboliques. Tous les deux possèdent le même nom : « `Ressources sur le réseau` ». L'un se trouve dans le répertoire `/home/<login>/` et l'autre dans le répertoire `/home/<login>/Bureau/`.
 
-**Recommandation :** À la place de `Public sur le réseau`, il sera plus judicieux de mettre `Ressources sur le réseau`
+**Anciennes versions :** Pour les anciennes version du paquet, à la place de `Ressources sur le réseau`, vous trouverez `Public sur le réseau` mais nous vous conseillons de le modifier, par l'intermédiaire du fichier `logon_perso`, en `Ressources sur le réseau` qui nous semble plus judicieux.
 
-**Remarque :** Ce partage`//SERVEUR/Docs/` pourra aussi être accessible aux élèves en supprimant ses conditions d'acès dans le fichier `logon_perso` mais il faudra alors paramétrer en conséquence les droits sur les fichiers et répertoires de ce partage.
+**Remarque :** Ce partage`//SERVEUR/Docs/` pourra aussi être accessible aux élèves en supprimant ses conditions d'accès dans le fichier `logon_perso` mais il faudra alors paramétrer en conséquence les droits sur les fichiers et répertoires de ce partage.
 
 ### Partages pour le compte `admin`
 
