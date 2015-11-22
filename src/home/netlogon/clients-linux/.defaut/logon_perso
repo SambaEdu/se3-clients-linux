@@ -34,8 +34,8 @@ function ouverture_perso ()
     # c'est un compte "prof" qui se connecte, ou bien "admin".
     if [ "$LOGIN" = "admin" ] || est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"; then
         monter_partage "//$SE3/Docs" "Public" \
-            "$REP_HOME/Public sur le réseau" \
-            "$REP_HOME/Bureau/Public sur le réseau"
+            "$REP_HOME/Ressources sur le réseau" \
+            "$REP_HOME/Bureau/Ressources sur le réseau"
     fi
     
     # Montage du partage « admhomes » et de « netlogon-linux » 
