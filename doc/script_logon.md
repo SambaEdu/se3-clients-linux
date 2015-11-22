@@ -420,9 +420,12 @@ function ouverture_perso ()
     # afin d'éviter des effets indésirables…
     # Récupération serveur → home local
     
-    [ ! -d /mnt/_$LOGIN/Docs/.profile-linux/.mozilla ] && mkdir -p /mnt/_$LOGIN/Docs/.profile-linux/.mozilla
-    rsync -az --delete /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/ /home/$LOGIN/.mozilla/
-    chown -R $LOGIN:5005 /home/$LOGIN/.mozilla
+    if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"
+    then
+        [ ! -e /mnt/_$LOGIN/Docs/.profile-linux/.mozilla ] && mkdir -p /mnt/_$LOGIN/Docs/.profile-linux/.mozilla
+        rsync -az --delete /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/ /home/$LOGIN/.mozilla/
+        chown -R $LOGIN:5005 /home/$LOGIN/.mozilla
+    fi
     …
 }
 ```
@@ -435,7 +438,10 @@ function fermeture_perso ()
     # Synchronisation des préférences, favoris, historique... des applis
     # Le tout est enregistré dans un répertoire caché appelé .profile-linux
     # Sauvegarde home local → serveur
-    rsync -az --delete /home/$LOGIN/.mozilla/ /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/
+    if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"
+    then
+        rsync -az --delete /home/$LOGIN/.mozilla/ /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/
+    fi
     …
 }
 ```
