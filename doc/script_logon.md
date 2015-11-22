@@ -1,10 +1,10 @@
 #Le script de logon
 
-Comme vous pourrez le constater, le script de `logon` est un peu le « chef d'orchestre » de chacun des clients GNU/Linux.
-
-Une partie importante de ce script est gérée par le `logon_perso` qui permettra d'aptater son fonctionnement aux besoins des utilisateurs.
 
 **Mécanisme du script de `logon`**
+
+Comme vous pourrez le constater, le script de `logon` est un peu le « chef d'orchestre » de chacun des clients GNU/Linux.
+
 * [Les 3 phases d'exécution du script de `logon`](#les-3-phases-dexécution-du-script-de-logon)
     * [initialisation](#linitialisation)
     * [ouverture](#louverture)
@@ -12,7 +12,11 @@ Une partie importante de ce script est gérée par le `logon_perso` qui permettr
 * [Emplacement du script de `logon`](#emplacement-du-script-de-logon)
 * [Synchronisation entre un `logon` local et le `logon` distant](#synchronisation-entre-un-logon-local-et-le-logon-distant)
 
+
 **Personnaliser le script de `logon`**
+
+Une partie importante de ce script est gérée par le `logon_perso` qui permettra d'aptater son fonctionnement aux besoins des utilisateurs.
+
 * [Personnaliser à l'aide du `logon_perso`](#personnaliser-le-script-de-logon)
     * [Structure du `logon_perso`](#structure-du-fichier-logon_perso)
     * [Conséquences sur le comportement du `logon`](#conséquences-du-logon_perso-sur-le-comportement-du-script-de-logon)
