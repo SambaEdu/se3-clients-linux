@@ -6,10 +6,8 @@ Pour commencer, [toutes les variables et les fonctions présentées ici](variabl
 
 ##`LOGIN`
 Cette variable stocke le login de l'utilisateur qui a ouvert une session.
-Cette variable n'a de sens que lors de la phase d'ouverture et de ferme-
-ture (c'est-à-dire uniquement à l'intérieur des fonctions `ouverture_perso` et
-`fermeture_perso`), pas lors de la phase d'initialisation (c'est-à-dire à l'in-
-térieur de la fonction `initialisation_perso`) puisque personne n'a encore
+Cette variable n'a de sens que lors de la phase d'ouverture et de fermeture (c'est-à-dire uniquement à l'intérieur des fonctions `ouverture_perso` et
+`fermeture_perso`), pas lors de la phase d'initialisation (c'est-à-dire à l'intérieur de la fonction `initialisation_perso`) puisque personne n'a encore
 ouvert de session à ce moment là.
 
 ##`NOM_COMPLET_LOGIN`
@@ -42,8 +40,7 @@ fi
 
 Au passage, dans ce code, aucune requête LDAP n'est effectuée puisque la
 variable `LISTE_GROUPES_LOGIN` contient déjà la liste des groupes auxquels
-appartient l'utilisateur qui vient de se connecter (la requête LDAP permet-
-tant de définir la variable `LISTE_GROUPES_LOGIN` a été faite par le script de
+appartient l'utilisateur qui vient de se connecter (la requête LDAP permettant de définir la variable `LISTE_GROUPES_LOGIN` a été faite par le script de
 logon en amont, une fois pour toute).
 
 ##`DEMARRAGE`
