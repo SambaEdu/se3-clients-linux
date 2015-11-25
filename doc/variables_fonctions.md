@@ -21,7 +21,7 @@ Voici la liste des variables et des fonctions pouvant être utilisées dans le `
 * [`afficher_liste_groupes`](#afficher_liste_groupes)
 * [`est_utilisateur_local`](#est_utilisateur_local)
 * [`est_connecte`](#est_connecte)
-* 
+* [`activer_pave_numerique`](#activer_pave_numerique)
 
 
 ## `SE3`
