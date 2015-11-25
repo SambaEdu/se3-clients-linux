@@ -17,27 +17,27 @@ Pour commencer, [toutes les variables et les fonctions présentées ici](variabl
 
 ## `LOGIN`
 
-Cette variable stocke le login de l'utilisateur qui a ouvert une session.
+Cette variable stocke l'identifiant de l'utilisateur qui a ouvert une session.
 
 Cette variable n'a de sens que **lors de la phase d'ouverture et de fermeture** (c'est-à-dire uniquement à l'intérieur des fonctions `ouverture_perso` et `fermeture_perso`), pas lors de la phase d'initialisation (c'est-à-dire à l'intérieur de la fonction `initialisation_perso`) puisque personne n'a encore ouvert de session à ce moment-là.
 
 
 ## `NOM_COMPLET_LOGIN`
 
-Cette variable stocke le nom complet (sous la forme « prénom nom ») de l'utilisateur qui a ouvert une session.
+Cette variable stocke le nom complet (par exemple sous la forme « prénom nom » ou « pnom » selon le choix effectué pour la forme des identifiants) de l'utilisateur qui a ouvert une session.
 
 Cette variable n'a de sens que **lors de la phase d'ouverture et de fermeture**.
 
 
 ## `REP_HOME`
 
-Cette variable stocke le chemin absolu du répertoire home de l'utilisateur qui se connecte.
+Cette variable stocke le chemin absolu du répertoire `home` de l'utilisateur qui se connecte.
 
 Par exemple, si le compte `toto` ouvre une session, la variable contiendra la chaîne `/home/toto`.
 
 Remarquez que cette variable est un simple raccourci pour écrire `"/home/$LOGIN"`.
 
-Cette variable n'a de sens que lors de la phase d'ouverture et de fermeture.
+Cette variable n'a de sens que **lors des phases d'ouverture et de fermeture**.
 
 
 ## `LISTE_GROUPES_LOGIN`
@@ -57,17 +57,14 @@ elif est_dans_liste "$LISTE_GROUPES_LOGIN" "Eleves"; then
 fi
 ```
 
-Au passage, dans ce code, aucune requête LDAP n'est effectuée puisque la
+Au passage, dans ce code, aucune requête `LDAP` n'est effectuée puisque la
 variable `LISTE_GROUPES_LOGIN` contient déjà la liste des groupes auxquels
-appartient l'utilisateur qui vient de se connecter (la requête LDAP permettant de définir la variable `LISTE_GROUPES_LOGIN` a été faite par le script de
-logon en amont, une fois pour toute).
+appartient l'utilisateur qui vient de se connecter (la requête `LDAP` permettant de définir la variable `LISTE_GROUPES_LOGIN` a été faite par le script de `logon` en amont, une fois pour toute).
 
 
 ## `DEMARRAGE`
 
-Cette variable stocke toujours la valeur `false`, sauf lorsqu'on se trouve lors
-d'une phase d'initialisation qui correspond à un démarrage du système où elle
-stocke alors la valeur `true`.
+Cette variable stocke toujours la valeur `false`, **sauf** lorsqu'on se trouve **lors d'une phase d'initialisation** qui correspond à un démarrage du système où elle stocke alors la valeur `true`.
 
 Cette variable n'a donc d'intérêt que **lorsqu'elle est utilisée dans la fonction `initialisation_perso`**.
 
@@ -87,7 +84,7 @@ partages réseau sur le serveur, il faudra forcément faire usage de cette fonct
 qui est donc très importante.
 
 Toutes les explications sur cette fonction se
-trouvent dans la partie concernant [la personnalisation du script de logon](script_logon.md#gestion-du-montage-des-partages-réseau) 
+trouvent dans la partie concernant [la personnalisation du script de `logon`](script_logon.md#gestion-du-montage-des-partages-réseau) 
 
 Cette fonction n'a de sens que **lors de la phase d'ouverture**.
 
@@ -95,16 +92,16 @@ Cette fonction n'a de sens que **lors de la phase d'ouverture**.
 ## `creer_lien`
 
 Cette fonction, qui va de pair avec la précédente, sera détaillée aussi
-dans la partie concernant [la personnalisation du script de logon](script_logon.md#la-fonction-creer_lien).
+dans la partie concernant [la personnalisation du script de `logon`](script_logon.md#la-fonction-creer_lien).
 
 Cette fonction n'a de sens que **lors de la phase d'ouverture**.
 
 
 ## `changer_icone`
 
-Cette fonction sera détaillée dans la partie concernant [la personnalisation du script de logon](script_logon.md#changer-les-icônes-représentants-les-liens-pour-faire-plus-joli).
+Cette fonction sera détaillée dans la partie concernant [la personnalisation du script de `logon`](script_logon.md#changer-les-icônes-représentants-les-liens-pour-faire-plus-joli).
 
-Cette fonction n'a de sens que lors de la phase d'ouverture.
+Cette fonction n'a de sens que **lors de la phase d'ouverture**.
 
 
 ## `changer_papier_peint`
@@ -116,7 +113,7 @@ Elle prend un argument qui correspond au chemin absolu (sur le client) du fichie
 utiliser en guise de fond d'écran.
 
 Un exemple de l'utilisation de cette fonction
-sera donné dans la partie concernant [la personnalisation du script de logon](script_logon.md#changer-le-papier-peint-en-fonction-des-utilisateurs).
+sera donné dans la partie concernant [la personnalisation du script de `logon`](script_logon.md#changer-le-papier-peint-en-fonction-des-utilisateurs).
 
 
 ## `activer_pave_numerique`
@@ -127,9 +124,7 @@ détaillée dans la partie concernant [la personnalisation du script de logon](s
 
 ## `executer_a_la_fin`
 
-Parfois certaines commandes nécessitent d'être exécutées **une fois le script de
-logon terminé** (c'est-à-dire une fois l'initialisation, l'ouverture ou la fermeture
-terminée). C'est ce que permet cette fonction.
+Parfois certaines commandes nécessitent d'être exécutées **une fois le script de `logon` terminé** (c'est-à-dire une fois l'initialisation, l'ouverture ou la fermeture terminée). C'est ce que permet cette fonction.
 
 Avec, par exemple :
 ```sh
@@ -142,6 +137,5 @@ Un exemple de l'usage de cette fonction sera donné dans la partie concernant [l
 
 
 **Attention**, l'exécution
-se faisant une fois le script de logon terminé, il n''y aura **aucune trace dans les
-fichiers de log** de l'exécution de la commande `commande`.
+se faisant une fois le script de `logon` terminé, il n'y aura **aucune trace dans les fichiers de `log`** de l'exécution de la commande `commande`.
 
