@@ -6,7 +6,7 @@ Pour commencer, [toutes les variables et les fonctions présentées ici](variabl
 
 **Les variables :**
 
-* [`LOGIN`](#logon)
+* [`LOGIN`](#login)
 * [`NOM_COMPLET_LOGIN`](#nom_complet_login)
 * [`REP_HOME`](#rep_home)
 * [`LISTE_GROUPES_LOGIN`](#liste_groupes_login)
@@ -20,7 +20,7 @@ Pour commencer, [toutes les variables et les fonctions présentées ici](variabl
 * [`changer_icone`](#changer_icone)
 * [`changer_papier_peint`](#changer_papier_peint)
 * [`activer_pave_numerique`](#activer_pave_numerique)
-* [`activer_pave_numerique`](#activer_pave_numerique)
+* [`executer_a_la_fin`](#executer_a_la_fin)
 
 
 ## `LOGIN`
