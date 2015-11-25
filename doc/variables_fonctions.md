@@ -2,8 +2,8 @@
 
 Voici la liste des variables et des fonctions pouvant être utilisées dans le `logon_perso` et dans les scripts `unefois`.
 
-**Liste des variables**                      | **Liste des fonctions**
----------------------------------------------|----------------------------------------------
+ **Liste des variables**                     | **Liste des fonctions**
+---------------------------------------------|------------------------------------------------------------
   [`SE3`](#se3)                              |  [`appartient_au_parc`](#appartient_au_parc)
   [`NOM_DE_CODE`](#nom_de_code)              |  [`afficher_liste_parcs`](#afficher_liste_parcs)
   [`ARCHITECTURE`](#architecture)            |  [`est_dans_liste`](#est_dans_liste)
