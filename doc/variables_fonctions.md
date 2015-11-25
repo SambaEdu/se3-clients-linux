@@ -1,4 +1,4 @@
-#Des variables et des fonctions prêtes à l'emploi
+#Des variables et des fonctions prêtes à l'emploi pour des scripts
 
 Voici la liste des variables et des fonctions pouvant être utilisées dans le `logon_perso` et dans les scripts `unefois`.
 
@@ -13,7 +13,7 @@ Voici la liste des variables et des fonctions pouvant être utilisées dans le `
                                    |  [`est_connecte`](#est_connecte)
                                    |  [`activer_pave_numerique`](#activer_pave_numerique)
 
-[D'autres variables et fonctions](variables_fonctions_logon.md) pourront être utiles pour le fichier `logon_perso`.
+**Nota :** d'autres [variables et fonctions](variables_fonctions_logon.md) pourront être utiles pour le fichier `logon_perso`.
 
 
 ## `SE3`

@@ -1,8 +1,6 @@
-#Quelques variables et fonctions prêtes à l'emploi
+#Quelques variables et fonctions prêtes à l'emploi pour personnaliser le script de `logon`
 
 Voici la liste des variables et des fonctions que vous pourrez utiliser dans le fichier `logon_perso` et qui seront susceptibles de vous aider à affiner le comportement du script de logon :
-
-Pour commencer, [toutes les variables et les fonctions présentées ici](variables_fonctions.md) sont utilisables.
 
 
  **Les variables**                                    | **Les fonctions**
@@ -13,6 +11,8 @@ Pour commencer, [toutes les variables et les fonctions présentées ici](variabl
   [`LISTE_GROUPES_LOGIN`](#liste_groupes_login)       |  [`changer_papier_peint`](#changer_papier_peint)
   [`DEMARRAGE`](#demarrage)                           |  [`activer_pave_numerique`](#activer_pave_numerique)
                                                       |  [`executer_a_la_fin`](#executer_a_la_fin)
+
+**Nota :** d'autres [variables et fonctions](variables_fonctions.md) sont aussi utilisables dans le fichier `logon_perso`.
 
 
 ## `LOGIN`
