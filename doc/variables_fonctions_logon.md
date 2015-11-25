@@ -4,23 +4,15 @@ Voici la liste des variables et des fonctions que vous pourrez utiliser dans le 
 
 Pour commencer, [toutes les variables et les fonctions présentées ici](variables_fonctions.md) sont utilisables.
 
-**Les variables :**
 
-* [`LOGIN`](#login)
-* [`NOM_COMPLET_LOGIN`](#nom_complet_login)
-* [`REP_HOME`](#rep_home)
-* [`LISTE_GROUPES_LOGIN`](#liste_groupes_login)
-* [`DEMARRAGE`](#demarrage)
-
-
-**Les fonctions :**
-
-* [`monter_partage`](#monter_partage)
-* [`creer_lien`](#creer_lien)
-* [`changer_icone`](#changer_icone)
-* [`changer_papier_peint`](#changer_papier_peint)
-* [`activer_pave_numerique`](#activer_pave_numerique)
-* [`executer_a_la_fin`](#executer_a_la_fin)
+**Les variables :**                                | **Les fonctions :**
+---------------------------------------------------|------------------------------------------
+* [`LOGIN`](#login)                                | * [`monter_partage`](#monter_partage)
+* [`NOM_COMPLET_LOGIN`](#nom_complet_login)        | * [`creer_lien`](#creer_lien)
+* [`REP_HOME`](#rep_home)                          | * [`changer_icone`](#changer_icone)
+* [`LISTE_GROUPES_LOGIN`](#liste_groupes_login)    | * [`changer_papier_peint`](#changer_papier_peint)
+* [`DEMARRAGE`](#demarrage)                        | * [`activer_pave_numerique`](#activer_pave_numerique)
+                                                   | * [`executer_a_la_fin`](#executer_a_la_fin)
 
 
 ## `LOGIN`
