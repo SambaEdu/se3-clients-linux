@@ -4,25 +4,44 @@ Voici la liste des variables et des fonctions que vous pourrez utiliser dans le 
 
 Pour commencer, [toutes les variables et les fonctions présentées ici](variables_fonctions.md) sont utilisables.
 
-##`LOGIN`
+**Les variables :**
+
+* [`LOGIN`](#logon)
+* [`NOM_COMPLET_LOGIN`](#nom_complet_login)
+* [`REP_HOME`](#rep_home)
+* [`LISTE_GROUPES_LOGIN`](#liste_groupes_login)
+* [`DEMARRAGE`](#demarrage)
+
+
+**Les fonctions :**
+
+* [`monter_partage`](#monter_partage)
+* [`creer_lien`](#creer_lien)
+* [`changer_icone`](#changer_icone)
+* [`changer_papier_peint`](#changer_papier_peint)
+* [`activer_pave_numerique`](#activer_pave_numerique)
+* [`activer_pave_numerique`](#activer_pave_numerique)
+
+
+## `LOGIN`
 Cette variable stocke le login de l'utilisateur qui a ouvert une session.
 Cette variable n'a de sens que lors de la phase d'ouverture et de fermeture (c'est-à-dire uniquement à l'intérieur des fonctions `ouverture_perso` et
 `fermeture_perso`), pas lors de la phase d'initialisation (c'est-à-dire à l'intérieur de la fonction `initialisation_perso`) puisque personne n'a encore
 ouvert de session à ce moment là.
 
-##`NOM_COMPLET_LOGIN`
+## `NOM_COMPLET_LOGIN`
 Cette variable stocke le nom complet (sous la forme « prénom nom ») de
 l'utilisateur qui a ouvert une session. Cette variable n'a de sens que lors de
 la phase d'ouverture et de fermeture.
 
-##`REP_HOME`
+## `REP_HOME`
 Cette variable stocke le chemin absolu du répertoire home de l'utilisateur qui
 se connecte. Par exemple, si le compte `toto` ouvre une session, la variable
 contiendra la chaîne `/home/toto`. Remarquez que cette variable est un simple
 raccourci pour écrire `"/home/$LOGIN"`. Cette variable n'a de sens que lors de
 la phase d'ouverture et de fermeture.
 
-##`LISTE_GROUPES_LOGIN`
+## `LISTE_GROUPES_LOGIN`
 Cette variable, qui n'a de sens **que lors de la phase d'ouverture**, stocke la
 liste des groupes auxquels appartient l'utilisateur qui a ouvert une session (le
 format étant un nom de groupe par ligne). Une utilisation typique de cette
@@ -43,7 +62,7 @@ variable `LISTE_GROUPES_LOGIN` contient déjà la liste des groupes auxquels
 appartient l'utilisateur qui vient de se connecter (la requête LDAP permettant de définir la variable `LISTE_GROUPES_LOGIN` a été faite par le script de
 logon en amont, une fois pour toute).
 
-##`DEMARRAGE`
+## `DEMARRAGE`
 Cette variable stocke toujours la valeur `false`, sauf lorsqu'on se trouve lors
 d'une phase d'initialisation qui correspond à un démarrage du système où elle
 stocke alors la valeur `true`. Cette variable n'a donc d'intérêt que lorsqu'elle
@@ -56,33 +75,33 @@ if "$DEMARRAGE"; then
 fi
 ```
 
-##`monter_partage`
+## `monter_partage`
 Si vous voulez que les utilisateurs du domaine puissent avoir accès à des
 partages réseau sur le serveur, il faudra forcément faire usage de cette fonction
 qui est donc très importante. Toutes les explications sur cette fonction se
 trouvent à la section 9.5 [TODO]. Cette fonction n'a de sens que lors de la
 phase d'ouverture.
 
-##`creer_lien`
+## `creer_lien`
 Cette fonction, qui va de pair avec la précédente, sera détaillée à la section 9.5
 [TODO]. Cette fonction n'a de sens que lors de la phase d'ouverture.
 
-##`changer_icone`
+## `changer_icone`
 Cette fonction sera détaillée à la section 9.6.1 [TODO]. Cette fonction n'a de
 sens que lors de la phase d'ouverture.
 
-##`changer_papier_peint`
+## `changer_papier_peint`
 Cette fonction, utilisable uniquement pendant la phase d'ouverture, permet
 de changer le fond d'écran de l'utilisateur qui se connecte. Elle prend un
 argument qui correspond au chemin absolu (sur le client) du fichier image à
 utiliser en guise de fond d'écran. Un exemple de l'utilisation de cette fonction
 sera donné à la section 9.6.2 [TODO].
 
-##`activer_pave_numerique`
+## `activer_pave_numerique`
 Cette fonction, qui fait exactement ce à quoi on pense naturellement, sera
 détaillée à la section 9.6.3 [TODO].
 
-##`executer_a_la_fin`
+## `executer_a_la_fin`
 Parfois certaines commandes nécessitent d'être exécutées un fois le script de
 logon terminé (c'est-à-dire une fois l'initialisation, l'ouverture ou la fermeture
 terminée). C'est ce que permet cette fonction. Avec par exemple :
@@ -95,3 +114,4 @@ que le script de logon ait terminé son exécution. Un exemple de l'usage de
 cette fonction sera donné à la section 9.6.4 [TODO]. Attention, l'exécution
 se faisant une fois le script de logon terminé, il y aura aucune trace dans les
 fichiers de log de l'exécution de la commande `commande`.
+
