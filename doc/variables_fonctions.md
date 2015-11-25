@@ -2,16 +2,16 @@
 
 Voici la liste des variables et des fonctions pouvant être utilisées dans le `logon_perso` et dans les scripts `unefois`.
 
-**Liste des variables**                     | **Liste des fonctions**
---------------------------------------------|----------------------------------------------
-* [`SE3`](#se3)                             | * [`appartient_au_parc`](#appartient_au_parc)
-* [`NOM_DE_CODE`](#nom_de_code)             | * [`afficher_liste_parcs`](#afficher_liste_parcs)
-* [`ARCHITECTURE`](#architecture)           | * [`est_dans_liste`](#est_dans_liste)
-* [`BASE_DN`](#base_dn)                     | * [`appartient_au_groupe`](#appartient_au_groupe)
-* [`NOM_HOTE`](#nom_hote)                   | * [`afficher_liste_groupes`](#afficher_liste_groupes)
-                                            | * [`est_utilisateur_local`](#est_utilisateur_local)
-                                            | * [`est_connecte`](#est_connecte)
-                                            | * [`activer_pave_numerique`](#activer_pave_numerique)
+**Liste des variables**                      | **Liste des fonctions**
+---------------------------------------------|----------------------------------------------
+  [`SE3`](#se3)                              |  [`appartient_au_parc`](#appartient_au_parc)
+  [`NOM_DE_CODE`](#nom_de_code)              |  [`afficher_liste_parcs`](#afficher_liste_parcs)
+  [`ARCHITECTURE`](#architecture)            |  [`est_dans_liste`](#est_dans_liste)
+  [`BASE_DN`](#base_dn)                      |  [`appartient_au_groupe`](#appartient_au_groupe)
+  [`NOM_HOTE`](#nom_hote)                    |  [`afficher_liste_groupes`](#afficher_liste_groupes)
+                                             |  [`est_utilisateur_local`](#est_utilisateur_local)
+                                             |  [`est_connecte`](#est_connecte)
+                                             |  [`activer_pave_numerique`](#activer_pave_numerique)
 
 [D'autres variables et fonctions](variables_fonctions_logon.md) pourront être utiles pour le fichier `logon_perso`.
 
