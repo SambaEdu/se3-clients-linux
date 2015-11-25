@@ -1,22 +1,46 @@
 #Des variables et des fonctions prêtes à l'emploi
 
-##`SE3`
+Voici la liste des variables et des fonctions pouvant être utilisées dans le `logon_perso` et dans les scripts `unefois`.
+
+**Liste des variables :**
+
+* [`SE3`](#se3)
+* [`NOM_DE_CODE`](#nom_de_code)
+* [`ARCHITECTURE`](#architecture)
+* [`BASE_DN`](#base_dn)
+* [`NOM_HOTE`](#nom_hote)
+
+
+
+**Liste des fonctions :**
+
+* [`appartient_au_parc`](#appartient_au_parc)
+* [`afficher_liste_parcs`](#afficher_liste_parcs)
+* [`est_dans_liste`](#est_dans_liste)
+* [`appartient_au_groupe`](#appartient_au_groupe)
+* [`afficher_liste_groupes`](#afficher_liste_groupes)
+* [`est_utilisateur_local`](#est_utilisateur_local)
+* [`est_connecte`](#est_connecte)
+* 
+
+
+## `SE3`
 
 Cette variable stocke l'adresse IP du serveur récupérée automatiquement lors de l'installation du paquet `se3-clients-linux`.
 
-##`NOM_DE_CODE`
+## `NOM_DE_CODE`
 
 Cette variable stocke ce qu'on appelle le « nom de code » de la distribution (`squeeze` dans le cas d'une Debian Squeeze, `precise` dans le cas d'une Ubuntu Precise Pangolin etc).
 
-##`ARCHITECTURE`
+## `ARCHITECTURE`
 
 Cette variable stocke l'architecture du système. Par exemple, si le système repose sur une architecture 64 bits, alors la variable stockera la chaîne de caractères `x86_64`.
 
-##`BASE_DN`
+## `BASE_DN`
 
 Cette variable contient le suffixe de base LDAP de l'annuaire du serveur. Elle pourra vous être utile si vous souhaitez faire vous-même des requêtes LDAP particulières sur les clients à l'aide de la commande `ldapsearch`.
 
-##`NOM_HOTE`
+## `NOM_HOTE`
 
 Cette variable stocke le nom du client GNU/Linux (celui qui se trouve dans le fichier de configuration `/etc/hostname`). Par exemple, si vous avez pris l'ha-
 bitude de choisir des noms de machines de la forme `<salle>-xxx` (comme dans `S121-PC04` ou même comme dans `S18-DELL-02`), alors vous pourrez récupérer le nom de la salle où se trouve le client GNU/Linux par l'intermédiaire de la variable `NOM_HOTE` comme ceci :
@@ -34,7 +58,7 @@ fi
 # etc.
 ```
 
-##appartient_au_parc
+## `appartient_au_parc`
 
 Cette fonction permet de savoir si une machine appartient à un parc donné. Pour ce faire, la fonction appartient_au_parc interroge l'annuaire du serveur via une requête LDAP. Voici un exemple d'utilisation :
 
@@ -45,7 +69,7 @@ else
     # La machine n'appartient pas au parc S121
 fi
 ```
-##`afficher_liste_parcs`
+## `afficher_liste_parcs`
 
 Un exemple vaudra mieux qu'un long discours :
 ```sh
@@ -54,7 +78,7 @@ liste_parcs=$(afficher_liste_parcs "S121-LS-P")
 
 Dans cet exemple, la fonction effectue une requête LDAP auprès du serveur afin de connaître le nom de tous les parcs auxquels appartient la machine `S121-LS-P`. Si la machine `S121-LS-P` appartient aux parcs `S121` et `PostesProfs`, alors la variable `liste_parcs` contiendra deux lignes, la première contenant `S121` et la deuxième contenant PostesProfs. L'idée est de stocker tous les parcs d'une machine dans une variable, le tout en une seule requête LDAP. Enfin, à la place de `S121-LS-P` comme argument de la fonction, on aurait pu utiliser `$NOM_HOTE`, comme dans l'exemple ci-dessous qui sera plus éclairant sur la manière dont on peut exploiter de telles listes.
 
-##`est_dans_liste`
+## `est_dans_liste`
 
 Là aussi, illustrons cette fonction par un exemple :
 
@@ -83,7 +107,7 @@ En revanche, nous verrons plus loin [TODO] que ces fonctions sont également dis
 
 ----
 
-##`appartient_au_groupe`
+## `appartient_au_groupe`
 
 Cette fonction permet de savoir si le login d'un utilisateur correspond à un compte qui appartient à un groupe donné. Pour ce faire, la fonction `appartient_au_groupe` interroge l'annuaire du serveur via une requête LDAP. Voici un exemple :
 
@@ -95,7 +119,7 @@ else
 fi
 ```
 
-#`afficher_liste_groupes`
+# `afficher_liste_groupes`
 Un exemple vaudra mieux qu'un long discours :
 ```sh
 liste_groupes_toto=$(afficher_liste_groupes "toto")
@@ -106,7 +130,7 @@ fi
 
 Dans cet exemple, la fonction effectue une requête LDAP auprès du serveur afin de connaître le nom des groupes auxquels compte utilisateur `toto` appartient. Si par exemple ce compte appartient aux groupes `Eleves` et `Classe_1ES2`, alors la variable `liste_groupes_toto` contiendra deux lignes, la première contenant `Eleves` et la deuxième contenant `Classe_1ES2`. L'idée est de stocker tous les groupes d'un compte donné dans une variable, le tout en une seule requête LDAP.
 
-#`est_utilisateur_local`
+# `est_utilisateur_local`
 Cette fonction permet de tester si un compte est local (c'est-à-dire contenu dans le fichier `/etc/passwd` du client GNU/Linux) ou non (c'est-à-dire un compte du domaine contenu dans l'annuaire du serveur).
 
 ```sh
@@ -115,7 +139,7 @@ if est_utilisateur_local "toto"; then
 fi
 ```
 
-#`est_connecte`
+# `est_connecte`
 Cette fonction permet de tester si un compte est actuellement connecté au système (c'est-à-dire s'il a ouvert une session).
 
 ```sh
@@ -125,6 +149,7 @@ if est_connecte "toto"; then
 fi
 ```
 
-#`activer_pave_numerique`
+# `activer_pave_numerique`
 
 Cette fonction, qui ne prend pas d'argument, permet simplement d'activer le pavé numérique du client GNU/Linux.
+
