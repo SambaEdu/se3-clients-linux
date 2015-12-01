@@ -73,7 +73,7 @@ Il peut être intéressant de modifier les paramètres d'impression par défaut,
 
 Pour cela, il faut que l'imprimante ait été installée.
 
-Récupérer la liste des options d'impression :
+Récupérer la liste des paramètres d'impression disponibles :
 ```sh
 lpoptions -p NOM-IMPRIMANTE -l
 ```
