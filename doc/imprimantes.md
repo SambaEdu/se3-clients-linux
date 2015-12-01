@@ -8,6 +8,7 @@ Ne disposant personnellement d'aucune imprimante réseau, je n'ai jamais pu test
 * [Installation d'une imprimante réseau](#installation-dune-imprimante-réseau)
 * [Imprimante par défaut](#imprimante-par-défaut)
 * [Suppression d'une imprimante](#suppression-dune-imprimante)
+* [Définir le paramétrage d'impression par défaut](#définir-le-paramétrage-dimpression-par-défaut)
 * [CUPS](#cups)
 * [Références](#références)
 
