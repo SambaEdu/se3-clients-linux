@@ -132,11 +132,19 @@ les scripts à l'environnement de votre serveur (parce que
 par exemple son IP a changé, ou que vous avez modifié le skel,
 ou le logon_perso,…), cela est prévu :-)
 
-Pour cela, il vous suffit de lancer la
-commande suivante en tant que `root` sur une console du serveur
-`dpkg-reconfigure se3-clients-linux`.
+Deux méthodes sont prévues :
 
-Cette commande est aussi accessible via un client-linux à l'aide du compte admin.
+**via le `se3`**
+Pour cela, il vous suffit de lancer la commande suivante
+en tant que `root` sur une console du serveur `se3` :
+```sh
+dpkg-reconfigure se3-clients-linux
+```
+
+**via un client-linux**
+Si vous avez ouvert une session sur un client-linux avec le compte `admin`, vous pourrez double-cliquer sur le fichier `reconfigure.bash` accessible en passant par le lien symbolique `clients-linux` sur le bureau puis par le répertoire `bin/` (le mot de passe root du serveur se3 sera demandé).
+
+Voir le schéma de [l'arborescence du répertoire `clients-linux/`](#arborescence-du-répertoire-clients-linux).
 
 
 ## Intégration d'un client GNU/Linux
