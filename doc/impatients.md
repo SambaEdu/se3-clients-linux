@@ -141,13 +141,13 @@ en tant que `root` sur une console du serveur `se3` :
 dpkg-reconfigure se3-clients-linux
 ```
 
-#### via un client-linux
+#### via un `client-linux`
 Si vous avez ouvert une session sur un client-linux avec le compte `admin`, vous pourrez double-cliquer sur le fichier `reconfigure.bash` accessible en passant par le lien symbolique `clients-linux` sur le bureau puis par le répertoire `bin/` (le mot de passe root du serveur se3 sera demandé).
 
 Voir le schéma de [l'arborescence du répertoire `clients-linux/`](#arborescence-du-répertoire-clients-linux).
 
 
-## Intégration d'un client GNU/Linux
+## Intégration d'un client `GNU/Linux`
 
 Le répertoire `/home/netlogon/clients-linux/` de votre
 serveur contient un script d'intégration par type de
@@ -169,7 +169,7 @@ qui permet d'effectuer très simplement des copies
 entre deux machines (sous GNU/Linux) distantes.
 
 
-### Copier le script d'intégration sur le client-linux
+### Copier le script d'intégration sur le `client-linux`
 
 Sur le terminal d'un client `Debian Jessie`,
 exécutez les commandes suivantes :
