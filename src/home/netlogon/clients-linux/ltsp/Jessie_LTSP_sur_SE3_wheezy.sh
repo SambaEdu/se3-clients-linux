@@ -30,7 +30,8 @@ echo " - configurer le chroot des clients lourds Jessie pour l'identification av
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " Etes-vous sur de vouloir débuter l installation ? o ou n ? :																				"
 read REPONSE
-if [ "$REPONSE" != "o" ]; then
+if [ "$REPONSE" != "o" ]
+then
 	exit 0;
 fi
 
@@ -38,7 +39,8 @@ fi
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 0-Vérifications sur le se3 avant installation de ltsp																		"
 echo "------------------------------------------------------------------------------------------------------------------------------"
-if egrep -q "^7" /etc/debian_version; then
+if egrep -q "^7" /etc/debian_version
+then
 		echo "Votre serveur est bien version Debian Wheezy"
 		echo "Le script peut se poursuivre"
 else
@@ -47,7 +49,8 @@ else
 		exit 1
 fi
 
-if [ ! -e "/home/netlogon/clients-linux" ]; then
+if [ ! -e "/home/netlogon/clients-linux" ]
+then
 	echo "Installation du paquet se3-client-linux pour le montage des partages Samba"
 	apt-get install se3-clients-linux -y --force-yes
 fi
@@ -391,7 +394,18 @@ DESKTOP=Desktop
 EOF
 
 echo "--------------------------------------------------------------------------------------"
-echo " 13-Redémarrage du serveur se3 dans 5 secondes ...										"
+echo " 13-Choisir le boot PXE par défaut des PC du réseau									"
+echo "--------------------------------------------------------------------------------------"
+echo " Voulez-vous que tous les PC de votre réseau démarrent en client lourd Jessie ? 		"
+echo " Taper o pour oui 																	"
+read REPONSE
+if [ "$REPONSE" = "o" ]
+then
+	sed -i -e "s/^ONTIMEOUT*/ONTIMEOUT ltspJessie/g" /tftpboot/pxelinux.cfg/default		
+fi
+
+echo "--------------------------------------------------------------------------------------"
+echo " 14-Redémarrage du serveur se3 dans 5 secondes ...										"
 echo "--------------------------------------------------------------------------------------"
 sleep 5
 reboot

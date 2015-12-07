@@ -1,4 +1,4 @@
-ltsp-chroot -m --arch "$ENVIRONNEMENT" #!/bin/bash
+#!/bin/bash
 # Rédigé par Nicolas Aldegheri, le 06/12/2015
 # Sous licence GNU
 
@@ -282,14 +282,14 @@ echo "--------------------------------------------------------------------------
 
 if [ "$ENVIRONNEMENT" = "ubuntu" ] 
 then
-cat <<EOF > "nano /opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm.conf"
+cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm.conf"
 [SeatDefaults]
 greeter-show-manual-login=false
 greeter-hide-users=true
 allow-guest=false
 EOF
 else
-cat <<EOF > "nano /opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm.conf"
+cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm.conf"
 [SeatDefaults]
 greeter-show-manual-login=true
 greeter-hide-users=true
@@ -336,7 +336,18 @@ ltsp-update-image "$ENVIRONNEMENT"
 service nbd-server restart
 
 echo "--------------------------------------------------------------------------------------"
-echo " 14-Redémarrage du serveur se3 dans 5 secondes ...										"
+echo " 14-Choisir le boot PXE par défaut des PC du réseau									"
+echo "--------------------------------------------------------------------------------------"
+echo " Voulez-vous que tous les PC de votre réseau démarrent en client lourd Trusty ? 		"
+echo " Taper o pour oui  																	"
+read REPONSE
+if [ "$REPONSE" = "o" ]
+then
+	sed -i -e "s/^ONTIMEOUT*/ONTIMEOUT ltspTrusty/g" /tftpboot/pxelinux.cfg/default		
+fi
+
+echo "--------------------------------------------------------------------------------------"
+echo " 15-Redémarrage du serveur se3 dans 5 secondes ...										"
 echo "--------------------------------------------------------------------------------------"
 sleep 5
 reboot
