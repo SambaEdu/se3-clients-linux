@@ -79,7 +79,7 @@ echo "--------------------------------------------------------------------------
 echo " 3-Construction de l environnement $ENVIRONNEMENT pour les clients lourds Jessie														"
 echo "------------------------------------------------------------------------------------------------------------------------------"
 ltsp-build-client --arch i386 --chroot "$ENVIRONNEMENT" --fat-client-desktop "task-$ENVIRONNEMENT-desktop" --dist jessie --mirror http://ftp.fr.debian.org/debian/ --locale fr_FR.UTF-8 --prompt-rootpass --purge-chroot
-#cp -a "/opt/ltsp/$ENVIRONNEMENT" /opt/ltsp/save_jessie
+cp -a "/opt/ltsp/$ENVIRONNEMENT" /opt/ltsp/jessie_save
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 4-Creation d'un compte local enseignant dans l'environnement des clients lourds												"

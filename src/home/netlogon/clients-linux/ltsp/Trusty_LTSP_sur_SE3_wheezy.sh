@@ -80,7 +80,7 @@ then
 fi
 
 VENDOR=Ubuntu CONFIG_NBD=true ltsp-build-client --arch i386 --chroot "$ENVIRONNEMENT" --fat-client-desktop "$ENVIRONNEMENT-desktop" --dist trusty --mirror http://fr.archive.ubuntu.com/ubuntu/ --locale fr_FR.UTF-8 --prompt-rootpass --purge-chroot
-#cp -a "/opt/ltsp/$ENVIRONNEMENT" /opt/ltsp/save_trusty
+cp -a "/opt/ltsp/$ENVIRONNEMENT" /opt/ltsp/trusty_save
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 3-Creation d'un compte local enseignant dans l'environnement des clients lourds												"
@@ -306,19 +306,18 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade
 ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
 wolfram-engine shared/accepted-wolfram-eula boolean true
 EOF
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano aptitude less wine vlc flashplugin-installer ubuntu-restricted-extras libavcodec-extra openjdk-7-jre icedtea-plugin icedtea-7-plugin
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y -f nano aptitude less wine vlc flashplugin-installer ubuntu-restricted-extras libavcodec-extra openjdk-7-jre icedtea-plugin icedtea-7-plugin firefox-locale-fr
 
-ltsp-chroot --arch "$ENVIRONNEMENT" apt-get remove libreoffice*
-ltsp-chroot --arch "$ENVIRONNEMENT" add-apt-repository ppa:libreoffice/ppa
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get remove -y libreoffice*
+ltsp-chroot --arch "$ENVIRONNEMENT" add-apt-repository -y ppa:libreoffice/ppa
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update 
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade
-ltsp-chroot -m --arch apt-get -y install libreoffice libreoffice-l10n-fr
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y -f install libreoffice libreoffice-l10n-fr
 
 
 # Pour mettre le clavier et certains éléments du bureau lubuntu en français ...
 if [ "$ENVIRONNEMENT" = "lubuntu" ] 
 then
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y ubuntu-keyboard-french libreoffice-l10n-fr language-pack-fr-base language-pack-gnome-fr-base firefox-locale-fr
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y ubuntu-keyboard-french language-pack-fr-base language-pack-gnome-fr-base
 fi
 
 echo "--------------------------------------------------------------------------------------"
