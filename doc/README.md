@@ -10,7 +10,7 @@
 * [Distributions GNU/Linux testées](#distributions-gnulinux-test%C3%A9es)
 * [Avertissements](#avertissements)
 * [Pour les impatients qui veulent tester rapidement](impatients.md)
-* [Visite rapide du répertoire clients-linux/ du serveur](visite_rapide.md)
+* [Visite rapide du répertoire `clients-linux/` du serveur `se3`](visite_rapide.md)
 * [Les options des scripts d'intégration](options_scripts.md)
 * [La "désintégration" (fonctionalité dépréciée)](desintegration.md)
 * [Les partages des utilisateurs](partages_utilisateurs.md)
