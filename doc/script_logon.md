@@ -621,7 +621,7 @@ FIN
 }
 ```
 
-Enfin, vous rajouterai l'appel de cette fonction dans la fonction `ouverture_perso` :
+Enfin, vous rajouterez l'appel de cette fonction dans la fonction `ouverture_perso` :
 
 ```sh
 function ouverture_perso ()
