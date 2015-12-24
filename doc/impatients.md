@@ -4,9 +4,12 @@ La mise en place de clients-linux commence par l'installation
 du paquet `se3-clients-linux` sur le serveur.
 
 * [Installation du paquet `se3-clients-linux` sur le serveur](#installation-du-paquet-se3-clients-linux-sur-le-serveur)
+    * [Quelques précisions](#quelques-pr%C3%A9cisions)
     * [En ligne de commande](#en-ligne-de-commande)
     * [Par l'interface Web du serveur se3](#par-linterface-web-du-serveur-se3)
-    * [Quelques précisions](#quelques-pr%C3%A9cisions)
+    * [Message éventuel concernant le serveur NTP](#message-éventuel-concernant-le-serveur-ntp)
+    * [Le partage CIFS netlogon-linux](#le-partage-cifs-netlogon-linux)
+    * [Reconfiguration du paquet et restauration des droits](#reconfiguration-du-paquet-et-restauration-des-droits)
 
 
 Ensuite, sur chaque client-linux, sera exécuté le script correspondant
@@ -23,30 +26,12 @@ Ensuite, sur chaque client-linux, sera exécuté le script correspondant
 
 ## Installation du paquet `se3-clients-linux` sur le serveur
 
-Il faut que votre réseau local dispose d'une connexion
-Internet. Pour commencer, il faut préparer votre serveur
-Samba en y installant le paquet `se3-clients-linux`. Pour ce
-faire, les 2 modes possibles sont soit `la ligne de commande`, soit `l'interface Web du se3`.
+Il faut, bien sûr, que votre réseau local dispose d'une connexion
+Internet pour préparer votre serveur `se3` en y installant le paquet `se3-clients-linux`.
 
-### En ligne de commande
+Pour ce faire, les 2 modes possibles sont soit `la ligne de commande`, soit `l'interface Web du se3`.
 
-Il faut ouvrir une console en tant que `root` et lancer :
-```sh
-apt-get update
-apt-get install se3-clients-linux
-```
-Ce mode de mise en place est valable quel que soit la version de votre se3.
-Cependant, si vous êtes en `Lenny`, nous vous conseillons fortement de passer en `Squeeze`.
-
-
-### Par l'interface Web du serveur se3
-
-Vous pouvez aussi faire l'installation du module `se3-clients-linux`
-en passant par `l'interface d'administration Web` du serveur
-via les menus `Configuration générale` puis `Modules`.
-
-Dans le tableau des modules, le paquet `se3-clients-linux`
-correspond à la ligne avec l'intitulé `Support des clients linux`.
+Ces 2 modes sont détaillés un peu plus bas, mais il peut être sage de lire auparavant quelques précisions sur les conséquences de l'installation du paquet `se3-clients-linux`.
 
 
 ### Quelques précisions
@@ -80,7 +65,28 @@ de l'installation du paquet sont au nombre de trois :
     3. l'adresse du serveur de temps NTP.
 
 
-**Message éventuel concernant le serveur NTP**
+### En ligne de commande
+
+Il faut ouvrir une console en tant que `root` et lancer :
+```sh
+apt-get update
+apt-get install se3-clients-linux
+```
+Ce mode de mise en place est valable quel que soit la version de votre se3.
+Cependant, si vous êtes en `Lenny`, nous vous conseillons fortement de passer en `Squeeze`.
+
+
+### Par l'interface Web du serveur se3
+
+Vous pouvez aussi faire l'installation du module `se3-clients-linux`
+en passant par `l'interface d'administration Web` du serveur
+via les menus `Configuration générale` puis `Modules`.
+
+Dans le tableau des modules, le paquet `se3-clients-linux`
+correspond à la ligne avec l'intitulé `Support des clients linux`.
+
+
+### Message éventuel concernant le serveur NTP
 
 Lors de l'installation du paquet, si jamais
 vous obtenez un message vous indiquant que `le serveur NTP` ne
@@ -98,9 +104,9 @@ Si tout se passe bien, vous ne devriez plus obtenir
 d'avertissement à propos du serveur NTP.
 
 
-**Le partage CIFS netlogon-linux**
+### Le partage CIFS netlogon-linux
 
-Votre serveur Samba possède donc un nouveau partage CIFS
+Votre serveur Samba possède donc un nouveau partage `CIFS`
 qui, au passage, ne sera pas visible par les machines
 clientes sous Windows.
 
@@ -117,18 +123,31 @@ serveur, plus aucune manipulation supplémentaire n'est
 nécessaire désormais.
 
 
-**Reconfiguration du paquet et restauration des droits**
+### Reconfiguration du paquet et restauration des droits
 
 Sachez enfin que si, pour une raison ou pour une autre, il
 vous est nécessaire de reconfigurer le paquet pour restaurer
 des droits corrects sur les fichiers, ou bien pour réadapter
 les scripts à l'environnement de votre serveur (parce que
-par exemple son IP a changé), il vous suffit de lancer la
-commande suivante en tant que `root` sur une console du serveur
-`dpkg-reconfigure se3-clients-linux`.
+par exemple son IP a changé, ou que vous avez modifié le skel,
+ou le logon_perso,…), cela est prévu :-)
+
+Deux méthodes sont prévues :
+
+#### via le `se3`
+Pour cela, il vous suffit de lancer la commande suivante
+en tant que `root` sur une console du serveur `se3` :
+```sh
+dpkg-reconfigure se3-clients-linux
+```
+
+#### via un `client-linux`
+Si vous avez ouvert une session sur un client-linux avec le compte `admin`, vous pourrez double-cliquer sur le fichier `reconfigure.bash` accessible en passant par le lien symbolique `clients-linux` sur le bureau puis par le répertoire `bin/` (le mot de passe root du serveur se3 sera demandé).
+
+Voir le schéma de [l'arborescence du répertoire `clients-linux/`](#arborescence-du-répertoire-clients-linux).
 
 
-## Intégration d'un client GNU/Linux
+## Intégration d'un client `GNU/Linux`
 
 Le répertoire `/home/netlogon/clients-linux/` de votre
 serveur contient un script d'intégration par type de
@@ -150,7 +169,7 @@ qui permet d'effectuer très simplement des copies
 entre deux machines (sous GNU/Linux) distantes.
 
 
-### Copier le script d'intégration sur le client-linux
+### Copier le script d'intégration sur le `client-linux`
 
 Sur le terminal d'un client `Debian Jessie`,
 exécutez les commandes suivantes :

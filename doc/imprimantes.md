@@ -8,6 +8,7 @@ Ne disposant personnellement d'aucune imprimante réseau, je n'ai jamais pu test
 * [Installation d'une imprimante réseau](#installation-dune-imprimante-réseau)
 * [Imprimante par défaut](#imprimante-par-défaut)
 * [Suppression d'une imprimante](#suppression-dune-imprimante)
+* [Définir le paramétrage d'impression par défaut](#définir-le-paramétrage-dimpression-par-défaut)
 * [CUPS](#cups)
 * [Références](#références)
 
@@ -58,6 +59,36 @@ Et pour supprimer l'imprimante :
 ```sh
 lpadmin -x NOM-IMPRIMANTE
 ```
+
+## Lister les imprimantes installées sur le poste
+
+Pour lister les imprimantes installées sur le poste, afin de retouver par exemple leur nom :
+```sh
+lpstat -p
+```
+
+## Définir le paramétrage d'impression par défaut
+
+Il peut être intéressant de modifier les paramètres d'impression par défaut, par exemple pour définir que l'impression se fasse en noir sur une imprimante couleur, activer l'impression recto-verso, etc.
+
+Pour cela, il faut que l'imprimante ait été installée.
+
+Récupérer la liste des paramètres d'impression disponibles :
+```sh
+lpoptions -p NOM-IMPRIMANTE -l
+```
+
+Rechercher parmi ces options celles qui nous intéressent. Par esemple, sur une imprimante Brother HL3170CDW, on peut repérer la ligne :
+```sh
+BRMonoColor/Color / Mono: *Auto FullColor Mono
+```
+Dans cette ligne, ce qui précède le premier `/` correspond au nom du paramètre, les valeurs possibles pour les paramètres se trouvent après les deux points `:`, et l'astérisque `*` précède la valeur actuellement sélectionnée.
+
+Pour modifier ce paramètre, on lancera la commande suivante (par exemple avec un script unefois agissant sur un parc déterminé) :
+```sh
+lpadmin -p HL3170CDW -o "BRMonoColor=Mono"
+```
+Attention : si cette commande n'est pas lancée en tant que `root`, le paramètre est modifié dans le profil de l'utilisateur actuellement connecté, et non pas pour l'ensemble du système.
 
 
 ## CUPS

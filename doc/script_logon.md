@@ -1,8 +1,9 @@
 #Le script de logon
 
-Comme vous pourrez le constater, le script de `logon` est un peu le « chef d'orchestre » de chacun des clients GNU/Linux.
 
-Une partie importante de ce script est gérée par le `logon_perso` qui permettra d'aptater son fonctionnement aux besoins des utilisateurs.
+**Mécanisme du script de `logon`**
+
+Comme vous pourrez le constater, le script de `logon` est un peu le « chef d'orchestre » de chacun des clients GNU/Linux.
 
 * [Les 3 phases d'exécution du script de `logon`](#les-3-phases-dexécution-du-script-de-logon)
     * [initialisation](#linitialisation)
@@ -10,11 +11,25 @@ Une partie importante de ce script est gérée par le `logon_perso` qui permettr
     * [fermeture](#la-fermeture)
 * [Emplacement du script de `logon`](#emplacement-du-script-de-logon)
 * [Synchronisation entre un `logon` local et le `logon` distant](#synchronisation-entre-un-logon-local-et-le-logon-distant)
+
+
+**Personnaliser le script de `logon`**
+
+Une partie importante de ce script est gérée par le `logon_perso` qui permettra d'aptater son fonctionnement aux besoins des utilisateurs.
+
 * [Personnaliser à l'aide du `logon_perso`](#personnaliser-le-script-de-logon)
     * [Structure du `logon_perso`](#structure-du-fichier-logon_perso)
     * [Conséquences sur le comportement du `logon`](#conséquences-du-logon_perso-sur-le-comportement-du-script-de-logon)
     * [Incorporer le `logon_perso` au `logon`](#incorporer-le-logon_perso-dans-le-logon)
 * [Variables et fonctions utiles pour le `logon_perso`](#quelques-variables-et-fonctions-prêtes-à-lemploi)
+* [Gestion du montage des partages réseau](#gestion-du-montage-des-partages-réseau)
+    * [Un exemple](#un-exemple)
+    * [Un autre exemple](#un-autre-exemple)
+    * [Syntaxe de la fonction `monter_partage`](#syntaxe-de-la-fonction-monter_partage)
+    * [Montage limité à un utilisateur](#montage-limité-à-un-utilisateur)
+    * [Montage limité à un groupe](#montage-limité-à-un-groupe)
+    * [Le montage `home` d'un utilisateur](#le-montage-home-dun-utilisateur)
+    * [La fonction `creer_lien`](#la-fonction-creer_lien)
 * [Gérer les profils pour `Iceweasel`](#gérer-les-profils-pour-iceweasel)
     * [à l'aide de `rsync`](#méthode-à-laide-de-rsync)
     * [à l'aide d'un montage](#méthode-à-laide-dun-montage)
@@ -172,8 +187,10 @@ Comme cela a déjà été expliqué, c'est vous qui allez gérer les montages de
 
 Évidemment, si la gestion par défaut des montages vous convient telle quelle, alors vous n'avez pas besoin de toucher à ce fichier.
 
-Commençons par un exemple simple :
 
+### Un exemple
+
+Commençons par un exemple simple, concernant le répertoires des classes :
 ```sh
 function ouverture_perso ()
 {
@@ -185,14 +202,16 @@ function ouverture_perso ()
 
 Ici la fonction `monter_partage` possède trois **arguments qui devront être délimités par des doubles quotes** (`"`) :
 
-1. Le premier représente le chemin `UNC` du partage à monter.
+1. Le premier argument représente **le chemin `UNC` du partage à monter**.
 
     Vous reconnaissez sans doute la variable `SE3` qui stocke l'adresse IP du serveur. Par exemple si l'adresse IP du serveur est `172.20.0.2`, alors le premier argument sera automatiquement développé en :
     `//172.20.0.2/Classes`.
     
-    Cela signifie que c'est le partage `Classes` du serveur `172.20.0.2` qui va être monté sur le clients GNU/Linux. Attention, sous GNU/Linux un chemin UNC de partage s'écrit avec des slashs (`/`) et non avec des antislashs (`\`) comme c'est le cas sous Windows.
+    Cela signifie que c'est le partage `Classes` du serveur `172.20.0.2` qui va être monté sur le clients GNU/Linux.
+    
+    **Attention**, sous GNU/Linux un chemin UNC de partage s'écrit avec des slashs (`/`) et non avec des antislashs (`\`) comme c'est le cas sous Windows.
 
-2. Maintenant, il faut un répertoire local pour monter un partage. C'est le rôle du deuxième argument.
+2. Maintenant, **il faut un répertoire local pour monter un partage**. C'est le rôle du deuxième argument.
 
     Quoi qu'il arrive (vous n'avez pas le choix sur ce point), le partage sera monté dans un sous-répertoire du répertoire `/mnt/_$LOGIN/`.
     
@@ -200,21 +219,24 @@ Ici la fonction `monter_partage` possède trois **arguments qui devront être d�
     
     Le deuxième argument spécifie le nom de ce sous-répertoire. Ici nous avons décidé assez logiquement de l'appeler `Classes`. Par conséquent, en visitant le répertoire `/mnt/_toto/Classes/` sur le poste client, notre cher `toto` aura accès au contenu du partage `Classes` du serveur.
     
-    Attention, dans le choix du nom de ce sous-répertoire, vous êtes limité(e) aux **caractères a-z, A-Z, 0-9, le tiret (`-`) et le tiret bas (`_`)**. C'est tout. En particulier **pas d'espace ni accent**. Si vous ne respectez pas cette consigne le partage ne sera tout simplement pas monté et une fenêtre d'erreur s'affichera à l'ouverture de session.
+    **Attention**, dans le choix du nom de ce sous-répertoire, vous êtes limité(e) aux **caractères a-z, A-Z, 0-9, le tiret (`-`) et le tiret bas (`_`)**. C'est tout. En particulier **pas d'espace ni accent**. Si vous ne respectez pas cette consigne le partage ne sera tout simplement pas monté et une fenêtre d'erreur s'affichera à l'ouverture de session.
     
     Vous serez sans doute amené(e) à monter plusieurs partages réseau pour un même utilisateur (via plusieurs appels de la fonction `monter_partage` au sein de la fonction `ouverture_perso`). Donc il y aura plusieurs sous-répertoires dans `/mnt/_$LOGIN/`. Charge à vous d'éviter les doublons dans les noms des sous-répertoires, sans quoi certains partages ne seront pas montés.
 
-3. À ce stade, notre cher `toto` pourra accéder au partage `Classes` du serveur en passant par `/mnt/_toto/Classes/`. Mais cela n'est pas très pratique. L'idéal serait d'avoir accès à ce partage directement via un dossier sur le bureau de `toto`. C'est exactement ce que fait le troisième argument.
-
+3. À ce stade, notre cher `toto` pourra accéder au partage `Classes` du serveur en passant par `/mnt/_toto/Classes/`. Mais cela n'est pas très pratique. L'idéal serait d'**avoir accès à ce partage directement via un dossier sur le bureau** de `toto`. C'est exactement ce que fait le troisième argument.
+    
     Si `toto` ouvre une session, l'argument `"$REP_HOME/Bureau/Répertoire Classes"` va se développer en `"/home/toto/Bureau/Répertoire Classes"` si bien qu'un raccourci (sous GNU/Linux on appelle ça un lien symbolique) portant le nom `Répertoire Classes` sera créé sur le bureau de `toto`.
     
     Donc en double-cliquant sur ce raccourci (ce genre de raccourci ressemble à un simple dossier), sans même le savoir, `toto` visitera le répertoire `/mnt/_toto/Classes/` qui correspondra au contenu du partage `Classes` du serveur.
     
     Vous n'êtes pas limité(e) dans le choix du nom de ce raccourci. Les espaces et les accents sont parfaitement autorisés (**évitez par contre le caractère double-quote**). En revanche, ce raccourci doit forcément être créé dans le home de l'utilisateur qui se connecte. **Donc ce troisième argument devra toujours commencer par `"$REP_HOME/..."`** sans quoi le lien ne sera tout simplement pas créé.
 
+
+### Un autre exemple
+
 Tout n'a pas encore été dévoilé concernant cette fonction `monter_partage`. En fait, vous pouvez créer autant de raccourcis que vous voulez. Il suffit pour cela d'ajouter un quatrième argument, puis un cinquième , puis un sixième etc.
 
-Voici un exemple :
+Voici un exemple, toujours à propos du répertoires de classes :
 ```sh
 function ouverture_perso ()
 {
@@ -228,11 +250,14 @@ function ouverture_perso ()
 
 **Remarque :** normalement il faut mettre une fonction avec ses arguments sur une même ligne car un saut de ligne signifie la fin d'une instruction aux yeux de l'interpréteur `Bash`. Mais ici la ligne serait bien longue à écrire et dépasserait la largeur de la page de ce document. La combinaison antislash (`\`) puis ENTRÉE permet simplement de passer à la ligne tout en signifiant à l'interpréteur `Bash` que l'instruction entamée n'est pas terminée et qu'elle se prolonge sur la ligne suivante.
 
-Le premier argument correspond toujours au chemin `UNC` du partage réseau et le deuxième argument au nom du sous-répertoire dans `/mnt/_$LOGIN/` associé à ce partage.
+Le premier argument correspond toujours au **chemin `UNC` du partage réseau** et le deuxième argument au **nom du sous-répertoire dans `/mnt/_$LOGIN/` associé à ce partage**.
 
 Ensuite, nous avons cette fois-ci un troisième **et un quatrième argument** qui correspondent aux raccourcis pointant vers le partage : l'un est créé sur le bureau et l'autre est créé à la racine du home de l'utilisateur qui se connecte.
 
 Il est possible de créer autant de raccourcis que l'on souhaite, il suffit d'empiler les arguments 3, 4, 5 etc. les uns à la suite des autres.
+
+
+### Syntaxe de la fonction `monter_partage`
 
 La syntaxe de la fonction `monter_partage` est donc la suivante :
 ```sh
@@ -241,9 +266,17 @@ monter_partage "<partage>" "<répertoire>" ["<raccourci>"]...
 
 où seuls les deux premiers arguments sont obligatoires :
 
-* `<partage>` est le chemin `UNC` du partage à monter. Il est possible de se limiter à un sous-répertoire du partage, par exemple comme dans `//$SE3//administration/docs` où l'on montera uniquement le sous-répertoire `docs/` du partage administration du serveur.
-* `<répertoire>` est le nom du sous-répertoire de `/mnt/_$LOGIN/` qui sera créé et sur lequel le partage sera monté. Seuls les caractères `-_a-zA-Z0-9` sont autorisés.
-* Les arguments `<raccourci>` sont optionnels. Ils représentent les chemins absolus des raccourcis qui seront créés et qui pointeront vers le partage. Ils doivent toujours se situer dans le home de l'utilisateur qui se connecte, donc ils doivent toujours commencer par `"$REP_HOME/..."`. Si ces arguments ne sont pas présents, alors le partage sera monté mais aucun raccourci ne sera créé.
+* `<partage>` est le chemin `UNC` du partage à monter.
+
+Il est possible de se limiter à un sous-répertoire du partage, par exemple comme dans `//$SE3//administration/docs` où l'on montera uniquement le sous-répertoire `docs/` du partage administration du serveur.
+
+* `<répertoire>` est le nom du sous-répertoire de `/mnt/_$LOGIN/` qui sera créé et sur lequel le partage sera monté.
+
+Seuls les caractères `-_a-zA-Z0-9` sont autorisés.
+
+* Les arguments `<raccourci>` sont optionnels.
+
+Ils représentent les chemins absolus des raccourcis qui seront créés et qui pointeront vers le partage. Ils doivent toujours se situer dans le home de l'utilisateur qui se connecte, donc ils doivent **toujours commencer par `"$REP_HOME/..."`**. Si ces arguments ne sont pas présents, alors le partage sera monté mais aucun raccourci ne sera créé.
 
 **Attention :** le montage du partage réseau se fait avec les droits de l'utilisateur qui est en train de se connecter. Si l'utilisateur n'a pas les droits suffisants pour accéder à ce partage, ce dernier ne sera tout simplement pas monté.
 
@@ -251,9 +284,14 @@ où seuls les deux premiers arguments sont obligatoires :
 
 **Remarque 2 :** je vous conseille de toujours créer au moins un raccourci à la racine du home de l'utilisateur qui se connecte. En effet, lorsqu'un utilisateur souhaite enregistrer un fichier via une application quelconque, très souvent l'explorateur de fichiers s'ouvre au départ à la racine de son home. C'est donc un endroit privilégié pour placer les raccourcis vers les partages réseau. Il me semble que doubler les raccourcis à la fois à la racine du home et sur le bureau de l'utilisateur est une bonne chose. Mais bien sûr, tout cela est une question de goût...
 
+
+### Montage limité à un utilisateur
+
 Étant donné que le montage d'un partage se fait avec les droits de l'utilisateur qui se connecte, certains partages devront être montés uniquement dans certains cas.
 
-Prenons l'exemple du partage `netlogon-linux` du serveur. Celui-ci n'est accessible qu'au compte `admin` du domaine. Pour pouvoir monter ce partage seulement quand c'est le compte admin qui se connecte, il va falloir ajouter ce bout de code dans la fonction `ouverture_perso` du fichier `logon_perso` :
+Prenons l'exemple du partage `netlogon-linux` du serveur. Celui-ci **n'est accessible qu'au compte `admin`** du domaine.
+
+Pour pouvoir monter ce partage seulement quand c'est le compte admin qui se connecte, il va falloir ajouter ce bout de code dans la fonction `ouverture_perso` du fichier `logon_perso` :
 ```sh
 function ouverture_perso ()
 {
@@ -272,7 +310,12 @@ function ouverture_perso ()
 
 **Remarque :** attention, en `Bash`, le crochet ouvrant au niveau du `if` doit absolument être précédé et suivi d'un espace et le crochet fermant doit absolument être précédé d'un espace.
 
-Autre cas très classique, celui d'un partage **accessible uniquement à un groupe**. Là aussi, une structure avec un `if` s'impose :
+
+### Montage limité à un groupe
+
+Autre cas très classique, celui d'un partage **accessible uniquement à un groupe**.
+
+Là aussi, une structure avec un `if` s'impose :
 ```sh
 function ouverture_perso ()
 {
@@ -292,11 +335,14 @@ L'instruction « `if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"; then` » doi
 
 **Attention :** le test `if` ci-dessus est sensible à la casse si bien que le résultat ne sera pas le même si vous mettez `"Profs"` ou `"profs"`. Par conséquent, prenez bien la peine de regarder le nom du groupe qui vous intéresse avant de l'insérer dans un test `if` comme ci-dessus afin de bien respecter les minuscules et les majuscules.
 
-Si vous voulez savoir le nom des partages disponibles pour un utilisateur donné, par exemple toto, il vous suffit de lancer la commande suivante sur le serveur en tant que root :
+**Astuce :** Si vous voulez savoir le nom des partages disponibles pour un utilisateur donné, par exemple `toto`, il vous suffit de lancer la commande suivante sur le serveur en tant que root :
 ```sh
 smbclient --list localhost -U toto
 # Il faudra alors saisir le mot de passe de toto.
 ```
+
+
+### Le montage `home` d'un utilisateur
 
 Parmi la liste des partages, l'un d'eux est affiché sous le nom de `home`. Il correspond au home de `toto` sur le serveur.
 
@@ -323,6 +369,9 @@ Dans l'exemple ci-dessus, on ne monte pas le partage `homes` mais uniquement le 
 
 **Note :** Comme d'habitude sous GNU/Linux, respectez bien la casse des noms de partages et de répertoires.
 
+
+### La fonction `creer_lien`
+
 Pour l'instant, de par la manière dont la fonction `monter_partage` est définie, on peut créer uniquement des liens qui pointent vers la racine du partage associé. Mais on peut vouloir par exemple monter un partage et créer des liens uniquement vers des sous-répertoires de ce partage (et non vers sa racine). C'est tout à fait possible avec la fonction `creer_lien`.
 
 Voici un exemple :
@@ -342,10 +391,14 @@ function ouverture_perso ()
 }
 ```
 
-Le premier argument de la fonction `creer_lien` est la cible du ou des liens à créer. Cette cible peut s'écrire sous la forme d'un chemin absolu, c'est-à-dire un chemin qui commence par un antislash (ce qui n'est pas le cas ci-dessus). Si le chemin ne commence pas par un antislash, alors la fonction part du principe que c'est un chemin relatif qui part de `/mnt/_$LOGIN/`. (Du coup, mettre `"home/Docs"` ou mettre `/mnt/_$LOGIN/home/Docs` comme premier argument revient exactement
+* Le premier argument de la fonction `creer_lien` est **la cible du ou des liens à créer**.
+
+Cette cible peut s'écrire sous la forme d'un chemin absolu, c'est-à-dire un chemin qui commence par un antislash (ce qui n'est pas le cas ci-dessus). Si le chemin ne commence pas par un antislash, alors la fonction part du principe que c'est un chemin relatif qui part de `/mnt/_$LOGIN/`. (Du coup, mettre `"home/Docs"` ou mettre `/mnt/_$LOGIN/home/Docs` comme premier argument revient exactement
 au même.).
 
-Ensuite, le deuxième argument et les suivants (autant qu'on veut) sont les chemins absolus du ou des liens qui seront créés. Ces chemins doivent impérativement tous commencer par `"$REP_HOME/..."`.
+* Le deuxième argument et les suivants (autant qu'on veut) sont **les chemins absolus du ou des liens qui seront créés**.
+
+Ces chemins doivent impérativement tous commencer par `"$REP_HOME/..."`.
 
 
 ## Gérer les profils pour Iceweasel
@@ -367,9 +420,12 @@ function ouverture_perso ()
     # afin d'éviter des effets indésirables…
     # Récupération serveur → home local
     
-    mkdir -p /mnt/_$LOGIN/Docs/.profile-linux/.mozilla
-    rsync -az --delete /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/ /home/$LOGIN/.mozilla/
-    chown -R $LOGIN:5005 /home/$LOGIN/.mozilla
+    if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"
+    then
+        [ ! -e /mnt/_$LOGIN/Docs/.profile-linux/.mozilla ] && mkdir -p /mnt/_$LOGIN/Docs/.profile-linux/.mozilla
+        rsync -az --delete /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/ /home/$LOGIN/.mozilla/
+        chown -R $LOGIN:5005 /home/$LOGIN/.mozilla
+    fi
     …
 }
 ```
@@ -382,7 +438,10 @@ function fermeture_perso ()
     # Synchronisation des préférences, favoris, historique... des applis
     # Le tout est enregistré dans un répertoire caché appelé .profile-linux
     # Sauvegarde home local → serveur
-    rsync -az --delete /home/$LOGIN/.mozilla/ /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/
+    if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"
+    then
+        rsync -az --delete /home/$LOGIN/.mozilla/ /mnt/_$LOGIN/Docs/.profile-linux/.mozilla/
+    fi
     …
 }
 ```
@@ -562,7 +621,7 @@ FIN
 }
 ```
 
-Enfin, vous rajouterai l'appel de cette fonction dans la fonction `ouverture_perso` :
+Enfin, vous rajouterez l'appel de cette fonction dans la fonction `ouverture_perso` :
 
 ```sh
 function ouverture_perso ()
