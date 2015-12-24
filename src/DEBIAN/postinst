@@ -79,6 +79,7 @@ function restaurer_droits ()
         -type f -exec chmod "a-x" "{}" \+ 2>/dev/null || true
     setfacl -m u:www-data:rx "$REPERTOIRE_INSTALLATION"
     setfacl -m d:u:www-data:rx "$REPERTOIRE_INSTALLATION"
+	setfacl -m u:www-se3:rx "$REPERTOIRE_INSTALLATION"
 
 
     # Le répertoire bin/ contient des exécutables.
