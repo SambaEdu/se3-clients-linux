@@ -103,3 +103,5 @@ https://github.com/flaf/se3-clients-linux/blob/master/README.md
 Nouveau support de Debian Jessie (version 8)
 (x)Ubuntu Trusty Tahr (version 14.04) 
 
+Le 01 Janvier 2016
+- Correction droits sur /home/netlogon/clients-linux pour ajout www-se3 en rx
