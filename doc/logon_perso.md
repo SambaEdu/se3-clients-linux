@@ -84,7 +84,7 @@ Cette mise à jour peut se faire de 2 façons :
 
 * via  la commande « `dpkg-reconfigure se3-clients-linux` » en console `root` sur le serveur se3.
 
-* via le fichier `reconfigure.bash` : **si vous avez ouvert une session sur un client-linux avec le compte `admin`**, vous pourrez double-cliquer sur le fichier `reconfigure.bash` accessible en passant par le lien symbolique `clients-linux` sur le bureau puis par le répertoire `bin/` (le mot de passe root du serveur se3 sera demandé). Voir le schéma de [l'arborescence du répertoire `clients-linux/`](#arborescence-du-répertoire-clients-linux).
+* via le fichier `reconfigure.bash` : **si vous avez ouvert une session sur un client-linux avec le compte `admin`**, vous pourrez double-cliquer sur le fichier `reconfigure.bash` accessible en passant par le lien symbolique `clients-linux` sur le bureau puis par le répertoire `bin/` (le mot de passe root du serveur se3 sera demandé). Voir le schéma de [l'arborescence du répertoire `clients-linux/`](visite_rapide.md#arborescence-du-répertoire-clients-linux).
 
 
 ## Quelques variables et fonctions prêtes à l'emploi
