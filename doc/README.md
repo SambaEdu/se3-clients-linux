@@ -18,26 +18,15 @@
 * [Le répertoire unefois/](repertoire_unefois.md)
 * [Des variables et des fonctions prêtes à l'emploi](variables_fonctions.md)
 * [Le script de `logon`](script_logon.md)
-* [Personnaliser avec le `logon_perso`](script_logon.md#personnaliser-le-script-de-logon)
+* [Personnaliser avec le `logon_perso`](logon_perso.md)
 * [Des variables et des fonctions utiles pour le `logon_perso`](variables_fonctions_logon.md)
 * [Les logs pour détecter un problème](logs_detecter_probleme.md)
 * [Le cas des classes nomades](classes_nomades.md)
 * [Un mot sur les imprimantes](imprimantes.md)
 * [Désinstallation/réinstallation du paquet se3-clients-linux](desinstall_reinstall_paquet.md)
+* [Annexes](#annexes)
+* [Ressources externes](#ressources-externes)
 
-
-## Annexes
-
-* [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
-* [Installer un miroir local APT de cache avec apt-cacher-ng](apt-cacher-ng.md)
-* [Documentation pour le (futur) contributeur/développeur](dev/README.md)
-* [Installer et tester en toute sécurité la version du paquet issue de la branche `se3testing`](upgrade-via-se3testing.md)
-
-
-## Ressources externes
-
-* [Installation de clients Debian Wheezy via Se3 avec intégration automatique](http://www-annexe.ac-rouen.fr/productions/tice/SE3_install_wheezy_pxe_web_gen_web/co/SE3_install_wheezy_pxe_web.html)
-* [Transformer votre client Debian Jessie en serveur LTSP](http://wiki.dane.ac-versailles.fr/index.php?title=Installer_un_serveur_de_clients_l%C3%A9gers_%28LTSP_sous_Debian_Jessie%29_dans_un_r%C3%A9seau_Se3)
 
 
 ## Objectifs
@@ -99,3 +88,17 @@ malgré tout, mais nous ne pouvons en rien vous garantir le
 résultat final, et l'apparition de régressions ici ou là par
 rapport à ce qui est annoncé dans ce document n'est pas à
 exclure.
+
+
+## Annexes
+
+* [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
+* [Installer un miroir local APT de cache avec apt-cacher-ng](apt-cacher-ng.md)
+* [Documentation pour le (futur) contributeur/développeur](dev/README.md)
+* [Installer et tester en toute sécurité la version du paquet issue de la branche `se3testing`](upgrade-via-se3testing.md)
+
+
+## Ressources externes
+
+* [Installation de clients Debian Wheezy via Se3 avec intégration automatique](http://www-annexe.ac-rouen.fr/productions/tice/SE3_install_wheezy_pxe_web_gen_web/co/SE3_install_wheezy_pxe_web.html)
+* [Transformer votre client Debian Jessie en serveur LTSP](http://wiki.dane.ac-versailles.fr/index.php?title=Installer_un_serveur_de_clients_l%C3%A9gers_%28LTSP_sous_Debian_Jessie%29_dans_un_r%C3%A9seau_Se3)

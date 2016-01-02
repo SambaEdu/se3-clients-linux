@@ -9,7 +9,7 @@ Comme vous pourrez le constater, le script de `logon` est un peu le « chef d'or
     * [fermeture](#la-fermeture)
 * [Emplacement du script de `logon`](#emplacement-du-script-de-logon)
 * [Synchronisation entre un `logon` local et le `logon` distant](#synchronisation-entre-un-logon-local-et-le-logon-distant)
-* [Personnalisation du script de `logon`](#le-logon-perso)
+* [Personnalisation du script de `logon`](#le-logon_perso)
 
 
 ## Les 3 phases d'exécution du script de `logon`
