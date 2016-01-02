@@ -506,6 +506,7 @@ text_buffer_size 1024
 own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
 TEXT
 Bonjour $NOM_COMPLET_LOGIN,
+
 Pensez bien à enregistrer vos données personnelles
 dans le dossier :
 
