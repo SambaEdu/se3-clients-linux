@@ -27,10 +27,9 @@ Une partie importante du script de `logon` est gérée par le `logon_perso` qui 
 
 
 
-
 ## Personnaliser le script de `logon`
 
-Le fichier `logon_perso` va vous permettre d'affiner et personnaliser le comportement du script de `logon` afin de l'adapter à vos besoins.
+Le fichier `logon_perso` va vous permettre d'affiner et personnaliser le comportement du [script de `logon`](script_logon.md) afin de l'adapter à vos besoins.
 
 Et, très important, **cette adaptation sera pérenne dans le temps** (les modifications persisteront notamment après une mise à jour du paquet `se3-clients-linux`).
 

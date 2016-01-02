@@ -7,7 +7,7 @@
 ## Table des matières
 
 * [Objectifs](#objectifs)
-* [Distributions GNU/Linux testées](#distributions-gnulinux-test%C3%A9es)
+* [Distributions `GNU/Linux` testées](#distributions-gnulinux-test%C3%A9es)
 * [Avertissements](#avertissements)
 * [Pour les impatients qui veulent tester rapidement](impatients.md)
 * [Visite rapide du répertoire `clients-linux/` du serveur `se3`](visite_rapide.md)
@@ -15,7 +15,7 @@
 * [La "désintégration" (fonctionalité dépréciée)](desintegration.md)
 * [Les partages des utilisateurs](partages_utilisateurs.md)
 * [La gestion des profils](gestion_profils.md)
-* [Le répertoire unefois/](repertoire_unefois.md)
+* [Le répertoire `unefois/`](repertoire_unefois.md)
 * [Des variables et des fonctions prêtes à l'emploi](variables_fonctions.md)
 * [Le script de `logon`](script_logon.md)
 * [Personnaliser avec le `logon_perso`](logon_perso.md)
@@ -23,7 +23,7 @@
 * [Les logs pour détecter un problème](logs_detecter_probleme.md)
 * [Le cas des classes nomades](classes_nomades.md)
 * [Un mot sur les imprimantes](imprimantes.md)
-* [Désinstallation/réinstallation du paquet se3-clients-linux](desinstall_reinstall_paquet.md)
+* [Désinstallation/réinstallation du paquet `se3-clients-linux`](desinstall_reinstall_paquet.md)
 * [Annexes](#annexes)
 * [Ressources externes](#ressources-externes)
 
@@ -32,8 +32,8 @@
 ## Objectifs
 
 Le but de cette documentation est de décrire un mode opératoire
-d'intégration de stations clientes Debian ou Ubuntu dans un domaine
-SambaÉdu (avec un serveur en version Squeeze ou Wheezy) par
+d'intégration de stations clientes `Debian` ou `Ubuntu` dans un domaine
+SambaÉdu (avec un serveur en version `Squeeze` ou `Wheezy`) par
 l'intermédiaire du paquet `se3-clients-linux`.
 
 En pratique, l'objectif est de pouvoir ouvrir une session
@@ -49,16 +49,16 @@ différente de celle mise en place pour les clients Windows
 (voir la documentation pour plus de précisions).
 
 
-## Distributions GNU/Linux testées
+## Distributions `GNU/Linux` testées
 
-Les distributions GNU/Linux qui ont été testées sont :
+Les distributions `GNU/Linux` qui ont été testées sont :
 
-* Debian Squeeze (version 6)
-* Debian Wheezy (version 7)
-* Debian Jessie (version 8)
-* Ubuntu Precise Pangolin (version 12.04)
-* Xubuntu Precise Pangolin (version 12.04)
-* Ubuntu Trusty Tahr (version 14.04)
+* Debian `Squeeze` (version 6)
+* Debian `Wheezy` (version 7)
+* Debian `Jessie` (version 8)
+* Ubuntu `Precise Pangolin` (version 12.04)
+* Xubuntu `Precise Pangolin` (version 12.04)
+* Ubuntu `Trusty Tahr` (version 14.04)
 
 
 ## Avertissements
@@ -79,8 +79,8 @@ il est supposé que c'est bien le cas.
 Si jamais vous tenez à changer de « display manager » sur
 votre distribution, il est quasiment certain que vous devrez
 modifier le script d'intégration de la distribution parce
-que celui-ci ne fonctionnera pas en l'état : à partir de Jessie
-et Trusty, une vérification est faite aussi sur le « display manager ».
+que celui-ci ne fonctionnera pas en l'état : à partir de `Jessie`
+et `Trusty`, une vérification est faite aussi sur le « display manager ».
 
 Si vous tenez à changer uniquement l'environnement de bureau,
 il est possible que le script d'intégration fonctionne en l'état
@@ -92,13 +92,13 @@ exclure.
 
 ## Annexes
 
-* [Transformer votre client Debian Wheezy en serveur LTSP](ltsp.md)
-* [Installer un miroir local APT de cache avec apt-cacher-ng](apt-cacher-ng.md)
+* [Transformer votre client Debian Wheezy en serveur `LTSP`](ltsp.md)
+* [Installer un miroir local APT de cache avec `apt-cacher-ng`](apt-cacher-ng.md)
 * [Documentation pour le (futur) contributeur/développeur](dev/README.md)
 * [Installer et tester en toute sécurité la version du paquet issue de la branche `se3testing`](upgrade-via-se3testing.md)
 
 
 ## Ressources externes
 
-* [Installation de clients Debian Wheezy via Se3 avec intégration automatique](http://www-annexe.ac-rouen.fr/productions/tice/SE3_install_wheezy_pxe_web_gen_web/co/SE3_install_wheezy_pxe_web.html)
-* [Transformer votre client Debian Jessie en serveur LTSP](http://wiki.dane.ac-versailles.fr/index.php?title=Installer_un_serveur_de_clients_l%C3%A9gers_%28LTSP_sous_Debian_Jessie%29_dans_un_r%C3%A9seau_Se3)
+* [Installation de clients Debian `Wheezy` via `Se3` avec intégration automatique](http://www-annexe.ac-rouen.fr/productions/tice/SE3_install_wheezy_pxe_web_gen_web/co/SE3_install_wheezy_pxe_web.html)
+* [Transformer votre client Debian `Jessie` en serveur `LTSP`](http://wiki.dane.ac-versailles.fr/index.php?title=Installer_un_serveur_de_clients_l%C3%A9gers_%28LTSP_sous_Debian_Jessie%29_dans_un_r%C3%A9seau_Se3)
