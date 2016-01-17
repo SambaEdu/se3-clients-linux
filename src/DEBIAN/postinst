@@ -63,13 +63,14 @@ function afficher ()
 function restaurer_droits ()
 {
     # On met en place des droits cohérents sur les
-    # répertoires et sur les fichiers, tout en faisant
-    # attention de ne pas changer les droits dans les skels
-    # des distribs qui sont la propriété de l'administrateur
-    # du système (pas du paquet). On s'autorise un chown
-    # global sur tous les fichiers car c'est indispensable
-    # mais pour le chmod, mais on n'interfère pas dans les
-    # skels des administrateurs au niveau de chmod.
+    # répertoires et sur les fichiers tout en faisant
+    # attention de ne pas changer les droits dans les
+    # répertoires skel/ des distribs qui, eux, sont la
+    # propriété de l'administrateur du système (ce n'est pas
+    # la propriété du paquet). On s'autorise un chown global
+    # sur tous les fichiers (répertoires skel/ compris) car
+    # c'est indispensable mais pour le chmod on n'agit pas
+    # dans les skel/.
     chown -R "admin:admins" "$REPERTOIRE_INSTALLATION"
     find "$REPERTOIRE_INSTALLATION" -regextype posix-extended        \
         ! -regex "^$REPERTOIRE_INSTALLATION/distribs/[a-z]+/skel/.*" \
