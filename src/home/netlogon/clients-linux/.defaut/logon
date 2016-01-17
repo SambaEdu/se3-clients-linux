@@ -333,7 +333,7 @@ function mettre_a_jour_profil ()
     # qu'il y ait certaines copies non faites.
     # L'option --bwlimit indique une limite de téléchargement
     # en KiloBytes/s. Ici on a 2048 KB/s soit 2 Mo/s.
-    if rsync -rtxh --links --delete --bwlimit=2048 "$REP_SKEL" "$REP_SE3_LOCAL"
+    if rsync -rtxhp --links --delete --bwlimit=2048 "$REP_SKEL" "$REP_SE3_LOCAL"
     then
         # La commande rsync s'est bien passée.
         exit_code=0
@@ -346,9 +346,17 @@ function mettre_a_jour_profil ()
     fi
 
     chown -R "root:" "$REP_SKEL_LOCAL"
-    # On met des droits cohérents sur les fichiers et les répertoires.
-    find "$REP_SKEL_LOCAL" -type f -exec chmod u=rw,g=rw,o='',u-s,g-s,o-t '{}' \;
-    find "$REP_SKEL_LOCAL" -type d -exec chmod u=rwx,g=rwx,o='',u-s,g-s,o-t '{}' \;
+    # On met des droits cohérents sur les fichiers et les
+    # répertoires.
+    #
+    # Finalement, on se limite au chown. L'option -p de
+    # rsync ci-dessus est censée préserver les permissions.
+    # On part du principe que l'on doit conserver les droits
+    # mis en place par l'admin au niveau des répertoires
+    # skel/.
+    #
+    #find "$REP_SKEL_LOCAL" -type f -exec chmod u=rw,g=rw,o='',u-s,g-s,o-t '{}' \;
+    #find "$REP_SKEL_LOCAL" -type d -exec chmod u=rwx,g=rwx,o='',u-s,g-s,o-t '{}' \;
     sync
 
     return "$exit_code"
@@ -1693,7 +1701,7 @@ function ouverture ()
     shopt -s dotglob
     local f
     for f in "$REP_SKEL_LOCAL/"*; do
-        cp -r "$f" "$REP_HOME"
+        cp -ar "$f" "$REP_HOME"
     done
     shopt -u dotglob
     
