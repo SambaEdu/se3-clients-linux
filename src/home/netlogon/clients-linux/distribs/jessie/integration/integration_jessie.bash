@@ -698,6 +698,7 @@ verifier_ip_se3()
 verifier_acces_ping_se3()
 {
     # On vérifie que le Se3 est bien accessible via un ping.
+    # mais certains vlans bloquent les pings…
     #
     if ! ping -c 5 -W 2 "$SE3" >$SORTIE 2>&1
     then
@@ -705,6 +706,22 @@ verifier_acces_ping_se3()
                  "Fin du script."
         exit 1
     fi
+}
+
+
+verifier_acces_nmap_se3()
+{
+    # Certains réseaux comportent des vlans bloquant les pings
+    # on utilise nmap
+    test=$(nmap $ip_se3)
+    test_se3=$(echo $test | grep "1 host up")
+    if [ -z $test_se3 ]
+    then
+        afficher "Désolé, le SambaÉdu est inaccessible via la commande nmap." \
+                 "Fin du script."
+        exit 1
+    fi
+    
 }
 
 
@@ -1731,7 +1748,8 @@ verifier_ip_se3
 echo " 0..."
 afficher "gestionnaire de connexion installé : $gdm"
 afficher "vérification accès se3"
-verifier_acces_ping_se3
+#verifier_acces_ping_se3
+verifier_acces_nmap_se3     # meilleure vérification ?
 afficher "vérifications terminées"
 afficher "désinstallation du paquet libnss-mdns"
 desinstaller_mDNS
