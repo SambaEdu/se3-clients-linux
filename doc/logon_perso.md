@@ -17,7 +17,7 @@ Une partie importante du script de `logon` est gérée par le `logon_perso` qui 
     * [La fonction `creer_lien`](#la-fonction-creer_lien)
 * [Gérer les profils pour `Iceweasel`](#gérer-les-profils-pour-iceweasel)
     * [à l'aide de `rsync`](#méthode-à-laide-de-rsync)
-    * [à l'aide d'un montage](#méthode-à-laide-dun-montage)
+    * [à l'aide d'un lien](#méthode-à-laide-dun-lien)
 * [Quelques bricoles pour les perfectionnistes](#quelques-bricoles-pour-les-perfectionnistes)
     * [Changer les icônes](#changer-les-icônes-représentants-les-liens-pour-faire-plus-joli)
     * [Changer le papier peint](#changer-le-papier-peint-en-fonction-des-utilisateurs)
@@ -360,13 +360,13 @@ function fermeture_perso ()
 Cette méthode fonctionne bien mais il peut y avoir *des effets de bord* lors de la transition entre le .mozilla du skel et celui de l'utilisateur. Pour l'instant je n'ai eu qu'un seul cas dont la gestion s'est faite *à la mano*.
 
 
-### Méthode à l'aide d'un montage
+### Méthode à l'aide d'un lien
 
 J'avais gardé en mémoire une autre méthode. Je crois me souvenir qu'elle avait été proposée par Stéphane Boiron (À confirmer…). Elle permet d'utiliser le même profil entre les différents clients.
 
 La voici :
 
-* ajouter un montage dans le logon_perso, uniquement pour les profs :
+* ajouter un partage dans le logon_perso, uniquement pour les profs :
 
 ```sh
 function ouverture_perso ()
@@ -374,6 +374,7 @@ function ouverture_perso ()
     …
     if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"
     then
+        rm -Rf "$REP_HOME/.mozilla/firefox"
         monter_partage "//$SE3/homes/profil/appdata/Mozilla/Firefox" "ProfilFirefox" \
             "$REP_HOME/.mozilla/firefox"
     fi
@@ -381,7 +382,7 @@ function ouverture_perso ()
 }
 ```
 
-Si vous avez testé cette méthode, dites-le nous :-)
+Je l'ai testé sur un réseau virtuel. Cette méthode est nettement plus simple que la précédente.
 
 
 ## Quelques bricoles pour les perfectionnistes
