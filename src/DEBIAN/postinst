@@ -311,18 +311,41 @@ case "$1" in
             afficher "Mise en place du contenu par défaut du répertoire unefois/."
             cp -r "$REPERTOIRE_UNEFOIS_DEFAUT" "$REPERTOIRE_INSTALLATION"
         fi        
-
+		
+		PROXY=$(grep proxy /etc/skel/user/.mozilla/firefox/default/prefs.js)
+		
         # Les profils par défaut des distributions.
         for f in "$REPERTOIRE_DEFAUT/skel_"*; do 
             [ "$f" = "$REPERTOIRE_DEFAUT/skel_*" ] && continue
             n=$(basename "$f")
             nom_de_code="${n#skel_}"
+            PREFJS="$REPERTOIRE_DISTRIBS/$nom_de_code/skel/.mozilla/firefox/default/prefs.js"
+            fichier_version="$REPERTOIRE_DISTRIBS/$nom_de_code/skel/.VERSION"
+            
             if [ ! -e "$REPERTOIRE_DISTRIBS/$nom_de_code/skel" ]; then
                 afficher "Mise en place du profil par défaut de la distribution $nom_de_code."
                 cp -r "$f" "$REPERTOIRE_DISTRIBS/$nom_de_code/skel"
+                if  [ -e "$PREFJS" ]; then
+					afficher "Mise en place du proxy pour la distribution $nom_de_code."
+					echo "$proxy" >> "$PREFJS"
+				fi
+            else
+				if  [ -e "$PREFJS" ]; then
+						PROXY_COURANT=$(grep proxy "$PREFJS")
+						if [ "$PROXY_COURANT" != "$PROXY" ]; then
+							afficher "Modification du proxy pour la distribution $nom_de_code."
+							echo "$proxy" >> "$REPERTOIRE_DISTRIBS/$nom_de_code/skel/.mozilla/firefox/default/prefs.js"
+							echo "mise à jour pour modification du proxy" >> "$fichier_version"
+						fi
+						
+				fi
+            
             fi
+            
+			
         done
 
+		
         mkdir -p "$REPERTOIRE_SSHKEY"
         chmod 755 "$REPERTOIRE_SSHKEY"
         chown admin:admins "$REPERTOIRE_SSHKEY"
