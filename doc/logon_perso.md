@@ -17,7 +17,7 @@ Une partie importante du script de `logon` est gérée par le `logon_perso` qui 
     * [La fonction `creer_lien`](#la-fonction-creer_lien)
 * [Gérer les profils pour `Iceweasel`](#gérer-les-profils-pour-iceweasel)
     * [à l'aide de `rsync`](#méthode-à-laide-de-rsync)
-    * [à l'aide d'un partage](#méthode-à-laide-dun-partage)
+    * [à l'aide d'un partage ou d'un lien](#méthode-à-laide-dun-partage)
 * [Quelques bricoles pour les perfectionnistes](#quelques-bricoles-pour-les-perfectionnistes)
     * [Changer les icônes](#changer-les-icônes-représentants-les-liens-pour-faire-plus-joli)
     * [Changer le papier peint](#changer-le-papier-peint-en-fonction-des-utilisateurs)
@@ -383,6 +383,24 @@ function ouverture_perso ()
 ```
 
 Je l'ai testé sur un réseau virtuel. Cette méthode est nettement plus simple que la précédente.
+
+On peut modifier cette méthode à l'aide d'un lien si on veut séparer les profils windows et linux, comme cela est proposé ci-dessous en utilisant le partage Docs déjà monté :
+
+* ajouter un lien dans le logon_perso, uniquement pour les profs :
+
+```sh
+function ouverture_perso ()
+{
+    …
+    if est_dans_liste "$LISTE_GROUPES_LOGIN" "Profs"
+    then
+        rm -Rf "$REP_HOME/.mozilla"
+        [ ! -e "/mnt/_$LOGIN/Docs/.profile-linux/.mozilla" ] && mkdir -p /mnt/_$LOGIN/Docs/.profile-linux/.mozilla
+        creer_lien "Docs/.profile-linux/.mozilla" "$REP_HOME/.mozilla"
+    fi
+    …
+}
+```
 
 
 ## Quelques bricoles pour les perfectionnistes
