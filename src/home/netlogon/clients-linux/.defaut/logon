@@ -254,7 +254,14 @@ function nettoyer_rep_montage ()
     shopt -u dotglob
 }
 
+# Fonction qui vide la regle udev sur eth0
+function nettoyer_udev_eth ()
+{
+	if [ -e "/etc/udev/rules.d/70-persistent-net.rules" ]; then
+		echo > "/etc/udev/rules.d/70-persistent-net.rules" 
 
+	fi
+}
 
 # Fonction qui vide REP_TMP_LOCAL de son contenu.
 function nettoyer_rep_tmp_local ()
@@ -1537,6 +1544,7 @@ export -f est_connecte
 
 function initialisation ()
 {
+    nettoyer_udev_eth
     nettoyer_rep_tmp_local
     
     # On attend un petit peu car, sur Precise par exemple, les processus de
