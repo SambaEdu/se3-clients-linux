@@ -285,7 +285,7 @@ Dans l'exemple ci-dessus, on ne monte pas le partage `homes` mais uniquement le 
 
 Pour l'instant, de par la manière dont la fonction `monter_partage` est définie, on peut créer uniquement des liens qui pointent vers la racine du partage associé. Mais on peut vouloir par exemple monter un partage et créer des liens uniquement vers des sous-répertoires de ce partage (et non vers sa racine). C'est tout à fait possible avec la fonction `creer_lien`.
 
-Voici un exemple :
+Voici un 1er exemple :
 ```sh
 function ouverture_perso ()
 {
@@ -310,6 +310,29 @@ au même.).
 * Le deuxième argument et les suivants (autant qu'on veut) sont **les chemins absolus du ou des liens qui seront créés**.
 
 Ces chemins doivent impérativement tous commencer par `"$REP_HOME/..."`.
+
+Voici un 2ème exemple :
+
+```sh
+function ouverture_perso ()
+{
+    …
+    # Montage du partage « perso » pour tout le monde.
+     monter_partage "//$SE3/homes/Docs" "Docs" \
+         "$REP_HOME/Documents de $LOGIN sur le réseau" \
+         "$REP_HOME/Bureau/Documents de $LOGIN sur le réseau"
+     # lien vers les documents de l'utilisateur sur le réseau
+     # quand on clique sur Documents dans le navigateur de fichiers
+     rm -Rf "$REP_HOME/Documents"
+     creer_lien "Docs" "$REP_HOME/Documents"
+     # On suppose que le partage "perso" est déjà monté et qu’un
+     # lien vers ce partage a déjà été créé sur le bureau...
+     changer_icone "$REP_HOME/Bureau/Documents de $LOGIN sur le réseau" \
+         "$REP_HOME/.icons/Documents.png"
+    …
+}
+```
+Dans cet exemple, nous avons rajouté un lien entre le répertoire local *Documents* et le répertoire *Docs* de l'utilisateur. Ainsi, lorsque l'utilisateur clique sur le raccourcis *Documents* du navigateur de fichiers, il se trouve dans le répertoire de ses documents sur le serveur `se3`. Nous avons aussi rajouté l'utilisation de la fonction de changement d'icône qui est décrite ci-dessous.
 
 
 ## Gérer les profils pour Iceweasel
