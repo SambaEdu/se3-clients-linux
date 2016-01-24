@@ -24,6 +24,10 @@ function ouverture_perso ()
     monter_partage "//$SE3/homes/Docs" "Docs" \
         "$REP_HOME/Documents de $LOGIN sur le réseau" \
         "$REP_HOME/Bureau/Documents de $LOGIN sur le réseau"
+    # lien vers les documents de l'utilisateur sur le réseau
+    # quand on clique sur Documents dans le navigateur de fichiers
+    rm -Rf "$REP_HOME/Documents"
+    creer_lien "Docs" "$REP_HOME/Documents"
         
     # Montage du partage « Classes » pour tout le monde.
     monter_partage "//$SE3/Classes" "Classes" \
