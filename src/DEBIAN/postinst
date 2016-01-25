@@ -312,7 +312,7 @@ case "$1" in
             cp -r "$REPERTOIRE_UNEFOIS_DEFAUT" "$REPERTOIRE_INSTALLATION"
         fi        
 		
-		PROXY=$(grep proxy /etc/skel/user/.mozilla/firefox/default/prefs.js)
+		PROXY=$(grep proxy /etc/skel/user/.mozilla/firefox/default/prefs.js || true)
 		
         # Les profils par défaut des distributions.
         for f in "$REPERTOIRE_DEFAUT/skel_"*; do 
@@ -331,7 +331,7 @@ case "$1" in
 				fi
             else
 				if  [ -e "$PREFJS" ]; then
-						PROXY_COURANT=$(grep proxy "$PREFJS")
+						PROXY_COURANT=$(grep proxy "$PREFJS"|| true)
 						if [ "$PROXY_COURANT" != "$PROXY" ]; then
 							afficher "Modification du proxy pour la distribution $nom_de_code."
 							echo "$proxy" >> "$REPERTOIRE_DISTRIBS/$nom_de_code/skel/.mozilla/firefox/default/prefs.js"
