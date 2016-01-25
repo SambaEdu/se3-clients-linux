@@ -512,7 +512,7 @@ definir_paquets_a_installer()
     #
     PAQUETS_MONTAGE_CIFS="cifs-utils"
     PAQUETS_CLIENT_LDAP="ldap-utils"
-    PAQUETS_AUTRES="libnss-ldapd libpam-ldapd nscd nslcd libpam-script rsync ntpdate xterm imagemagick"
+    PAQUETS_AUTRES="libnss-ldapd libpam-ldapd nscd nslcd libpam-script rsync ntpdate xterm imagemagick nmap"
     if "$OPTION_INSTALLER_SAMBA"
     then
         PAQUETS_AUTRES="$PAQUETS_AUTRES samba"
