@@ -28,8 +28,9 @@ Nouveau nom: \c"
 	fi
 done
 
-
-
 /usr/bin/gksu "/home/admin/clients-linux/bin/renome_poste.bash $NOM_CLIENT"
-read tst
+if [ "$?" = "0" ]; then
+	echo "Ok ! Fermer la session ou rebooter afin que le changement soit effectif"
+	sleep 2
+fi
 exit 0
