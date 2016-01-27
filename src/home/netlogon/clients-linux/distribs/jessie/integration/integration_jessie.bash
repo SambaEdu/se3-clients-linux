@@ -402,7 +402,7 @@ recuperer_options()
     
     LISTE_OPTIONS=$(getopt --options h --longoptions "$suite_options" -n "$NOM_DU_SCRIPT" -- "$@")
     # Si l'appel est syntaxiquement incorrect on arrête le script.
-    if [ $? != 0 ]
+    if [ "$?" != "0" ]
     then
         echo "Arrêt du script $NOM_DU_SCRIPT." >&2
         exit 1
@@ -1621,7 +1621,7 @@ suite_options="$suite_options,debug,d"
 
 LISTE_OPTIONS=$(getopt --options h --longoptions "$suite_options" -n "$NOM_DU_SCRIPT" -- "$@")
 # Si l'appel est syntaxiquement incorrect on arrête le script.
-if [ $? != 0 ]
+if [ "$?" != "0" ]
 then
     echo "Arrêt du script $NOM_DU_SCRIPT." >&2
     exit 1
