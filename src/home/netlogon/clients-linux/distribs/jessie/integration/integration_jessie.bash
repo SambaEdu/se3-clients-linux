@@ -714,7 +714,7 @@ verifier_acces_nmap_se3()
     # Certains réseaux comportent des vlans bloquant les pings
     # on utilise nmap, avec l'option -sP pour scan Ping (plus rapide !)
     test_se3=$(nmap -sP $SE3 | grep "1 host up")
-    if [ -z $test_se3 ]
+    if [ -z "$test_se3" ]
     then
         afficher "Désolé, le SambaÉdu est inaccessible via la commande nmap." \
                  "Fin du script."
