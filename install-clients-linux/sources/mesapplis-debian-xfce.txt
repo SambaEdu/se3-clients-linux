@@ -1,5 +1,0 @@
-evince-gtk
-inkscape
-synaptic
-gdebi
-gksu
