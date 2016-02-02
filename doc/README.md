@@ -100,5 +100,6 @@ exclure.
 
 ## Ressources externes
 
-* [Installation de clients Debian `Wheezy` via `Se3` avec intégration automatique](http://www-annexe.ac-rouen.fr/productions/tice/SE3_install_wheezy_pxe_web_gen_web/co/SE3_install_wheezy_pxe_web.html)
+* [Installation de clients `Gnu/Linux` (`Debian` ou `Ubuntu`) via `Se3` avec intégration automatique](https://github.com/flaf/pxe-clients-linux/blob/master/doc/README.md)
+* [Installation de clients `Debian Wheezy` via `Se3` avec intégration automatique](http://www-annexe.ac-rouen.fr/productions/tice/SE3_install_wheezy_pxe_web_gen_web/co/SE3_install_wheezy_pxe_web.html)
 * [Transformer votre client Debian `Jessie` en serveur `LTSP`](http://wiki.dane.ac-versailles.fr/index.php?title=Installer_un_serveur_de_clients_l%C3%A9gers_%28LTSP_sous_Debian_Jessie%29_dans_un_r%C3%A9seau_Se3)
