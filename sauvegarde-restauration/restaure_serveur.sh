@@ -7,7 +7,7 @@
 # ou pour une migration d'un ancien serveur à un nouveau serveur se3
 #
 # version du 16/04/2014
-# modifiée le 30/09/2015
+# modifiée le 15/02/2016
 #
 # Auteurs :		Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
 #				François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
@@ -130,7 +130,7 @@ then
 			setfacl --restore=$SAUVEGARDEHOME/varse3.acl
 			cd /home
 			echo -e "${jaune}`date +%R` ${neutre}Restauration des droits" 2>&1 | tee -a $COURRIEL
-			/usr/share/se3/sbin/restore_droits.sh
+			/usr/share/se3/scripts/restore_droits.sh
 			;;
 		*)
 			echo -e "${jaune}`date +%R` ${neutre}Pas de restauration des homes et de /var/se3" 2>&1 | tee -a $COURRIEL
@@ -212,7 +212,7 @@ fi
 restaure_adminse3()
 {
 echo -e "${jaune}`date +%R` ${neutre}Création du compte adminse3" 2>&1 | tee -a $COURRIEL
-create_adminse3.sh
+/usr/share/se3/sbin/create_adminse3.sh
 }
 
 restaure_dhcp()
