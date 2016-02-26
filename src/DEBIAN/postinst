@@ -327,14 +327,14 @@ case "$1" in
                 cp -r "$f" "$REPERTOIRE_DISTRIBS/$nom_de_code/skel"
                 if  [ -e "$PREFJS" ]; then
 					afficher "Mise en place du proxy pour la distribution $nom_de_code."
-					echo "$proxy" >> "$PREFJS"
+					echo "$PROXY" >> "$PREFJS"
 				fi
             else
 				if  [ -e "$PREFJS" ]; then
 						PROXY_COURANT=$(grep proxy "$PREFJS"|| true)
 						if [ "$PROXY_COURANT" != "$PROXY" ]; then
 							afficher "Modification du proxy pour la distribution $nom_de_code."
-							echo "$proxy" >> "$REPERTOIRE_DISTRIBS/$nom_de_code/skel/.mozilla/firefox/default/prefs.js"
+							echo "$PROXY" >> "$REPERTOIRE_DISTRIBS/$nom_de_code/skel/.mozilla/firefox/default/prefs.js"
 							echo "mise à jour pour modification du proxy" >> "$fichier_version"
 						fi
 						
