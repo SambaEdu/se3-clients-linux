@@ -374,7 +374,10 @@ configurer_lightdm ()
     #####
     # Modification du fichier /etc/lightdm/lightdm.conf
     #
-    restaurer_via_save "/etc/lightdm/lightdm.conf"
+    
+    #################################################################
+    # Xenial : try to delete "restaurer_via_save" mechanism
+    #restaurer_via_save "/etc/lightdm/lightdm.conf"
     sed -r -i "s|#greeter-setup-script.*$|greeter-setup-script=\"${LOGON_SCRIPT_LOCAL}\" initialisation|g" /etc/lightdm/lightdm.conf
     sed -r -i "s|#session-setup-script.*$|session-setup-script=\"${LOGON_SCRIPT_LOCAL}\" ouverture|g" /etc/lightdm/lightdm.conf
     sed -r -i "s|#session-cleanup-script.*$|session-cleanup-script=\"${LOGON_SCRIPT_LOCAL}\" fermeture|g" /etc/lightdm/lightdm.conf
@@ -1899,8 +1902,16 @@ afficher "Configuration de PAM afin que seul gdm3 (la fenêtre de login)" \
          "un compte local."
 #renommer_fichiers_pam
 #permettre_connexion_comptes_locaux
-modifier_fichiers_pam
-creation_fichier_pam
+
+# Xenial : try to make pam working 
+
+
+#modifier_fichiers_pam
+#creation_fichier_pam
+
+# Xenial end
+############################
+
 #parametrer_gnome_screensaver
 
 #=====
@@ -1968,7 +1979,9 @@ modifier_fichier_user_dirs
 afficher "Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy" \
 		 "et /usr/share/polkit-1/actions/org.freedesktop.login1.policy" \
          "afin de désactiver l'hibernation et la mise en veille du système."
-desactiver_hibernation_mise_en_veille
+
+# Xenial : try to delete "restaurer_via_save" mechanism, temporary modification to try to make pam working
+#desactiver_hibernation_mise_en_veille
 
 #=====
 # Pour Unity (Ubuntu), masquer la liste de tous les utilisateurs qui se sont déjà connectés au système
