@@ -1,10 +1,10 @@
 #! /bin/bash
 
 ##### #####
-# script d'intégration des clients Trusty  à un domaine géré par un se3
+# script d'intégration des clients Xenial  à un domaine géré par un se3
 #
 #
-# version : 20151024
+# version : 20160404
 #
 #
 ##### #####
@@ -38,7 +38,7 @@ NOM_DU_SCRIPT=${0##*/}
 # Nom actuel de la machine cliente.
 NOM_CLIENT_ANCIEN=$(cat "/etc/hostname")
 
-# Le nom de code de la distribution (par exemple "trusty").
+# Le nom de code de la distribution (par exemple "xenial").
 NOM_DE_CODE=$(lsb_release --codename | cut -f 2)
 
 # Le gestionnaire de connexion
@@ -556,11 +556,11 @@ verifier_droits_root()
 
 verifier_version_debian()
 {
-    # On vérifie que le système est bien Ubuntu Trusty.
+    # On vérifie que le système est bien Ubuntu Xenial.
     #
-    if [ "$NOM_DE_CODE" != "trusty" ]
+    if [ "$NOM_DE_CODE" != "xenial" ]
     then
-        afficher "Désolé, le script doit être exécuté sur Ubuntu Trusty." \
+        afficher "Désolé, le script doit être exécuté sur Ubuntu Xenial." \
                  "Fin du script."
         exit 1
     fi
@@ -1342,7 +1342,7 @@ modifier_fichiers_pam()
     #"${REP_SAVE_LOCAL}/etc/pam.d/${gdm}" > "/etc/pam.d/${gdm}"
     
     ################################################################
-    # Modification pour Trusty :
+    # Modification pour Trusty et Xenial :
     # Le module pam_script.so doit être appelé uniquement 
     # dans le module pam de lightdm, avant @common-account
     
@@ -1356,7 +1356,7 @@ modifier_fichiers_pam()
                     /etc/pam.d/common-auth \
                     /etc/pam.d/common-password
     
-    # Fin de la modification pam pour Trusty
+    # Fin de la modification pam pour Trusty et Xenial
     ################################################################
     
     # Inclusion des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
@@ -1517,7 +1517,7 @@ configurer_gestionnaire_graphique_old()
 
 configurer_gestionnaire_graphique()
 {
-    # Sous Trusty : par défaut, le fichier de configuration de lightdm /etc/lightdm/lightdm.conf
+    # Sous Trusty et Xenial : par défaut, le fichier de configuration de lightdm /etc/lightdm/lightdm.conf
     # n'est pas présent sous Ubuntu, Xubuntu, Lubuntu.
     #    Créer le fichier /etc/lightdm/lightdm.conf permet de passer outre la configuration 
     #    par défaut d'Ubuntu, Xubuntu et Lubuntu.
@@ -1945,7 +1945,7 @@ configurer_gestionnaire_graphique
 ###############################
 
 ##################################
-# Trusty : desactivation de apport
+# Trusty et Xenial : desactivation de apport
 #
 # Cette fenetre de signalement de problème logiciel peut être 
 # génante en s'affichant de façon récurrente alors que le problème 
