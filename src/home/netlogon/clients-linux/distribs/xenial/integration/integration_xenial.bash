@@ -1,7 +1,7 @@
 #! /bin/bash
 
 ##### #####
-# script d'intégration des clients Xenial  à un domaine géré par un se3
+# script d'intégration des clients Xenial à un domaine géré par un se3
 #
 #
 # version : 20160404
@@ -374,10 +374,7 @@ configurer_lightdm ()
     #####
     # Modification du fichier /etc/lightdm/lightdm.conf
     #
-    
-    #################################################################
-    # Xenial : try to delete "restaurer_via_save" mechanism
-    #restaurer_via_save "/etc/lightdm/lightdm.conf"
+    restaurer_via_save "/etc/lightdm/lightdm.conf"
     sed -r -i "s|#greeter-setup-script.*$|greeter-setup-script=\"${LOGON_SCRIPT_LOCAL}\" initialisation|g" /etc/lightdm/lightdm.conf
     sed -r -i "s|#session-setup-script.*$|session-setup-script=\"${LOGON_SCRIPT_LOCAL}\" ouverture|g" /etc/lightdm/lightdm.conf
     sed -r -i "s|#session-cleanup-script.*$|session-cleanup-script=\"${LOGON_SCRIPT_LOCAL}\" fermeture|g" /etc/lightdm/lightdm.conf
@@ -559,7 +556,7 @@ verifier_droits_root()
 
 verifier_version_debian()
 {
-    # On vérifie que le système est bien Ubuntu Xenial.
+    # On vérifie que le système est bien Ubuntu Xenial
     #
     if [ "$NOM_DE_CODE" != "xenial" ]
     then
@@ -1235,7 +1232,7 @@ iface lo inet loopback
     #service networking start > $SORTIE 2>&1
     
     ###################################
-    # Sous Trusty : service networking ne semble pas fonctionner, on utilse ifdown et ifup
+    # Sous Trusty et Xenial : service networking ne semble pas fonctionner, on utilse ifdown et ifup
     for carte in $cartes_reseau
     do
         if [ "$carte" != "lo" ]
@@ -1345,7 +1342,7 @@ modifier_fichiers_pam()
     #"${REP_SAVE_LOCAL}/etc/pam.d/${gdm}" > "/etc/pam.d/${gdm}"
     
     ################################################################
-    # Modification pour Trusty et Xenial :
+    # Modification pour Trusty et Xenial:
     # Le module pam_script.so doit être appelé uniquement 
     # dans le module pam de lightdm, avant @common-account
     
@@ -1902,16 +1899,8 @@ afficher "Configuration de PAM afin que seul gdm3 (la fenêtre de login)" \
          "un compte local."
 #renommer_fichiers_pam
 #permettre_connexion_comptes_locaux
-
-# Xenial : try to make pam working 
-
-
-#modifier_fichiers_pam
-#creation_fichier_pam
-
-# Xenial end
-############################
-
+modifier_fichiers_pam
+creation_fichier_pam
 #parametrer_gnome_screensaver
 
 #=====
@@ -1979,9 +1968,7 @@ modifier_fichier_user_dirs
 afficher "Modification du fichier /usr/share/polkit-1/actions/org.freedesktop.upower.policy" \
 		 "et /usr/share/polkit-1/actions/org.freedesktop.login1.policy" \
          "afin de désactiver l'hibernation et la mise en veille du système."
-
-# Xenial : try to delete "restaurer_via_save" mechanism, temporary modification to try to make pam working
-#desactiver_hibernation_mise_en_veille
+desactiver_hibernation_mise_en_veille
 
 #=====
 # Pour Unity (Ubuntu), masquer la liste de tous les utilisateurs qui se sont déjà connectés au système
