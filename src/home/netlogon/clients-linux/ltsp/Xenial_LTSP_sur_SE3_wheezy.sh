@@ -2,7 +2,7 @@
 # Rédigé par Nicolas Aldegheri, le 04/04/2016
 # Sous licence GNU
 
-# Choisir l'environnement des clients lourds Xenial : ubuntu, xubuntu ou lubuntu
+# Choisir l'environnement des clients lourds Xenial : ubuntu, ubuntu-mate, xubuntu ou lubuntu
 ENVIRONNEMENT="lubuntu" 
 
 # Récupération des variables spécifiques au se3
