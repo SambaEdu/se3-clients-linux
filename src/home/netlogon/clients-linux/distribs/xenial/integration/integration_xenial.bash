@@ -4,7 +4,7 @@
 # script d'intégration des clients Xenial à un domaine géré par un se3
 #
 #
-# version : 20160404
+# version : 20160406
 #
 #
 ##### #####
@@ -1257,12 +1257,28 @@ installer_paquets_integration()
 libnss-ldapd    libnss-ldapd/nsswitch    multiselect    group, passwd, shadow
 libnss-ldapd    libnss-ldapd/clean_nsswitch    boolean    false
 libpam-ldapd    libpam-ldapd/enable_shadow    boolean    true
-nslcd    nslcd/ldap-bindpw    password    
-nslcd    nslcd/ldap-starttls    boolean    false
-nslcd    nslcd/ldap-base    string    $BASE_DN
-nslcd    nslcd/ldap-reqcert    select    
-nslcd    nslcd/ldap-uris    string    ldap://$SE3/
-nslcd    nslcd/ldap-binddn    string    
+# Xenial : preseed responses for nslcd must be completed ...
+#nslcd    nslcd/ldap-bindpw    password    
+#nslcd    nslcd/ldap-starttls    boolean    false
+#nslcd    nslcd/ldap-base    string    $BASE_DN
+#nslcd    nslcd/ldap-reqcert    select    
+#nslcd    nslcd/ldap-uris    string    ldap://$SE3/
+#nslcd    nslcd/ldap-binddn    string    
+nslcd	nslcd/ldap-bindpw	password
+nslcd	nslcd/ldap-starttls	boolean	true
+nslcd	nslcd/ldap-sasl-authcid	string	
+nslcd	nslcd/ldap-uris	string	ldap://$SE3/
+nslcd	nslcd/ldap-auth-type	select	simple
+nslcd	nslcd/ldap-sasl-mech	select	
+nslcd	nslcd/ldap-base	string	$BASE_DN
+nslcd	nslcd/ldap-sasl-secprops	string	
+nslcd	nslcd/ldap-sasl-krb5-ccname	string	/var/run/nslcd/nslcd.tkt
+nslcd	libraries/restart-without-asking	boolean	false
+nslcd	nslcd/ldap-sasl-realm	string	
+nslcd	nslcd/ldap-sasl-authzid	string	
+nslcd	nslcd/ldap-cacertfile	string
+nslcd	nslcd/restart-services	string	
+nslcd	nslcd/ldap-reqcert	select	never
 samba-common    samba-common/encrypt_passwords    boolean    true
 samba-common    samba-common/dhcp    boolean    false
 samba-common    samba-common/workgroup    string    WORKGROUP
@@ -1914,10 +1930,13 @@ reecrire_fichier_hosts
 #=====
 # Réécriture du fichier /etc/nslcd.conf
 #=====
-afficher "Réécriture complète du fichier /etc/nslcd.conf afin que la" \
-         "communication LDAP entre le client et le serveur (notamment" \
-         "au moment de l'authentification) soit cryptée."
-reecrire_fichier_nslcd
+
+# Xenial : la préconfiguration du paquet nslcd permet de configurer directement le cryptage 
+# pendant son installation, il devient de ce fait inutile de réécrire le fichier nslcd.conf
+#afficher "Réécriture complète du fichier /etc/nslcd.conf afin que la" \
+#         "communication LDAP entre le client et le serveur (notamment" \
+#         "au moment de l'authentification) soit cryptée."
+#reecrire_fichier_nslcd
 
 #=====
 # Modification du fichier smb.conf (s'il s'avère qu'on a installé Samba)
