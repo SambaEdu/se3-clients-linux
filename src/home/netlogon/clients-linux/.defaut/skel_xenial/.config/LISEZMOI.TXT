@@ -1,0 +1,13 @@
+Ceci est le contenu (élagué car apparemment seul le
+sous-répertoire dconf/ est nécessaire) du répertoire 
+"~/.config/" d'un compte sur Xenial dont on a appliqué 
+les « restrictions » suivantes :
+
+# Pour empêcher l'utilisateur de verrouiller la session.
+gsettings set org.gnome.desktop.lockdown disable-lock-screen true
+
+# Pour empêcher l'utilisateur de changer d'utilisateur.
+gsettings set org.gnome.desktop.lockdown disable-user-switching true
+
+# Et en plus, on a modifié la barre verticale à gauche contenant
+# une liste de lanceurs.
