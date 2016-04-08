@@ -4,7 +4,7 @@
 # script d'intégration des clients Xenial à un domaine géré par un se3
 #
 #
-# version : 20160406
+# version : 20160408
 #
 #
 ##### #####
