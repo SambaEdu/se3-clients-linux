@@ -1890,15 +1890,17 @@ mise_en_place_mot_de_passe_root
 # Désinstallation des paquets network-manager network-manager-gnome
 #=====
 
-enumerer_cartes_reseau
-afficher "Les paquets network-manager et network-manager-gnome vont être" \
-         "désinstallés. C'est le fichier $config_cartes qui permettra" \
-         "désormais de paramétrer la configuration IP des cartes réseau." \
-         "Par défaut, toutes les cartes réseau vont être configurées" \
-         "via le DHCP."
-purger_network_manager
-supprimer_paquets_inutiles
-infos_configuration_cartes_reseau
+# Xenial : 
+# 
+#enumerer_cartes_reseau
+#afficher "Les paquets network-manager et network-manager-gnome vont être" \
+#         "désinstallés. C'est le fichier $config_cartes qui permettra" \
+#         "désormais de paramétrer la configuration IP des cartes réseau." \
+#         "Par défaut, toutes les cartes réseau vont être configurées" \
+#         "via le DHCP."
+#purger_network_manager
+#supprimer_paquets_inutiles
+#infos_configuration_cartes_reseau
 
 #=====
 # Installation des paquets
