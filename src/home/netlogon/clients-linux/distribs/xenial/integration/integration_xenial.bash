@@ -1491,8 +1491,12 @@ modifier_fichier_smb()
                  "serveur WINS du domaine."
         sed -i -r -e "s/^.*wins +server +=.*$/wins server = $SE3/" "/etc/samba/smb.conf"
         #invoke-rc.d samba restart >> $SORTIE 2>&1
-        service samba restart >> $SORTIE 2>&1
-fi
+        
+        # Xenial : dont't work anymore, use systemctl
+        #service samba restart >> $SORTIE 2>&1
+        systemctl restart nmbd
+        systemctl restart smbd
+fi	
 }
 
 reecrire_fichier_ntpdate()
