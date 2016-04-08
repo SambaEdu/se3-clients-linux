@@ -174,7 +174,7 @@ changer_mot_de_passe_root ()
     #
     # 1 argument qui correspond au mot de passe souhaité.
     #
-    { echo "$1"; echo "$1"; } | passwd root > $SORTIE 2>&1
+    { echo "$1"; echo "$1"; } | passwd root >> $SORTIE 2>&1
 }
 
 restaurer_via_save ()
@@ -979,7 +979,7 @@ verifier_connexion_ldap_se3()
 {
     # Vérification de la connexion LDAP avec le Se3.
     #
-    ldapsearch -xLLL -h "$SE3" -b "ou=Computers,$BASE_DN" "(|(uid=$NOM_CLIENT$)(cn=$NOM_CLIENT))" "dn" > $SORTIE 2>&1
+    ldapsearch -xLLL -h "$SE3" -b "ou=Computers,$BASE_DN" "(|(uid=$NOM_CLIENT$)(cn=$NOM_CLIENT))" "dn" >> $SORTIE 2>&1
     if [ "$?" != 0 ]
     then
         afficher "Désolé, le serveur LDAP n'est pas joignable." \
@@ -1075,10 +1075,10 @@ renommer_nom_client()
     then
         afficher "Changement de nom du système."
         echo "$NOM_CLIENT" > "/etc/hostname"
-        #invoke-rc.d hostname.sh stop > $SORTIE 2>&1
-        service hostname stop > $SORTIE 2>&1
-        #invoke-rc.d hostname.sh start > $SORTIE 2>&1
-        service hostname start > $SORTIE 2>&1
+        #invoke-rc.d hostname.sh stop >> $SORTIE 2>&1
+        service hostname stop >> $SORTIE 2>&1
+        #invoke-rc.d hostname.sh start >> $SORTIE 2>&1
+        service hostname start >> $SORTIE 2>&1
     fi
     
     unset -v cartes_reseau carte_mac_ip carte adresse_mac adresse_ip 
@@ -1100,12 +1100,12 @@ mettre_en_place_mot_de_passe_grub()
         # un bug de la commande grub-mkpasswd-pbkdf2. Ces installations
         # seront supprimées ensuite, une fois la mise en place du
         # mot de passe Grub terminée.
-        apt-get install --reinstall --yes --force-yes $PAQUETS_RANDOM > $SORTIE 2>&1
+        apt-get install --reinstall --yes --force-yes $PAQUETS_RANDOM >> $SORTIE 2>&1
         echo "HRNGDEVICE=/dev/urandom" >> "/etc/default/rng-tools"
-        #invoke-rc.d rng-tools stop > $SORTIE 2>&1
-        service rng-tools stop > $SORTIE 2>&1
-        #invoke-rc.d rng-tools start > $SORTIE 2>&1
-        service rng-tools start > $SORTIE 2>&1
+        #invoke-rc.d rng-tools stop >> $SORTIE 2>&1
+        service rng-tools stop >> $SORTIE 2>&1
+        #invoke-rc.d rng-tools start >> $SORTIE 2>&1
+        service rng-tools start >> $SORTIE 2>&1
         
         if [ -z "$MDP_GRUB" ]
         then
@@ -1130,7 +1130,7 @@ mettre_en_place_mot_de_passe_grub()
         echo "password_pbkdf2 admin $mdp_grub_hache" >> "$fichier_grub_custom"
         
         # On met à jour la configuration de Grub.
-        update-grub > $SORTIE 2>&1
+        update-grub >> $SORTIE 2>&1
         if [ "$?" != "0" ]
         then
             afficher "Attention, la commande « update_grub » ne s'est pas" \
@@ -1143,7 +1143,7 @@ mettre_en_place_mot_de_passe_grub()
         unset -v mot_de_passe mdp_grub_hache fichier_grub_custom
         
         # Désinstallation de PAQUETS_RANDOM.
-        apt-get remove --purge --yes $PAQUETS_RANDOM > $SORTIE 2>&1
+        apt-get remove --purge --yes $PAQUETS_RANDOM >> $SORTIE 2>&1
 fi
 }
 
@@ -1152,7 +1152,7 @@ annuler_timeout_demarrage()
     # À supprimer ?
     
     sed -r -i -e 's/^\GRUB_TIMEOUT=5.*$/GRUB_TIMEOUT=-1/g' /etc/default/grub
-    update-grub > $SORTIE 2>&1
+    update-grub >> $SORTIE 2>&1
 }
 
 mise_en_place_mot_de_passe_root()
@@ -1197,14 +1197,14 @@ enumerer_cartes_reseau()
 
 purger_network_manager()
 {
-    apt-get remove --purge --yes network-manager network-manager-gnome > $SORTIE 2>&1
+    apt-get remove --purge --yes network-manager network-manager-gnome >> $SORTIE 2>&1
 }
 
 supprimer_paquets_inutiles()
 {
     # Tant qu'on y est, on supprime des paquets inutiles voire gênants
     # pour certains.
-    apt-get remove --yes $PAQUETS_A_SUPPRIMER > $SORTIE 2>&1
+    apt-get remove --yes $PAQUETS_A_SUPPRIMER >> $SORTIE 2>&1
 }
 
 infos_configuration_cartes_reseau()
@@ -1226,10 +1226,10 @@ iface lo inet loopback
         echo "" >> "$config_cartes"
     done
     
-    #invoke-rc.d networking stop > $SORTIE 2>&1
-    #service networking stop > $SORTIE 2>&1
-    #invoke-rc.d networking start > $SORTIE 2>&1
-    #service networking start > $SORTIE 2>&1
+    #invoke-rc.d networking stop >> $SORTIE 2>&1
+    #service networking stop >> $SORTIE 2>&1
+    #invoke-rc.d networking start >> $SORTIE 2>&1
+    #service networking start >> $SORTIE 2>&1
     
     ###################################
     # Sous Trusty et Xenial : service networking ne semble pas fonctionner, on utilse ifdown et ifup
@@ -1288,7 +1288,7 @@ samba-common    samba-common/do_debconf    boolean    true
     rm -f "$debconf_parametres"
     unset -v debconf_parametres
     
-    apt-get install --no-install-recommends --yes --reinstall $PAQUETS_AUTRES > $SORTIE 2>&1
+    apt-get install --no-install-recommends --yes --reinstall $PAQUETS_AUTRES >> $SORTIE 2>&1
 }
 
 desinstaller_gestionnaire_fenetres()
@@ -1475,10 +1475,10 @@ tls_reqcert never
 
 " > "/etc/nslcd.conf"
     
-    #invoke-rc.d nslcd stop > $SORTIE 2>&1
-    service nslcd stop > $SORTIE 2>&1
-    #invoke-rc.d nslcd start > $SORTIE 2>&1
-    service nslcd start > $SORTIE 2>&1
+    #invoke-rc.d nslcd stop >> $SORTIE 2>&1
+    service nslcd stop >> $SORTIE 2>&1
+    #invoke-rc.d nslcd start >> $SORTIE 2>&1
+    service nslcd start >> $SORTIE 2>&1
 }
     
 modifier_fichier_smb()
@@ -1490,8 +1490,8 @@ modifier_fichier_smb()
                  "à la machine cliente que le serveur SambaÉdu est le" \
                  "serveur WINS du domaine."
         sed -i -r -e "s/^.*wins +server +=.*$/wins server = $SE3/" "/etc/samba/smb.conf"
-        #invoke-rc.d samba restart > $SORTIE 2>&1
-        service samba restart > $SORTIE 2>&1
+        #invoke-rc.d samba restart >> $SORTIE 2>&1
+        service samba restart >> $SORTIE 2>&1
 fi
 }
 
