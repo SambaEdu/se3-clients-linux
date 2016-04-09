@@ -192,6 +192,82 @@ echo " 7-Configuration de pam_mount pour monter automatiquement les partages Sam
 echo "------------------------------------------------------------------------------------------------------------------------------"
 
 # Configuration des partages Samba "Docs" et "Classes"
+if [ "$ENVIRONNEMENT" = "ubuntu-mate" ]
+then
+cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE pam_mount SYSTEM "pam_mount.conf.xml.dtd">
+<!--
+	See pam_mount.conf(5) for a description.
+-->
+
+<pam_mount>
+
+		<!-- debug should come before everything else,
+		since this file is still processed in a single pass
+		from top-to-bottom -->
+
+<debug enable="0" />
+
+		<!-- Volume definitions -->
+<volume
+		user="admin"
+		pgrp="lcs-users"
+		fstype="cifs"
+		server="$IP_SE3"
+		path="netlogon-linux"
+		mountpoint="~/Clients-linux (sur le reseau)"
+		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
+/>
+
+<volume
+		user="*"
+		pgrp="lcs-users"
+		fstype="cifs"
+		server="$IP_SE3"
+		path="homes/Docs"
+		mountpoint="~/Docs (sur le reseau)"
+		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
+/>
+
+<volume
+		user="*"
+		pgrp="lcs-users"
+		fstype="cifs"
+		server="$IP_SE3"
+		path="Classes"
+		mountpoint="~/Classes (sur le reseau)"
+		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
+/>
+		<!-- pam_mount parameters: General tunables -->
+
+<!--
+<luserconf name=".pam_mount.conf.xml" />
+-->
+
+<!-- Note that commenting out mntoptions will give you the defaults.
+     You will need to explicitly initialize it with the empty string
+     to reset the defaults to nothing. -->
+<mntoptions allow="nosuid,nodev,loop,encryption,fsck,nonempty,allow_root,allow_other" />
+<!--
+<mntoptions deny="suid,dev" />
+<mntoptions allow="*" />
+<mntoptions deny="*" />
+-->
+<mntoptions require="nosuid,nodev" />
+
+<logout wait="0" hup="0" term="0" kill="0" />
+
+
+		<!-- pam_mount parameters: Volume-related -->
+
+<mkmountpoint enable="1" remove="true" />
+
+
+</pam_mount>
+EOF
+
+else
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE pam_mount SYSTEM "pam_mount.conf.xml.dtd">
@@ -264,6 +340,8 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 
 </pam_mount>
 EOF
+
+fi
 
 
 echo "--------------------------------------------------------------------------------------"
