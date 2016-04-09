@@ -1494,8 +1494,8 @@ modifier_fichier_smb()
         
         # Xenial : dont't work anymore, use systemctl
         #service samba restart >> $SORTIE 2>&1
-        systemctl restart nmbd
-        systemctl restart smbd
+        systemctl restart nmbd >> $SORTIE 2>&1
+        systemctl restart smbd >> $SORTIE 2>&1
 fi	
 }
 
@@ -1999,6 +1999,10 @@ desactiver_hibernation_mise_en_veille
 # Pour Unity (Ubuntu), masquer la liste de tous les utilisateurs qui se sont déjà connectés au système
 afficher "Modification pour masquer la liste des utilisateurs qui se sont déjà connectés (Unity sous Ubuntu)" 
 masquer_liste_utilisateurs_connectes_unity
+
+# Depuis Xenial :
+afficher "Suppression de la liste de paquets inutilisés"
+apt-get autoremove -y >> $SORTIE 2>&1
 
 #=====
 # FIN DE L'INTÉGRATION
