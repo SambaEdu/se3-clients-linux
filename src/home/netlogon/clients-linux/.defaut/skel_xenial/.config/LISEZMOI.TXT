@@ -1,13 +1,17 @@
-Ceci est le contenu (élagué car apparemment seul le
-sous-répertoire dconf/ est nécessaire) du répertoire 
-"~/.config/" d'un compte sur Xenial dont on a appliqué 
-les « restrictions » suivantes :
+Par défaut, le fichier user créé par dconf sous Ubuntu Mate Xenial est donné est fourni avec les restrictions suivantes :
 
-# Pour empêcher l'utilisateur de verrouiller la session.
-gsettings set org.gnome.desktop.lockdown disable-lock-screen true
+# Pour empêcher les mises à jour automatique 
+apps -> update-manager -> check-dist-upgrades false
 
-# Pour empêcher l'utilisateur de changer d'utilisateur.
-gsettings set org.gnome.desktop.lockdown disable-user-switching true
+# Pour configurer le clavier en français :
+desktop -> ibus -> general -> preload-engines ['xkb:fr::fra']
+		-> panel -> show-icon-on-systray false
 
-# Et en plus, on a modifié la barre verticale à gauche contenant
-# une liste de lanceurs.
+# Pour empêcher l'utilisateur de changer d'utilisateur et de vérouiller sa session
+mate -> desktop -> applications -> lockdown -> disable-lock-screen true
+					    -> disable-user-switching true
+
+# Pour désactiver l'économise d'écran et la fonction lockage
+mate -> screensaver -> idle-activation-enabled false
+		    -> locked-enabled false
+
