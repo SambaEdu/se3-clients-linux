@@ -1555,8 +1555,12 @@ configurer_gestionnaire_graphique()
             PARAM_USER_SESSION=lubuntu
             PARAM_GREETER_SESSION=true
         else
-            PARAM_USER_SESSION=ubuntu
-            PARAM_GREETER_SESSION=false
+			if [ -e "/etc/lightdm/lightdm-gtk-greeter.conf.d/99_ubuntu-mate.conf" ]
+				PARAM_GREETER_SESSION=true
+            else
+				PARAM_USER_SESSION=ubuntu
+				PARAM_GREETER_SESSION=false
+			fi
         fi
     fi
     
