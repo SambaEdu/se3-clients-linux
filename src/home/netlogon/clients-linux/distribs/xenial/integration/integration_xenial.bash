@@ -163,7 +163,7 @@ hacher_mot_de_passe_grub ()
     # passe en question.
     #
     { echo "$1"; echo "$1"; } \
-        | grub-mkpasswd-pbkdf2 -c 30 -l 30 -s 30 2>$SORTIE \
+        | grub-mkpasswd-pbkdf2 -c 30 -l 30 -s 30 2 >> $SORTIE \
         | grep -v 'password' \
         | sed -r 's/Your PBKDF2 is (.+)$/\1/'  
 }
@@ -231,7 +231,7 @@ nettoyer_avant_de_sortir ()
             fi
             
             # On supprime les paquets installés.
-            apt-get purge --yes $PAQUETS_TOUS >$SORTIE 2>&1
+            apt-get purge --yes $PAQUETS_TOUS >> $SORTIE 2>&1
         ;;
         
         *)
@@ -664,7 +664,8 @@ verifier_apt_get()
     # Du coup, je ne vois rien de mieux que de compter le nombre 
     # de lignes écrites sur la sortie standard des erreurs.
     #
-    if [ $(apt-get update 2>&1 >$SORTIE | wc -l) -gt 0 ]
+    apt-get update 2>&1 >> $SORTIE
+    if [ $(apt-get update 2>&1 >> $SORTIE | wc -l) -gt 0 ]
     then
         afficher "Désolé, la commande « apt-get update » ne fonctionne pas" \
                  "correctement. Il y des erreurs que vous devez rectifier." \
@@ -678,7 +679,7 @@ verifier_disponibilite_paquets()
     # Vérification de la disponibilité des paquets nécessaires à l'intégration.
     for paquet in $PAQUETS_TOUS
     do
-        if ! apt-get install "$paquet" --yes --simulate >$SORTIE 2>&1
+        if ! apt-get install "$paquet" --yes --simulate >> $SORTIE 2>&1
         then
             afficher "Désolé, le paquet $paquet n'est pas disponible dans" \
                      "les dépôts alors que celui-ci est nécessaire pour" \
@@ -700,7 +701,7 @@ verifier_ip_se3()
     octet="[0-9]{1,3}"
     if ! echo "$SE3" | grep -qE "^$octet\.$octet\.$octet\.$octet$"
     then
-        if ! host "$SE3" >$SORTIE
+        if ! host "$SE3" >> $SORTIE
         then
             afficher "Désolé, le nom d'hôte du SambaÉdu ($SE3) n'est pas résolu" \
                      "par la machine cliente. Fin du script."
@@ -715,7 +716,7 @@ verifier_acces_ping_se3()
 {
     # On vérifie que le Se3 est bien accessible via un ping.
     #
-    if ! ping -c 5 -W 2 "$SE3" >$SORTIE 2>&1
+    if ! ping -c 5 -W 2 "$SE3" >> $SORTIE 2>&1
     then
         afficher "Désolé, le SambaÉdu est inaccessible via la commande ping." \
                  "Fin du script."
@@ -744,7 +745,7 @@ desinstaller_mDNS()
     # « ping se3.intranet.local » ne fonctionnera pas alors que
     #  « ping se3 » fonctionnera).
     #
-    apt-get remove --purge --yes libnss-mdns >$SORTIE 2>&1
+    apt-get remove --purge --yes libnss-mdns >> $SORTIE 2>&1
 }
 
 arret_definitif_avahi_daemon()
@@ -760,9 +761,9 @@ arret_definitif_avahi_daemon()
     # Le mieux, c'est donc de stopper ce daemon et d'empêcher son lancement
     # lors du démarrage du système.
     #
-    #invoke-rc.d avahi-daemon stop >$SORTIE 2>&1
-    service avahi-daemon stop >$SORTIE 2>&1
-    update-rc.d -f avahi-daemon remove >$SORTIE 2>&1
+    #invoke-rc.d avahi-daemon stop >> $SORTIE 2>&1
+    service avahi-daemon stop >> $SORTIE 2>&1
+    update-rc.d -f avahi-daemon remove >> $SORTIE 2>&1
 }
 
 
@@ -776,7 +777,7 @@ purger_paquets()
     # Donc on l'ajoute dans la liste pour être sûr qu'il soit
     # désintallé.
     #
-    apt-get purge --yes $PAQUETS_TOUS samba >$SORTIE 2>&1
+    apt-get purge --yes $PAQUETS_TOUS samba >> $SORTIE 2>&1
 }
 
 arret_definitif_exim4_daemon()
@@ -785,9 +786,9 @@ arret_definitif_exim4_daemon()
     # cas d'une station cliente et qui peut bloquer pendant quelques secondes
     # (voire quelques minutes) l'arrivée du prompt de login sur tty[1-6].
     #
-    #invoke-rc.d exim4 stop >$SORTIE 2>&1
-    service exim4 stop >$SORTIE 2>&1
-    update-rc.d -f exim4 remove >$SORTIE 2>&1
+    #invoke-rc.d exim4 stop >> $SORTIE 2>&1
+    service exim4 stop >> $SORTIE 2>&1
+    update-rc.d -f exim4 remove >> $SORTIE 2>&1
 }
 
 installer_paquets_cifs()
@@ -813,7 +814,7 @@ samba-common    samba-common/do_debconf    boolean    true
     # --no-install-recommends permet d'éviter l'installation du paquet
     # samba-common-bin qui ferait du client un serveur Samba ce qui serait
     # inutile ici.
-    apt-get install --no-install-recommends --reinstall --yes $PAQUETS_MONTAGE_CIFS >$SORTIE 2>&1
+    apt-get install --no-install-recommends --reinstall --yes $PAQUETS_MONTAGE_CIFS >> $SORTIE 2>&1
 }
 
 
@@ -824,7 +825,7 @@ montage_partage_netlogon()
     mkdir "$REP_NETLOGON"
     chown "root:root" "$REP_NETLOGON"
     chmod 700 "$REP_NETLOGON"
-    mount -t cifs "$CHEMIN_PARTAGE_NETLOGON" "$REP_NETLOGON" -o ro,guest,"$OPTIONS_MOUNT_CIFS_BASE" >$SORTIE 2>&1
+    mount -t cifs "$CHEMIN_PARTAGE_NETLOGON" "$REP_NETLOGON" -o ro,guest,"$OPTIONS_MOUNT_CIFS_BASE" >> $SORTIE 2>&1
     if [ "$?" != "0" ]
     then
         rmdir "$REP_NETLOGON"
@@ -972,7 +973,7 @@ installer_paquets_client_ldap()
     # Installation du ou des paquets contenant un client LDAP (pour
     # faire des recherches.
     #
-    apt-get install --no-install-recommends --reinstall --yes "$PAQUETS_CLIENT_LDAP" >$SORTIE 2>&1
+    apt-get install --no-install-recommends --reinstall --yes "$PAQUETS_CLIENT_LDAP" >> $SORTIE 2>&1
 }
 
 verifier_connexion_ldap_se3()
@@ -1296,7 +1297,7 @@ desinstaller_gestionnaire_fenetres()
     # On désinstalle le gestionnaire de fenêtres TWM pour qu'au moment
     # de l'ouverture de session l'utilisateur ne puisse choisir que Gnome
     # et seulement Gnome.
-    apt-get remove --purge --yes twm >$SORTIE 2>&1
+    apt-get remove --purge --yes twm >> $SORTIE 2>&1
 }
 
 renommer_fichiers_pam()
