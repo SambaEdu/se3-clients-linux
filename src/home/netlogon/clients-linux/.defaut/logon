@@ -824,7 +824,7 @@ function lancer_unefois_dans_repertoire ()
             then
                 chmod u+x "$nom_local"
                 # L'exécutable « unefois » est lancé en arrière plan.
-                "$nom_local" > "$nom_local.log" 2>&1 &
+                "$nom_local" > "$nom_local.log" 2>&1
             else
                 # Si la copie en local n'a pas bien fonctionné,
                 # on ne lance pas l'exécutable et on supprime
@@ -1616,7 +1616,7 @@ function initialisation ()
             # REP_UNEFOIS, dans le cas où l'on est dans une phase d'initialisation
             # qui correspond à un démarrage.
             if "$DEMARRAGE" && timeout "--signal=SIGTERM" 2s test -d "$REP_UNEFOIS"; then
-                lancer_unefois
+                lancer_unefois &
             fi
             
             # Idem ci-dessus pour le répertoire lance-parc
