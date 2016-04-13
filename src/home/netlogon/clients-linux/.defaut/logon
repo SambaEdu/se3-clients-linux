@@ -1616,7 +1616,7 @@ function initialisation ()
             # REP_UNEFOIS, dans le cas où l'on est dans une phase d'initialisation
             # qui correspond à un démarrage.
             if "$DEMARRAGE" && timeout "--signal=SIGTERM" 2s test -d "$REP_UNEFOIS"; then
-                lancer_unefois &
+                lancer_unefois >"$REP_LOG_LOCAL/unefois.log" 2>&1 &
             fi
             
             # Idem ci-dessus pour le répertoire lance-parc
