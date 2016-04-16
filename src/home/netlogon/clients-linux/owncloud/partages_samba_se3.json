@@ -1,0 +1,50 @@
+[
+    {
+        "mount_id": 1,
+        "mount_point": "\/Classes (sur le se3)",
+        "storage": "\\OC\\Files\\Storage\\SMB",
+        "authentication_type": "password::sessioncredentials",
+        "configuration": {
+            "host": "172.20.1.10",
+            "share": "Classes",
+            "root": "",
+            "domain": ""
+        },
+        "options": {
+            "encrypt": true,
+            "previews": true,
+            "enable_sharing": false,
+            "filesystem_check_changes": 1
+        },
+        "applicable_users": [],
+        "applicable_groups": [
+            "Profs",
+            "admin",
+            "admins"
+        ]
+    },
+    {
+        "mount_id": 2,
+        "mount_point": "\/Docs (sur le se3)",
+        "storage": "\\OC\\Files\\Storage\\SMB",
+        "authentication_type": "password::sessioncredentials",
+        "configuration": {
+            "host": "172.20.1.10",
+            "share": "home",
+            "root": "Docs",
+            "domain": ""
+        },
+        "options": {
+            "encrypt": true,
+            "previews": true,
+            "enable_sharing": false,
+            "filesystem_check_changes": 1
+        },
+        "applicable_users": [],
+        "applicable_groups": [
+            "Profs",
+            "admin",
+            "admins"
+        ]
+    }
+]
