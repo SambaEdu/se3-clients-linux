@@ -1,5 +1,5 @@
 #!/bin/sh
-# Rédigé par Nicolas Aldegheri le vendredi 15 avril 2015
+# Rédigé par Nicolas Aldegheri le 15/04/2016
 # Sous licence GNU/Linux
 # Ce script intégre Owncloud sur un serveur SE3 wheezy. L'intégration consiste à :
 # - installer la partie "Owncloud" uniquement (possible depuis la version 9 d'Owncloud) dans le répertoire /var/www/owncloud du se3
@@ -8,11 +8,12 @@
 # Par défaut : 
 # - seul les groupes "Profs" et "admins" ont accés à la fonctionnalité "Stockage Externe" du se3.
 # - le compte administrateur d'Owncloud est le même que celui du compte admin de l'interface web du se3.
-# Une fois l'installation terminée, il est conseillé de :
-# - régler via l'interface d'administration d'Owncloud les quotas par défaut des utilisateurs
-# - personnaliser son Cloud : ajouter d'autres partages Samba, ajouter une documentation ...
+# Une fois l'installation terminée, se connecter à l'interface web d'administration du se3 puis :
+# - régler le quota par défaut des utilisateurs à une petite valeur (2 MB) car la racine / du se3 (contenant /var/www/owncloud) n'a pas une très grande taille ... 
+# - personnaliser son Cloud : ajouter d'autres partages Samba du se3, ajouter une documentation au skelette d'Owncloud, activer/désactiver des applications, ...
 
-debug="/root/compte_rendu_integration_owncloud.txt"
+# Pour de le débuggage :
+SORTIE="/root/compte_rendu_integration_owncloud.txt"
 
 echo "Etape 1 : Récupération des variables nécessaires à l'installation"
 # Récupération des paramétres spécifiques au se3 :
@@ -31,9 +32,9 @@ rep_courant=$(pwd)
 
 echo "Etape 2 : Installation des paquets nécessaires à Owncloud"
 #  Cette installation suivie ici est celle décrite pour un serveur Ubuntu Trusty dans la documentation officielle d'Owncloud
-apt-get install -y apache2 libapache2-mod-php5 > "$debug" 2>&1
-apt-get install -y php5-gd php5-json php5-mysql php5-curl >> "$debug" 2>&1
-apt-get install -y php5-intl php5-mcrypt php5-imagick >> "$debug" 2>&1
+apt-get install -y apache2 libapache2-mod-php5 > "$SORTIE" 2>&1
+apt-get install -y php5-gd php5-json php5-mysql php5-curl >> "$SORTIE" 2>&1
+apt-get install -y php5-intl php5-mcrypt php5-imagick >> "$SORTIE" 2>&1
 
 echo "Etape 3 : Ajout du dépot owncloud aux sources du se3 puis installation du paquet owncloud-files"
 echo "(ce paquet ne contient que la partie Owncloud 9, le serveur web du se3 étant conservé)"
@@ -41,13 +42,13 @@ echo "(ce paquet ne contient que la partie Owncloud 9, le serveur web du se3 ét
 # Sous Wheezy, depuis Owncloud 9, il est alors possible de n'installer que la partie Owncloud
 # Cela permet d' utiliser le serveur Apache2 et la base de donnée MySQL du serveur owncloud
 
-wget -nv https://download.owncloud.org/download/repositories/stable/Debian_7.0/Release.key -O Release.key >> "$debug" 2>&1
+wget -nv https://download.owncloud.org/download/repositories/stable/Debian_7.0/Release.key -O Release.key >> "$SORTIE" 2>&1
 apt-key add - < Release.key 
 rm -f Release.key
 
 sh -c "echo 'deb http://download.owncloud.org/download/repositories/stable/Debian_7.0/ /' >> /etc/apt/sources.list.d/owncloud.list"
-apt-get update >> "$debug" 2>&1
-apt-get install -y owncloud-files >> "$debug" 2>&1
+apt-get update >> "$SORTIE" 2>&1
+apt-get install -y owncloud-files >> "$SORTIE" 2>&1
 
 echo "Etape 4 : Ajout au se3 du fichier de configuration d'Apache fourni par Owncloud"
 # Fichier de configuration d'Apache fourni par la communauté d'Owncloud pour Ubuntu et ses dérivées
@@ -66,13 +67,13 @@ EOF
 
 ln -s /etc/apache2/sites-available/owncloud.conf /etc/apache2/sites-enabled/owncloud.conf
 
-echo "Etape 5 : Désactivation de reqtimeout_module pour éviter que php coute les upload"
-cat <<EOF >"/etc/apache2/mods-available/reqtimeout.conf"
-<IfModule reqtimeout_module>
-  RequestReadTimeout header=0
-  RequestReadTimeout body=0
-</IfModule>
-EOF
+#echo "Etape 5 : Désactivation de reqtimeout_module pour éviter que php coute les upload"
+#cat <<EOF >"/etc/apache2/mods-available/reqtimeout.conf"
+#<IfModule reqtimeout_module>
+#  RequestReadTimeout header=0
+#  RequestReadTimeout body=0
+#</IfModule>
+#EOF
 
 echo "Etape 6 : Activation des modules Apache utils à Owncloud"
 # Activation des modules Apache utiles à Owncloud :
@@ -88,23 +89,23 @@ a2enmod mime
 # a2enmod setenvif
 
 echo "Etape 7 : Redemarrage d'Apache 2"
-service apache2 restart >> "$debug" 2>&1
+service apache2 restart >> "$SORTIE" 2>&1
 
 echo "Etape 8 - Finalisation de l'installation : intégration au se3"
-# Mise des droits pour finaliser l'installation d'owncloud
-chown -R "$htuser":"$htgroup" "$ocpath" >> "$debug" 2>&1
+# Mise des droits temporaires pour finaliser l'installation d'owncloud : les droits seront reserrés à la fin de l'installation
+chown -R "$htuser":"$htgroup" "$ocpath" >> "$SORTIE" 2>&1
 
-# On se place dans le bon répertoire pour utiliser la commande occ utile pour intégré owncloud au se3
-cd "$ocpath" >> "$debug" 2>&1
+# On se place dans le "bon" répertoire pour utiliser la commande occ utile pour intégré owncloud au se3
+cd "$ocpath" >> "$SORTIE" 2>&1
 
 echo "Etape 8.1 Configuration générale"
-# Finalisation de l' installation en ligne de commande avec occ (installation "wizard")
+# Installation "wizard"
 sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admin" --admin-pass "$dbpass"
 
 # Configurer la langue par défaut de l'interface web en français
 sudo -u "$htuser" php occ config:system:set default_language --value="fr"
 
-# Configuration de config/config.php pour configurer les trusted domain et le proxy
+# Configuration de config/config.php pour configurer les trusted domain et éventuellement le proxy
 sudo -u "$htuser" php occ config:system:set trusted_domains 1 --value="$se3ip"
 sudo -u "$htuser" php occ config:system:set trusted_domains 2 --value="$domain"
 
@@ -114,16 +115,14 @@ then
 	sudo -u "$htuser" php occ config:system:set proxy --value="$proxy_url"
 fi
 
-# Configuration pour consultation de l'annuaire du se3
-# L'annuaire ldap du se3 ne contient pas l'attribut MemberOf pour détecter les groupes
-
 echo "Etape 8.2 Configuration pour consulter l'annuaire du se3"
 # Normalement, le paquet est installé ... mais dans le doute ...
-apt-get install -y php5-ldap >> "$debug" 2>&1
+apt-get install -y php5-ldap >> "$SORTIE" 2>&1
 
+# Activation du module ldap d'Owncloud
 sudo -u "$htuser" php occ app:enable user_ldap
 
-# La 1ère configuration créée ne possède pas de sid, on l'appelle avec un ""
+# La 1ère configuration ldap créée ne possède pas de sid, on l'appelle avec un ""
 sudo -u "$htuser" php occ ldap:create-empty-config
 sudo -u "$htuser" php occ ldap:set-config "" ldapHost "$ldap_server"
 sudo -u "$htuser" php occ ldap:set-config "" ldapPort "$ldap_port"
@@ -146,7 +145,7 @@ sudo -u "$htuser" php occ ldap:set-config "" ldapUserFilterMode "0"
 sudo -u "$htuser" php occ ldap:set-config "" ldapUserFilter "(|(objectclass=person))"
 sudo -u "$htuser" php occ ldap:set-config "" ldapUserFilterObjectclass "person"
 
-# Inutile en principe vu que owncloud est installé sur le même serveur que ldap
+# Inutile en principe vu que owncloud est installé sur le même serveur que l'annuaire ldap 
 #sudo -u "$htuser" php occ ldap:set-config "" turnOffCertCheck "1"
 #sudo -u "$htuser" php occ ldap:set-config "" ldapTLS "0"
 
@@ -159,29 +158,32 @@ echo "Etape 8.3 Configuration du module Stockage Externe pour rendre accessible 
 # Configuration du module external storage
 # Pour un bon fonctionnement de ce module, la documentation recommande d'installer  php5-libsmbclient
 echo 'deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/Debian_7.0/ /' >> /etc/apt/sources.list.d/php5-libsmbclient.list  
-wget http://download.opensuse.org/repositories/isv:ownCloud:community/Debian_7.0/Release.key >> "$debug" 2>&1
+wget http://download.opensuse.org/repositories/isv:ownCloud:community/Debian_7.0/Release.key >> "$SORTIE" 2>&1
 apt-key add - < Release.key
 rm -f Release.key
-apt-get update >> "$debug" 2>&1
-apt-get install -y smbclient php5-libsmbclient >> "$debug" 2>&1 
+apt-get update >> "$SORTIE" 2>&1
+apt-get install -y smbclient php5-libsmbclient >> "$SORTIE" 2>&1 
 
 # Activation du module de stockage externe 
 sudo -u "$htuser" php occ app:enable files_external
 
 # Par défaut, la local est 'en' pour le module stockage externe, ce qui pose des problèmes 
-# avec les répertoires ou fichiers qui contiennent des caractères spéciaux
-sed -i -e "s/const LOCALE = 'en_US.UTF-8'/const LOCALE ='fr_FR.UTF-8'/g" "$ocpath/apps/files_external/3rdparty/icewind/smb/src/Server.php"  >> "$debug" 2>&1 
+# avec les répertoires ou fichiers qui contiennent des caractères spéciaux : on la met en fr
+sed -i -e "s/const LOCALE = 'en_US.UTF-8'/const LOCALE ='fr_FR.UTF-8'/g" "$ocpath/apps/files_external/3rdparty/icewind/smb/src/Server.php"  >> "$SORTIE" 2>&1 
 
 
-# Par défaut, on ne partage que deux partages Samba du se3 via Owncloud : 
+# Par défaut, on ne va partager que deux partages Samba du se3 via Owncloud : 
 # - le répertoire Docs par défaut
 # - le répertoire Classes
-# Ces répertoires ne sont par défaut accessible qu'aux enseignants et adminins
-# Libre ensuite à l'administrateur d'Owncloud de ajouter/personnaliser/adjuster
-# ces partages via l'interface web d'administration d'Owncloud.
+# Ces répertoires ne seront accessibles qu'aux enseignants et adminins de l'annuaire ldap du se3
+# Libre ensuite à l'administrateur d'Owncloud d' ajouter/personnaliser/adjuster, via l'interface web
+# d'administration d'Owncloud le paramétrage proposé ici par défaut, si la configuration de son serveur
+# et de son réseau le permet
 
+#-------------------------------------------------------------------------------------------------------
 # La création du fichier de configuration des partages externes .json ne fonctionne pas avec la commande cat ... (erreur de parsing ..)
-# Ce fichier est la sortie de la commande occ après avoir paramétrée à la main, via l'interface, l'accès aux partages Docs et Classes du se3
+# Pour éviter cette erreur de parsing, on copie la sortie de la commande occ après avoir paramétrée à la 
+# main, via l'interface, l'accès aux partages Docs et Classes du se3. Ce fichier .json s'obtient avec la commande :
 # sudo -u "$htuser" php occ files_external:export "$ocpath/partage_samba_se3.json"
 #cat <<EOF > "$ocpath/partages_samba_se3.json"
 #[
@@ -237,10 +239,11 @@ sed -i -e "s/const LOCALE = 'en_US.UTF-8'/const LOCALE ='fr_FR.UTF-8'/g" "$ocpat
 #
 #echo ']' >> "$ocpath/partages_samba_se3.json"
 
-# On copie et mettre les droits sur le fichier contenant la configuration des partages samba "Docs" et "Classes" pour le module stockage externe d'Owncloud
+# On copie et on met les droits sur le fichier .json contenant la configuration des partages samba "Docs" # et "Classes" pour le module stockage externe d'Owncloud
 if [ -e "$rep_courant/partages_samba_se3.json" ]
 then
 	cp -f "$rep_courant/partages_samba_se3.json" "$ocpath/partages_samba_se3.json"
+	sed -i -e "s/__IPSE3__/$se3ip/g" "$ocpath/partages_samba_se3.json" >> "$SORTIE" 2>&1 
     chown "$htuser":"$htgroup" "$ocpath/partages_samba_se3.json"
 	chmod 750 "$ocpath/partages_samba_se3.json"		
 	sudo -u "$htuser" php occ files_external:import "$ocpath/partages_samba_se3.json"
@@ -254,11 +257,16 @@ echo "Etape 8.4 Construction d'un skelette vide sur le partage Owncloud : les ut
 # Définir le skelette par défaut des utilisateurs 
 mkdir "$ocpath/core/skeleton_vide"
 chown "$htuser":"$htgroup" "$ocpath/core/skeleton_vide"
-sudo -u "$htuser" php occ config:system:set skeletondirectory --value= "$ocpath/core/skeleton_vide"
+sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_vide"
 
-echo "Etape 8.5 La quota par défaut des utilisateurs est quasiment mis à 0 afin que les utilisateurs ne puissent pas enregistrer dans la partage owncloud"
-# Définir les quota par défaut des utilisateurs
-# les quotas sont réglés au minimum (1 MB) car l'espace /var/www n'est par défaut pas très grand sur un se3 : les utilisateurs doivent enregistrer sur le stockage externe (c a d les partages Samba du se3 ...)
+#echo "Etape 8.5 La quota par défaut des utilisateurs est quasiment mis à 0 afin que les utilisateurs ne #puissent pas enregistrer dans la partage owncloud"
+# Définir les quota par défaut des utilisateurs (où se trouve le paramètre default quota dans owncloud ?)
+# les quotas sont réglés au minimum (1 MB) car l'espace /var/www n'est pas très grand sur un se3 :
+# les utilisateurs devront enregistrer sur le stockage externe (c a d les partages Samba du se3 ...)
+
+echo "Etape 8.5 : Définition d'un cache local selon les recommandations d' Owncloud"
+apt-get install -y php-apc >> "$SORTIE" 2>&1
+sudo -u "$htuser" php occ config:system:set memcache.local --value='\OC\Memcache\APC'
 
 echo "Etape 8.6 Mise des droits sur les fichiers et repertoire du dossier owncloud selon les recommandations de la documnetation officielle d'Owncloud"
 # Script pour mettre les droits sur le répertoire owncloud (documentation officielle owncloud)
@@ -299,7 +307,7 @@ fi
 exit 0
 EOF
 
-bash /root/mettre_droits_owncloud.sh  >> "$debug" 2>&1
+bash /root/mettre_droits_owncloud.sh  >> "$SORTIE" 2>&1
 
 echo "Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
 echo "Le compte administrateur de votre serveur Owncloud est le compte admin de l'interface web de votre se3"
