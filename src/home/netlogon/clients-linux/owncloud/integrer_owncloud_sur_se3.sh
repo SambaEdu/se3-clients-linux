@@ -245,7 +245,7 @@ then
 	cp -f "$rep_courant/partages_samba_se3.json" "$ocpath/partages_samba_se3.json"
 	sed -i -e "s/__IPSE3__/$se3ip/g" "$ocpath/partages_samba_se3.json" >> "$SORTIE" 2>&1 
     chown "$htuser":"$htgroup" "$ocpath/partages_samba_se3.json"
-	chmod 750 "$ocpath/partages_samba_se3.json"		
+	chmod 750 "$ocpath/partages_samba_se3.json"
 	sudo -u "$htuser" php occ files_external:import "$ocpath/partages_samba_se3.json"
 	rm -f "$ocpath/partages_samba_se3.json"
 else
@@ -254,7 +254,7 @@ else
 fi
 
 echo "Etape 8.4 Construction d'un skelette vide sur le partage Owncloud : les utilisateurs doivent enregistrer dans les partages Samba"
-# Définir le skelette par défaut des utilisateurs 
+# Définir le skelette par défaut des utilisateurs
 mkdir "$ocpath/core/skeleton_vide"
 chown "$htuser":"$htgroup" "$ocpath/core/skeleton_vide"
 sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_vide"
@@ -267,6 +267,7 @@ sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/c
 echo "Etape 8.5 : Définition d'un cache local selon les recommandations d' Owncloud"
 apt-get install -y php-apc >> "$SORTIE" 2>&1
 sudo -u "$htuser" php occ config:system:set memcache.local --value='\OC\Memcache\APC'
+service apache2 restart >> "$SORTIE" 2>&1
 
 echo "Etape 8.6 Mise des droits sur les fichiers et repertoire du dossier owncloud selon les recommandations de la documnetation officielle d'Owncloud"
 # Script pour mettre les droits sur le répertoire owncloud (documentation officielle owncloud)
