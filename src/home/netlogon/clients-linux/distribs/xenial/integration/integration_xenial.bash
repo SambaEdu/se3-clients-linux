@@ -1634,6 +1634,47 @@ masquer_liste_utilisateurs_connectes_unity()
 	fi
 }
 
+preconfigurer_libpam_runtime()
+{
+	# Sous Xenial, le paqueet libpam-runtime a besoin d'être préconfiguré afin d'éviter des questions de la commande
+	# pam-auth-update lors de l'exécution d'un "apt-get upgrade"
+	
+	debconf-set-selections <<EOF
+#libpam-runtime	libpam-runtime/no_profiles_chosen	error	
+libpam-runtime	libpam-runtime/override	boolean	false
+#libpam-runtime	libpam-runtime/conflicts	error	
+libpam-runtime	libpam-runtime/profiles	multiselect	pam_script, unix, ldap, systemd, gnome-keyring
+EOF
+	
+}
+
+preconfigurer_ocsinventory()
+{
+	# L'installation du client ocsinventory nécessite de préconfigurer des réponses sous peine de "casser" dpkg
+	
+	debconf-set-selections <<EOF
+ocsinventory-agent	ocsinventory-agent/method	select	http
+ocsinventory-agent	ocsinventory-agent/server	string	$SE3:909
+# Action souhaitée pour le fichier de configuration modifié ocsinventory-agent.cfg :
+ocsinventory-agent	ocsinventory-agent/tag	string
+EOF
+	
+}
+
+masquer_liste_utilisateurs_connectes_unity()
+{
+	# Sous Unity (Ubuntu donc), la liste de tous les utilisateurs qui se sont connectés au PC apparaît dans l'onglet de fermeture ...
+	# Avec un annuaire ldap, la liste peut être longue ...
+	# On désactive donc cette fonctionnalité propre au bureau Unity (Ubuntu)
+	
+	if [ ! -e "/etc/lightdm/lightdm.conf.d/10-xubuntu.conf" ] && [ ! -e "/etc/lightdm/lightdm.conf.d/20-lubuntu.conf" ]
+	then
+		echo -e "[com.canonical.indicator.session]\nuser-show-menu=false" > /usr/share/glib-2.0/schemas/myoverride.gschema.override
+		cp /usr/share/glib-2.0/schemas/gschemas.compiled /usr/share/glib-2.0/schemas/gschemas.compiled.bak
+		glib-compile-schemas /usr/share/glib-2.0/schemas
+	fi
+}
+
 decompte_10s()
 {
     if "$OPTION_REDEMARRER"
@@ -2005,6 +2046,12 @@ desactiver_hibernation_mise_en_veille
 # Pour Unity (Ubuntu), masquer la liste de tous les utilisateurs qui se sont déjà connectés au système
 afficher "Modification pour masquer la liste des utilisateurs qui se sont déjà connectés (Unity sous Ubuntu)" 
 masquer_liste_utilisateurs_connectes_unity
+
+# Depuis Xenial :
+preconfigurer_libpam_runtime
+
+# Depuis Xenial :
+preconfigurer_ocsinventory
 
 # Depuis Xenial :
 afficher "Suppression de la liste de paquets inutilisés"
