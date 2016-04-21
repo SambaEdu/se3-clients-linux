@@ -1,5 +1,5 @@
 #!/bin/sh
-# Rédigé par Nicolas Aldegheri le 15/04/2016
+# Rédigé par Nicolas Aldegheri le 21/04/2016
 # Sous licence GNU/Linux
 # Ce script intégre Owncloud sur un serveur SE3 wheezy. L'intégration consiste à :
 # - installer la partie "Owncloud" uniquement (possible depuis la version 9 d'Owncloud) dans le répertoire /var/www/owncloud du se3
@@ -157,19 +157,19 @@ echo "Etape 8.3 Configuration du module Stockage Externe pour rendre accessible 
 
 # Configuration du module external storage
 # Pour un bon fonctionnement de ce module, la documentation recommande d'installer  php5-libsmbclient
-echo 'deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/Debian_7.0/ /' >> /etc/apt/sources.list.d/php5-libsmbclient.list  
-wget http://download.opensuse.org/repositories/isv:ownCloud:community/Debian_7.0/Release.key >> "$SORTIE" 2>&1
-apt-key add - < Release.key
-rm -f Release.key
-apt-get update >> "$SORTIE" 2>&1
-apt-get install -y smbclient php5-libsmbclient >> "$SORTIE" 2>&1 
+#echo 'deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/Debian_7.0/ /' >> /etc/apt/sources.list.d/php5-libsmbclient.list  
+#wget http://download.opensuse.org/repositories/isv:ownCloud:community/Debian_7.0/Release.key >> "$SORTIE" 2>&1
+#apt-key add - < Release.key
+#rm -f Release.key
+#apt-get update >> "$SORTIE" 2>&1
+#apt-get install -y smbclient php5-libsmbclient >> "$SORTIE" 2>&1 
 
 # Activation du module de stockage externe 
-sudo -u "$htuser" php occ app:enable files_external
+#sudo -u "$htuser" php occ app:enable files_external
 
 # Par défaut, la local est 'en' pour le module stockage externe, ce qui pose des problèmes 
 # avec les répertoires ou fichiers qui contiennent des caractères spéciaux : on la met en fr
-sed -i -e "s/const LOCALE = 'en_US.UTF-8'/const LOCALE ='fr_FR.UTF-8'/g" "$ocpath/apps/files_external/3rdparty/icewind/smb/src/Server.php"  >> "$SORTIE" 2>&1 
+#sed -i -e "s/const LOCALE = 'en_US.UTF-8'/const LOCALE ='fr_FR.UTF-8'/g" "$ocpath/apps/files_external/3rdparty/icewind/smb/src/Server.php"  >> "$SORTIE" 2>&1 
 
 
 # Par défaut, on ne va partager que deux partages Samba du se3 via Owncloud : 
@@ -240,24 +240,25 @@ sed -i -e "s/const LOCALE = 'en_US.UTF-8'/const LOCALE ='fr_FR.UTF-8'/g" "$ocpat
 #echo ']' >> "$ocpath/partages_samba_se3.json"
 
 # On copie et on met les droits sur le fichier .json contenant la configuration des partages samba "Docs" # et "Classes" pour le module stockage externe d'Owncloud
-if [ -e "$rep_courant/partages_samba_se3.json" ]
-then
-	cp -f "$rep_courant/partages_samba_se3.json" "$ocpath/partages_samba_se3.json"
-	sed -i -e "s/__IPSE3__/$se3ip/g" "$ocpath/partages_samba_se3.json" >> "$SORTIE" 2>&1 
-    chown "$htuser":"$htgroup" "$ocpath/partages_samba_se3.json"
-	chmod 750 "$ocpath/partages_samba_se3.json"
-	sudo -u "$htuser" php occ files_external:import "$ocpath/partages_samba_se3.json"
-	rm -f "$ocpath/partages_samba_se3.json"
-else
-	echo "le fichier partages_samba_se3.json décrivant les partages se3 n'est pas présent dans le répertoire contenant" 
-	echo "le script d'installation : la configuration du module Stockage Externe sera de ce fait incomplète ..."
-fi
+#if [ -e "$rep_courant/partages_samba_se3.json" ]
+#then
+#	cp -f "$rep_courant/partages_samba_se3.json" "$ocpath/partages_samba_se3.json"
+#	sed -i -e "s/__IPSE3__/$se3ip/g" "$ocpath/partages_samba_se3.json" >> "$SORTIE" 2>&1 
+#    chown "$htuser":"$htgroup" "$ocpath/partages_samba_se3.json"
+#	chmod 750 "$ocpath/partages_samba_se3.json"
+#	sudo -u "$htuser" php occ files_external:import "$ocpath/partages_samba_se3.json"
+#	rm -f "$ocpath/partages_samba_se3.json"
+#else
+#	echo "le fichier partages_samba_se3.json décrivant les partages se3 n'est pas présent dans le répertoire contenant" 
+#	echo "le script d'installation : la configuration du module Stockage Externe sera de ce fait incomplète ..."
+#fi
 
 echo "Etape 8.4 Construction d'un skelette vide sur le partage Owncloud : les utilisateurs doivent enregistrer dans les partages Samba"
 # Définir le skelette par défaut des utilisateurs
-mkdir "$ocpath/core/skeleton_vide"
-chown "$htuser":"$htgroup" "$ocpath/core/skeleton_vide"
-sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_vide"
+mkdir "$ocpath/core/skeleton_se3"
+mkdir "$ocpath/core/skeleton_se3/documents_cloud"
+chown -R "$htuser":"$htgroup" "$ocpath/core/skeleton_se3"
+sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_se3"
 
 #echo "Etape 8.5 La quota par défaut des utilisateurs est quasiment mis à 0 afin que les utilisateurs ne #puissent pas enregistrer dans la partage owncloud"
 # Définir les quota par défaut des utilisateurs (où se trouve le paramètre default quota dans owncloud ?)
