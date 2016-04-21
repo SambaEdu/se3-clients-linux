@@ -100,7 +100,7 @@ cd "$ocpath" >> "$SORTIE" 2>&1
 
 echo "Etape 8.1 Configuration générale"
 # Installation "wizard"
-sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admin" --admin-pass "$dbpass"
+sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admowncloud" --admin-pass "$dbpass" --data-dir="/home"
 
 # Configurer la langue par défaut de l'interface web en français
 sudo -u "$htuser" php occ config:system:set default_language --value="fr"
@@ -108,6 +108,7 @@ sudo -u "$htuser" php occ config:system:set default_language --value="fr"
 # Configuration de config/config.php pour configurer les trusted domain et éventuellement le proxy
 sudo -u "$htuser" php occ config:system:set trusted_domains 1 --value="$se3ip"
 sudo -u "$htuser" php occ config:system:set trusted_domains 2 --value="$domain"
+
 
 # Définition du proxy
 if [ "$proxy_url" != "" ]
@@ -154,7 +155,7 @@ sudo -u "$htuser" php occ ldap:set-config "" useMemberOfToDetectMembership "0"
 sudo -u "$htuser" php occ ldap:set-config "" ldapConfigurationActive "1"
 
 # Quota par défaut des utilisateurs de l'annuaire ldap (en octets) : 1Mo par défaut
-sudo -u "$htuser" php occ ldap:set-config "" ldapQuotaDefault "1000000000"
+sudo -u "$htuser" php occ ldap:set-config "" ldapQuotaDefault "1000000"
 
 # Choisir uid comme nom de répertoire des utilisateurs d'Owncloud afin qu'il soit identique à celui d'un utilisateur du se3 présent dans /home
 sudo -u "$htuser" php occ ldap:set-config "" homeFolderNamingRule "attr:uid"
