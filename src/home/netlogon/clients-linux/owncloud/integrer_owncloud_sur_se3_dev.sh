@@ -153,6 +153,12 @@ sudo -u "$htuser" php occ ldap:set-config "" ldapUserFilterObjectclass "person"
 sudo -u "$htuser" php occ ldap:set-config "" useMemberOfToDetectMembership "0"
 sudo -u "$htuser" php occ ldap:set-config "" ldapConfigurationActive "1"
 
+# Quota par défaut des utilisateurs de l'annuaire ldap (en octets) : 1Mo par défaut
+sudo -u "$htuser" php occ ldap:set-config "" ldapQuotaDefault "1000000000"
+
+# Choisir uid comme nom de répertoire des utilisateurs d'Owncloud afin qu'il soit identique à celui d'un utilisateur du se3 présent dans /home
+sudo -u "$htuser" php occ ldap:set-config "" homeFolderNamingRule "attr:uid"
+
 echo "Etape 8.3 Configuration du module Stockage Externe pour rendre accessible les partages Samba du se3"
 
 # Configuration du module external storage
