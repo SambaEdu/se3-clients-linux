@@ -1657,126 +1657,12 @@ decompte_10s()
 #=====
 # Les options
 #=====
-# mettre cette partie en fonction ?
-#recuperer_options() "$@"
-#
-# Une options longue avec les « :: » signifie que le paramètre est optionnel
-# (par exemple « --nom-client » ou « --nom-client="S121-HPS-04" »).
-# getopt réorganise les chaînes de caractères de "$@" pour que si par
-# exemple "$@" vaut « --nom-client=TOTO arg1 arg2 », alors LISTE_OPTIONS  
-# vaut « --nom-client 'TOTO' -- 'arg1' 'arg2' ».
-
-suite_options="help"
-suite_options="$suite_options,nom-client::,nc::"
-suite_options="$suite_options,mdp-grub::,mg::"
-suite_options="$suite_options,mdp-root::,mr::"
-suite_options="$suite_options,ignorer-verification-ldap,ivl"
-suite_options="$suite_options,redemarrer-client,rc"
-suite_options="$suite_options,installer-samba,is"
-suite_options="$suite_options,debug,d"
-
-LISTE_OPTIONS=$(getopt --options h --longoptions "$suite_options" -n "$NOM_DU_SCRIPT" -- "$@")
-# Si l'appel est syntaxiquement incorrect on arrête le script.
-if [ "$?" != "0" ]
-then
-    echo "Arrêt du script $NOM_DU_SCRIPT." >&2
-    exit 1
-fi
-
-unset -v suite_options
-
-# Évaluation de la chaîne $LISTE_OPTIONS afin de positionner 
-# $1, $2 comme étant la succession des mots de $LISTE_OPTIONS.
-eval set -- "$LISTE_OPTIONS"
-
-# On peut détruire la variable LISTE_OPTIONS.
-unset -v LISTE_OPTIONS 
-
-# On définit des variables indiquant si les options ont été
-# appelées. Par défaut, elles ont la valeur "false", c'est-à-dire
-# qu'il n'y a pas eu appel des options.
-OPTION_NOM_CLIENT="false"
-OPTION_MDP_GRUB="false"
-OPTION_MDP_ROOT="false"
-OPTION_IV_LDAP="false"
-OPTION_REDEMARRER="false"
-OPTION_INSTALLER_SAMBA="false"
-
-# La commande shift décale les paramètres $1, $2 etc.
-# Par exemple après "shift 2" $3 devient accessible via $1 etc.
-# On sortira forcément de la boucle car (et c'est entre autres le
-# travail de getopt), la chaîne LISTE_OPTIONS évaluée précédemment 
-# contient forcément un "--" qui séparent les options (à gauche) et les
-# arguments du script et qui ne sont pas des options (à droite de --).
-while true
-do
-    case "$1" in
-    
-        -h|--help)
-            afficher "Aide : voir la documentation (au format pdf) associée." 
-            exit 0
-        ;;
-        
-        --nom-client|--nc)
-            OPTION_NOM_CLIENT="true"
-            NOM_CLIENT="$2"
-            shift 2
-        ;;
-        
-        --mdp-grub|--mg) 
-            OPTION_MDP_GRUB="true"
-            MDP_GRUB="$2"
-            shift 2
-        ;;
-        
-        --mdp-root|--mr) 
-            OPTION_MDP_ROOT="true"
-            MDP_ROOT="$2"
-            shift 2
-        ;;
-        
-        --ignorer-verification-ldap|--ivl) 
-            OPTION_IV_LDAP="true"
-            shift 1
-        ;;
-        
-        --redemarrer-client|--rc) 
-            OPTION_REDEMARRER="true"
-            shift 1
-        ;;
-        
-        --installer-samba|--is) 
-            OPTION_INSTALLER_SAMBA="true"
-            shift 1
-        ;;
-        
-        --debug|--d) 
-            SORTIE=">&1"
-            shift 1
-        ;;
-        
-        --)
-            shift
-            break
-        ;;
-        
-        *) 
-            afficher "Erreur: «$1» est une option non implémentée."
-            exit 1
-        ;;
-        
-    esac
-done
-    
-if [ -n "$1" ]
-then
-    afficher "Désolé le script ne prend aucun argument à part des" \
-             "options de la forme « --xxx ». Fin du script."
-    exit 1
-fi
+# on récupère les options du script
+recuperer_options "$@"
 
 #=====
 # selon les options choisies, on rajoute certains paquets
+# → il s'agit du paquet samba
 #=====
 definir_paquets_a_installer
 
