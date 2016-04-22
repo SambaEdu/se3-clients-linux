@@ -368,5 +368,7 @@ fi
 ##############################################################################
 
 echo "Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
-echo "Le compte administrateur de votre serveur Owncloud est le compte admin de l'interface web de votre se3"
+echo "Le compte administrateur de votre serveur Owncloud est :"
+echo "Identifiant : admowncloud"
+echo "Mot de passe : celui du compte admin de l'interface web de votre se3"
 exit 0
