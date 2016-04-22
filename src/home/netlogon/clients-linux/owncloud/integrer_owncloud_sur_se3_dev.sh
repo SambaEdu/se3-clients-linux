@@ -99,7 +99,7 @@ cd "$ocpath" >> "$SORTIE" 2>&1
 
 echo "Etape 8.1 Configuration générale"
 # Installation "wizard"
-sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admin" --admin-pass "$dbpass" --data-dir "$ocpath/data"
+sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admowncloud" --admin-pass "$dbpass" --data-dir "$ocpath/data"
 
 # Configurer la langue par défaut de l'interface web en français
 sudo -u "$htuser" php occ config:system:set default_language --value="fr"
