@@ -672,37 +672,6 @@ arret_definitif_exim4_daemon()
     update-rc.d -f exim4 remove >> $SORTIE 2>&1
 }
 
-installer_paquets_cifs_obsolete()
-{
-    # À supprimer ?
-    # Nous allons installer PAQUETS_MONTAGE_CIFS nécessaire pour les montages CIFS.
-    #
-    # Cependant, ce paquet nécessite l'installation du paquet samba-common
-    # qui lui-même pose des questions à l'utilisateur au moment de
-    # l'installation. D'où la nécessité de renseigner la configuration
-    # de ce paquet via debconf.
-    # Avec Jessie, cela ne semble plus d'actualité
-    # et la ligne suivante n'est plus dans les paramètres :
-    # samba-common    samba-common/encrypt_passwords    boolean    true
-    #
-    debconf_parametres=$(mktemp)
-    cat > "$debconf_parametres" << END
-    echo "
-samba-common    samba-common/dhcp    boolean    false
-samba-common    samba-common/workgroup    string    WORKGROUP
-samba-common    samba-common/do_debconf    boolean    true
-END
-    debconf-set-selections < "$debconf_parametres"
-    rm -f "$debconf_parametres"
-    unset -v debconf_parametres
-    
-    # On installe le paquet qui contient la commande « mount.cifs ». L'option
-    # --no-install-recommends permet d'éviter l'installation du paquet
-    # samba-common-bin qui ferait du client un serveur Samba ce qui serait
-    # inutile ici.
-    apt-get install --no-install-recommends --reinstall --yes $PAQUETS_MONTAGE_CIFS >> $SORTIE 2>&1
-}
-
 installer_paquets_cifs()
 {
     # Nous allons installer PAQUETS_MONTAGE_CIFS nécessaire pour les montages CIFS.
@@ -713,10 +682,10 @@ installer_paquets_cifs()
     # dpkg-reconfigure samba-common permet la configuration (2 questions pour Jessie)
     # mais on préconfigure
     # pour le praramètre dhcp, par défaut c'est false
-    # mais ici on met true pour le service WINS
+    # mais ici on met true pour le service WINS si OPTION_INSTALLER_SAMBA est à true
     debconf_parametres=$(mktemp)
     cat > "$debconf_parametres" << END
-samba-common	samba-common/dhcp	boolean	true
+samba-common	samba-common/dhcp	boolean	$OPTION_INSTALLER_SAMBA
 samba-common	samba-common/workgroup	string	WORKGROUP
 samba-common	samba-common/do_debconf	boolean	true
 END
@@ -1123,35 +1092,6 @@ mise_en_place_mot_de_passe_root()
         unset -v mot_de_passe
         
     fi
-}
-
-installer_paquets_integration_old()
-{
-    # Utilisation de debconf pour rendre l'installation non-interactive
-    # mais adaptée à la situation présente.
-    # Avec Jessie, il n'y a que 3 questions posées : voir la nouvelle fonction
-    #
-    debconf_parametres=$(mktemp)
-    cat > "$debconf_parametres" << END
-libnss-ldapd    libnss-ldapd/nsswitch    multiselect    group, passwd, shadow
-libnss-ldapd    libnss-ldapd/clean_nsswitch    boolean    false
-libpam-ldapd    libpam-ldapd/enable_shadow    boolean    true
-nslcd    nslcd/ldap-bindpw    password    
-nslcd    nslcd/ldap-starttls    boolean    false
-nslcd    nslcd/ldap-base    string    $BASE_DN
-nslcd    nslcd/ldap-reqcert    select    
-nslcd    nslcd/ldap-uris    string    ldap://$SE3/
-nslcd    nslcd/ldap-binddn    string    
-samba-common    samba-common/encrypt_passwords    boolean    true
-samba-common    samba-common/dhcp    boolean    false
-samba-common    samba-common/workgroup    string    WORKGROUP
-samba-common    samba-common/do_debconf    boolean    true
-END
-    debconf-set-selections < "$debconf_parametres"
-    rm -f "$debconf_parametres"
-    unset -v debconf_parametres
-    
-    apt-get install --no-install-recommends --yes --reinstall $PAQUETS_AUTRES >> $SORTIE 2>&1
 }
 
 installer_paquets_integration()
@@ -1696,10 +1636,12 @@ afficher "vérifications terminées"
 #=====
 # Cas mdns et avahi
 #=====
-afficher "désinstallation du paquet libnss-mdns"
-desinstaller_mDNS
-afficher "arrêt définitif du service avahi-daemon"
-arret_definitif_avahi_daemon
+# est-ce utile ?
+#afficher "désinstallation du paquet libnss-mdns"
+#desinstaller_mDNS
+# est-ce utile ?
+#afficher "arrêt définitif du service avahi-daemon"
+#arret_definitif_avahi_daemon
 # est-il utile de purger les paquets pour les ré-installer par la suite ?
 #afficher "purge des paquets $PAQUETS_TOUS"
 #purger_paquets
