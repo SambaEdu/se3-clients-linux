@@ -99,8 +99,38 @@ chown -R "$htuser":"$htgroup" "$ocpath" >> "$SORTIE" 2>&1
 cd "$ocpath" >> "$SORTIE" 2>&1
 
 echo "Etape 8.1 Configuration générale"
-# Installation "wizard"
-sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admowncloud" --admin-pass "$dbpass" --data-dir="/home"
+
+# Utiliser le /home du se3 comme répertoire data d'Owncloud
+# Mise des droits sur le /home du se3 afin que Owncloud puisse écrire
+setfacl -Rm d:u:www-data:rwx,d:g:www-data:rx,u:www-data:rwx,g:www-data:rx /home
+# On supprimer les droits www-data dans les repertoires autres que les users de /home :
+setfacl -Rm d:u:www-data:---,d:g:www-data:---,u:www-data:---,g:www-data:--- /home/netlogon /home/profiles /home/templates /home/admin
+
+# le /home du se3 a les droits 775 (nécessaire pour les montages Samba du se3 par exemple)
+# Or owncloud impose à son répertoire data d'avoir les droits 770 et il n'est pas possible de paramétrer cet umask ...
+# Je n'ai pas trouvé d'autre solution que de modifier le code source d'Owncloud pour changer ce paramètre .. ce qui n'est vraiment pas propre du tout 
+# De ce fait, cette modification sautera à chaque maj d'owncloud et il faudra donc la refaire à chaque fois ...
+sed -i -e "s/perms, -1) != '0'/perms, -1) != '5'/g"  "$ocpath/lib/private/util.php"
+sed -i -e "s/dataDirectory, 0770/dataDirectory, 0775/g"  "$ocpath/lib/private/util.php"
+sed -i -e "s/perms, 2, 1) != '0'/perms, 2, 1) != '5'/g"  "$ocpath/lib/private/util.php"
+
+########################################################################################
+# 1ère solution :
+# Cette solution consiste à dire à l'installation wizard d'Owncloud d'utiliser le /home du se3 comme repertoire data
+# Installation "wizard" avec indication d'utiliser le /home du se3 comme répertoire data d'Owncloud
+#sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admowncloud" --admin-pass "$dbpass" --data-dir "/home"
+# Fin de la 1ère solution
+##########################################################################################
+
+##########################################################################################
+# 2ème solution pour utiliser le home du se3 comme répertoire data d'Owncloud :
+# Cette solution consiste à garder le repertoire data par défaut d'Owncloud à savoir /var/www/owncloud/data
+# puis à la fin de l'installation créer un lien symbolique vers le /home du se3
+#
+sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admowncloud" --admin-pass "$dbpass"
+
+# se reporter à la fin de l'installation pour la création du lien et la mise des droits
+########################################################################################
 
 # Configurer la langue par défaut de l'interface web en français
 sudo -u "$htuser" php occ config:system:set default_language --value="fr"
@@ -263,7 +293,7 @@ echo "Etape 8.3 Configuration du module Stockage Externe pour rendre accessible 
 echo "Etape 8.4 Construction d'un skelette vide sur le partage Owncloud : les utilisateurs doivent enregistrer dans les partages Samba"
 # Définir le skelette par défaut des utilisateurs
 mkdir "$ocpath/core/skeleton_se3"
-mkdir "$ocpath/core/skeleton_se3/documents_cloud"
+mkdir "$ocpath/core/skeleton_se3/cloud"
 chown -R "$htuser":"$htgroup" "$ocpath/core/skeleton_se3"
 sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_se3"
 
@@ -317,6 +347,25 @@ exit 0
 EOF
 
 bash /root/mettre_droits_owncloud.sh  >> "$SORTIE" 2>&1
+
+##############################################################################
+# Fin de la 2ème solution pour utiliser /home comme répertoire data d'Owncloud
+# Copie des fichiers de configuration de data dans /home
+if [ -d "${ocpath}/data" ]
+then
+	cp -p "$ocpath/data/.htaccess" /home/
+	cp -p "$ocpath/data/.ocdata" /home/
+	cp -p "$ocpath/data/index.html" /home/
+	cp -p "$ocpath/data/owncloud.log" /home/
+	cp -Rp "$ocpath/data/admowncloud" /home/
+	
+	# Sauvegarde du dossier data avant création du lien symbolique
+	mv "$ocpath/data" "$ocpath/data_save"
+
+	# Création du lien symbolique
+	ln -s /home "$ocpath/data"
+fi
+##############################################################################
 
 echo "Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
 echo "Le compte administrateur de votre serveur Owncloud est le compte admin de l'interface web de votre se3"
