@@ -1491,7 +1491,8 @@ export BASE_DN
 export NOM_HOTE
 export NOM_DE_CODE
 export ARCHITECTURE
-export REP_BIN_LOCAL # Seulement parce que la fonction activer_pave_numerique l'utilise.
+export REP_BIN_LOCAL # Used by the function activer_pave_numerique.
+export DEBIAN_FRONTEND='noninteractive' # Non-interactive APT.
 
 # Les variables LOGIN, NOM_COMPLET_LOGIN, LISTE_GROUPES_LOGIN seront utilisables 
 # dans les fonctions ouverture_perso et fermeture_perso, mais un export 
