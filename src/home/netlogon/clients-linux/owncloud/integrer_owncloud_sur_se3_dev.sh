@@ -29,6 +29,9 @@ htgroup='www-data'
 rootuser='root'
 rep_courant=$(pwd)
 
+# Récupération du fichier .json décrivant les partages Samba du module Stockage externe
+wget https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/owncloud/partages_samba_se3.json
+
 echo "Etape 2 : Installation des paquets nécessaires à Owncloud"
 #  Cette installation suivie ici est celle décrite pour un serveur Ubuntu Trusty dans la documentation officielle d'Owncloud
 apt-get install -y apache2 libapache2-mod-php5 > "$SORTIE" 2>&1
@@ -249,6 +252,28 @@ exit 0
 EOF
 
 bash /root/mettre_droits_owncloud.sh  >> "$SORTIE" 2>&1
+
+#######################################################################################################################################
+# Essayer de se passer du module stockage externe et utiliser les répertoires Docs et Classes du se3 comme espace de stockage d'OC
+# Le but étant de :
+# - éviter d'avoir deux espaces de stockages disctincts (celui du se3 et celui d'OC)
+# - utiliser les partages Samba "en interne" pour leur efficacité et disposer des fonctionnalités d'OC pour partager 
+#   et accéder de l'extérieur aux partages Samba du se3
+
+# Création des liens symboliques du répertoire data vers le partage Docs du se3
+find /home -mindepth 1 -maxdepth 1 ! -path /home/netlogon ! -path /home/profiles ! -path /home/_templates ! -path /home/templates ! -path /home/_netlogon \
+-exec setfacl -m u:www-data:x,g:www-data:x {} \; \
+-exec setfacl -Rm d:u:www-data:rwx,d:g:www-data:rx,u:www-data:rwx,g:www-data:rx {}/Docs \; \
+-exec mkdir -p "$ocpath"/data{}/cache "$ocpath"/data{}/files \; \
+-exec ln -s {}/Docs "$ocpath"/data{}/files/Docs \;
+
+chown -R www-data:www-data "$ocpath"/data/home
+chmod -R 750 "$ocpath"/data/home
+cp -rnpP "$ocpath"/data/home/* "$ocpath"/data/
+rm -rf "$ocpath"/data/home
+
+# Fin 
+#######################################################################################################################################
 
 echo " Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
 echo " Le compte administrateur de votre serveur Owncloud est :"
