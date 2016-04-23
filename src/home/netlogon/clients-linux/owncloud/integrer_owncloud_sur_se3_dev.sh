@@ -149,6 +149,8 @@ sudo -u "$htuser" php occ ldap:set-config "" ldapUserFilterMode "0"
 sudo -u "$htuser" php occ ldap:set-config "" ldapUserFilter "(|(objectclass=person))"
 sudo -u "$htuser" php occ ldap:set-config "" ldapUserFilterObjectclass "person"
 
+sudo -u "$htuser" php occ ldap:set-config "" ldapAttributesForUserSearch "givenname"
+
 # Inutile en principe vu que owncloud est installé sur le même serveur que l'annuaire ldap 
 #sudo -u "$htuser" php occ ldap:set-config "" turnOffCertCheck "1"
 #sudo -u "$htuser" php occ ldap:set-config "" ldapTLS "0"
