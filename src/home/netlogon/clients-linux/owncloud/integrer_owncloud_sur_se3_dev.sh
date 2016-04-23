@@ -8,7 +8,7 @@
 # Par défaut : 
 # - seul les groupes "Profs" et "admins" ont accés à la fonctionnalité "Stockage Externe" du se3.
 # - le compte administrateur d'Owncloud est admowncloud avec le mot de passe de l'admin de l'interface web du se3
-# - les quotas par défaut des utilisateurs sont réglés à un petite valeur 1 Mo : ils sont ajustable dans la partie avancée du module ldap de l'interface web d'OC
+# - les quotas par défaut des utilisateurs sont réglés à un petite valeur 2 Mo : ils pourront être ajustés ensuite dans l'interface web de l'administrateur Owncloud
 # Une fois l'installation terminée, il est possible de personnaliser le cloud en se connectant à http://IP_SE3/owncloud avec le compte admowncloud
 
 # Pour de le débuggage :
@@ -39,7 +39,7 @@ echo "Etape 3 : Ajout du dépot owncloud aux sources du se3 puis installation du
 echo "(ce paquet ne contient que la partie Owncloud 9, le serveur web du se3 étant conservé)"
 # L'installation est réalisé à partir du dépot de la version stable d'Owncloud.
 # Sous Wheezy, depuis Owncloud 9, il est alors possible de n'installer que la partie Owncloud
-# Cela permet d' utiliser le serveur Apache2 et la base de donnée MySQL du serveur owncloud
+# Cela permet d'utiliser le serveur Web et la base de donnée MySQL du serveur se3
 
 wget -nv https://download.owncloud.org/download/repositories/stable/Debian_7.0/Release.key -O Release.key >> "$SORTIE" 2>&1
 apt-key add - < Release.key 
@@ -250,6 +250,8 @@ EOF
 
 bash /root/mettre_droits_owncloud.sh  >> "$SORTIE" 2>&1
 
-echo "Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
-echo "Le compte administrateur de votre serveur Owncloud est le compte admin de l'interface web de votre se3"
+echo " Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
+echo " Le compte administrateur de votre serveur Owncloud est :"
+echo " Identifiant : admowncloud"
+echo " Mot de passe : celui du compte admin de l'interface web de votre se3"
 exit 0
