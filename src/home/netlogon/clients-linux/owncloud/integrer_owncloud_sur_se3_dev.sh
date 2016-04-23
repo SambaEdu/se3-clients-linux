@@ -114,6 +114,11 @@ then
 	sudo -u "$htuser" php occ config:system:set proxy --value="$proxy_url"
 fi
 
+# Définition du quota par défaut des utilisateurs
+# Ne connaissant pas l'espace alloué au repertoire data OC : on fixe par défaut
+# une petite valeur : libre à l'admin OC de changer par la suite cette valeur
+sudo -u "$htuser" php occ config:app:set files default_quota --value="2 MB"
+
 echo "Etape 8.2 Configuration pour consulter l'annuaire du se3"
 # Normalement, le paquet est installé ... mais dans le doute ...
 apt-get install -y php5-ldap >> "$SORTIE" 2>&1
@@ -153,7 +158,7 @@ sudo -u "$htuser" php occ ldap:set-config "" useMemberOfToDetectMembership "0"
 sudo -u "$htuser" php occ ldap:set-config "" ldapConfigurationActive "1"
 
 # Quota par défaut des utilisateurs de l'annuaire ldap (en octets) : 1Mo par défaut
-sudo -u "$htuser" php occ ldap:set-config "" ldapQuotaDefault "1000000"
+#sudo -u "$htuser" php occ ldap:set-config "" ldapQuotaDefault "2 MB"
 
 # Choisir uid comme nom de répertoire des utilisateurs d'Owncloud afin qu'il soit identique à celui d'un utilisateur du se3 présent dans /home
 sudo -u "$htuser" php occ ldap:set-config "" homeFolderNamingRule "attr:uid"
