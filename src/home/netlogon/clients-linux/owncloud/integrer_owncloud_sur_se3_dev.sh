@@ -80,12 +80,12 @@ ln -s /etc/apache2/sites-available/owncloud.conf /etc/apache2/sites-enabled/ownc
 echo "Etape 6 : Activation des modules Apache utils à Owncloud"
 # Activation des modules Apache utiles à Owncloud :
 # Module indispensable au bon fonctionnement d'Owncloud :
-a2enmod rewrite
+a2enmod rewrite  >> "$SORTIE" 2>&1
 # Modules complémentaires utiles à Owncloud : mod_headers, mod_env, mod_dir and mod_mime:
-a2enmod headers
-a2enmod env
-a2enmod dir
-a2enmod mime
+a2enmod headers  >> "$SORTIE" 2>&1
+a2enmod env  >> "$SORTIE" 2>&1
+a2enmod dir  >> "$SORTIE" 2>&1
+a2enmod mime  >> "$SORTIE" 2>&1
 
 # Si utilisation de mod_fcgi à la place de mod_php, autorisé aussi (sur Apache2.4)
 # a2enmod setenvif
@@ -99,6 +99,11 @@ chown -R "$htuser":"$htgroup" "$ocpath" >> "$SORTIE" 2>&1
 
 # On se place dans le "bon" répertoire pour utiliser la commande occ utile pour intégré owncloud au se3
 cd "$ocpath" >> "$SORTIE" 2>&1
+
+# Création du skelette pour les utilisateurs d'OC
+mv "$ocpath/core/skeleton" "$ocpath/core/skeleton_save" 
+mkdir -p "$ocpath/core/skeleton/Cloud"
+chown -R "$htuser":"$htgroup" "$ocpath/core/skeleton"
 
 echo "Etape 8.1 Configuration générale"
 # Installation "wizard"
@@ -185,8 +190,8 @@ sudo -u "$htuser" php occ config:app:set core outgoing_server2server_share_enabl
 filtre_groupes='(&(|(objectclass=top))(|(cn=Profs)(cn=admins)'
 
 resultats="$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Equipe_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
-resultats="$resultat $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Matiere_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
-resultats="$resultat $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Cours_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
+resultats="$resultats $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Matiere_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
+resultats="$resultats $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Cours_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
 
 for groupese3 in "$resultats"
 do
@@ -230,11 +235,13 @@ else
 	echo "le script d'installation : la configuration du module Stockage Externe sera de ce fait incomplète ..."
 fi
 
-echo "Etape 8.4 Construction d'un skelette vide sur le partage Owncloud : les utilisateurs doivent enregistrer dans les partages Samba"
+#echo "Etape 8.4 Construction d'un skelette vide sur le partage Owncloud : les utilisateurs doivent enregistrer dans les partages Samba"
 # Définir le skelette par défaut des utilisateurs
-mkdir -p "$ocpath/core/skeleton_se3/cloud"
-chown -R "$htuser":"$htgroup" "$ocpath/core/skeleton_se3"
-sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_se3"
+#mkdir -p "$ocpath/core/skeleton_se3/cloud"
+#chown -R "$htuser":"$htgroup" "$ocpath/core/skeleton_se3"
+#sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_se3"
+
+# Le compte admin d'OC est déjà créé et dispose donc du skeleton 
 
 echo "Etape 8.5 : Définition d'un cache local selon les recommandations d' Owncloud"
 apt-get install -y php-apc >> "$SORTIE" 2>&1
@@ -349,13 +356,16 @@ fi
 if [ ! -d "/var/se3/dataOC/\$user" ]
 then
 	mkdir -p "/var/se3/dataOC/\$user/cache" "/var/se3/dataOC/\$user/files"
-	cp -r "$ocpath/core/skeleton_se3/*" "/var/se3/dataOC/\$user/files/"
+	cp -r $ocpath/core/skeleton/* /var/se3/dataOC/\$user/files/
 fi
 
 # On met les droits sur le répertoire owncloud
 setfacl -Rm d:u:"\$user":rwx,u:"\$user":rwx "/var/se3/dataOC/\$user"
 EOF
 
+chown www-se3:root /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
+chmod ug+rx /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
+chmod o-rwx /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
 
 # On crée le partage owncloud
 cat <<EOF > "/etc/samba/smb_owncloud.conf"
