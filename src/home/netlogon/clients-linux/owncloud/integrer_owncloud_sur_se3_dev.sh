@@ -5,10 +5,11 @@
 # - installer la partie "Owncloud" uniquement : c'est possible avec un dépôt depuis la version 9 d'Owncloud.
 # - configurer le module ldap d'Owncloud pour qu'il consulte l'annuaire ldap du se3
 # - installer et configurer le module "Stockage Externe" d' Owncloud afin de pouvoir accéder aux partages Samba "Docs" et "Classes" du se3 depuis l'extérieur de l'établissement
+# - créer un partage Samba sur le cloud afin d'y accéder da façon efficace en interne.
 # Par défaut : 
 # - seul les groupes "Profs" et "admins" ont accés à la fonctionnalité "Stockage Externe" du se3.
-# - le compte administrateur d'Owncloud est admowncloud avec le mot de passe de l'admin de l'interface web du se3
-# - les quotas par défaut des utilisateurs sont réglés à un petite valeur 2 Mo : ils pourront être ajustés ensuite dans l'interface web de l'administrateur Owncloud
+# - le compte administrateur d'Owncloud est identique au compte admin de l'interface web du se3
+# - les quotas par défaut des utilisateurs sont réglés par défaut à 100 Mo : ils pourront être ajustés ensuite
 # Une fois l'installation terminée, il est possible de personnaliser le cloud en se connectant à http://IP_SE3/owncloud avec le compte admowncloud
 
 # Pour de le débuggage :
@@ -102,25 +103,27 @@ cd "$ocpath" >> "$SORTIE" 2>&1
 
 echo "Etape 8.1 Configuration générale"
 # Installation "wizard"
-sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admowncloud" --admin-pass "$dbpass" --data-dir "$ocpath/data"
+sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admin" --admin-pass "$dbpass" --data-dir "$ocpath/data"
 
 # Configurer la langue par défaut de l'interface web en français
 sudo -u "$htuser" php occ config:system:set default_language --value="fr"
 
 # Configuration de config/config.php pour configurer les trusted domain et éventuellement le proxy
-sudo -u "$htuser" php occ config:system:set trusted_domains 1 --value="$se3ip"
-sudo -u "$htuser" php occ config:system:set trusted_domains 2 --value="$domain"
+#sudo -u "$htuser" php occ config:system:set trusted_domains 1 --value="$se3ip"
+#sudo -u "$htuser" php occ config:system:set trusted_domains 2 --value="$domain"
+# On supprime localhost
+sudo -u "$htuser" php occ config:system:set trusted_domains 0 --value="$se3ip"
+sudo -u "$htuser" php occ config:system:set trusted_domains 1 --value="$domain"
 
-# Définition du proxy
+# Définition du proxy, s'il existe ...
 if [ "$proxy_url" != "" ]
 then
 	sudo -u "$htuser" php occ config:system:set proxy --value="$proxy_url"
 fi
 
 # Définition du quota par défaut des utilisateurs
-# Ne connaissant pas l'espace alloué au repertoire data OC : on fixe par défaut
-# une petite valeur : libre à l'admin OC de changer par la suite cette valeur
-sudo -u "$htuser" php occ config:app:set files default_quota --value="2 MB"
+# Ne connaissant pas l'espace disponible pour le repertoire data OC dans /var/se3 : on le fixe à 100 MB par défaut
+sudo -u "$htuser" php occ config:app:set files default_quota --value="100 MB"
 
 echo "Etape 8.2 Configuration pour consulter l'annuaire du se3"
 # Normalement, le paquet est installé ... mais dans le doute ...
@@ -131,7 +134,8 @@ sudo -u "$htuser" php occ app:enable user_ldap
 
 # La 1ère configuration ldap créée ne possède pas de sid, on l'appelle avec un ""
 sudo -u "$htuser" php occ ldap:create-empty-config
-sudo -u "$htuser" php occ ldap:set-config "" ldapHost "$ldap_server"
+#sudo -u "$htuser" php occ ldap:set-config "" ldapHost "$ldap_server"
+sudo -u "$htuser" php occ ldap:set-config "" ldapHost "localhost"
 sudo -u "$htuser" php occ ldap:set-config "" ldapPort "$ldap_port"
 sudo -u "$htuser" php occ ldap:set-config "" ldapBase "$ldap_base_dn"
 sudo -u "$htuser" php occ ldap:set-config "" ldapAgentName "uid=admin,ou=People,$ldap_base_dn"
@@ -139,7 +143,6 @@ sudo -u "$htuser" php occ ldap:set-config "" ldapAgentPassword "$dbpass"
 sudo -u "$htuser" php occ ldap:set-config "" ldapBaseGroups "ou=Groups,$ldap_base_dn"
 sudo -u "$htuser" php occ ldap:set-config "" ldapBaseUsers "ou=People,$ldap_base_dn"
 sudo -u "$htuser" php occ ldap:set-config "" ldapGroupDisplayName "cn"
-sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilter "(&(|(objectclass=top))(|(cn=Profs)(cn=admins)))"
 sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilterGroups 'Administratifs;Profs;admins'
 sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilterMode "0"
 sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilterObjectclass "top"
@@ -162,11 +165,39 @@ sudo -u "$htuser" php occ ldap:set-config "" ldapAttributesForUserSearch "givenn
 sudo -u "$htuser" php occ ldap:set-config "" useMemberOfToDetectMembership "0"
 sudo -u "$htuser" php occ ldap:set-config "" ldapConfigurationActive "1"
 
+
 # Quota par défaut des utilisateurs de l'annuaire ldap (en octets) : 1Mo par défaut
+# Le quota des utilisateurs est défini dans la configuration system ...
 #sudo -u "$htuser" php occ ldap:set-config "" ldapQuotaDefault "2 MB"
 
 # Choisir uid comme nom de répertoire des utilisateurs d'Owncloud afin qu'il soit identique à celui d'un utilisateur du se3 présent dans /home
 sudo -u "$htuser" php occ ldap:set-config "" homeFolderNamingRule "attr:uid"
+
+# Autoriser uniquement le partage entre certains groupes de l'annuaire ldap du se3
+sudo -u "$htuser" php occ config:app:set core shareapi_only_share_with_group_members --value "yes"
+sudo -u "$htuser" php occ config:app:set core shareapi_only_with_group_members --value "yes"
+sudo -u "$htuser" php occ config:app:set core shareapi_allow_group_sharing --value "yes"
+sudo -u "$htuser" php occ config:app:set core shareapi_allow_links --value "no"
+sudo -u "$htuser" php occ config:app:set core shareapi_allow_resharing --value "no"
+sudo -u "$htuser" php occ config:app:set core incoming_server2server_share_enabled --value "no"
+sudo -u "$htuser" php occ config:app:set core outgoing_server2server_share_enabled --value "no"
+
+# On recherche les groupes autorisés à faire du partage, cad Equipe*, Cours* Matieres, Profs, admins et on les ajoute à la conf du ldap d'OC
+filtre_groupes='(&(|(objectclass=top))(|(cn=Profs)(cn=admins)'
+
+resultats=$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Equipe_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ Equipe_//")
+resultats=$(echo -e "$resultat\n$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Matiere_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ Matiere_//")")
+resultats=$(echo -e "$resultat\n$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Cours_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ Cours_//")")
+
+for groupese3 in "$resultats"
+do
+	filtre_groupes="$filtre_groupes(cn=$groupese3)"
+done
+
+# On ferme les parenthèses du filtre
+filtre_groupes="$filtre_groupes))"
+
+sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilter "$filtre_groupes"
 
 echo "Etape 8.3 Configuration du module Stockage Externe pour rendre accessible les partages Samba du se3"
 
@@ -186,7 +217,6 @@ sudo -u "$htuser" php occ app:enable files_external
 # avec les répertoires ou fichiers qui contiennent des caractères spéciaux : on la met en fr
 sed -i -e "s/const LOCALE = 'en_US.UTF-8'/const LOCALE ='fr_FR.UTF-8'/g" "$ocpath/apps/files_external/3rdparty/icewind/smb/src/Server.php"  >> "$SORTIE" 2>&1 
 
-
 # On copie et on met les droits sur le fichier .json contenant la configuration des partages samba "Docs" # et "Classes" pour le module stockage externe d'Owncloud
 if [ -e "$rep_courant/partages_samba_se3.json" ]
 then
@@ -203,16 +233,16 @@ fi
 
 echo "Etape 8.4 Construction d'un skelette vide sur le partage Owncloud : les utilisateurs doivent enregistrer dans les partages Samba"
 # Définir le skelette par défaut des utilisateurs
-mkdir "$ocpath/core/skeleton_vide"
-chown "$htuser":"$htgroup" "$ocpath/core/skeleton_vide"
-sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_vide"
+mkdir -p "$ocpath/core/skeleton_se3/cloud"
+chown "$htuser":"$htgroup" "$ocpath/core/skeleton_se3"
+sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_se3"
 
 echo "Etape 8.5 : Définition d'un cache local selon les recommandations d' Owncloud"
 apt-get install -y php-apc >> "$SORTIE" 2>&1
 sudo -u "$htuser" php occ config:system:set memcache.local --value='\OC\Memcache\APC'
 service apache2 restart >> "$SORTIE" 2>&1
 
-echo "Etape 8.6 Mise des droits sur les fichiers et repertoire du dossier owncloud selon les recommandations de la documnetation officielle d'Owncloud"
+echo "Etape 8.6 Mise des droits sur les fichiers et repertoire du dossier owncloud selon les recommendations de la doc officielle d'OC"
 # Script pour mettre les droits sur le répertoire owncloud (documentation officielle owncloud)
 # Attention, ces droits sont très serrés : pour une mise à jour ultérieure d'Owncloud, il sera nécessaire # de les relachế ... (se reporter à la documentation officielle)
  
@@ -251,7 +281,9 @@ fi
 exit 0
 EOF
 
-bash /root/mettre_droits_owncloud.sh  >> "$SORTIE" 2>&1
+bash /root/mettre_droits_owncloud.sh >> "$SORTIE" 2>&1
+
+rm -f /root/mettre_droits_owncloud.sh >> "$SORTIE" 2>&1	
 
 #######################################################################################################################################
 # Essayer de se passer du module stockage externe et utiliser les répertoires Docs et Classes du se3 comme espace de stockage d'OC
@@ -261,22 +293,94 @@ bash /root/mettre_droits_owncloud.sh  >> "$SORTIE" 2>&1
 #   et accéder de l'extérieur aux partages Samba du se3
 
 # Création des liens symboliques du répertoire data vers le partage Docs du se3
-find /home -mindepth 1 -maxdepth 1 ! -path /home/netlogon ! -path /home/profiles ! -path /home/_templates ! -path /home/templates ! -path /home/_netlogon \
--exec setfacl -m u:www-data:x,g:www-data:x {} \; \
--exec setfacl -Rm d:u:www-data:rwx,d:g:www-data:rx,u:www-data:rwx,g:www-data:rx {}/Docs \; \
--exec mkdir -p "$ocpath"/data{}/cache "$ocpath"/data{}/files \; \
--exec ln -s {}/Docs "$ocpath"/data{}/files/Docs \;
+#find /home -mindepth 1 -maxdepth 1 ! -path /home/netlogon ! -path /home/profiles ! -path /home/_templates ! -path /home/templates ! -path /home/_netlogon \
+#-exec setfacl -m u:www-data:x,g:www-data:x {} \; \
+#-exec setfacl -Rm d:u:www-data:rwx,d:g:www-data:rx,u:www-data:rwx,g:www-data:rx {}/Docs \; \
+#-exec mkdir -p "$ocpath"/data{}/cache "$ocpath"/data{}/files \; \
+#-exec ln -s {}/Docs "$ocpath"/data{}/files/Docs \;
 
-chown -R www-data:www-data "$ocpath"/data/home
-chmod -R 750 "$ocpath"/data/home
-cp -rnpP "$ocpath"/data/home/* "$ocpath"/data/
-rm -rf "$ocpath"/data/home
+#chown -R www-data:www-data "$ocpath"/data/home
+#chmod -R 750 "$ocpath"/data/home
+#cp -rnpP "$ocpath"/data/home/* "$ocpath"/data/
+#rm -rf "$ocpath"/data/home
 
 # Fin 
+# Cette solution pose des soucis au niveau des quotas : le quota défini sur OW est prioritaire sur celui définit sur le /home du se3
 #######################################################################################################################################
 
+#######################################################################################################################################
+# Solution alternative : on déplace le répertoire data d'OC dans /var/se3/owncloud_data afin d'avoir plus de place
+# On crée un partage Samba owncloud sur le se3 pour rendre accessible via smb, en interne, leur répertoire owncloud
+# On crée un groupe owncloud sur le se3 afin que les utilisateurs du se3 puissent y accéder
+# On créer et ajouter chaque utilisateur au groupe owncloud
+
+# On déplace le répertoire data d'OC dans /var/se3 car il y a plus de place que dans /var/www/owncloud
+sudo -u "$htuser" php occ config:system:set datadirectory --value="/var/se3/dataOC"
+mv "$ocpath/data" /var/se3/dataOC
+
+# On crée le groupe owncloud s'il n'existe pas ...
+resultat=$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" "cn=owncloud" "dn")
+
+if [ "$resultat" = "" ]
+then
+	perl /usr/share/se3/sbin/groupAdd.pl "1" "owncloud" "Partage owncloud" >> "$SORTIE" 2>&1
+fi
+
+# On met les droits sur le répertoire data d'OW afin de pouvoir y accéder par un partage Samba
+setfacl -m g:owncloud:x /var/se3/dataOC  >> "$SORTIE" 2>&1
+
+# On crée le script qui va permettre de créer le skelette d'owncloud à la 1ère connexion de l'utilisateur
+# et de mettre les droits pour que le partage Samba puissent être accessible à l'utilisateur se3
+
+cat <<EOF > "/usr/share/se3/scripts/donner_acces_partage_owncloud.sh"
+#!/bin/sh
+
+user=\"\$1\"
+
+# On ajoute l'utilisateur au groupe owncloud s'il n'y fait pas parti déjà
+
+resultat=\$(ldapsearch -xLLL -b \"cn=owncloud,ou=Groups,$ldap_base_dn\" \"memberUid=\$user\" \"dn\")
+
+if [ \"\$resultat\" = \"\" ]
+then
+	perl /usr/share/se3/sbin/groupAddUser.pl \"\$user\" \"owncloud\" > /dev/null 2>&1
+fi
+
+# On crée éventuellement le répertoire owncloud de l'utilisateur, s'il n'existe pas déjà
+if [ ! -d \"/var/se3/dataOC/\$user\" ]
+then
+	mkdir -p \"/var/se3/dataOC/\$user/cache\" \"/var/se3/dataOC/\$user/files\"
+	cp -r \"$ocpath/core/skeleton_se3/*" \"/var/se3/dataOC/\$user/files/\"
+fi
+
+# On met les droits sur le répertoire owncloud
+setfacl -Rm d:u:\"\$user\":rwx,u:\"\$user\":rwx \"/var/se3/dataOC/\$user\"
+EOF
+
+# On crée le partage owncloud
+cat <<EOF > "/etc/samba/smb_owncloud.conf"
+[owncloud]
+	comment= Cloud de %u
+	path = /var/se3/dataOC/%u/files
+	read only = No
+	browseable = Yes
+	valid users = @owncloud
+	root preexec = /usr/share/se3/scripts/donner_acces_partage_owncloud.sh %u
+	root preexec close = Yes
+EOF
+
+# S'il n'existe pas déjà, on rajoute le fichier de configuration du partage Owncloud à la conf de Samba
+resultat=$(grep "smb_owncloud.conf" "/etc/samba/smb.conf")
+
+if [ "$resultat" = "" ]
+then
+cat <<EOF >> "/etc/samba/smb.conf"
+include = /etc/samba/smb_owncloud.conf
+EOF
+fi
+
+service samba restart >> "$SORTIE" 2>&1
+
 echo " Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
-echo " Le compte administrateur de votre serveur Owncloud est :"
-echo " Identifiant : admowncloud"
-echo " Mot de passe : celui du compte admin de l'interface web de votre se3"
+echo " Le compte administrateur de votre serveur Owncloud est identique à celui du compte admin de l'interface web de votre se3"
 exit 0
