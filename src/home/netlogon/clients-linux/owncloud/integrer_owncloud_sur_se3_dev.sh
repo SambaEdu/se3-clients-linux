@@ -31,16 +31,15 @@ rootuser='root'
 rep_courant=$(pwd)
 
 # Récupération du fichier .json décrivant les partages Samba du module Stockage externe
-wget https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/owncloud/partages_samba_se3.json
+wget https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/owncloud/partages_samba_se3.json > "$SORTIE" 2>&1
 
 echo "Etape 2 : Installation des paquets nécessaires à Owncloud"
 #  Cette installation suivie ici est celle décrite pour un serveur Ubuntu Trusty dans la documentation officielle d'Owncloud
-apt-get install -y apache2 libapache2-mod-php5 > "$SORTIE" 2>&1
+apt-get install -y apache2 libapache2-mod-php5 >> "$SORTIE" 2>&1
 apt-get install -y php5-gd php5-json php5-mysql php5-curl >> "$SORTIE" 2>&1
 apt-get install -y php5-intl php5-mcrypt php5-imagick >> "$SORTIE" 2>&1
 
 echo "Etape 3 : Ajout du dépot owncloud aux sources du se3 puis installation du paquet owncloud-files"
-echo "(ce paquet ne contient que la partie Owncloud 9, le serveur web du se3 étant conservé)"
 # L'installation est réalisé à partir du dépot de la version stable d'Owncloud.
 # Sous Wheezy, depuis Owncloud 9, il est alors possible de n'installer que la partie Owncloud
 # Cela permet d'utiliser le serveur Web et la base de donnée MySQL du serveur se3
@@ -185,9 +184,9 @@ sudo -u "$htuser" php occ config:app:set core outgoing_server2server_share_enabl
 # On recherche les groupes autorisés à faire du partage, cad Equipe*, Cours* Matieres, Profs, admins et on les ajoute à la conf du ldap d'OC
 filtre_groupes='(&(|(objectclass=top))(|(cn=Profs)(cn=admins)'
 
-resultats=$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Equipe_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ Equipe_//")
-resultats=$(echo -e "$resultat\n$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Matiere_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ Matiere_//")")
-resultats=$(echo -e "$resultat\n$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Cours_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ Cours_//")")
+resultats="$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Equipe_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
+resultats="$resultat $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Matiere_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
+resultats="$resultat $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Cours_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
 
 for groupese3 in "$resultats"
 do
@@ -384,33 +383,32 @@ service samba restart
 cat <<EOF > "/usr/share/se3/scripts/donner_acces_partage_owncloud.sh"
 #!/bin/sh
 
-user=\"\$1\"
+user="\$1"
 
 # On ajoute l'utilisateur au groupe owncloud s'il n'y fait pas parti déjà
 
-resultat=\$(ldapsearch -xLLL -b \"cn=owncloud,ou=Groups,$ldap_base_dn\" \"memberUid=\$user\" \"dn\")
+resultat=\$(ldapsearch -xLLL -b "cn=owncloud,ou=Groups,$ldap_base_dn" "memberUid=\$user" "dn")
 
-if [ \"\$resultat\" = \"\" ]
+if [ "\$resultat" = "" ]
 then
-	perl /usr/share/se3/sbin/groupAddUser.pl \"\$user\" \"owncloud\" > /dev/null 2>&1
+	perl /usr/share/se3/sbin/groupAddUser.pl "\$user" "owncloud" > /dev/null 2>&1
 fi
 
 # On crée éventuellement le répertoire owncloud de l'utilisateur, s'il n'existe pas déjà
-if [ ! -d \"/var/se3/dataOC/\$user\" ]
+if [ ! -d "/var/se3/dataOC/\$user" ]
 then
-	mkdir -p \"/var/se3/dataOC/\$user/cache\" \"/var/se3/dataOC/\$user/files\"
-	cp -r \"$ocpath/core/skeleton_se3/*" \"/var/se3/dataOC/\$user/files/\"
+	mkdir -p "/var/se3/dataOC/\$user/cache" "/var/se3/dataOC/\$user/files"
+	cp -r "$ocpath/core/skeleton_se3/*" "/var/se3/dataOC/\$user/files/"
 fi
 
 # On met les droits sur le répertoire owncloud
-setfacl -Rm d:u:\"\$user\":rwx,u:\"\$user\":rwx \"/var/se3/dataOC/\$user\"
+setfacl -Rm d:u:"\$user":rwx,u:"\$user":rwx "/var/se3/dataOC/\$user"
 EOF
 
 echo " Etape 9 : Suppression d'Owncloud de la liste des dépôts du se3 afin d'éviter une maj automatique d'OC lors d'un apt-get upgrade sur le se3"
 echo " Pour réaliser une maj d'OC, il faudra lancer le script /usr/share/se3/sbin/upgrade_owncloud.sh "
 
 rm -f /etc/apt/sources.list.d/owncloud.list /etc/apt/sources.list.d/php5-libsmbclient.list
-
 
 echo " Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
 echo " Le compte administrateur de votre serveur Owncloud est identique à celui du compte admin de l'interface web de votre se3"
