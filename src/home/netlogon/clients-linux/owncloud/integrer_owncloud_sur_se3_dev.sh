@@ -234,7 +234,7 @@ fi
 echo "Etape 8.4 Construction d'un skelette vide sur le partage Owncloud : les utilisateurs doivent enregistrer dans les partages Samba"
 # Définir le skelette par défaut des utilisateurs
 mkdir -p "$ocpath/core/skeleton_se3/cloud"
-chown "$htuser":"$htgroup" "$ocpath/core/skeleton_se3"
+chown -R "$htuser":"$htgroup" "$ocpath/core/skeleton_se3"
 sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_se3"
 
 echo "Etape 8.5 : Définition d'un cache local selon les recommandations d' Owncloud"
