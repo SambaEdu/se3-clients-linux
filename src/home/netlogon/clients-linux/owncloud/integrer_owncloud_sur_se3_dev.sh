@@ -189,14 +189,25 @@ sudo -u "$htuser" php occ config:app:set core outgoing_server2server_share_enabl
 # On recherche les groupes autorisés à faire du partage, cad Equipe*, Cours* Matieres, Profs, admins et on les ajoute à la conf du ldap d'OC
 filtre_groupes='(&(|(objectclass=top))(|(cn=Profs)(cn=admins)'
 
-resultats="$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Equipe_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
-resultats="$resultats $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Matiere_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
-resultats="$resultats $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Cours_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
+#resultats="$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Equipe_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
+#resultats="$resultats $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Matiere_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
+#resultats="$resultats $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Cours_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
 
-for groupese3 in "$resultats"
+#for groupese3 in "$resultats"
+#do
+#	filtre_groupes="$filtre_groupes(cn=$groupese3)"
+#done
+
+ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Equipe_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //" > resultats
+ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Matiere_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //" >> resultats
+ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Cours_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //" >> resultats
+
+for groupese3 in $(cat resultats)
 do
 	filtre_groupes="$filtre_groupes(cn=$groupese3)"
 done
+
+rm -f resultats
 
 # On ferme les parenthèses du filtre
 filtre_groupes="$filtre_groupes))"
@@ -325,46 +336,53 @@ sudo -u "$htuser" php occ config:system:set datadirectory --value="/var/se3/data
 mv "$ocpath/data" /var/se3/dataOC
 
 # On crée le groupe owncloud s'il n'existe pas ...
-resultat=$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" "cn=owncloud" "dn")
+#resultat=$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" "cn=owncloud" "dn")
 
-if [ "$resultat" = "" ]
-then
-	perl /usr/share/se3/sbin/groupAdd.pl "1" "owncloud" "Partage owncloud"
-fi
+#if [ "$resultat" = "" ]
+#then
+#	perl /usr/share/se3/sbin/groupAdd.pl "1" "owncloud" "Partage owncloud"
+#fi
 
 # On met les droits sur le répertoire data d'OW afin de pouvoir y accéder par un partage Samba
-setfacl -m g:owncloud:x /var/se3/dataOC  
+#setfacl -m g:owncloud:x /var/se3/dataOC  
+setfacl -m g:Profs:x /var/se3/dataOC
+setfacl -m g:Eleves:x /var/se3/dataOC
+setfacl -m g:admins:x /var/se3/dataOC
 
 # On crée le script qui va permettre de créer le skelette d'owncloud à la 1ère connexion de l'utilisateur
 # et de mettre les droits pour que le partage Samba puissent être accessible à l'utilisateur se3
 
-cat <<EOF > "/usr/share/se3/scripts/donner_acces_partage_owncloud.sh"
+cat << 'EOF' > "/usr/share/se3/scripts/donner_acces_partage_owncloud.sh"
 #!/bin/sh
 
-user="\$1"
+user="$1"
 
 # On ajoute l'utilisateur au groupe owncloud s'il n'y fait pas parti déjà
 
-resultat="\$(ldapsearch -xLLL -b "cn=owncloud,ou=Groups,$ldap_base_dn" "memberUid=\$user" "dn")"
+#resultat="$(ldapsearch -xLLL -b "cn=owncloud,ou=Groups,$ldap_base_dn" "memberUid=$user" "dn")"
 
-if [ "\$resultat" = "" ]
-then
-	perl /usr/share/se3/sbin/groupAddUser.pl "\$user" "owncloud" > /dev/null 2>&1
-fi
+#if [ "$resultat" = "" ]
+#then
+#	perl /usr/share/se3/sbin/groupAddUser.pl "$user" "owncloud" > /dev/null 2>&1
+#fi
 
 # On crée éventuellement le répertoire owncloud de l'utilisateur, s'il n'existe pas déjà
-if [ ! -d "/var/se3/dataOC/\$user" ]
+if [ ! -d "/var/se3/dataOC/$user" ]
 then
-	mkdir -p "/var/se3/dataOC/\$user/cache" "/var/se3/dataOC/\$user/files"
-	cp -r $ocpath/core/skeleton/* /var/se3/dataOC/\$user/files/
+	mkdir -p "/var/se3/dataOC/$user/cache" "/var/se3/dataOC/$user/files"
+	cp -r /var/www/owncloud/core/skeleton/* "/var/se3/dataOC/$user/files/"
+	chown -R www-data:www-data "/var/se3/dataOC/$user"
+	chmod -R 750 "/var/se3/dataOC/$user"
 fi
 
 # On met les droits sur le répertoire owncloud
-setfacl -Rm d:u:"\$user":rwx,u:"\$user":rwx "/var/se3/dataOC/\$user"
+# setfacl -Rm d:u:"$user":rwx,u:"$user":rwx "/var/se3/dataOC/$user"
+setfacl -Rm d:u:"$user":rwx,u:"$user":rwx "/var/se3/dataOC/$user"
 EOF
 
 chown www-se3:root /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
 chmod ug+rx /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
+chmod u-w /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
 chmod o-rwx /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
 
 # On crée le partage owncloud
@@ -374,7 +392,7 @@ cat <<EOF > "/etc/samba/smb_owncloud.conf"
 	path = /var/se3/dataOC/%u/files
 	read only = No
 	browseable = Yes
-	valid users = @owncloud
+	valid users = @admins, @Profs, @Eleves
 	root preexec = /usr/share/se3/scripts/donner_acces_partage_owncloud.sh %u
 	root preexec close = Yes
 EOF
