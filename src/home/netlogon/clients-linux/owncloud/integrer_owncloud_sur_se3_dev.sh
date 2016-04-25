@@ -323,11 +323,11 @@ resultat=$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" "cn=owncloud" "dn")
 
 if [ "$resultat" = "" ]
 then
-	perl /usr/share/se3/sbin/groupAdd.pl "1" "owncloud" "Partage owncloud" >> "$SORTIE" 2>&1
+	perl /usr/share/se3/sbin/groupAdd.pl "1" "owncloud" "Partage owncloud"
 fi
 
 # On met les droits sur le répertoire data d'OW afin de pouvoir y accéder par un partage Samba
-setfacl -m g:owncloud:x /var/se3/dataOC  >> "$SORTIE" 2>&1
+setfacl -m g:owncloud:x /var/se3/dataOC  
 
 # On crée le script qui va permettre de créer le skelette d'owncloud à la 1ère connexion de l'utilisateur
 # et de mettre les droits pour que le partage Samba puissent être accessible à l'utilisateur se3
@@ -379,7 +379,38 @@ include = /etc/samba/smb_owncloud.conf
 EOF
 fi
 
-service samba restart >> "$SORTIE" 2>&1
+service samba restart
+
+cat <<EOF > "/usr/share/se3/scripts/donner_acces_partage_owncloud.sh"
+#!/bin/sh
+
+user=\"\$1\"
+
+# On ajoute l'utilisateur au groupe owncloud s'il n'y fait pas parti déjà
+
+resultat=\$(ldapsearch -xLLL -b \"cn=owncloud,ou=Groups,$ldap_base_dn\" \"memberUid=\$user\" \"dn\")
+
+if [ \"\$resultat\" = \"\" ]
+then
+	perl /usr/share/se3/sbin/groupAddUser.pl \"\$user\" \"owncloud\" > /dev/null 2>&1
+fi
+
+# On crée éventuellement le répertoire owncloud de l'utilisateur, s'il n'existe pas déjà
+if [ ! -d \"/var/se3/dataOC/\$user\" ]
+then
+	mkdir -p \"/var/se3/dataOC/\$user/cache\" \"/var/se3/dataOC/\$user/files\"
+	cp -r \"$ocpath/core/skeleton_se3/*" \"/var/se3/dataOC/\$user/files/\"
+fi
+
+# On met les droits sur le répertoire owncloud
+setfacl -Rm d:u:\"\$user\":rwx,u:\"\$user\":rwx \"/var/se3/dataOC/\$user\"
+EOF
+
+echo " Etape 9 : Suppression d'Owncloud de la liste des dépôts du se3 afin d'éviter une maj automatique d'OC lors d'un apt-get upgrade sur le se3"
+echo " Pour réaliser une maj d'OC, il faudra lancer le script /usr/share/se3/sbin/upgrade_owncloud.sh "
+
+rm -f /etc/apt/sources.list.d/owncloud.list /etc/apt/sources.list.d/php5-libsmbclient.list
+
 
 echo " Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
 echo " Le compte administrateur de votre serveur Owncloud est identique à celui du compte admin de l'interface web de votre se3"
