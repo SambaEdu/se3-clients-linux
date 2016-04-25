@@ -17,11 +17,7 @@
             "filesystem_check_changes": 1
         },
         "applicable_users": [],
-        "applicable_groups": [
-            "Profs",
-            "admin",
-            "admins"
-        ]
+        "applicable_groups": []
     },
     {
         "mount_id": 2,
@@ -41,10 +37,6 @@
             "filesystem_check_changes": 1
         },
         "applicable_users": [],
-        "applicable_groups": [
-            "Profs",
-            "admin",
-            "admins"
-        ]
+        "applicable_groups": []
     }
 ]
