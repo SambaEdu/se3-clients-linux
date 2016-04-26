@@ -56,6 +56,7 @@ CHEMIN_PARTAGE_NETLOGON="//$SE3/$NOM_PARTAGE_NETLOGON"
 # Les répertoires/fichiers importants suite au montage du partage.
 REP_MONTAGE="/mnt"
 REP_NETLOGON="$REP_MONTAGE/netlogon"
+#rep_save à supprimer ?
 REP_SAVE="$REP_NETLOGON/distribs/$NOM_DE_CODE/save"
 REP_SKEL="$REP_NETLOGON/distribs/$NOM_DE_CODE/skel"
 REP_BIN="$REP_NETLOGON/bin"
@@ -63,6 +64,7 @@ REP_INTEGRATION="$REP_NETLOGON/distribs/$NOM_DE_CODE/integration"
 
 # Les répertoires/fichiers importants locaux au client.
 REP_SE3_LOCAL="/etc/se3"
+#rep_save_local à supprimer ?
 REP_SAVE_LOCAL="$REP_SE3_LOCAL/save"
 REP_BIN_LOCAL="$REP_SE3_LOCAL/bin"
 REP_SKEL_LOCAL="$REP_SE3_LOCAL/skel"
@@ -72,7 +74,7 @@ REP_TMP_LOCAL="$REP_SE3_LOCAL/tmp"
 LOGON_SCRIPT_LOCAL="$REP_BIN_LOCAL/logon"
 PAM_SCRIPT_AUTH="/usr/share/libpam-script/pam_script_auth"
 CREDENTIALS="$REP_TMP_LOCAL/credentials"
-#LIGHTDM_CONF="/etc/lightdm/lightdm.conf"
+#LIGHTDM_CONF="/etc/lightdm/lightdm.conf"   à supprimer ?
 
 # Les options de base pour un montage CIFS.
 OPTIONS_MOUNT_CIFS_BASE="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
@@ -190,7 +192,7 @@ changer_mot_de_passe_root ()
 
 restaurer_via_save ()
 {
-    # est-ce utile ?
+    # est-ce utile ? à supprimer.
     # Fonction qui restaure, en préservant les droits, un fichier
     # à partir de sa version dans REP_SAVE_LOCAL.
     
@@ -259,8 +261,8 @@ trap 'nettoyer_avant_de_sortir' EXIT
 
 recuperer_options()
 {
-    # fonction inutilisée actuellement :
     # la récupération des options se fait en début du programme (voir ci-dessous)
+    # cette fonction analyse les différentes options transmises au script.
     
     # Une options longue avec les « :: » signifie que le paramètre est optionnel
     # (par exemple « --nom-client » ou « --nom-client="S121-HPS-04" »).
@@ -381,8 +383,6 @@ recuperer_options()
 definir_paquets_a_installer()
 {
     # Les paquets nécessaires à l'intégration.
-    # Ces paquets seront désinstaller pour être installés par la suite
-    # Cela permettra la configuration convenable de certains d'entre eux
     #
     # Ils ne peuvent être définis qu'après avoir connaissance
     # de l'activation éventuelle de l'option --installer-samba.
@@ -580,6 +580,7 @@ verifier_acces_ping_se3()
     # On vérifie que le Se3 est bien accessible via un ping.
     # mais certains vlans bloquent les pings…
     # il vaut donc mieux utiliser nmap
+    # on conserve cette fonction pour mémoire…
     #
     if ! ping -c 5 -W 2 "$SE3" >> $SORTIE 2>&1
     then
@@ -607,6 +608,7 @@ verifier_acces_nmap_se3()
 
 desinstaller_mDNS()
 {
+    # à supprimer ?
     # Pas de client mDNS (le paquet tout seul est désinstallé).
     #
     # En effet, lors de la résolution d'un nom, ce protocole est
@@ -630,6 +632,7 @@ desinstaller_mDNS()
 
 arret_definitif_avahi_daemon()
 {
+    # à supprimer ?
     # Arrêt définitif du service avahi-daemon.
     #
     # C'est la partie serveur du protocole mDNS dont on n'a que faire.
@@ -678,9 +681,8 @@ installer_paquets_cifs()
     #
     # Ce paquet nécessite l'installation du paquet samba-common
     # qui ne pose plus de questions à l'utilisateur au moment de
-    # l'installation : voir la fonction obsolète ci-dessus.
+    # l'installation ; cependant, on maintient les paramètres.
     # dpkg-reconfigure samba-common permet la configuration (2 questions pour Jessie)
-    # mais on préconfigure
     # pour le praramètre dhcp, par défaut c'est false
     # mais ici on met true pour le service WINS si OPTION_INSTALLER_SAMBA est à true
     debconf_parametres=$(mktemp)
@@ -720,7 +722,6 @@ effacer_repertoire_rep_se3_local()
 {
     # est-ce utile ? par précaution ?
     # On efface le fichier ou répertoire REP_SE3_LOCAL s'il existe
-    # pour créer un répertoire vide qui sera rempli ensuite.
     #
     if [ -e "$REP_SE3_LOCAL" ]
     then
@@ -741,6 +742,7 @@ creer_repertoire_rep_se3_local()
 
 copier_repertoire_rep_bin()
 {
+    # création d'un répertoire vide qui sera rempli ensuite.
     # Copie du répertoire REP_BIN.
     #
     cp -r "$REP_BIN" "$REP_BIN_LOCAL"
@@ -767,7 +769,7 @@ copier_repertoire_rep_skel()
 
 copier_repertoire_rep_save()
 {
-    # est-ce utile ?
+    # est-ce utile ? à supprimer
     # Copie du répertoire REP_SAVE
     #
     cp -r "$REP_SAVE" "$REP_SAVE_LOCAL"
@@ -777,7 +779,8 @@ copier_repertoire_rep_save()
 
 droits_fichiers_locaux()
 {
-    # est-ce utile ? Sachant qu'on n'utilise le script que dans un système venant d'être installé donc "clean"…
+    # est-ce utile ? à supprimer
+    # Sachant qu'on n'utilise le script que dans un système venant d'être installé donc "clean"…
     # Mise en place des droits sur les fichiers tels qu'ils sont
     # sur un système « clean ».
     #
@@ -1147,57 +1150,10 @@ desinstaller_gestionnaire_fenetres()
     apt-get remove --purge --yes twm >> $SORTIE 2>&1
 }
 
-modifier_fichiers_pam_old()
-{
-    # Fonction inutile ?
-    # On modifie le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
-    #
-    # Buts :
-    # 1) il fasse appel à la bibliothèque pam_script.so.
-    # 2) il y ait des « includes » des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
-    #
-    if [ "$gdm" = "gdm3" ]
-    then
-        # le nom du fichier gdm3 a changé avec Jessie
-        # Ensuite (cas gdm3), dans le fichier "/etc/pam.d/gdm-password" et lui seul, on va
-        # changer les instructions « @include » pour importer les fichiers
-        # "/etc/pam.d/common-*.AVEC-LDAP". Ainsi, gdm3 sera la seule application
-        # utilisant PAM qui tiendra compte de LDAP. Par exemple, les comptes
-        # LDAP ne pourront pas se connecter au système via la console ou via ssh.
-        fichier_gdm="gdm-password"
-    fi
-    if [ "$gdm" = "lightdm" ]
-    then
-        # toujours le même nom avec ligthdm
-        fichier_gdm="lightdm"
-    fi
-    restaurer_via_save "/etc/pam.d/${fichier_gdm}"
-    # Insertion de la ligne « auth    optional    pam_script.so ».
-    awk '{ print $0 }  /^\-?auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
-    "${REP_SAVE_LOCAL}/etc/pam.d/${fichier_gdm}" > "/etc/pam.d/${fichier_gdm}"
-    
-    # Inclusion des fichiers "/etc/pam.d/common-*.AVEC-LDAP".
-    sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/${fichier_gdm}"
-    
-    #####
-    # Modification de pam pour Jessie :
-    # L'installation de libpam-script a ajouté des appels à pam_script.so
-    # Or cet appel ne doit se faire que dans le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
-    # dans tous les fichiers common-*.AVEC-LDAP, on les met donc en commentaire
-    # → inutile pour les autres puisqu'ils ont été restaurer via la fonction "restaurer_via_save"
-    sed -i '/pam_script/ s/^/#/g'     /etc/pam.d/common-session.AVEC-LDAP \
-                                    /etc/pam.d/common-session-noninteractive.AVEC-LDAP \
-                                    /etc/pam.d/common-account.AVEC-LDAP \
-                                    /etc/pam.d/common-auth.AVEC-LDAP \
-                                    /etc/pam.d/common-password.AVEC-LDAP
-    # Fin de la modification de pam pour Jessie
-    #####
-}
-
 
 modifier_fichiers_pam()
 {
-    # Jessie - Modification pour "ldapiser" tous les processus utilisant les common-*
+    # À partir de Jessie - Modification pour "ldapiser" tous les processus utilisant les common-*
     # On modifie le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
     # pour faire appel à la bibliothèque pam_script.so.
     #
@@ -1215,12 +1171,7 @@ modifier_fichiers_pam()
             fichier_gdm="lightdm"
         ;;
     esac
-    # → est-il nécessaire de restaurer ? Peut-on utiliser sans problème le fichier existant ?
-    #restaurer_via_save "/etc/pam.d/${fichier_gdm}"
     # Insertion de la ligne « auth    optional    pam_script.so ».
-    # ligne à supprimer ?
-    #awk '{ print $0 }  /^\-?auth.*pam_gnome_keyring\.so/ { print "auth\toptional\tpam_script.so" }' \
-    #    "${REP_SAVE_LOCAL}/etc/pam.d/${fichier_gdm}" > "/etc/pam.d/${fichier_gdm}"
     # ligne issue du script pour Xenial
     sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/${fichier_gdm}
     
@@ -1279,7 +1230,7 @@ END
 
 parametrer_gnome_screensaver()
 {
-    # fonction plus utilisée
+    # fonction plus utilisée : à supprimer
     
     # Paramétrage de gnome-screensaver,
     # utiliser quand une session doit être déverrouillée.
@@ -1293,6 +1244,7 @@ parametrer_gnome_screensaver()
 
 reecrire_fichier_nslcd()
 {
+    # inutile ? à supprimer
     # On ré-écris de A à Z le fichier /etc/nslcd.conf
     cat > "/etc/nslcd.conf" << END
 # /etc/nslcd.conf
@@ -1494,7 +1446,8 @@ configurer_gestionnaire_connexion()
 
 modifier_fichier_user_dirs()
 {
-    # est-ce utile ? le skel s'en charge
+    # est-ce utile ? à supprimer
+    # le skel s'en charge
     # Ce fichier permet de gérer les répertoires créés par défaut dans
     # le /home de l'utilisateur (comme le répertoire Bureau ou Images etc).
     #
@@ -1661,20 +1614,13 @@ montage_partage_netlogon
 # Mise en place du répertoire local REP_SE3_LOCAL
 #=====
 afficher "mise en place du répertoire local $REP_SE3_LOCAL"
-echo -n " 7..."
-# est-il utile d'effacer ?
+echo -n " 5..."
 effacer_repertoire_rep_se3_local
 creer_repertoire_rep_se3_local
-echo -n " 6..."
-copier_repertoire_rep_bin
-echo -n " 5..."
-copier_repertoire_rep_skel
 echo -n " 4..."
-# est-ce utile ?
-#copier_repertoire_rep_save
+copier_repertoire_rep_bin
 echo -n " 3..."
-# est-ce utile ?
-#droits_fichiers_locaux
+copier_repertoire_rep_skel
 echo -n " 2..."
 creation_repertoire_unefois_local
 echo -n " 1..."
