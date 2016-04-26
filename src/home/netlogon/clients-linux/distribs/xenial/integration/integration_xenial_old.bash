@@ -4,7 +4,7 @@
 # script d'intégration des clients Xenial à un domaine géré par un se3
 #
 #
-# version : 20160408
+# version : 20160426
 #
 #
 ##### #####
@@ -1855,18 +1855,12 @@ verifier_ip_se3
 echo " 0..."
 verifier_acces_ping_se3
 afficher "Vérifications OK."
-
-##############################################
-# Xenial :
-#afficher "désinstallation du paquet libnss-mdns"
-#desinstaller_mDNS
-#afficher "arrêt définitif du service avahi-daemon"
-#arret_definitif_avahi_daemon
-#afficher "purge des paquets $PAQUETS_TOUS"
-#purger_paquets
-# Fin Xenial
-##############################################
-
+afficher "désinstallation du paquet libnss-mdns"
+desinstaller_mDNS
+afficher "arrêt définitif du service avahi-daemon"
+arret_definitif_avahi_daemon
+afficher "purge des paquets $PAQUETS_TOUS"
+purger_paquets
 #afficher "arrêt définitif du daemon exim4"
 #arret_definitif_exim4_daemon
 
