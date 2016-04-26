@@ -987,7 +987,8 @@ renommer_nom_client()
         echo "$NOM_CLIENT" > "/etc/hostname"
         #invoke-rc.d hostname.sh stop >> $SORTIE 2>&1
         service hostname stop >> $SORTIE 2>&1
-        #invoke-rc.d hostname.sh start >> $SORTIE 2>&1
+        invoke-rc.d hostname.sh start >> $SORTIE 2>&1
+        # ne fonctionne plus…
         service hostname start >> $SORTIE 2>&1
     fi
     
@@ -1298,8 +1299,9 @@ modifier_fichier_smb()
                  "à la machine cliente que le serveur SambaÉdu est le" \
                  "serveur WINS du domaine" | tee -a $compte_rendu
         sed -i -r -e "s/^.*wins +server +=.*$/wins server = $SE3/" "/etc/samba/smb.conf"
-        #invoke-rc.d samba restart >> $SORTIE 2>&1
-        service samba restart >> $SORTIE 2>&1
+        invoke-rc.d samba restart >> $SORTIE 2>&1
+        # ne fonctionne plus…
+        #service samba restart >> $SORTIE 2>&1
     fi
 }
 
