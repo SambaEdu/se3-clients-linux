@@ -986,10 +986,10 @@ renommer_nom_client()
         afficher "changement de nom du système" | tee -a $compte_rendu
         echo "$NOM_CLIENT" > "/etc/hostname"
         #invoke-rc.d hostname.sh stop >> $SORTIE 2>&1
-        service hostname stop >> $SORTIE 2>&1
+        #service hostname stop >> $SORTIE 2>&1
         invoke-rc.d hostname.sh start >> $SORTIE 2>&1
         # ne fonctionne plus…
-        service hostname start >> $SORTIE 2>&1
+        #service hostname start >> $SORTIE 2>&1
     fi
     
     unset -v cartes_reseau carte_mac_ip carte adresse_mac adresse_ip 
