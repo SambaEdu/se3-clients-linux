@@ -679,7 +679,7 @@ verifier_disponibilite_paquets()
     # Vérification de la disponibilité des paquets nécessaires à l'intégration.
     for paquet in $PAQUETS_TOUS
     do
-        if ! apt-get install "$paquet" --yes --simulate >> $SORTIE 2>&1
+        if ! apt-get -f install "$paquet" --yes --simulate >> $SORTIE 2>&1
         then
             afficher "Désolé, le paquet $paquet n'est pas disponible dans" \
                      "les dépôts alors que celui-ci est nécessaire pour" \
@@ -815,6 +815,7 @@ samba-common    samba-common/do_debconf    boolean    true
     # samba-common-bin qui ferait du client un serveur Samba ce qui serait
     # inutile ici.
     apt-get install --no-install-recommends --reinstall --yes $PAQUETS_MONTAGE_CIFS >> $SORTIE 2>&1
+    apt-get -f install >> $SORTIE 2>&1 
 }
 
 
