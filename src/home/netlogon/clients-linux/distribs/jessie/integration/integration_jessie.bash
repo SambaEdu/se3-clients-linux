@@ -4,7 +4,7 @@
 # script d'intégration des clients Jessie à un domaine géré par un se3
 #
 #
-# version : 20160422
+# version : 20160426
 #
 #
 #
@@ -82,6 +82,8 @@ OPTIONS_MOUNT_CIFS_BASE="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
 # Variable de sortie en cas de debuggage
 SORTIE="/dev/null"
 
+ladate=$(date +%Y%m%d%H%M%S)
+compte_rendu=/root/compte_rendu_integration_client_${ladate}.txt
 
 #=====
 # Fonctions du programme
@@ -259,6 +261,11 @@ nettoyer_avant_de_sortir ()
 # Avant de se terminer la fonction nettoyer_avant_de_sortir sera appelée.
 trap 'nettoyer_avant_de_sortir' EXIT
 
+message_debut()
+{
+    echo "Compte-rendu de l'intégration du client-linux : $ladate" > $compte_rendu
+}
+
 recuperer_options()
 {
     # la récupération des options se fait en début du programme (voir ci-dessous)
@@ -317,45 +324,52 @@ recuperer_options()
         case "$1" in
         
             -h|--help)
-                afficher "Aide : voir la documentation (au format pdf) associée." 
+                afficher "Aide : voir la documentation (https://github.com/SambaEdu/se3-docs/blob/master/se3-clients-linux/options_scripts.md) associée." 
                 exit 0
             ;;
             
             --nom-client|--nc)
                 OPTION_NOM_CLIENT="true"
                 NOM_CLIENT="$2"
+                echo "le nom du client : $NOM_CLIENT" >> $compte_rendu
                 shift 2
             ;;
             
             --mdp-grub|--mg) 
                 OPTION_MDP_GRUB="true"
                 MDP_GRUB="$2"
+                echo "le mot de passe grub : $MDP_GRUB" >> $compte_rendu
                 shift 2
             ;;
             
             --mdp-root|--mr) 
                 OPTION_MDP_ROOT="true"
                 MDP_ROOT="$2"
+                echo "le mot de passe root : $MDP_ROOT" >> $compte_rendu
                 shift 2
             ;;
             
             --ignorer-verification-ldap|--ivl) 
                 OPTION_IV_LDAP="true"
+                echo "on ignore la vérification ldap" >> $compte_rendu
                 shift 1
             ;;
             
             --redemarrer-client|--rc) 
                 OPTION_REDEMARRER="true"
+                echo "on redémarre le client à la fin" >> $compte_rendu
                 shift 1
             ;;
             
             --installer-samba|--is) 
                 OPTION_INSTALLER_SAMBA="true"
+                echo "on installe samba" >> $compte_rendu
                 shift 1
             ;;
             
             --debug|--d) 
-                SORTIE=">&1"
+                SORTIE="$compte_rendu"
+                echo "mode debuggage demandé" >> $compte_rendu
                 shift 1
             ;;
             
@@ -374,7 +388,7 @@ recuperer_options()
     
     if [ -n "$1" ]
     then
-        afficher "Désolé le script ne prend aucun argument à part des" \
+        afficher "Désolé, le script ne prend aucun argument à part des" \
                  "options de la forme « --xxx ». Fin du script."
         exit 1
     fi
@@ -933,24 +947,24 @@ afficher_info_carte_reseau_client()
     # de la machine cliente.
     #
     afficher "pour information, voici l'adresse MAC et l'adresse IP des cartes" \
-             "réseau de la machine cliente ($NOM_CLIENT) :"
+             "réseau de la machine cliente ($NOM_CLIENT) :" | tee -a $compte_rendu
     for i in $carte_mac_ip
     do
         carte=$(echo "$i" | cut -d";" -f 1)
         adresse_mac=$(echo "$i" | cut -d";" -f 2)
         adresse_ip=$(echo "$i" | cut -d";" -f 3)
         # On ne saute pas de ligne ici, alors on utilise echo.
-        echo "* $carte <--> $adresse_mac (IP: $adresse_ip)"
+        echo "* $carte <--> $adresse_mac (IP: $adresse_ip)" | tee -a $compte_rendu
     done
     
     if "$OPTION_IV_LDAP"
     then
         afficher "vous avez choisi d'ignorer la vérification LDAP, le script" \
-                 "d'intégration continue son exécution"
+                 "d'intégration continue son exécution" | tee -a $compte_rendu
     else
         afficher "d'après les informations ci-dessus, voulez-vous continuer" \
                  "l'exécution du script d'intégration ? Si oui, alors répondez" \
-                 "« oui » (en minuscules), sinon répondez autre chose :"
+                 "« oui » (en minuscules), sinon répondez autre chose :" | tee -a $compte_rendu
         read -r reponse
         if [ "$reponse" != "oui" ]
         then
@@ -969,7 +983,7 @@ renommer_nom_client()
     #
     if "$OPTION_NOM_CLIENT"
     then
-        afficher "changement de nom du système"
+        afficher "changement de nom du système" | tee -a $compte_rendu
         echo "$NOM_CLIENT" > "/etc/hostname"
         #invoke-rc.d hostname.sh stop >> $SORTIE 2>&1
         service hostname stop >> $SORTIE 2>&1
@@ -1005,7 +1019,7 @@ set_grub_pwd ()
     # un mot de passe Grub.
     if "$OPTION_MDP_GRUB"
     then
-        afficher "mise en place du mot de passe Grub (le login sera « admin »)."
+        afficher "mise en place du mot de passe Grub (le login sera « admin »)." | tee -a $compte_rendu
         
         if [ -z "$MDP_GRUB" ]
         then
@@ -1057,7 +1071,7 @@ set_grub_pwd ()
             afficher "Attention, la commande « update_grub » ne s'est pas" \
                      "effectuée correctement, a priori Grub n'est pas"     \
                      "opérationnel. Il faut rectifier la configuration de" \
-                     "Grub jusqu'à ce que la commande se déroule sans erreur."
+                     "Grub jusqu'à ce que la commande se déroule sans erreur." | tee -a $compte_rendu
             exit 1
         fi
         
@@ -1074,7 +1088,7 @@ mise_en_place_mot_de_passe_root()
     #
     if "$OPTION_MDP_ROOT"
     then
-        afficher "changement du mot de passe root"
+        afficher "changement du mot de passe root" | tee -a $compte_rendu
         
         if [ -z "$MDP_ROOT" ]
         then
@@ -1282,7 +1296,7 @@ modifier_fichier_smb()
     then
         afficher "modification du fichier /etc/samba/smb.conf afin d'indiquer" \
                  "à la machine cliente que le serveur SambaÉdu est le" \
-                 "serveur WINS du domaine"
+                 "serveur WINS du domaine" | tee -a $compte_rendu
         sed -i -r -e "s/^.*wins +server +=.*$/wins server = $SE3/" "/etc/samba/smb.conf"
         #invoke-rc.d samba restart >> $SORTIE 2>&1
         service samba restart >> $SORTIE 2>&1
@@ -1319,7 +1333,7 @@ configurer_gdm3 ()
     #
     afficher "configuration du gestionnaire de connexion : ${gdm} "\
              "afin que le script de logon soit exécuté au démarrage de ${gdm}," \
-             "à l'ouverture et à la fermeture de session."
+             "à l'ouverture et à la fermeture de session." | tee -a $compte_rendu
     
     #####
     # Modification du fichier /etc/gdm3/Init/Default
@@ -1421,7 +1435,7 @@ configurer_lightdm ()
     #
     afficher "configuration du gestionnaire de connexion ${gdm} "\
              "afin que le script de logon soit exécuté au démarrage de ${gdm}," \
-             "à l'ouverture et à la fermeture de session."
+             "à l'ouverture et à la fermeture de session." | tee -a $compte_rendu
     
     #####
     # Modification du fichier /etc/lightdm/lightdm.conf
@@ -1523,18 +1537,18 @@ decompte_10s()
 {
     if "$OPTION_REDEMARRER"
     then
-        afficher "La machine va redémarrer dans 10 secondes."
+        afficher "La machine va redémarrer dans 10 secondes." | tee -a $compte_rendu
         echo ""
         for i in 1 2 3 4 5 6 7 8 9 10
         do
             sleep 1
-            echo -n "$i... "
+            echo -n "$i... " | tee -a $compte_rendu
         done
         printf "\n"
         reboot
         exit 0
     else
-        afficher "pour que le système soit opérationnel, vous devez le redémarrer."
+        afficher "pour que le système soit opérationnel, vous devez le redémarrer." | tee -a $compte_rendu
         exit 0
     fi
 }
@@ -1546,6 +1560,8 @@ decompte_10s()
 
 #####
 # début du programme
+# le compte-rendu : mise en place
+message_debut
 
 #=====
 # Les options
@@ -1562,29 +1578,29 @@ definir_paquets_a_installer
 #=====
 # Vérifications sur le client
 #=====
-afficher "vérifications sur le système client..."
-echo -n " 8..."
+afficher "vérifications sur le système client..." | tee -a $compte_rendu
+echo -n " 8..." | tee -a $compte_rendu
 verifier_droits_root
-echo -n " 7..."
+echo -n " 7..." | tee -a $compte_rendu
 verifier_version_debian
-echo -n " 6..."
+echo -n " 6..." | tee -a $compte_rendu
 verifier_gdm
-echo -n " 5..."
+echo -n " 5..." | tee -a $compte_rendu
 verifier_nom_client
-echo -n " 4..."
+echo -n " 4..." | tee -a $compte_rendu
 verifier_repertoire_montage
-echo -n " 3..."
+echo -n " 3..." | tee -a $compte_rendu
 verifier_apt_get
-echo -n " 2..."
+echo -n " 2..." | tee -a $compte_rendu
 verifier_disponibilite_paquets
-echo -n " 1..."
+echo -n " 1..." | tee -a $compte_rendu
 verifier_ip_se3
-echo " 0..."
-afficher "gestionnaire de connexion installé : $gdm"
-afficher "vérification accès se3"
+echo " 0..." | tee -a $compte_rendu
+afficher "gestionnaire de connexion installé : $gdm" | tee -a $compte_rendu
+afficher "vérification accès se3" | tee -a $compte_rendu
 #verifier_acces_ping_se3
 verifier_acces_nmap_se3     # meilleure vérification pour l'instant
-afficher "vérifications terminées"
+afficher "vérifications terminées" | tee -a $compte_rendu
 
 #=====
 # Cas mdns et avahi
@@ -1605,27 +1621,27 @@ afficher "vérifications terminées"
 #=====
 # Montage du partage NOM_PARTAGE_NETLOGON
 #=====
-afficher "installation du paquet $PAQUETS_MONTAGE_CIFS"
+afficher "installation du paquet $PAQUETS_MONTAGE_CIFS" | tee -a $compte_rendu
 installer_paquets_cifs
-afficher "montage du partage « $NOM_PARTAGE_NETLOGON » du serveur"
+afficher "montage du partage « $NOM_PARTAGE_NETLOGON » du serveur" | tee -a $compte_rendu
 montage_partage_netlogon
 
 #=====
 # Mise en place du répertoire local REP_SE3_LOCAL
 #=====
-afficher "mise en place du répertoire local $REP_SE3_LOCAL"
-echo -n " 5..."
+afficher "mise en place du répertoire local $REP_SE3_LOCAL" | tee -a $compte_rendu
+echo -n " 5..." | tee -a $compte_rendu
 effacer_repertoire_rep_se3_local
 creer_repertoire_rep_se3_local
-echo -n " 4..."
+echo -n " 4..." | tee -a $compte_rendu
 copier_repertoire_rep_bin
-echo -n " 3..."
+echo -n " 3..." | tee -a $compte_rendu
 copier_repertoire_rep_skel
-echo -n " 2..."
+echo -n " 2..." | tee -a $compte_rendu
 creation_repertoire_unefois_local
-echo -n " 1..."
+echo -n " 1..." | tee -a $compte_rendu
 creation_repertoire_rep_log_local
-echo " 0..."
+echo " 0..." | tee -a $compte_rendu
 creation_repertoire_rep_tmp_local
 
 #=====
@@ -1635,16 +1651,16 @@ recuperer_nom_client
 afficher "installation de l'exécutable ldapsearch et vérification de la" \
          "connexion avec l'annuaire LDAP du serveur à travers une" \
          "recherche d'enregistrements en rapport avec le client (au niveau" \
-         "du nom de machine ou de l'adresse MAC ou de l'adresse IP)"
-afficher "installation du paquet $PAQUETS_CLIENT_LDAP"
+         "du nom de machine ou de l'adresse MAC ou de l'adresse IP)" | tee -a $compte_rendu
+afficher "installation du paquet $PAQUETS_CLIENT_LDAP" | tee -a $compte_rendu
 installer_paquets_client_ldap
-afficher "vérification de la connexion à l'annuaire ldap du se3"
+afficher "vérification de la connexion à l'annuaire ldap du se3" | tee -a $compte_rendu
 verifier_connexion_ldap_se3
 rechercher_ldap_client
-afficher "résultat de la recherche LDAP :"
-echo "-------------------------------------------------"
-echo "$resultat"
-echo "-------------------------------------------------"
+afficher "résultat de la recherche LDAP :" | tee -a $compte_rendu
+echo "-------------------------------------------------" | tee -a $compte_rendu
+echo "$resultat" | tee -a $compte_rendu
+echo "-------------------------------------------------" | tee -a $compte_rendu
 afficher_info_carte_reseau_client
 # dépend de l'option --nom-client
 renommer_nom_client
@@ -1654,7 +1670,7 @@ renommer_nom_client
 #=====
 # Peu importe que l'option --nom-client ait été spécifiée ou non,
 # nous allons réécriture le fichier /etc/hosts.
-afficher "réécriture complète du fichier /etc/hosts"
+afficher "réécriture complète du fichier /etc/hosts" | tee -a $compte_rendu
 reecrire_fichier_hosts
 
 #=====
@@ -1672,12 +1688,12 @@ mise_en_place_mot_de_passe_root
 #=====
 # Installation des paquets
 #=====
-afficher "installation des paquets nécessaires à l'intégration : $PAQUETS_AUTRES"
+afficher "installation des paquets nécessaires à l'intégration : $PAQUETS_AUTRES" | tee -a $compte_rendu
 installer_paquets_integration
 # Cas particulier : sur Debian, on a besoin du paquet sudo
 # Cela sert dans le fichier logon plusieurs fois.
 installer_paquet_sudo
-afficher "installation des paquets terminée"
+afficher "installation des paquets terminée" | tee -a $compte_rendu
 
 # twm n'est plus utilisé par debian
 #desinstaller_gestionnaire_fenetres        # supprimer cette fonction ?
@@ -1688,7 +1704,7 @@ afficher "installation des paquets terminée"
 afficher "configuration de PAM afin que seul le gestionnaire de connexion" \
          "consulte l'annuaire LDAP du serveur pour l'authentification." \
          "Une authentification via ssh (par exemple) ne sera possible" \
-         "qu'avec un compte local"
+         "qu'avec un compte local" | tee -a $compte_rendu
 modifier_fichiers_pam
 creation_fichier_pam
 
@@ -1713,7 +1729,7 @@ modifier_fichier_smb
 #=====
 afficher "réécriture complète du fichier /etc/default/ntpdate" \
          "afin que l'heure du système soit mise à jour via le" \
-         "serveur NTP indiqué dans le script d'intégration"
+         "serveur NTP indiqué dans le script d'intégration" | tee -a $compte_rendu
 reecrire_fichier_ntpdate
 
 #=====
@@ -1750,11 +1766,11 @@ desactiver_hibernation_mise_en_veille
 #=====
 # suppression de la liste des paquets inutilisés
 apt-get autoremove -y >> $SORTIE 2>&1
-afficher "intégration terminée"
+afficher "intégration terminée" | tee -a $compte_rendu
 afficher "si ce n'est pas déjà fait, pensez à effectuer" \
          "une réservation d'adresse IP du client via" \
          "le serveur DHCP du SambaÉdu, afin d'inscrire" \
-         "le nom de la machine cliente dans l'annuaire"
+         "le nom de la machine cliente dans l'annuaire" | tee -a $compte_rendu
 decompte_10s
 
 # Fin du programme
