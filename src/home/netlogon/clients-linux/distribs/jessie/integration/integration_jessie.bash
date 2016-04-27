@@ -70,7 +70,6 @@ REP_TMP_LOCAL="$REP_SE3_LOCAL/tmp"
 LOGON_SCRIPT_LOCAL="$REP_BIN_LOCAL/logon"
 PAM_SCRIPT_AUTH="/usr/share/libpam-script/pam_script_auth"
 CREDENTIALS="$REP_TMP_LOCAL/credentials"
-#LIGHTDM_CONF="/etc/lightdm/lightdm.conf"   à supprimer ?
 
 # Les options de base pour un montage CIFS.
 OPTIONS_MOUNT_CIFS_BASE="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
@@ -443,7 +442,7 @@ verifier_gdm()
         ;;
     
         lightdm)
-            # test réussi pour lightdm : à confirmer…
+            # test réussi pour lightdm
             true
         ;;
     
@@ -1356,7 +1355,7 @@ desactiver_hibernation_mise_en_veille()
             # afin d'éviter qu'un PC soit vérouillé par un utilisateur et ne nécessite, de ce fait,
             # un redémarrage pour être déverrouiller…
             # 
-            # Et sous lxde, est-ce xscreensaver ?
+            # Et sous Lxde, est-ce xscreensaver ?
             afficher "purge du paquet xscreensaver" \
                      "pour rendre caduque l'onglet « vérouillage de l'écran »"
             apt-get purge -y xscreensaver
