@@ -4,7 +4,7 @@
 # script d'intégration des clients Jessie à un domaine géré par un se3
 #
 #
-# version : 20160426
+# version : 20160427
 #
 #
 #
@@ -56,16 +56,12 @@ CHEMIN_PARTAGE_NETLOGON="//$SE3/$NOM_PARTAGE_NETLOGON"
 # Les répertoires/fichiers importants suite au montage du partage.
 REP_MONTAGE="/mnt"
 REP_NETLOGON="$REP_MONTAGE/netlogon"
-#rep_save à supprimer ?
-REP_SAVE="$REP_NETLOGON/distribs/$NOM_DE_CODE/save"
 REP_SKEL="$REP_NETLOGON/distribs/$NOM_DE_CODE/skel"
 REP_BIN="$REP_NETLOGON/bin"
 REP_INTEGRATION="$REP_NETLOGON/distribs/$NOM_DE_CODE/integration"
 
 # Les répertoires/fichiers importants locaux au client.
 REP_SE3_LOCAL="/etc/se3"
-#rep_save_local à supprimer ?
-REP_SAVE_LOCAL="$REP_SE3_LOCAL/save"
 REP_BIN_LOCAL="$REP_SE3_LOCAL/bin"
 REP_SKEL_LOCAL="$REP_SE3_LOCAL/skel"
 REP_UNEFOIS_LOCAL="$REP_SE3_LOCAL/unefois"
@@ -82,15 +78,18 @@ OPTIONS_MOUNT_CIFS_BASE="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
 # Variable de sortie en cas de debuggage
 SORTIE="/dev/null"
 
+# date et compte-rendu du script
 ladate=$(date +%Y%m%d%H%M%S)
 compte_rendu=/root/compte_rendu_integration_client_${ladate}.txt
+
 
 #=====
 # Fonctions du programme
 # début
 #=====
 
-afficher ()
+
+afficher()
 {
     # Fonction pour afficher des messages.
     #
@@ -100,7 +99,7 @@ afficher ()
     sleep 0.5
 }
 
-tester_nom_client ()
+tester_nom_client()
 {
     # Fonction qui teste si le nom du client est un nom valide.
     # Elle prend un argument qui est le nom à tester bien sûr.
@@ -125,7 +124,7 @@ tester_nom_client ()
 }
 
 
-afficher_erreur_nom_client ()
+afficher_erreur_nom_client()
 {
     # Affiche un message d'erreur concernant le nom du client à intégrer.
     #
@@ -135,7 +134,7 @@ afficher_erreur_nom_client ()
 }
 
 
-demander_mot_de_passe ()
+demander_mot_de_passe()
 {
     # Fonction qui Demande un mot de passe à l'utilisateur avec confirmation
     # et définit ensuite la variable « mot_de_passe » qui contient alors 
@@ -169,7 +168,7 @@ demander_mot_de_passe ()
 }
 
 
-hash_grub_pwd ()
+hash_grub_pwd()
 {
     # Fonction qui permet d'obtenir le hachage version Grub2 d'un mot 
     # de passe donné. La fonction prend un argument qui est le mot de 
@@ -182,7 +181,7 @@ hash_grub_pwd ()
 }
 
 
-changer_mot_de_passe_root ()
+changer_mot_de_passe_root()
 {
     # Fonction qui permet de changer le mot de passe root.
     #
@@ -192,24 +191,7 @@ changer_mot_de_passe_root ()
 }
 
 
-restaurer_via_save ()
-{
-    # est-ce utile ? à supprimer.
-    # Fonction qui restaure, en préservant les droits, un fichier
-    # à partir de sa version dans REP_SAVE_LOCAL.
-    
-    # 1 argument : Le nom du fichier est donné 
-    # 1) Le fichier doit exister dans REP_SAVE_LOCAL et 
-    # 2) son nom doit être exprimé sous la forme d'un chemin absolu, correspondant
-    # à son emplacement dans le système. Par exemple "/etc/machin" comme paramètre
-    # implique que "$REP_SAVE_LOCAL"/etc/machin" doit exister.
-    #
-    # Si la cible existe déjà, elle sera écrasée.
-    cp -a "${REP_SAVE_LOCAL}$1" "$1"
-}
-
-
-nettoyer_avant_de_sortir ()
+nettoyer_avant_de_sortir()
 {
     # Fonction qui permettra de supprimer le montage REP_NETLOGON
     # (entre autres) si le script se termine incorrectement.
@@ -258,13 +240,17 @@ nettoyer_avant_de_sortir ()
     esac
 }
 
-# Avant de se terminer la fonction nettoyer_avant_de_sortir sera appelée.
+
+# En cas de sortie impromptue du script,
+# la fonction nettoyer_avant_de_sortir sera appelée.
 trap 'nettoyer_avant_de_sortir' EXIT
+
 
 message_debut()
 {
     echo "Compte-rendu de l'intégration du client-linux : $ladate" > $compte_rendu
 }
+
 
 recuperer_options()
 {
@@ -394,6 +380,7 @@ recuperer_options()
     fi
 }
 
+
 definir_paquets_a_installer()
 {
     # Les paquets nécessaires à l'intégration.
@@ -412,6 +399,7 @@ definir_paquets_a_installer()
     PAQUETS_TOUS="$PAQUETS_MONTAGE_CIFS $PAQUETS_CLIENT_LDAP $PAQUETS_AUTRES"
 }
 
+
 verifier_droits_root()
 {
     # On vérifie que l'utilisateur a bien les droits de root.
@@ -428,6 +416,7 @@ verifier_droits_root()
     fi
 }
 
+
 verifier_version_debian()
 {
     # On vérifie que la version Debian est bien celle correspondant au script.
@@ -440,6 +429,7 @@ verifier_version_debian()
         exit 1
     fi
 }
+
 
 verifier_gdm()
 {
@@ -466,6 +456,7 @@ verifier_gdm()
     
     esac
 }
+
 
 verifier_nom_client()
 {
@@ -498,6 +489,7 @@ verifier_nom_client()
         fi
     fi
 }
+
 
 verifier_repertoire_montage()
 {
@@ -532,6 +524,7 @@ verifier_repertoire_montage()
     fi
 }
 
+
 verifier_apt_get()
 {
     # Vérification du bon fonctionnement de « apt-get update ».
@@ -550,6 +543,7 @@ verifier_apt_get()
     fi
 }
 
+
 verifier_disponibilite_paquets()
 {
     # Vérification de la disponibilité des paquets nécessaires à l'intégration.
@@ -567,6 +561,7 @@ verifier_disponibilite_paquets()
         fi
     done
 }
+
 
 verifier_ip_se3()
 {
@@ -620,75 +615,6 @@ verifier_acces_nmap_se3()
 }
 
 
-desinstaller_mDNS()
-{
-    # à supprimer ?
-    # Pas de client mDNS (le paquet tout seul est désinstallé).
-    #
-    # En effet, lors de la résolution d'un nom, ce protocole est
-    # utilisé avant DNS si et seulement si le nom d'hôte se termine
-    # par ".local". Et comme sur un réseau pédagogique il n'y a pas
-    # serveur mDNS, la résolution ne fonctionne pas. Et par défaut,
-    # quand la résolution mDNS n'aboutit pas, le protocole DNS n'est
-    # pas utilisé ensuite si bien que le nom d'hôte n'est pas résolu.
-    #
-    # Ça provient de la ligne
-    # « hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4 »
-    # dans le fichier /etc/nsswitch.conf.
-    #
-    # Bref, ce protocole ne sert à rien dans un réseau pédagogique
-    # et il peut même entraîner des erreurs (par exemple un simple
-    # « ping se3.intranet.local » ne fonctionnera pas alors que
-    #  « ping se3 » fonctionnera).
-    #
-    apt-get remove --purge --yes libnss-mdns >> $SORTIE 2>&1
-}
-
-arret_definitif_avahi_daemon()
-{
-    # à supprimer ?
-    # Arrêt définitif du service avahi-daemon.
-    #
-    # C'est la partie serveur du protocole mDNS dont on n'a que faire.
-    # Désintaller le paquet avahi-daemon ne doit pas être tenté
-    # car, par le jeu des dépendances, le paquet gnome-desktop-environment
-    # a besoin de avahi-daemon et du coup, si on désintalle avahi-daemon,
-    # gnome-desktop-environment se désinstalle et avec lui de très nombreuses
-    # dépendances ce qui ampute le système de plein de fonctionnalités.
-    # Le mieux, c'est donc de stopper ce daemon et d'empêcher son lancement
-    # lors du démarrage du système.
-    #
-    #invoke-rc.d avahi-daemon stop >> $SORTIE 2>&1
-    service avahi-daemon stop >> $SORTIE 2>&1
-    update-rc.d -f avahi-daemon remove >> $SORTIE 2>&1
-}
-
-purger_paquets()
-{
-    # Cette fonction est-elle utile ? à supprimer.
-    # Purge des paquets pour repartir sur une base saine et pouvoir
-    # enchaîner deux intégrations de suite sur le même client.
-    #
-    # Peut-être que l'option --installer-samba n'est pas activée
-    # et dans ce cas $PAQUETS_TOUS ne contient pas samba.
-    # Donc on l'ajoute dans la liste pour être sûr qu'il soit
-    # désintallé.
-    #
-    apt-get purge --yes $PAQUETS_TOUS samba >> $SORTIE 2>&1
-}
-
-arret_definitif_exim4_daemon()
-{
-    # Cette fonction est-elle utile ? à supprimer
-    # On stoppe définitivement le daemon exim4 qui ne sert pas dans le
-    # cas d'une station cliente et qui peut bloquer pendant quelques secondes
-    # (voire quelques minutes) l'arrivée du prompt de login sur tty[1-6].
-    #
-    #invoke-rc.d exim4 stop >> $SORTIE 2>&1
-    service exim4 stop >> $SORTIE 2>&1
-    update-rc.d -f exim4 remove >> $SORTIE 2>&1
-}
-
 installer_paquets_cifs()
 {
     # Nous allons installer PAQUETS_MONTAGE_CIFS nécessaire pour les montages CIFS.
@@ -715,6 +641,7 @@ END
     apt-get install --no-install-recommends --reinstall --yes $PAQUETS_MONTAGE_CIFS >> $SORTIE 2>&1
 }
 
+
 montage_partage_netlogon()
 {
     # Montage du partage NOM_PARTAGE_NETLOGON.
@@ -732,6 +659,7 @@ montage_partage_netlogon()
     fi
 }
 
+
 effacer_repertoire_rep_se3_local()
 {
     # est-ce utile ? par précaution ?
@@ -747,12 +675,14 @@ effacer_repertoire_rep_se3_local()
     fi
 }
 
+
 creer_repertoire_rep_se3_local()
 {
     mkdir -p "$REP_SE3_LOCAL"
     chown "root:" "$REP_SE3_LOCAL"
     chmod "700" "$REP_SE3_LOCAL"
 }
+
 
 copier_repertoire_rep_bin()
 {
@@ -766,6 +696,7 @@ copier_repertoire_rep_bin()
     chown -R "root:" "$REP_BIN_LOCAL"
     chmod -R "700" "$REP_BIN_LOCAL"
 }
+
 
 copier_repertoire_rep_skel()
 {
@@ -781,38 +712,6 @@ copier_repertoire_rep_skel()
     find "$REP_SKEL_LOCAL" -type f -exec chmod u=rw,g=rw,o='',u-s,g-s,o-t '{}' \;
 }
 
-copier_repertoire_rep_save()
-{
-    # est-ce utile ? à supprimer
-    # Copie du répertoire REP_SAVE
-    #
-    cp -r "$REP_SAVE" "$REP_SAVE_LOCAL"
-    chown -R "root:" "$REP_SAVE_LOCAL"
-    chmod "700" "$REP_SAVE_LOCAL"
-}
-
-droits_fichiers_locaux()
-{
-    # est-ce utile ? à supprimer
-    # Sachant qu'on n'utilise le script que dans un système venant d'être installé donc "clean"…
-    # Mise en place des droits sur les fichiers tels qu'ils sont
-    # sur un système « clean ».
-    #
-    # Pour ce faire, on utilise le fichier "droits"
-    # qui contient, sous un certain format, toutes les
-    # informations nécessaires.
-    #
-    cat "$REP_SAVE_LOCAL/droits" | while read
-    do
-        nom="$REP_SAVE_LOCAL$(echo "$REPLY" | cut -d ':' -f 1)"
-        proprietaire="$(echo "$REPLY" | cut -d ':' -f 2)"
-        groupe_proprietaire="$(echo "$REPLY" | cut -d ':' -f 3)"
-        droits="$(echo "$REPLY" | cut -d ':' -f 4)"
-        chown "$proprietaire:$groupe_proprietaire" "$nom"
-        chmod "$droits" "$nom"
-    done
-    unset -v nom proprietaire groupe_proprietaire droits
-}
 
 creation_repertoire_unefois_local()
 {
@@ -823,6 +722,7 @@ creation_repertoire_unefois_local()
     chmod 700 "$REP_UNEFOIS_LOCAL"
 }
 
+
 creation_repertoire_rep_log_local()
 {
     # Création du répertoire REP_LOG_LOCAL
@@ -832,6 +732,7 @@ creation_repertoire_rep_log_local()
     chmod 700 "$REP_LOG_LOCAL"
 }
 
+
 creation_repertoire_rep_tmp_local()
 {
     # Création du répertoire REP_TMP_LOCAL
@@ -840,6 +741,7 @@ creation_repertoire_rep_tmp_local()
     chown "root:" "$REP_TMP_LOCAL"
     chmod 700 "$REP_TMP_LOCAL"
 }
+
 
 recuperer_nom_client()
 {
@@ -875,6 +777,7 @@ recuperer_nom_client()
     fi
 }
 
+
 installer_paquets_client_ldap()
 {
     # Installation du ou des paquets contenant un client LDAP
@@ -882,6 +785,7 @@ installer_paquets_client_ldap()
     #
     apt-get install --no-install-recommends --reinstall --yes "$PAQUETS_CLIENT_LDAP" >> $SORTIE 2>&1
 }
+
 
 verifier_connexion_ldap_se3()
 {
@@ -895,6 +799,7 @@ verifier_connexion_ldap_se3()
         exit 1
     fi
 }
+
 
 rechercher_ldap_client()
 {
@@ -941,6 +846,7 @@ rechercher_ldap_client()
     fi
 }
 
+
 afficher_info_carte_reseau_client()
 {
     # On affiche quelques informations sur les cartes réseau
@@ -974,6 +880,7 @@ afficher_info_carte_reseau_client()
     fi
 }
 
+
 renommer_nom_client()
 {
     # Après les vérifications, on procède au renommage proprement dit.
@@ -985,16 +892,13 @@ renommer_nom_client()
     then
         afficher "changement de nom du système" | tee -a $compte_rendu
         echo "$NOM_CLIENT" > "/etc/hostname"
-        #invoke-rc.d hostname.sh stop >> $SORTIE 2>&1
-        #service hostname stop >> $SORTIE 2>&1
-        invoke-rc.d hostname.sh start >> $SORTIE 2>&1
-        # ne fonctionne plus…
-        #service hostname start >> $SORTIE 2>&1
+        # prise en compte du changement dans la fonction reecrire_fichier_hosts
     fi
     
     unset -v cartes_reseau carte_mac_ip carte adresse_mac adresse_ip 
     unset -v filtre_recherche resultat reponse
 }
+
 
 reecrire_fichier_hosts()
 {
@@ -1011,7 +915,10 @@ ff00::0  ip6-mcastprefix
 ff02::1  ip6-allnodes
 ff02::2  ip6-allrouters
 END
+    # on prend en compte le changement de nom et le fichier /etc/hosts
+    /etc/init.d/hostname.sh start
 }
+
 
 set_grub_pwd ()
 {
@@ -1080,6 +987,7 @@ set_grub_pwd ()
     fi
 }
 
+
 mise_en_place_mot_de_passe_root()
 {
     # Si l'option  --mdp-root n'a pas été spécifiée,
@@ -1111,6 +1019,7 @@ mise_en_place_mot_de_passe_root()
         
     fi
 }
+
 
 installer_paquets_integration()
 {
@@ -1145,24 +1054,12 @@ END
     apt-get install --no-install-recommends --yes --reinstall $PAQUETS_AUTRES >> $SORTIE 2>&1
 }
 
+
 installer_paquet_sudo()
 {
     # Pour le script logon, l'installation du paquet sudo est nécessaire
     #
     apt-get install --yes  sudo >> $SORTIE 2>&1
-}
-
-desinstaller_gestionnaire_fenetres()
-{
-    # fonction plus utilisée avec Jessie. À supprimer ?
-    
-    # On désinstalle le gestionnaire de fenêtres TWM pour qu'au moment
-    # de l'ouverture de session l'utilisateur ne puisse choisir que Gnome
-    # et seulement Gnome.
-    #
-    # Ce paquet n'est plus installé dans Jessie
-    #
-    apt-get remove --purge --yes twm >> $SORTIE 2>&1
 }
 
 
@@ -1257,34 +1154,15 @@ parametrer_gnome_screensaver()
     sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/gnome-screensaver"
 }
 
-reecrire_fichier_nslcd()
+
+relancer_service_nslcd()
 {
-    # inutile ? à supprimer
-    # On ré-écris de A à Z le fichier /etc/nslcd.conf
-    cat > "/etc/nslcd.conf" << END
-# /etc/nslcd.conf
-# nslcd configuration file. See nslcd.conf(5) for details.
-
-# The user and group nslcd should run as.
-uid nslcd
-gid nslcd
-
-# The location at which the LDAP server(s) should be reachable.
-uri ldap://$SE3/
-
-# The search base that will be used for all queries.
-base $BASE_DN
-
-# SSL options
-ssl start_tls
-tls_reqcert never
-tls_cacertfile /etc/ssl/certs/ca-certificates.crt
-END
-    #invoke-rc.d nslcd stop >> $SORTIE 2>&1
+    # suite aux modifications de configuration de nslcd,
+    # on relance le service
     service nslcd stop >> $SORTIE 2>&1
-    #invoke-rc.d nslcd start >> $SORTIE 2>&1
     service nslcd start >> $SORTIE 2>&1
 }
+
 
 modifier_fichier_smb()
 {
@@ -1299,11 +1177,12 @@ modifier_fichier_smb()
                  "à la machine cliente que le serveur SambaÉdu est le" \
                  "serveur WINS du domaine" | tee -a $compte_rendu
         sed -i -r -e "s/^.*wins +server +=.*$/wins server = $SE3/" "/etc/samba/smb.conf"
-        invoke-rc.d samba restart >> $SORTIE 2>&1
-        # ne fonctionne plus…
-        #service samba restart >> $SORTIE 2>&1
+        # on relance les services smbd et nmbd
+        service smbd restart >> $SORTIE 2>&1
+        service nmbd restart >> $SORTIE 2>&1
     fi
 }
+
 
 reecrire_fichier_ntpdate()
 {
@@ -1328,6 +1207,7 @@ NTPSERVERS="$SERVEUR_NTP"
 NTPOPTIONS=""
 END
 }
+
 
 configurer_gdm3 ()
 {
@@ -1426,13 +1306,13 @@ END
     # Modification de /etc/gdm3/greeter.dconf-defaults
     # Ce fichier permet de gérer quelques options de la fenêtre de
     # connexion qui s'affiche après le démarrage du système.
+    # Ici, on fait en sorte que la liste des utilisateurs ne soit pas proposée
     sed -r -i -e 's/^\# disable-user-list=true.*$/disable-user-list=true/g' /etc/gdm3/greeter.dconf-defaults
 }
 
 
 configurer_lightdm ()
 {
-    #####
     # Configuration de lightdm
     #
     afficher "configuration du gestionnaire de connexion ${gdm} "\
@@ -1441,12 +1321,11 @@ configurer_lightdm ()
     
     #####
     # Modification du fichier /etc/lightdm/lightdm.conf
-    # Est-ce utile ?
-    #restaurer_via_save "/etc/lightdm/lightdm.conf"
     sed -r -i "s|#greeter-setup-script.*$|greeter-setup-script=\"${LOGON_SCRIPT_LOCAL}\" initialisation|g" /etc/lightdm/lightdm.conf
     sed -r -i "s|#session-setup-script.*$|session-setup-script=\"${LOGON_SCRIPT_LOCAL}\" ouverture|g" /etc/lightdm/lightdm.conf
     sed -r -i "s|#session-cleanup-script.*$|session-cleanup-script=\"${LOGON_SCRIPT_LOCAL}\" fermeture|g" /etc/lightdm/lightdm.conf
 }
+
 
 configurer_gestionnaire_connexion()
 {
@@ -1460,32 +1339,10 @@ configurer_gestionnaire_connexion()
     esac
 }
 
-modifier_fichier_user_dirs()
-{
-    # est-ce utile ? à supprimer
-    # le skel s'en charge
-    # Ce fichier permet de gérer les répertoires créés par défaut dans
-    # le /home de l'utilisateur (comme le répertoire Bureau ou Images etc).
-    #
-    # Est-ce utile ?
-    #restaurer_via_save "/etc/xdg/user-dirs.defaults"
-    
-    # On édite carrément le fichier de A à Z.
-    # → quel est alors l'intérêt de le restaurer ?
-    cat > "/etc/xdg/user-dirs.defaults" << END
-
-# Le bureau sera le seul répertoire créé par défaut
-# dans le /home de l'utilisateur.
-
-DESKTOP=Desktop
-
-END
-}
 
 desactiver_hibernation_mise_en_veille()
 {
-    # Sous Jessie, le fichier polkit à modifier est "org.freedesktop.login1.policy"
-    # (et non plus "org.freedesktop.upower.policy" comme sous Squeeze ou Wheezy...)
+    # À partir de Jessie, on utilise le skel pour ces fonctions.
     
     case "$gdm" in
         gdm3)
@@ -1494,12 +1351,8 @@ desactiver_hibernation_mise_en_veille()
             true
         ;;
         lightdm)
-            # Faut-il restaurer ?
-            # → ne vaut-il mieux pas utiliser dconf et le skel pour cela ?
-            #restaurer_via_save "/usr/share/polkit-1/actions/org.freedesktop.login1.policy"
-            #
             # Sous Xfce, on désinstalle l'économiseur d'écran "xscreensaver"
-            #(l'onglet "Verrouillage de l'écran" devient de ce fait caduque ...) 
+            # (l'onglet "Verrouillage de l'écran" devient de ce fait caduque…) 
             # afin d'éviter qu'un PC soit vérouillé par un utilisateur et ne nécessite, de ce fait,
             # un redémarrage pour être déverrouiller…
             # 
@@ -1510,6 +1363,7 @@ desactiver_hibernation_mise_en_veille()
         ;;
     esac
 }
+
 
 preconfigurer_libpam_runtime()
 {
@@ -1523,6 +1377,7 @@ libpam-runtime	libpam-runtime/profiles	multiselect	pam_script, unix, ldap, syste
 EOF
 }
 
+
 preconfigurer_ocsinventory()
 {
     # L'installation du client ocsinventory nécessite
@@ -1534,6 +1389,7 @@ ocsinventory-agent	ocsinventory-agent/server	string	$SE3:909
 ocsinventory-agent	ocsinventory-agent/tag	string
 EOF
 }
+
 
 decompte_10s()
 {
@@ -1605,22 +1461,6 @@ verifier_acces_nmap_se3     # meilleure vérification pour l'instant
 afficher "vérifications terminées" | tee -a $compte_rendu
 
 #=====
-# Cas mdns et avahi
-#=====
-# est-ce utile ?
-#afficher "désinstallation du paquet libnss-mdns"
-#desinstaller_mDNS
-# est-ce utile ?
-#afficher "arrêt définitif du service avahi-daemon"
-#arret_definitif_avahi_daemon
-# est-il utile de purger les paquets pour les ré-installer par la suite ?
-#afficher "purge des paquets $PAQUETS_TOUS"
-#purger_paquets
-#afficher "arrêt définitif du daemon exim4"
-# NB : est-ce utile ? (20151026)
-#arret_definitif_exim4_daemon
-
-#=====
 # Montage du partage NOM_PARTAGE_NETLOGON
 #=====
 afficher "installation du paquet $PAQUETS_MONTAGE_CIFS" | tee -a $compte_rendu
@@ -1647,7 +1487,8 @@ echo " 0..." | tee -a $compte_rendu
 creation_repertoire_rep_tmp_local
 
 #=====
-# Renommage (éventuel) du client
+# Configuration accès réseau et Ldap
+# renommage éventuel du client-linux
 #=====
 recuperer_nom_client
 afficher "installation de l'exécutable ldapsearch et vérification de la" \
@@ -1664,12 +1505,8 @@ echo "-------------------------------------------------" | tee -a $compte_rendu
 echo "$resultat" | tee -a $compte_rendu
 echo "-------------------------------------------------" | tee -a $compte_rendu
 afficher_info_carte_reseau_client
-# dépend de l'option --nom-client
+# On renomme le client (dépend de l'option --nom-client)
 renommer_nom_client
-
-#=====
-# Configuration accès réseau
-#=====
 # Peu importe que l'option --nom-client ait été spécifiée ou non,
 # nous allons réécriture le fichier /etc/hosts.
 afficher "réécriture complète du fichier /etc/hosts" | tee -a $compte_rendu
@@ -1697,9 +1534,6 @@ installer_paquets_integration
 installer_paquet_sudo
 afficher "installation des paquets terminée" | tee -a $compte_rendu
 
-# twm n'est plus utilisé par debian
-#desinstaller_gestionnaire_fenetres        # supprimer cette fonction ?
-
 #=====
 # Configuration de PAM
 #=====
@@ -1713,12 +1547,10 @@ creation_fichier_pam
 #=====
 # Configuration du service nslcd
 #=====
-# la préconfiguration du paquet nslcd permet de configurer directement le cryptage 
+# la préconfiguration du paquet nslcd a permis de configurer directement le cryptage
 # pendant son installation, il devient de ce fait inutile de réécrire le fichier nslcd.conf
-#afficher "réécriture complète du fichier /etc/nslcd.conf afin que la" \
-#         "communication LDAP entre le client et le serveur (notamment" \
-#         "au moment de l'authentification) soit cryptée"
-#reecrire_fichier_nslcd
+# On relance le service nslcd
+relancer_service_nslcd
 
 #=====
 # Configuration pour le serveur WINS (s'il s'avère qu'on a installé Samba)
@@ -1747,20 +1579,9 @@ preconfigurer_libpam_runtime
 preconfigurer_ocsinventory
 
 #=====
-# Modification du fichier /etc/xdg/user-dirs.defaults
-#=====
-#afficher "modification du fichier /etc/xdg/user-dirs.defaults afin" \
-#         "que « Bureau » soit le seul répertoire créé automatiquement" \
-#         "dans le home d'un utilisateur"
-# est-ce utile ? gestion via le skel
-#modifier_fichier_user_dirs
-
-#=====
 # Gestion hibernation et mise en veille
 #=====
-#afficher "modification du fichier /usr/share/polkit-1/actions/org.freedesktop.login1.policy" \
-#         "afin de désactiver l'hibernation, la mise en veille et le verrouillage du système"
-# est-ce utile ? gestion via le skel ?
+# est-ce utile pour lightdm ? gestion via le skel ?
 desactiver_hibernation_mise_en_veille
 
 #=====
