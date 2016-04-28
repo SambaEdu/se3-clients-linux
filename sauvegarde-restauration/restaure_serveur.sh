@@ -575,15 +575,15 @@ echo -e "${bleu}Souhaitez-vous procéder à la restauration maintenant ? ${neutr
 read REPONSE1
 case $REPONSE1 in
     oui|OUI)
-        trouver_disque               # une sauvegarde est-elle disponible ?
+        trouver_disque                  # une sauvegarde est-elle disponible ?
         [ "$?" != "0" ] && exit 1
         # une sauvegarde est disponible, on peut lancer la restauration
-        #mise_a_jour                  # mise à jour du se3 avant la restauration
-        #restaurer_serveur            # on lance la restauration
-        menage                       # on revient dans l'état de départ du script
-        recuperer_mail               # on récupére l'adresse de messagerie pour l'envoi du compte-rendu
-        #courriel                     # on envoie le compte-rendu de la restauration
-        redemarrer                   # demande de redémarrage du serveur
+        mise_a_jour                     # mise à jour du se3 avant la restauration
+        restaurer_serveur               # on lance la restauration
+        menage                          # on revient dans l'état de départ du script
+        recuperer_mail                  # on récupére l'adresse de messagerie pour l'envoi du compte-rendu
+        courriel                        # on envoie le compte-rendu de la restauration
+        redemarrer                      # demande de redémarrage du serveur
         ;;
     *)
         # si un montage existe, on ne doit pas y toucher lors de l'abandon
