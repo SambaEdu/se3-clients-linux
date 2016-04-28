@@ -332,11 +332,11 @@ mode_script $1                # déterminer mode silencieux, verbeux ou test
 recuperer_mail                # récupération de l'adresse mel de l'admnistrateur
 
 # on vérifie si tout est en place pour lancer la sauvegarde
-presence_repertoire_se3                 # présence d'un répertoire de sauvegarde
+presence_repertoire_se3                     # présence d'un répertoire de sauvegarde
 [ "$?" != "0" ] && test="2"
-[ "$test" != "2" ] && trouver_disque      # présence d'un disque externe monté dans le répertoire de sauvegarde
+[ "$test" != "2" ] && trouver_disque        # présence d'un disque externe monté dans le répertoire de sauvegarde
 [ "$?" != "0" ] && test="2"
-[ "$test" != "2" ] && deux_repertoires    # présence des sous-répertoires de sauvegarde (création si nécessaire)
+[ "$test" != "2" ] && deux_repertoires      # présence des sous-répertoires de sauvegarde (création si nécessaire)
 
 case $test in
     0)
