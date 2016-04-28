@@ -7,14 +7,14 @@
 # ou pour une migration d'un ancien serveur à un nouveau serveur se3
 #
 # version du 16/04/2014
-# modifiée le 15/02/2016
+# modifiée le 28/04/2016
 #
-# Auteurs :      Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
-#                François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
-#                Rémy Barroso remy.barroso@crdp.ac-versailles.fr
+# Auteurs :     Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
+#               François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
+#               Rémy Barroso remy.barroso@crdp.ac-versailles.fr
 #
-# Modifié par :  Michel Suquet Michel-Emi.Suquet@ac-versailles.fr
-#                
+# Modifié par : Michel Suquet Michel-Emi.Suquet@ac-versailles.fr
+#               
 #
 # Ce programme est un logiciel libre : vous pouvez le redistribuer ou
 #    le modifier selon les termes de la GNU General Public Licence tels
@@ -49,10 +49,9 @@
 SAUV="SauveGarde"            # Nom du répertoire de sauvegarde de /var/se3/save
 SAUVHOME="SauveGardeHome"    # Nom du répertoire de sauvegarde de /home et de /var/se3
 ##### #####
-DATERESTAURATION=$(date +%F+%0kh%0M)    # Date de la restauration
-DATEDEBUT=$(date +%s)                   # Début de la restauration
-DATEJOUR=$(date +%A)                    # Jour de la restauration
-COURRIEL="/root/mail.txt"               # compte-rendu de la restauration
+DATE_RESTAURATION=$(date +%F+%0kh%0M)   # Date de la restauration
+DATE_JOUR=$(date +%A)                   # Jour de la restauration
+COURRIEL="/root/restauration_${DATE_RESTAURATION}.txt"       # compte-rendu de la restauration
 MONTAGE="/mnt/sav"
 SAUVEGARDE=$MONTAGE/$SAUV
 SAUVEGARDEHOME=$MONTAGE/$SAUVHOME
@@ -147,7 +146,7 @@ restaure_varse3home()
 restaure_conf_imprimante()
 {
     cd /
-    mkdir /savetc
+    [ ! -d /savetc ] && mkdir /savetc
     cd /savetc
     tar zxf $SAUVEGARDE/etc/etc.$JOUR.tar.gz
     test1=$(ls /savetc/etc/cups/ | grep printers.conf)
@@ -224,25 +223,54 @@ restaure_dhcp()
 abandonner()
 {
     echo -e "${neutre}"
-    echo -e "${orange}Restauration abandonnée, vous pourrez la relancer en utilisant ${neutre}restaure_serveur.sh"
+    echo -e "${orange}Restauration abandonnée," 2>&1 | tee -a $COURRIEL
+    echo -e "vous pourrez la relancer en utilisant ${neutre}restaure_serveur.sh" 2>&1 | tee -a $COURRIEL
     echo -e "${neutre}"
-    [ -d "$MONTAGE" ] && mount | grep $MONTAGE >/dev/null && umount $MONTAGE
-    [ -d "$MONTAGE" ] && rm -r $MONTAGE
+    # cas d'un montage préalable au lancement du script
+    if [ -z "${test_montage}" ]
+    then
+        [ -d "$MONTAGE" ] && mount | grep $MONTAGE >/dev/null && umount $MONTAGE
+        # cas de l'existence du répertoire préalablement au lancement du script
+        [ -z "${test_rep}" ] && [ -d "$MONTAGE" ] && rm -r $MONTAGE
+    fi
+}
+
+montage_partition()
+{
+    # 1 argument : la partition à monter éventuellement
+    # cas d'un montage préalable au lancement du script
+    if [ -z "${test_montage}" ]
+    then
+        # il n'y a pas de montage préalable
+        [ -z "${test_rep}" ] && mkdir $MONTAGE
+        mount /dev/$1 $MONTAGE
+    else
+        # il y a un montage préalable au script
+        true
+    fi
+}
+
+demontage_partition()
+{
+    # on démonte la partition si elle n'était pas montée préalablement au script
+    [ -z "${test_montage}" ] && umount $MONTAGE
+    # on supprime le répertoire s'il n'existait pas préalablement au script
+    [ -z "${test_rep}" ] && [ -d "$MONTAGE" ] && rm -r $MONTAGE
 }
 
 choix_archive_sauvegarde()
 {
     # 1 argument : la partition à examiner
-    [ ! -d "$MONTAGE" ] && mkdir $MONTAGE
-    mount /dev/$1 $MONTAGE
+    # on la monte éventuellement
+    montage_partition $1
     pasbon="true"
     Sauvegardedisponible=$(ls -ltr $SAUVEGARDE/etc/ | awk -- '{ print $9 " " $6 " " $7 }' | grep etc | sed "s/etc//g" | sed "s/tar.gz//g" | sed "s/\.//g")
     echo -e ""
     while $pasbon :
     do
         # affichage des sauvegardes disponibles
-        echo -e "${neutre}Sur le disque $1, voici les sauvegardes disponibles :"
-        echo "$Sauvegardedisponible"
+        echo -e "${neutre}Sur le disque $1, voici les sauvegardes disponibles :" 2>&1 | tee -a $COURRIEL
+        echo "$Sauvegardedisponible" 2>&1 | tee -a $COURRIEL
         echo -e "${neutre}ne saisir que les trois premières lettres du jour : lun, mar,…"
         echo -e "ou bien q pour abandonner"
         echo -e "${bleu}Vous souhaitez restaurer la sauvegarde de quel jour ?${vert} \c"
@@ -252,9 +280,11 @@ choix_archive_sauvegarde()
             dim|lun|mar|mer|jeu|ven|sam|Sun|Mon|Tue|Wed|Thu|Fri|Sat)
                 if [ -f "$SAUVEGARDE/etc/etc.$JOUR.tar.gz" ]
                 then
+                    # il y a une archive
+                    echo -e "${neutre}Archive choisie : ${vert}${SAUVEGARDE}/etc/etc.$JOUR.tar.gz${neutre}" 2>&1 | tee -a $COURRIEL
                     pasbon="false"
                 else
-                    echo -e "${orange}Il n'y a pas d'archive pour le jour choisi"
+                    echo -e "${orange}Il n'y a pas d'archive pour le jour choisi : $JOUR" 2>&1 | tee -a $COURRIEL
                     echo -e "${neutre}"
                 fi
                 ;;
@@ -276,50 +306,74 @@ choix_archive_sauvegarde()
 trouver_archive_sauvegarde()
 {
     # 1 argument : la partition à examiner
-    [ ! -d "$MONTAGE" ] && mkdir $MONTAGE
-    mount /dev/$1 $MONTAGE
+    # on la monte éventuellement
+    montage_partition $1
     Sauvegardedisponible=$(ls -l $SAUVEGARDE/etc/ | awk -- '{ print $9 " " $6 " " $7 }'| grep etc | sed "s/etc//g" | sed "s/tar.gz//g" | sed "s/\.//g")
     if [ "$Sauvegardedisponible" = "  " ]
     then
         # Il n'y pas d'archive de sauvegarde
-        umount $MONTAGE
-        rm -r $MONTAGE
+        # on la démonte éventuellement
+        demontage_partition
         return 1
     else
         # il y a au moins une archive de sauvegarde
-        umount $MONTAGE
-        rm -r $MONTAGE
+        # on la démonte éventuellement
+        demontage_partition
         return 0
     fi
 }
 
 trouver_sauvegarde()
 {
-    # 1 argument : la partition à examiner
-    [ -d "$MONTAGE" ] && mount | grep $MONTAGE >/dev/null && umount $MONTAGE
-    [ ! -d "$MONTAGE" ] && mkdir $MONTAGE
-    mount /dev/$1 $MONTAGE
+    # 1 argument : la partition à monter éventuellement
+    # on la monte éventuellement
+    montage_partition $1
     # Y a-t-il un répertoire SauveGarde, sans que ce soit SauveGardeHome ?
     SAV=$(ls $MONTAGE | grep $SAUV | grep -v $SAUVHOME)
     if [ -n "$SAV" ]
     then
         # il y a un répertoire SauveGarde
-        umount $MONTAGE
-        rm -r $MONTAGE
+        # on la démonte éventuellement
+        demontage_partition
         return 0
     else
         # il n'y a pas de répertoire SauveGarde
-        umount $MONTAGE
-        rm -r $MONTAGE
+        # on la démonte éventuellement
+        demontage_partition
         return 1
     fi
 }
 
-trouver_disque()
+rechercher_montage()
 {
-    echo -e "${neutre}\c"
-    # on repère les disques branchés
-    DISQUES=$(fdisk -l | grep ^/dev | grep -v Extended | grep -v swap | gawk -F" " '/[^:]/ {print $1}'| sed 's:/dev/::')
+    # tester s'il exite le répertoire de sauvegarde à la racine du se3
+    if [ -d $MONTAGE ]
+    then
+        # le répertoire $MONTAGE existe
+        test_rep="1"
+        # on teste s'il y a un montage sur ce répertoire
+        test_montage=$(mount | grep $MONTAGE)
+        if [ -z "${test_montage}" ]
+        then
+            # pas de montage sur le répertoire /mnt/sav
+            # on peut abandonner cette piste
+            return 1
+        else
+            # il y a un montage sur ce répertoire
+            # reste à savoir s'il contient une sauvegarde
+            return 0
+        fi
+    else
+        # le répertoire $MONTAGE n'existe pas, on peut abandonner cette piste
+        test_rep=""
+        # et regarder si un disque usb est branché
+        test=""
+        return 1
+    fi
+}
+
+collecter_candidats()
+{
     # on collecte les candidats : sauvegarde ayant au moins une archive quotidienne
     for part in $DISQUES
     do
@@ -340,13 +394,19 @@ trouver_disque()
                 ;;
         esac
     done
+}
+
+examiner_liste_candidats()
+{
     # on examine la liste des candidats collectés
+    # il ne doit y en avoir qu'un seul
     if [ -z "$candidat" ]
     then
         # aucun candidat : bizarre
         echo -e ""
-        echo -e "${rouge}Aucun disque ne contient de répertoire ${orange}$SAUV${rouge} ou d'archive quotidienne${neutre}"
+        echo -e "${rouge}Aucun disque ne contient de répertoire ${orange}$SAUV${rouge} ou d'archive quotidienne${neutre}" 2>&1 | tee -a $COURRIEL
         abandonner
+        # arrêt du script
         exit 1
     else
         # tester s'il y a plusieurs disques possédant une sauvegarde
@@ -359,28 +419,61 @@ trouver_disque()
             *)
                 # plusieurs disques possèdent des sauvegardes : bizarre
                 echo -e ""
-                echo -e "${rouge}Plusieurs disques possèdent une sauvegarde :${neutre} \c"
-                echo ${candidat[*]}
-                echo -e "${neutre}Il ne faut qu'un seul disque possédant une sauvegarde${neutre}"
+                echo -e "${rouge}Plusieurs disques possèdent une sauvegarde :${neutre} \c" 2>&1 | tee -a $COURRIEL
+                echo ${candidat[*]} 2>&1 | tee -a $COURRIEL
+                echo -e "${neutre}Il ne faut qu'un seul disque possédant une sauvegarde${neutre}" 2>&1 | tee -a $COURRIEL
                 abandonner
+                # arrêt du script
                 exit 1
                 ;;
         esac
+        # il n'y a qu'un seul candidat,
+        # on choisit une archive
         choix_archive_sauvegarde $PART
         if [ "$?" = "0" ]
         then
+            # une archive a été choisie,
+            # on peut restaurer
             return 0
         else
-            exit 1
+            # on a abandonné la recherche
+            return 1
         fi
         
     fi
 }
 
+trouver_disque()
+{
+    echo -e "${neutre}\c"
+    # on repère si un montage est réalisé dans /mnt/save (disque usb ou NAS)
+    rechercher_montage
+    if [ "$?" = "0" ]
+    then
+        # c'est le cas, on recherche la présence d'une sauvegarde
+        DISQUES=$(mount | grep $MONTAGE | gawk -F" " '/[^:]/ {print $1}'| sed 's:/dev/::')
+    else
+        # ce n'est pas le cas, on recherche si un disque usb est branché pour lancer la même recherche
+        DISQUES=$(fdisk -l | grep ^/dev | grep -v Extended | grep -v swap | gawk -F" " '/[^:]/ {print $1}'| sed 's:/dev/::')
+    fi
+    # on regarde si des disques contiennent des candidats
+    collecter_candidats
+    # parmi les candidats repérés, on regarde s'il y a des sauvegardes contenant des archives
+    examiner_liste_candidats
+    if [ "$?" = "0" ]
+    then
+        # une archive a été choisie,
+        # on peut restaurer
+        return 0
+    else
+        # on a abandonné la recherche
+        return 1
+    fi
+}
+
 gestion_temps()
 {
-    DATEFIN=$(date +%s)                # Fin de la restauration en secondes
-    TEMPS=$(($DATEFIN-$DATEDEBUT))    # durée de la restauration, en secondes
+    TEMPS=$((${DATE_FIN}-${DATE_DEBUT}))    # durée de la restauration, en secondes
     HEURES=$(( TEMPS/3600 ))
     MINUTES=$(( (TEMPS-HEURES*3600)/60 ))
     # gestion de l'accord pour les heures ; pour les minutes, elles seront souvent plusieurs ;-)
@@ -399,13 +492,18 @@ gestion_temps()
 
 menage()
 {
-    rm -rf /savetc
+    [ -d /savetc ] && rm -rf /savetc
     echo -e "${jaune}`date +%R` ${neutre}Travail terminé : ${vert}se3 restauré${neutre}" 2>&1 | tee -a $COURRIEL
     gestion_temps
     #echo -e "${neutre}" 2>&1 | tee -a $COURRIEL
     echo -e "Le se3 doit redémarrer pour prendre en compte toutes les modifications" 2>&1 | tee -a $COURRIEL
-    umount $MONTAGE
-    rm -r $MONTAGE
+    # cas d'un montage préalable au lancement du script
+    if [ -z "${test_montage}" ]
+    then
+        [ -d "$MONTAGE" ] && mount | grep $MONTAGE >/dev/null && umount $MONTAGE
+        # cas de l'existence du répertoire préalablement au lancement du script
+        [ -z "${test_rep}" ] && [ -d "$MONTAGE" ] && rm -r $MONTAGE
+    fi
 }
 
 courriel()
@@ -419,7 +517,7 @@ courriel()
 
 redemarrer()
 {
-    echo -e "${neutre}Un compte-rendu de la restauration a été envoyé par la messagerie"
+    echo -e "${neutre}Un compte-rendu de la restauration a été envoyé par la messagerie" 2>&1 | tee -a $COURRIEL
     echo -e "${bleu}Souhaitez-vous redémarrer maintenant ? ${neutre}(oui ou OUI)${vert} \c"
     read REPONSE2
     case $REPONSE2 in
@@ -429,7 +527,7 @@ redemarrer()
             ;;
         *)
             echo -e ""
-            echo -e "${neutre}À bientôt ! N'oubliez pas de redémarrer…${neutre}"
+            echo -e "${neutre}À bientôt ! N'oubliez pas de redémarrer…${neutre}" 2>&1 | tee -a $COURRIEL
             echo -e ""
             ;;
     esac
@@ -437,6 +535,9 @@ redemarrer()
 
 restaurer_serveur()
 {
+    # une sauvegarde étant présente, on restaure le serveur
+    echo -e "${jaune}`date +%R` ${neutre}Début du travail : ${vert}restauration du serveur${neutre}" 2>&1 | tee -a $COURRIEL
+    DATE_DEBUT=$(date +%s)          # Début de la restauration en secondes
     arret_des_serveurs
     restaure_samba
     restaure_conf_imprimante
@@ -447,6 +548,7 @@ restaurer_serveur()
     restaure_mysql
     restaure_adminse3
     restaure_dhcp
+    DATE_FIN=$(date +%s)            # Fin de la restauration en secondes
 }
 
 #----- -----
@@ -457,12 +559,17 @@ restaurer_serveur()
 # Début du programme
 #
 echo -e "" > $COURRIEL
-echo -e "${bleu}Restauration du se3 ${neutre}$DATERESTAURATION${neutre}\n" 2>&1 | tee -a $COURRIEL
+echo -e "${bleu}Restauration du se3 ${neutre}${DATE_RESTAURATION}${neutre}\n" 2>&1 | tee -a $COURRIEL
 echo -e "Ce script va restaurer la configuration de votre SE3 à partir d'une sauvegarde"
-echo -e "${orange}Assurez-vous d'avoir installé tous les modules du se3 préalablement utilisés"
-echo -e "Si vous installez ces modules *après* la restauration, les fichiers de configuration seront remis à zéro"
 echo -e ""
-echo -e "${neutre}N'oubliez pas de brancher sur un port usb le disque comportant une sauvegarde de votre se3"
+echo -e "${orange}Assurez-vous d'avoir installé tous les modules du se3 préalablement utilisés"
+echo -e "Si vous installez ces modules *après* la restauration,"
+echo -e "les fichiers de configuration seront remis à zéro"
+echo -e "${neutre}"
+echo -e "N'oubliez pas de brancher, sur un port usb,"
+echo -e "→ le disque comportant une sauvegarde de votre se3"
+echo -e "ou bien de monter, dans le répertoire /mnt/sav,"
+echo -e "→ le NAS comportant une sauvegarde de votre se3"
 echo -e "-------------------"
 echo -e "${bleu}Souhaitez-vous procéder à la restauration maintenant ? ${neutre}(oui ou  OUI)${vert} \c"
 read REPONSE1
@@ -470,14 +577,17 @@ case $REPONSE1 in
     oui|OUI)
         trouver_disque               # une sauvegarde est-elle disponible ?
         [ "$?" != "0" ] && exit 1
-        mise_a_jour                  # mise à jour du se3 avant la restauration
-        restaurer_serveur            # on lance la restauration
-        menage                       # on essaye de revenir dans l'état de départ du script
+        # une sauvegarde est disponible, on peut lancer la restauration
+        #mise_a_jour                  # mise à jour du se3 avant la restauration
+        #restaurer_serveur            # on lance la restauration
+        menage                       # on revient dans l'état de départ du script
         recuperer_mail               # on récupére l'adresse de messagerie pour l'envoi du compte-rendu
-        courriel                     # on envoi le compte-rendu de la restauration
+        #courriel                     # on envoie le compte-rendu de la restauration
         redemarrer                   # demande de redémarrage du serveur
         ;;
     *)
+        # si un montage existe, on ne doit pas y toucher lors de l'abandon
+        rechercher_montage
         abandonner
         ;;
 esac
