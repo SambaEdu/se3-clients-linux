@@ -378,6 +378,10 @@ fi
 # On met les droits sur le répertoire owncloud
 # setfacl -Rm d:u:"$user":rwx,u:"$user":rwx "/var/se3/dataOC/$user"
 setfacl -Rm d:u:"$user":rwx,u:"$user":rwx "/var/se3/dataOC/$user"
+
+# On met les droits pour que les fichiers enregistrés via samba soit utilisable par OC
+setfacl -Rm d:u:www-data:rwx,d:g:www-data:rx "/var/se3/dataOC/$user"
+
 EOF
 
 chown www-se3:root /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
