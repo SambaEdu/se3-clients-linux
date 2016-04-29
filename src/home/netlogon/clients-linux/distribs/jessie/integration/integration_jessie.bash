@@ -1381,10 +1381,11 @@ preconfigurer_ocsinventory()
 {
     # L'installation du client ocsinventory nécessite
     # de préconfigurer des réponses sous peine de "casser" dpkg
-    
+    # NB : port 909 pour se3 en squeeze et port 80 à partir d'un se3 en wheezy
+    port_ocs="80"
     debconf-set-selections <<EOF
 ocsinventory-agent	ocsinventory-agent/method	select	http
-ocsinventory-agent	ocsinventory-agent/server	string	$SE3:909
+ocsinventory-agent	ocsinventory-agent/server	string	$SE3:$port_ocs
 ocsinventory-agent	ocsinventory-agent/tag	string
 EOF
 }
@@ -1575,7 +1576,8 @@ configurer_gestionnaire_connexion
 # Configurations de paquets
 #=====
 preconfigurer_libpam_runtime
-preconfigurer_ocsinventory
+# pour ocs, cela est fait au niveau de la post-install
+#preconfigurer_ocsinventory
 
 #=====
 # Gestion hibernation et mise en veille

@@ -1651,15 +1651,15 @@ EOF
 
 preconfigurer_ocsinventory()
 {
-	# L'installation du client ocsinventory nécessite de préconfigurer des réponses sous peine de "casser" dpkg
-	
-	debconf-set-selections <<EOF
+    # L'installation du client ocsinventory nécessite
+    # de préconfigurer des réponses sous peine de "casser" dpkg
+    # NB : port 909 pour se3 en squeeze et port 80 à partir d'un se3 en wheezy
+    port_ocs="80"
+    debconf-set-selections <<EOF
 ocsinventory-agent	ocsinventory-agent/method	select	http
-ocsinventory-agent	ocsinventory-agent/server	string	$SE3:909
-# Action souhaitée pour le fichier de configuration modifié ocsinventory-agent.cfg :
+ocsinventory-agent	ocsinventory-agent/server	string	$SE3:$port_ocs
 ocsinventory-agent	ocsinventory-agent/tag	string
 EOF
-	
 }
 
 masquer_liste_utilisateurs_connectes_unity()
@@ -2058,7 +2058,8 @@ masquer_liste_utilisateurs_connectes_unity
 preconfigurer_libpam_runtime
 
 # Depuis Xenial :
-preconfigurer_ocsinventory
+# pour ocs, cela est fait au niveau de la post-install
+#preconfigurer_ocsinventory
 
 # Depuis Xenial :
 afficher "Suppression de la liste de paquets inutilisés"
