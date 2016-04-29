@@ -1,5 +1,5 @@
 #!/bin/sh
-# Rédigé par Nicolas Aldegheri le 22/04/2016
+# Rédigé par Nicolas Aldegheri le 29/04/2016
 # Sous licence GNU/Linux
 # Ce script intégre Owncloud sur un serveur SE3 wheezy. L'intégration consiste à :
 # - installer la partie "Owncloud" uniquement : c'est possible avec un dépôt depuis la version 9 d'Owncloud.
@@ -9,13 +9,56 @@
 # Par défaut : 
 # - seul les groupes "Profs" et "admins" ont accés à la fonctionnalité "Stockage Externe" du se3.
 # - le compte administrateur d'Owncloud est identique au compte admin de l'interface web du se3
-# - les quotas par défaut des utilisateurs sont réglés par défaut à 100 Mo : ils pourront être ajustés ensuite
-# Une fois l'installation terminée, il est possible de personnaliser le cloud en se connectant à http://IP_SE3/owncloud avec le compte admowncloud
+# - les quotas par défaut des utilisateurs sont réglés par défaut à 100 Mo : ils pourront être ajustés par la suite
+# Une fois l'installation terminée, il est possible de personnaliser le cloud en se connectant à http://IP_SE3/owncloud avec un compte utilisateur du se3.
 
 # Pour de le débuggage :
 SORTIE="/root/compte_rendu_integration_owncloud.txt"
 
-echo "Etape 1 : Récupération des variables nécessaires à l'installation"
+#########################################################
+echo "Etape 0 : Quelques vérifications avant de lancer le script"
+#########################################################
+
+# On récupère éventuellement le numéro de version d'OC passé en paramètre du script d'intégration
+# Si aucun numéro n'est indiqué, ce sera la version stable d'OC qui sera installée
+
+case "$@" in
+            9.0)
+                echo "La version 9.0 d'Owncloud va être installée sur votre se3" 
+                VERSION_OC="9.0"
+            ;;
+            
+            9.1)
+                echo "La version 9.1 d'Owncloud n'est pas encore sortie ... : on quitte le script d'installation" 
+                VERSION_OC="9.1"
+                exit 1
+            ;;
+            
+            9.2)
+                echo "La version 9.2 d'Owncloud n'est pas encore sortie ... : on quitte le script d'installation" 
+                VERSION_OC="9.2"
+                exit 1
+            ;;
+            
+            *) 
+                echo "La version stable d'Owncloud va être installée sur votre se3"
+                VERSION_OC="stable"
+            ;;
+esac
+
+# Vérification que le script est lancé sur un se3 wheezy
+if egrep -q "^7" /etc/debian_version
+then
+		echo "Votre serveur est bien version Debian Wheezy"
+		echo "Le script peut se poursuivre"
+		VERSION_SE3='Debian_7.0'
+else
+		echo "Votre serveur se3 n'est pas en version Wheezy"
+		echo "Le script va s'arrêter ..."
+		exit 1
+fi
+
+echo "Etape 1 : Récupération des variables se3"
 # Récupération des paramétres spécifiques au se3 :
 . /etc/se3/config_c.cache.sh
 . /etc/se3/config_l.cache.sh
@@ -23,6 +66,7 @@ echo "Etape 1 : Récupération des variables nécessaires à l'installation"
 . /etc/se3/setup_se3.data
 . /etc/se3/config_o.cache.sh
 
+echo "Etape 2 : Mise en place des variables Owncloud"
 # Quelques variables spécifiques à Owncloud :
 ocpath='/var/www/owncloud'
 htuser='www-data'
@@ -30,29 +74,31 @@ htgroup='www-data'
 rootuser='root'
 rep_courant=$(pwd)
 
+echo "Etape 3 : Récupération sur github du fichier .json pour le Stockage externe"
 # Récupération du fichier .json décrivant les partages Samba du module Stockage externe
 wget https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/owncloud/partages_samba_se3.json > "$SORTIE" 2>&1
 
-echo "Etape 2 : Installation des paquets nécessaires à Owncloud"
-#  Cette installation suivie ici est celle décrite pour un serveur Ubuntu Trusty dans la documentation officielle d'Owncloud
+echo "Etape 4 : Installation complémentaires de paquets web nécessaires à Owncloud"
+#  La procédure d'installation suivie ici est celle décrite pour un serveur Ubuntu Trusty dans la doc officielle d'OC
 apt-get install -y apache2 libapache2-mod-php5 >> "$SORTIE" 2>&1
 apt-get install -y php5-gd php5-json php5-mysql php5-curl >> "$SORTIE" 2>&1
 apt-get install -y php5-intl php5-mcrypt php5-imagick >> "$SORTIE" 2>&1
 
-echo "Etape 3 : Ajout du dépot owncloud aux sources du se3 puis installation du paquet owncloud-files"
+echo "Etape 5 : Ajout du dépot owncloud aux sources du se3 puis installation du paquet owncloud-files"
 # L'installation est réalisé à partir du dépot de la version stable d'Owncloud.
 # Sous Wheezy, depuis Owncloud 9, il est alors possible de n'installer que la partie Owncloud
 # Cela permet d'utiliser le serveur Web et la base de donnée MySQL du serveur se3
 
-wget -nv https://download.owncloud.org/download/repositories/stable/Debian_7.0/Release.key -O Release.key >> "$SORTIE" 2>&1
-apt-key add - < Release.key 
-rm -f Release.key
+wget -nv "https://download.owncloud.org/download/repositories/$VERSION_OC/$VERSION_SE3/Release.key" -O Release.key >> "$SORTIE" 2>&1
+apt-key add - < Release.key >> "$SORTIE" 2>&1
+rm -f Release.key >> "$SORTIE" 2>&1
 
-sh -c "echo 'deb http://download.owncloud.org/download/repositories/stable/Debian_7.0/ /' >> /etc/apt/sources.list.d/owncloud.list"
+#sh -c "echo 'deb http://download.owncloud.org/download/repositories/stable/Debian_7.0/ /' > /etc/apt/sources.list.d/owncloud.list" >> "$SORTIE" 2>&1
+echo "deb http://download.owncloud.org/download/repositories/$VERSION_OC/$VERSION_SE3/ /" > /etc/apt/sources.list.d/owncloud.list
 apt-get update >> "$SORTIE" 2>&1
 apt-get install -y owncloud-files >> "$SORTIE" 2>&1
 
-echo "Etape 4 : Ajout au se3 du fichier de configuration d'Apache fourni par Owncloud"
+echo "Etape 6 : Ajout au se3 du fichier de configuration d'Owncloud"
 # Fichier de configuration d'Apache fourni par la communauté d'Owncloud pour Ubuntu et ses dérivées
 cat <<EOF >/etc/apache2/sites-available/owncloud.conf
 Alias /owncloud "/var/www/owncloud/"
@@ -67,9 +113,9 @@ SetEnv HTTP_HOME /var/www/owncloud
 </Directory>
 EOF
 
-ln -s /etc/apache2/sites-available/owncloud.conf /etc/apache2/sites-enabled/owncloud.conf
+ln -s /etc/apache2/sites-available/owncloud.conf /etc/apache2/sites-enabled/owncloud.conf  >> "$SORTIE" 2>&1
 
-#echo "Etape 5 : Désactivation de reqtimeout_module pour éviter que php coute les upload"
+#echo "Etape 6 bis : Désactivation de reqtimeout_module pour éviter que php coute les upload"
 #cat <<EOF >"/etc/apache2/mods-available/reqtimeout.conf"
 #<IfModule reqtimeout_module>
 #  RequestReadTimeout header=0
@@ -77,11 +123,10 @@ ln -s /etc/apache2/sites-available/owncloud.conf /etc/apache2/sites-enabled/ownc
 #</IfModule>
 #EOF
 
-echo "Etape 6 : Activation des modules Apache utils à Owncloud"
-# Activation des modules Apache utiles à Owncloud :
+echo "Etape 7 : Activation des modules Apache utils à Owncloud"
 # Module indispensable au bon fonctionnement d'Owncloud :
 a2enmod rewrite  >> "$SORTIE" 2>&1
-# Modules complémentaires utiles à Owncloud : mod_headers, mod_env, mod_dir and mod_mime:
+# Modules complémentaires utils à Owncloud : mod_headers, mod_env, mod_dir and mod_mime:
 a2enmod headers  >> "$SORTIE" 2>&1
 a2enmod env  >> "$SORTIE" 2>&1
 a2enmod dir  >> "$SORTIE" 2>&1
@@ -90,10 +135,11 @@ a2enmod mime  >> "$SORTIE" 2>&1
 # Si utilisation de mod_fcgi à la place de mod_php, autorisé aussi (sur Apache2.4)
 # a2enmod setenvif
 
-echo "Etape 7 : Redemarrage d'Apache 2"
 service apache2 restart >> "$SORTIE" 2>&1
 
+#######################################################################################
 echo "Etape 8 - Finalisation de l'installation : intégration au se3"
+#######################################################################################
 # Mise des droits temporaires pour finaliser l'installation d'owncloud : les droits seront reserrés à la fin de l'installation
 chown -R "$htuser":"$htgroup" "$ocpath" >> "$SORTIE" 2>&1
 
@@ -105,16 +151,19 @@ mv "$ocpath/core/skeleton" "$ocpath/core/skeleton_save"
 mkdir -p "$ocpath/core/skeleton/Cloud"
 chown -R "$htuser":"$htgroup" "$ocpath/core/skeleton"
 
-echo "Etape 8.1 Configuration générale"
+########################################
+echo "Etape 8.1 : Installation Wizard"
+########################################
 # Installation "wizard"
 sudo -u "$htuser" php occ maintenance:install --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "$MYSQLPW" --admin-user "admin" --admin-pass "$dbpass" --data-dir "$ocpath/data"
 
+########################################
+echo "Etape 8.2 : Configuration de config.php"
+########################################
 # Configurer la langue par défaut de l'interface web en français
 sudo -u "$htuser" php occ config:system:set default_language --value="fr"
 
-# Configuration de config/config.php pour configurer les trusted domain et éventuellement le proxy
-#sudo -u "$htuser" php occ config:system:set trusted_domains 1 --value="$se3ip"
-#sudo -u "$htuser" php occ config:system:set trusted_domains 2 --value="$domain"
+# Configuration des trusted_domains
 # On supprime localhost
 sudo -u "$htuser" php occ config:system:set trusted_domains 0 --value="$se3ip"
 sudo -u "$htuser" php occ config:system:set trusted_domains 1 --value="$domain"
@@ -127,9 +176,17 @@ fi
 
 # Définition du quota par défaut des utilisateurs
 # Ne connaissant pas l'espace disponible pour le repertoire data OC dans /var/se3 : on le fixe à 100 MB par défaut
+# Il sera toujours possible à l'admin du se3 d'ajuster ce paramètre via l'interface web d'administration d'Owncloud
 sudo -u "$htuser" php occ config:app:set files default_quota --value="100 MB"
 
-echo "Etape 8.2 Configuration pour consulter l'annuaire du se3"
+# Définition d'un cache local selon les recommandations d' Owncloud"
+apt-get install -y php-apc >> "$SORTIE" 2>&1
+sudo -u "$htuser" php occ config:system:set memcache.local --value='\OC\Memcache\APC'
+service apache2 restart >> "$SORTIE" 2>&1
+
+#######################################################################################################
+echo "Etape 8.3 : Configuration du module ldap d'Owncloud afin qu'il consulte l'annuaire ldap du se3"
+#######################################################################################################
 # Normalement, le paquet est installé ... mais dans le doute ...
 apt-get install -y php5-ldap >> "$SORTIE" 2>&1
 
@@ -147,7 +204,6 @@ sudo -u "$htuser" php occ ldap:set-config "" ldapAgentPassword "$dbpass"
 sudo -u "$htuser" php occ ldap:set-config "" ldapBaseGroups "ou=Groups,$ldap_base_dn"
 sudo -u "$htuser" php occ ldap:set-config "" ldapBaseUsers "ou=People,$ldap_base_dn"
 sudo -u "$htuser" php occ ldap:set-config "" ldapGroupDisplayName "cn"
-sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilterGroups 'Administratifs;Profs;admins'
 sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilterMode "0"
 sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilterObjectclass "top"
 sudo -u "$htuser" php occ ldap:set-config "" ldapGroupMemberAssocAttr "memberUid"
@@ -159,7 +215,7 @@ sudo -u "$htuser" php occ ldap:set-config "" ldapUserFilterMode "0"
 sudo -u "$htuser" php occ ldap:set-config "" ldapUserFilter "(|(objectclass=person))"
 sudo -u "$htuser" php occ ldap:set-config "" ldapUserFilterObjectclass "person"
 
-sudo -u "$htuser" php occ ldap:set-config "" ldapAttributesForUserSearch "givenname"
+sudo -u "$htuser" php occ ldap:set-config "" ldapAttributesForUserSearch "uid;sn"
 
 # Inutile en principe vu que owncloud est installé sur le même serveur que l'annuaire ldap 
 #sudo -u "$htuser" php occ ldap:set-config "" turnOffCertCheck "1"
@@ -169,8 +225,7 @@ sudo -u "$htuser" php occ ldap:set-config "" ldapAttributesForUserSearch "givenn
 sudo -u "$htuser" php occ ldap:set-config "" useMemberOfToDetectMembership "0"
 sudo -u "$htuser" php occ ldap:set-config "" ldapConfigurationActive "1"
 
-
-# Quota par défaut des utilisateurs de l'annuaire ldap (en octets) : 1Mo par défaut
+# Quota par défaut des utilisateurs de l'annuaire ldap (en octets) : 2Mo par défaut
 # Le quota des utilisateurs est défini dans la configuration system ...
 #sudo -u "$htuser" php occ ldap:set-config "" ldapQuotaDefault "2 MB"
 
@@ -187,7 +242,8 @@ sudo -u "$htuser" php occ config:app:set core incoming_server2server_share_enabl
 sudo -u "$htuser" php occ config:app:set core outgoing_server2server_share_enabled --value "no"
 
 # On recherche les groupes autorisés à faire du partage, cad Equipe*, Cours* Matieres, Profs, admins et on les ajoute à la conf du ldap d'OC
-filtre_groupes='(&(|(objectclass=top))(|(cn=Profs)(cn=admins)'
+filtre_groupes1=''
+filtre_groupes2='(&(|(objectclass=top))(|(cn=Profs)(cn=admins)'
 
 #resultats="$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Equipe_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
 #resultats="$resultats $(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Matiere_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
@@ -204,22 +260,29 @@ ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Cours_* | grep "^cn:" | cut -d"
 
 for groupese3 in $(cat resultats)
 do
-	filtre_groupes="$filtre_groupes(cn=$groupese3)"
+	filtre_groupes1="$filtre_groupes1;$groupese3"
+	filtre_groupes2="$filtre_groupes2(cn=$groupese3)"
 done
 
 rm -f resultats
 
-# On ferme les parenthèses du filtre
-filtre_groupes="$filtre_groupes))"
+# On supprimer le 1er caractère ';' qui est en trop dans le filtre 1
+filtre_groupes1=$(echo "$filtre_groupes1" | cut -c 2-)
 
-sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilter "$filtre_groupes"
+# On ferme les parenthèses du filtre 2
+filtre_groupes2="$filtre_groupes2))"
 
-echo "Etape 8.3 Configuration du module Stockage Externe pour rendre accessible les partages Samba du se3"
+sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilterGroups "$filtre_groupes1"
+sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilter "$filtre_groupes2"
 
-# Configuration du module external storage
-# Pour un bon fonctionnement de ce module, la documentation recommande d'installer  php5-libsmbclient
-echo 'deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/Debian_7.0/ /' >> /etc/apt/sources.list.d/php5-libsmbclient.list  
-wget http://download.opensuse.org/repositories/isv:ownCloud:community/Debian_7.0/Release.key >> "$SORTIE" 2>&1
+
+##################################################################
+echo "Etape 8.4 : Configuration du module Stockage Externe CIFS/SMB"
+##################################################################
+
+# Pour un bon fonctionnement de ce module, la documentation recommande d'installer php5-libsmbclient
+echo "deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/$VERSION_SE3/ /" > /etc/apt/sources.list.d/php5-libsmbclient.list
+wget "http://download.opensuse.org/repositories/isv:ownCloud:community/$VERSION_SE3/Release.key" >> "$SORTIE" 2>&1
 apt-key add - < Release.key
 rm -f Release.key
 apt-get update >> "$SORTIE" 2>&1
@@ -228,11 +291,10 @@ apt-get install -y smbclient php5-libsmbclient >> "$SORTIE" 2>&1
 # Activation du module de stockage externe 
 sudo -u "$htuser" php occ app:enable files_external
 
-# Par défaut, la local est 'en' pour le module stockage externe, ce qui pose des problèmes 
-# avec les répertoires ou fichiers qui contiennent des caractères spéciaux : on la met en fr
+# Par défaut, la local est 'en', ce qui pose des problèmes avec les caractéres spéciaux dans les noms de répertoires et de fichiers
 sed -i -e "s/const LOCALE = 'en_US.UTF-8'/const LOCALE ='fr_FR.UTF-8'/g" "$ocpath/apps/files_external/3rdparty/icewind/smb/src/Server.php"  >> "$SORTIE" 2>&1 
 
-# On copie et on met les droits sur le fichier .json contenant la configuration des partages samba "Docs" # et "Classes" pour le module stockage externe d'Owncloud
+# On copie et on met les droits sur le fichier .json contenant la configuration des partages samba "Docs" et "Classes" du se3
 if [ -e "$rep_courant/partages_samba_se3.json" ]
 then
 	cp -f "$rep_courant/partages_samba_se3.json" "$ocpath/partages_samba_se3.json"
@@ -246,24 +308,13 @@ else
 	echo "le script d'installation : la configuration du module Stockage Externe sera de ce fait incomplète ..."
 fi
 
-#echo "Etape 8.4 Construction d'un skelette vide sur le partage Owncloud : les utilisateurs doivent enregistrer dans les partages Samba"
-# Définir le skelette par défaut des utilisateurs
-#mkdir -p "$ocpath/core/skeleton_se3/cloud"
-#chown -R "$htuser":"$htgroup" "$ocpath/core/skeleton_se3"
-#sudo -u "$htuser" php occ config:system:set skeletondirectory --value="$ocpath/core/skeleton_se3"
+##################################################################
+echo "Etape 8.5 : Reserrer les droits sur le repertoire owncloud (selon les recommandations de la doc officielle)"
+##################################################################
 
-# Le compte admin d'OC est déjà créé et dispose donc du skeleton 
+# Script pour mettre les "bons" droits sur le répertoire owncloud (fourni dans la doc officielle d'owncloud)
 
-echo "Etape 8.5 : Définition d'un cache local selon les recommandations d' Owncloud"
-apt-get install -y php-apc >> "$SORTIE" 2>&1
-sudo -u "$htuser" php occ config:system:set memcache.local --value='\OC\Memcache\APC'
-service apache2 restart >> "$SORTIE" 2>&1
-
-echo "Etape 8.6 Mise des droits sur les fichiers et repertoire du dossier owncloud selon les recommendations de la doc officielle d'OC"
-# Script pour mettre les droits sur le répertoire owncloud (documentation officielle owncloud)
-# Attention, ces droits sont très serrés : pour une mise à jour ultérieure d'Owncloud, il sera nécessaire # de les relachế ... (se reporter à la documentation officielle)
- 
-cat <<EOF > "/root/mettre_droits_owncloud.sh"
+cat <<EOF > "/usr/share/se3/scripts/mettre_droits_sur_data_owncloud.sh"
 
 #!/bin/sh
 printf "Creating possible missing Directories\n"
@@ -298,126 +349,257 @@ fi
 exit 0
 EOF
 
-bash /root/mettre_droits_owncloud.sh >> "$SORTIE" 2>&1
+bash /usr/share/se3/scripts/mettre_droits_sur_data_owncloud.sh >> "$SORTIE" 2>&1
 
-rm -f /root/mettre_droits_owncloud.sh >> "$SORTIE" 2>&1	
 
-#######################################################################################################################################
-# Essayer de se passer du module stockage externe et utiliser les répertoires Docs et Classes du se3 comme espace de stockage d'OC
-# Le but étant de :
-# - éviter d'avoir deux espaces de stockages disctincts (celui du se3 et celui d'OC)
-# - utiliser les partages Samba "en interne" pour leur efficacité et disposer des fonctionnalités d'OC pour partager 
-#   et accéder de l'extérieur aux partages Samba du se3
-
-# Création des liens symboliques du répertoire data vers le partage Docs du se3
-#find /home -mindepth 1 -maxdepth 1 ! -path /home/netlogon ! -path /home/profiles ! -path /home/_templates ! -path /home/templates ! -path /home/_netlogon \
-#-exec setfacl -m u:www-data:x,g:www-data:x {} \; \
-#-exec setfacl -Rm d:u:www-data:rwx,d:g:www-data:rx,u:www-data:rwx,g:www-data:rx {}/Docs \; \
-#-exec mkdir -p "$ocpath"/data{}/cache "$ocpath"/data{}/files \; \
-#-exec ln -s {}/Docs "$ocpath"/data{}/files/Docs \;
-
-#chown -R www-data:www-data "$ocpath"/data/home
-#chmod -R 750 "$ocpath"/data/home
-#cp -rnpP "$ocpath"/data/home/* "$ocpath"/data/
-#rm -rf "$ocpath"/data/home
-
-# Fin 
-# Cette solution pose des soucis au niveau des quotas : le quota défini sur OW est prioritaire sur celui définit sur le /home du se3
-#######################################################################################################################################
-
-#######################################################################################################################################
-# Solution alternative : on déplace le répertoire data d'OC dans /var/se3/owncloud_data afin d'avoir plus de place
-# On crée un partage Samba owncloud sur le se3 pour rendre accessible via smb, en interne, leur répertoire owncloud
-# On crée un groupe owncloud sur le se3 afin que les utilisateurs du se3 puissent y accéder
-# On créer et ajouter chaque utilisateur au groupe owncloud
-
+#################################################################################################################
+echo "Etape 8.6 : On déplace le repertoire data d'Owncloud dans /var/se3 car il y a plus de place "
+echo "et cela permettra d'utiliser le système de sauvegarde des données du se3 pour sauvegarde les données d'OC"
+#################################################################################################################
 # On déplace le répertoire data d'OC dans /var/se3 car il y a plus de place que dans /var/www/owncloud
-sudo -u "$htuser" php occ config:system:set datadirectory --value="/var/se3/dataOC"
-mv "$ocpath/data" /var/se3/dataOC
+sudo -u "$htuser" php occ config:system:set datadirectory --value="/var/se3/dataOC" 
+mv "$ocpath/data" /var/se3/dataOC  >> "$SORTIE" 2>&1
 
-# On crée le groupe owncloud s'il n'existe pas ...
-#resultat=$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" "cn=owncloud" "dn")
+
+#################################################################################################################
+echo "Etape 8.7 : Faire executer cron.php par cron plutôt qu'ajax (recommandation de la doc officielle d'Owncloud)"
+#################################################################################################################
+
+# La doc d'Owncloud recommande d'executer cron.php par cron plutôt qu'ajax, lors de l'utilisation du module stockage externe
+# cron.php sera lancé tous les quarts d'heure.
+sudo -u "$htuser" php occ background:cron
+{ crontab -l -u "$htuser"; echo '*/15  *  *  *  * php -f /var/www/owncloud/cron.php'; } | crontab -u "$htuser" -
+
+##################################################################################################################
+#echo "Etape 8.8 : Création d'un partage samba nommé owncloud sur le se3"
+#echo "Ce partage a pour but de rendre en plus accessible le Cloud des utilisateurs via samba, sur le réseau péda"
+##################################################################################################################
+
+## On met les droits sur le répertoire data d'OC 
+#setfacl -m g:Profs:x /var/se3/dataOC  >> "$SORTIE" 2>&1
+#setfacl -m g:Eleves:x /var/se3/dataOC  >> "$SORTIE" 2>&1
+#setfacl -m g:admins:x /var/se3/dataOC  >> "$SORTIE" 2>&1
+
+## On crée le script qui va permettre de : 
+## - créer, s'il n'existe pas déjà, le skelette d'owncloud de l'utilisateur lorsqu'il y accède via samba
+## - mettre les droits sur le repertoire data d'OC afin que l'utilisateur puisse y accéder via samba et via OC 
+
+#cat << 'EOF' > "/usr/share/se3/scripts/donner_acces_partage_owncloud.sh"
+##!/bin/sh
+
+#user="$1"
+
+## On crée éventuellement le répertoire owncloud de l'utilisateur, s'il n'existe pas déjà
+#if [ ! -d "/var/se3/dataOC/$user" ]
+#then
+	#mkdir -p "/var/se3/dataOC/$user/cache" "/var/se3/dataOC/$user/files"
+	#cp -r /var/www/owncloud/core/skeleton/* "/var/se3/dataOC/$user/files/"
+	#chown -R www-data:www-data "/var/se3/dataOC/$user"
+	#chmod -R 750 "/var/se3/dataOC/$user"
+#fi
+
+## Mise des droits pour que l'utilisateur puisse accéder à ses données via samba
+#setfacl -Rm d:u:"$user":rwx,u:"$user":rwx "/var/se3/dataOC/$user"
+
+## Mise des droits pour que l'utilisateur puisse accéder à ses données via OC
+#setfacl -Rm d:u:www-data:rwx,d:g:www-data:rx,u:www-data:rwx,g:www-data:rx "/var/se3/dataOC/$user"
+
+#exit 0
+
+#EOF
+
+## Mise des droits sur le script en cohérence avec le se3
+#chown www-se3:root /usr/share/se3/scripts/donner_acces_partage_owncloud.sh  >> "$SORTIE" 2>&1
+#chmod 550 /usr/share/se3/scripts/donner_acces_partage_owncloud.sh  >> "$SORTIE" 2>&1
+
+## Lorsqu'un fichier est rajouté/supprimé dans le repertoire data d'OC via le partage samba,
+## il faut refaire un scan du dossier de cet utilisateur pour intégrer/supprimer ce nouveau fichier à OC
+#cat << 'EOF' > "/usr/share/se3/scripts/mettre_aplomb_data_owncloud.sh"
+##!/bin/sh
+
+#user="$1"
+
+#sudo -u www-data php /var/www/owncloud/occ files:scan --quiet --path="/$user/files"
+#exit 0
+
+#EOF
+
+## Mise des droits sur le script en cohérence avec le se3
+#chown www-se3:root /usr/share/se3/scripts/mettre_aplomb_data_owncloud.sh  >> "$SORTIE" 2>&1
+#chmod 550 /usr/share/se3/scripts/mettre_aplomb_data_owncloud.sh  >> "$SORTIE" 2>&1
+
+## On crée le partage owncloud
+#cat <<EOF > "/etc/samba/smb_owncloud.conf"
+#[owncloud]
+	#comment= Cloud de %u
+	#path = /var/se3/dataOC/%u/files
+	#read only = No
+	#browseable = Yes
+	#valid users = @admins, @Profs, @Eleves
+	#root preexec = /usr/share/se3/scripts/donner_acces_partage_owncloud.sh %u
+	#root postexec = /usr/share/se3/scripts/mettre_aplomb_data_owncloud.sh %u
+#EOF
+
+## S'il n'existe pas déjà, on rajoute le fichier de configuration du partage Owncloud à la conf de Samba
+#resultat=$(grep "smb_owncloud.conf" "/etc/samba/smb.conf")
 
 #if [ "$resultat" = "" ]
 #then
-#	perl /usr/share/se3/sbin/groupAdd.pl "1" "owncloud" "Partage owncloud"
+#cat <<EOF >> "/etc/samba/smb.conf"
+#include = /etc/samba/smb_owncloud.conf
+#EOF
 #fi
 
-# On met les droits sur le répertoire data d'OW afin de pouvoir y accéder par un partage Samba
-#setfacl -m g:owncloud:x /var/se3/dataOC  
-setfacl -m g:Profs:x /var/se3/dataOC
-setfacl -m g:Eleves:x /var/se3/dataOC
-setfacl -m g:admins:x /var/se3/dataOC
+#service samba restart  >> "$SORTIE" 2>&1
 
-# On crée le script qui va permettre de créer le skelette d'owncloud à la 1ère connexion de l'utilisateur
-# et de mettre les droits pour que le partage Samba puissent être accessible à l'utilisateur se3
+##################################################################################################################
+#echo "Etape 8.9 : Faire un cleanup et un scan complet des fichiers utilisateur deux fois par jour (à 12:40 et à 18:40)"
+##################################################################################################################
+## On effectue quotiennement, en tache cron, un cleanup et un scan de tous les fichiers data d'OC afin de mettre à jour la cache d'OC
+## Cela a pour but d'éviter que des fichiers créés/supprimés via la partage samba ne soient pas réactualisés dans Owncloud
+#{ crontab -l -u "$htuser"; echo '40 12 * * * php /var/www/owncloud/occ files:cleanup --quiet'; } | crontab -u "$htuser" -
+#{ crontab -l -u "$htuser"; echo '45 12 * * * php /var/www/owncloud/occ files:scan --quiet --all'; } | crontab -u "$htuser" -
 
-cat << 'EOF' > "/usr/share/se3/scripts/donner_acces_partage_owncloud.sh"
+#{ crontab -l -u "$htuser"; echo '40 18 * * * php /var/www/owncloud/occ files:cleanup --quiet'; } | crontab -u "$htuser" -
+#{ crontab -l -u "$htuser"; echo '45 18 * * * php /var/www/owncloud/occ files:scan --quiet --all'; } | crontab -u "$htuser" -
+
+
+##################################################################################################################
+#echo "Etape 8.10 : Utiliser l'uid plutôt que le uuid afin de pouvoir repérer un utilisateur et faire un scan sur ces fichiers après un accès via samba"
+##################################################################################################################
+#sudo -u "$htuser" php occ ldap:set-config "" ldap_expert_username_attr "uid"
+#sudo -u "$htuser" php occ ldap:set-config "" ldap_expert_uuid_user_attr "uid"
+
+
+#################################################################################################################
+echo " Etape 9 : Suppression d'Owncloud de la liste des dépôts du se3 afin d'éviter une maj automatique d'OC lors d'un apt-get upgrade sur le se3"
+echo " Pour réaliser une maj d'OC, il faudra lancer à la main le script /usr/share/se3/scripts/upgrade_owncloud.sh "
+#################################################################################################################
+
+rm -f /etc/apt/sources.list.d/owncloud.list /etc/apt/sources.list.d/php5-libsmbclient.list  >> "$SORTIE" 2>&1
+
+# Création du scritp pour faire un upgrade d'Owncloud
+cat << 'EOF' > "/usr/share/se3/scripts/upgrade_owncloud.sh"
 #!/bin/sh
 
-user="$1"
-
-# On ajoute l'utilisateur au groupe owncloud s'il n'y fait pas parti déjà
-
-#resultat="$(ldapsearch -xLLL -b "cn=owncloud,ou=Groups,$ldap_base_dn" "memberUid=$user" "dn")"
-
-#if [ "$resultat" = "" ]
-#then
-#	perl /usr/share/se3/sbin/groupAddUser.pl "$user" "owncloud" > /dev/null 2>&1
-#fi
-
-# On crée éventuellement le répertoire owncloud de l'utilisateur, s'il n'existe pas déjà
-if [ ! -d "/var/se3/dataOC/$user" ]
+# Vérification que le script est lancé sur un se3 wheezy
+if egrep -q "^7" /etc/debian_version
 then
-	mkdir -p "/var/se3/dataOC/$user/cache" "/var/se3/dataOC/$user/files"
-	cp -r /var/www/owncloud/core/skeleton/* "/var/se3/dataOC/$user/files/"
-	chown -R www-data:www-data "/var/se3/dataOC/$user"
-	chmod -R 750 "/var/se3/dataOC/$user"
+		echo "Votre serveur est bien version Debian Wheezy"
+		echo "Le script peut se poursuivre"
+		VERSION_SE3='Debian_7.0'
+else
+		echo "Votre serveur se3 n'est pas en version Wheezy"
+		echo "Le script va s'arrêter ..."
+		exit 1
 fi
 
-# On met les droits sur le répertoire owncloud
-# setfacl -Rm d:u:"$user":rwx,u:"$user":rwx "/var/se3/dataOC/$user"
-setfacl -Rm d:u:"$user":rwx,u:"$user":rwx "/var/se3/dataOC/$user"
+case "$@" in
+            9.0)
+                echo "Mise à jour vers la version 9.0 d'OC" 
+                VERSION_OC="9.0"
+            ;;
+            
+            9.1)
+                echo "La version 9.1 d'Owncloud n'est pas encore sortie ... : la maj n'est pas encore possible" 
+                VERSION_OC="9.1"
+                exit 1
+            ;;
+            
+            9.2)
+                echo "La version 9.2 d'Owncloud n'est pas encore sortie ... : la maj n'est pas encore possible" 
+                VERSION_OC="9.2"
+                exit 1
+            ;;
+            
+            *) 
+                echo "La maj va être réalisée vers la version stable d'Owncloud"
+                VERSION_OC="stable"
+            ;;
+esac
 
-# On met les droits pour que les fichiers enregistrés via samba soit utilisable par OC
-setfacl -Rm d:u:www-data:rwx,d:g:www-data:rx "/var/se3/dataOC/$user"
+# On se place dans le repertoire pour utiliser la commande occ
+cd /var/www/owncloud
 
-EOF
+# On remet data à l'endroit où le paquet owncloud-files l'a initialement installé (recommandation doc officielle)
+sudo -u www-data php occ config:system:set datadirectory --value="/var/www/owncloud/data" 
+mv /var/se3/dataOC /var/www/owncloud/data
 
-chown www-se3:root /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
-chmod ug+rx /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
-chmod u-w /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
-chmod o-rwx /usr/share/se3/scripts/donner_acces_partage_owncloud.sh
+# On rajoute temporairement les dépots pour faire la maj
+echo "deb http://download.owncloud.org/download/repositories/$VERSION_OC/$VERSION_SE3/ /" > /etc/apt/sources.list.d/owncloud.list
+echo "deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/$VERSION_SE3/ /" > /etc/apt/sources.list.d/php5-libsmbclient.list
 
-# On crée le partage owncloud
-cat <<EOF > "/etc/samba/smb_owncloud.conf"
-[owncloud]
-	comment= Cloud de %u
-	path = /var/se3/dataOC/%u/files
-	read only = No
-	browseable = Yes
-	valid users = @admins, @Profs, @Eleves
-	root preexec = /usr/share/se3/scripts/donner_acces_partage_owncloud.sh %u
-	root preexec close = Yes
-EOF
+# On place OC en mode maintenance pour couper son accès aux utilisateurs
+# sudo -u www-data php occ maintenance:mode --on
 
-# S'il n'existe pas déjà, on rajoute le fichier de configuration du partage Owncloud à la conf de Samba
-resultat=$(grep "smb_owncloud.conf" "/etc/samba/smb.conf")
+# On désactive toutes les applications tierce (est-ce réellement nécessaire ? inutile en mode maintenance ?)
+# sudo -u www-data php occ app:disable user_ldap
+# sudo -u www-data php occ app:disable files_external
 
-if [ "$resultat" = "" ]
-then
-cat <<EOF >> "/etc/samba/smb.conf"
-include = /etc/samba/smb_owncloud.conf
-EOF
-fi
+# On met à jour le paquet owncloud-files
+apt-get update && apt-get install owncloud-files
 
-service samba restart
+# On finalise l'installation avec occ
+sudo -u www-data php occ upgrade
+# ou sans le mode simulation (qui peut prendre plusieurs heures ...)
+# sudo -u www-data php occ upgrade --skip-migration-test
 
-echo " Etape 9 : Suppression d'Owncloud de la liste des dépôts du se3 afin d'éviter une maj automatique d'OC lors d'un apt-get upgrade sur le se3"
-echo " Pour réaliser une maj d'OC, il faudra lancer le script /usr/share/se3/sbin/upgrade_owncloud.sh "
+# On réactive les applications tierce (TODO : est-ce réellement nécessaire ? je ne les ai pas toutes désactivées ...)
+# sudo -u www-data php occ app:enable user_ldap
+# sudo -u www-data php occ app:enable files_external
 
+# On remets les droits sur le repertoire data d'OC
+bash /usr/share/se3/scripts/mettre_droits_sur_data_owncloud.sh
+
+# On redéplace le repertoire data dans /var/se3
+sudo -u www-data php occ config:system:set datadirectory --value="/var/se3/dataOC" 
+mv /var/www/owncloud/data /var/se3/dataOC
+
+# On supprime les depots d'OC pour éviter une maj d'OC non désirée (via un apt-get upgrade du se3 ...)
 rm -f /etc/apt/sources.list.d/owncloud.list /etc/apt/sources.list.d/php5-libsmbclient.list
 
+# On quitte le mode maintenance
+# sudo -u www-data php occ maintenance:mode --off
+
+# On nettoie et rescane l'ensemble des fichiers des utilisateurs pour mettre à jour le cache d'OC
+sudo -u www-data php /var/www/owncloud/occ files:cleanup --quiet
+sudo -u www-data php /var/www/owncloud/occ files:scan --quiet --all
+
+exit 0
+
+EOF
+
+chown www-se3:root /usr/share/se3/scripts/upgrade_owncloud.sh >> "$SORTIE" 2>&1
+chmod 550 /usr/share/se3/scripts/upgrade_owncloud.sh >> "$SORTIE" 2>&1
+
+###########################################################################################################
+echo " Etape 10 : Installation des applications bookmarks pour ajouter des favoris web, et de  l'application de messagerie/chat interne"
+###########################################################################################################
+
+#installation de l'application favoris
+cd /var/www/owncloud/apps/
+wget https://ovin.schiwon.me/index.php/s/3ROfUXOtwYIEY47/download
+mv download bookmarks.zip
+unzip bookmarks.zip
+chown -R www-data:www-data bookmarks
+rm  -f bookmarks.zip
+cd ..
+sudo -u www-data php occ app:enable bookmarks
+
+#installation de l'application messagerie/chat interne
+cd /var/www/owncloud/apps/
+wget https://github.com/simeonackermann/OC-User-Conversations/archive/master.zip
+unzip master.zip
+mv OC* conversations
+chown -R www-data:www-data conversations/
+cd ..
+sudo -u www-data php occ app:enable conversations
+cd apps
+rm -f master.zip
+
+
+#################################################################################################################
 echo " Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
 echo " Le compte administrateur de votre serveur Owncloud est identique à celui du compte admin de l'interface web de votre se3"
+#################################################################################################################
 exit 0
