@@ -242,7 +242,7 @@ sudo -u "$htuser" php occ config:app:set core incoming_server2server_share_enabl
 sudo -u "$htuser" php occ config:app:set core outgoing_server2server_share_enabled --value "no"
 
 # On recherche les groupes autorisés à faire du partage, cad Equipe*, Cours* Matieres, Profs, admins et on les ajoute à la conf du ldap d'OC
-filtre_groupes1=''
+filtre_groupes1='Profs;admins'
 filtre_groupes2='(&(|(objectclass=top))(|(cn=Profs)(cn=admins)'
 
 #resultats="$(ldapsearch -xLLL -b "ou=Groups,$ldap_base_dn" cn=Equipe_* | grep "^cn:" | cut -d":" -f2 | sed -e "s/^ //")"
@@ -265,9 +265,6 @@ do
 done
 
 rm -f resultats
-
-# On supprimer le 1er caractère ';' qui est en trop dans le filtre 1
-filtre_groupes1=$(echo "$filtre_groupes1" | cut -c 2-)
 
 # On ferme les parenthèses du filtre 2
 filtre_groupes2="$filtre_groupes2))"
@@ -358,7 +355,7 @@ echo "et cela permettra d'utiliser le système de sauvegarde des données du se3
 #################################################################################################################
 # On déplace le répertoire data d'OC dans /var/se3 car il y a plus de place que dans /var/www/owncloud
 sudo -u "$htuser" php occ config:system:set datadirectory --value="/var/se3/dataOC" 
-mv "$ocpath/data" /var/se3/dataOC  >> "$SORTIE" 2>&1
+mv "$ocpath/data" /var/se3/dataOC >> "$SORTIE" 2>&1
 
 
 #################################################################################################################
@@ -367,8 +364,8 @@ echo "Etape 8.7 : Faire executer cron.php par cron plutôt qu'ajax (recommandati
 
 # La doc d'Owncloud recommande d'executer cron.php par cron plutôt qu'ajax, lors de l'utilisation du module stockage externe
 # cron.php sera lancé tous les quarts d'heure.
-sudo -u "$htuser" php occ background:cron
-{ crontab -l -u "$htuser"; echo '*/15  *  *  *  * php -f /var/www/owncloud/cron.php'; } | crontab -u "$htuser" -
+sudo -u "$htuser" php occ background:cron 
+{ crontab -l -u "$htuser"; echo '*/15  *  *  *  * php -f /var/www/owncloud/cron.php'; } | crontab -u "$htuser" - >> "$SORTIE" 2>&1
 
 ##################################################################################################################
 #echo "Etape 8.8 : Création d'un partage samba nommé owncloud sur le se3"
@@ -472,8 +469,8 @@ sudo -u "$htuser" php occ background:cron
 
 
 #################################################################################################################
-echo " Etape 9 : Suppression d'Owncloud de la liste des dépôts du se3 afin d'éviter une maj automatique d'OC lors d'un apt-get upgrade sur le se3"
-echo " Pour réaliser une maj d'OC, il faudra lancer à la main le script /usr/share/se3/scripts/upgrade_owncloud.sh "
+echo "Etape 9 : Suppression d'Owncloud de la liste des dépôts du se3 afin d'éviter une maj automatique d'OC lors d'un apt-get upgrade sur le se3"
+echo "Pour réaliser une maj d'OC, il faudra lancer à la main le script /usr/share/se3/scripts/upgrade_owncloud.sh "
 #################################################################################################################
 
 rm -f /etc/apt/sources.list.d/owncloud.list /etc/apt/sources.list.d/php5-libsmbclient.list  >> "$SORTIE" 2>&1
@@ -578,20 +575,20 @@ echo " Etape 10 : Installation des applications bookmarks pour ajouter des favor
 
 #installation de l'application favoris
 cd /var/www/owncloud/apps/
-wget https://ovin.schiwon.me/index.php/s/3ROfUXOtwYIEY47/download
-mv download bookmarks.zip
-unzip bookmarks.zip
-chown -R www-data:www-data bookmarks
-rm  -f bookmarks.zip
+wget https://ovin.schiwon.me/index.php/s/3ROfUXOtwYIEY47/download >> "$SORTIE" 2>&1
+mv download bookmarks.zip >> "$SORTIE" 2>&1
+unzip bookmarks.zip >> "$SORTIE" 2>&1
+chown -R www-data:www-data bookmarks >> "$SORTIE" 2>&1
+rm  -f bookmarks.zip >> "$SORTIE" 2>&1
 cd ..
 sudo -u www-data php occ app:enable bookmarks
 
 #installation de l'application messagerie/chat interne
 cd /var/www/owncloud/apps/
-wget https://github.com/simeonackermann/OC-User-Conversations/archive/master.zip
-unzip master.zip
-mv OC* conversations
-chown -R www-data:www-data conversations/
+wget https://github.com/simeonackermann/OC-User-Conversations/archive/master.zip >> "$SORTIE" 2>&1
+unzip master.zip >> "$SORTIE" 2>&1
+mv OC* conversations >> "$SORTIE" 2>&1
+chown -R www-data:www-data conversations/ >> "$SORTIE" 2>&1
 cd ..
 sudo -u www-data php occ app:enable conversations
 cd apps
