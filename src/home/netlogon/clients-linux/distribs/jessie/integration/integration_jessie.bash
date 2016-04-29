@@ -4,7 +4,7 @@
 # script d'intégration des clients Jessie à un domaine géré par un se3
 #
 #
-# version : 20160427
+# version : 20160429
 #
 #
 #
