@@ -156,16 +156,16 @@ demander_mot_de_passe ()
     mot_de_passe="$mdp1" 
 }
 
-hacher_mot_de_passe_grub ()
+hash_grub_pwd()
 {
-    # Fonction qui permet d'obtenir le hachage version Grub2 d'un mot 
-    # de passe donné. La fonction prend un argument qui est le mot de 
+    # Fonction qui permet d'obtenir le hachage version Grub2 d'un mot
+    # de passe donné. La fonction prend un argument qui est le mot de
     # passe en question.
     #
-    { echo "$1"; echo "$1"; } \
-        | grub-mkpasswd-pbkdf2 -c 30 -l 30 -s 30 2 >> $SORTIE \
-        | grep -v 'password' \
-        | sed -r 's/Your PBKDF2 is (.+)$/\1/'  
+    { echo "$1"; echo "$1"; }                                          \
+        | LC_ALL=C grub-mkpasswd-pbkdf2 -c 30 -l 30 -s 30 2>>"$SORTIE" \
+        | grep 'PBKDF2'                                                \
+        | sed 's/^.* is //'
 }
 
 changer_mot_de_passe_root ()
@@ -1087,66 +1087,71 @@ renommer_nom_client()
     unset -v filtre_recherche resultat reponse
 }
 
-mettre_en_place_mot_de_passe_grub()
+set_grub_pwd ()
 {
     # Si l'option --mdp-grub n'a pas été spécifiée, alors on passe
     # à la suite sans rien faire. Sinon, il faut mettre en place
     # un mot de passe Grub.
-    
     if "$OPTION_MDP_GRUB"
     then
-        afficher "Mise en place du mot de passe Grub (le login sera « admin »)."
-        
-        # Installation temporaire qui permet de rendre le fichier
-        # /dev/random plus loquace ce qui permet ainsi de rectifier
-        # un bug de la commande grub-mkpasswd-pbkdf2. Ces installations
-        # seront supprimées ensuite, une fois la mise en place du
-        # mot de passe Grub terminée.
-        apt-get install --reinstall --yes --force-yes $PAQUETS_RANDOM >> $SORTIE 2>&1
-        echo "HRNGDEVICE=/dev/urandom" >> "/etc/default/rng-tools"
-        #invoke-rc.d rng-tools stop >> $SORTIE 2>&1
-        service rng-tools stop >> $SORTIE 2>&1
-        #invoke-rc.d rng-tools start >> $SORTIE 2>&1
-        service rng-tools start >> $SORTIE 2>&1
-        
+        afficher "mise en place du mot de passe Grub (le login sera « admin »)." | tee -a $compte_rendu
+
         if [ -z "$MDP_GRUB" ]
         then
             # MDP_GRUB est vide (l'option --mdp-grub a été spécifiée
             # sans paramètre), il faut donc demander à l'utilisateur
             # le mot de passe.
             demander_mot_de_passe # La variable mot_de_passe est alors définie.
-            MDP_GRUB=$mot_de_passe
+            MDP_GRUB="$mot_de_passe"
         else
             # MDP_GRUB a été spécifié via le paramètre de l'option
             # --mdp-grub. Il n'y a rien à faire dans ce cas.
             true
         fi
-        
+
         # On hache le mot de passe Grub.
-        mdp_grub_hache=$(hacher_mot_de_passe_grub "$MDP_GRUB")
-        
-        # On édite le fichier /etc/grub.d/40_custom.
-        fichier_grub_custom="/etc/grub.d/40_custom"
-        restaurer_via_save "$fichier_grub_custom"
-        echo 'set superusers="admin"' >> "$fichier_grub_custom"
-        echo "password_pbkdf2 admin $mdp_grub_hache" >> "$fichier_grub_custom"
-        
+        local hached_grub_pwd
+        hached_grub_pwd=$(hash_grub_pwd "$MDP_GRUB")
+
+        # Le fichier /etc/grub.d/40_custom existe déjà. Il faut le rééditer
+        # en partant de zéro.
+        printf '#!/bin/sh\n'                                    >/etc/grub.d/40_custom
+        printf 'exec tail -n +3 $0\n'                          >>/etc/grub.d/40_custom
+        printf 'set superusers="admin"\n'                      >>/etc/grub.d/40_custom
+        printf 'password_pbkdf2 admin %s\n' "$hached_grub_pwd" >>/etc/grub.d/40_custom
+
+        # Dans le fichier /etc/grub.d/10_linux, il faut chercher une ligne
+        # spécifique qui va générer les entrées de boot Grub dite "simples"
+        # (typiquement l'entrée de boot par défaut qui va lancer Jessie).
+        # Au niveau de cette ligne, il faudra ajouter « --unrestricted ».
+        # En effet, sans cela, par défaut avec seulement le compte "admin"
+        # créé, aucun boot ne sera possible sans les identifiants du compte
+        # admin (par exemple si on laisse le compteur de temps défiler, Grub
+        # lancera le boot par défaut mais il demandera des identifiants pour
+        # autoriser le boot ce qui n'est franchement pas pratique).
+
+        local pattern="'gnulinux-simple-\$boot_device_id'"
+
+        # Si, au niveau de la ligne, l'option est déjà présente alors
+        # on ne modifie pas le fichier. Sinon on le modifie.
+        if ! grep -- "$pattern" /etc/grub.d/10_linux | grep -q -- '--unrestricted'
+        then
+            # Ajout de l'option « --unrestricted ».
+            sed -i "s/$pattern/& --unrestricted/" /etc/grub.d/10_linux
+        fi
+
         # On met à jour la configuration de Grub.
-        update-grub >> $SORTIE 2>&1
-        if [ "$?" != "0" ]
+        if ! update-grub >> $SORTIE 2>&1
         then
             afficher "Attention, la commande « update_grub » ne s'est pas" \
-                     "effectuée correctement, a priori Grub n'est pas" \
+                     "effectuée correctement, a priori Grub n'est pas"     \
                      "opérationnel. Il faut rectifier la configuration de" \
-                     "Grub jusqu'à ce que la commande se déroule sans erreur."
+                     "Grub jusqu'à ce que la commande se déroule sans erreur." | tee -a $compte_rendu
             exit 1
         fi
-        
-        unset -v mot_de_passe mdp_grub_hache fichier_grub_custom
-        
-        # Désinstallation de PAQUETS_RANDOM.
-        apt-get remove --purge --yes $PAQUETS_RANDOM >> $SORTIE 2>&1
-fi
+
+        unset -v mot_de_passe
+    fi
 }
 
 annuler_timeout_demarrage()
@@ -1926,7 +1931,7 @@ renommer_nom_client
 # Mise en place (éventuelle) du mot de passe Grub
 #=====
 # dépend de l'option --mdp-grub
-mettre_en_place_mot_de_passe_grub
+set_grub_pwd
 
 ######################################################
 # Annulation du timeout de démarrage

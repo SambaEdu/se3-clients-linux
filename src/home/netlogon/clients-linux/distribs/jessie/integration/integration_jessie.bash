@@ -173,9 +173,9 @@ hash_grub_pwd()
     # de passe donné. La fonction prend un argument qui est le mot de 
     # passe en question.
     #
-    { echo "$1"; echo "$1"; }                                       \
-        | LC_ALL=C grub-mkpasswd-pbkdf2 -c 30 -l 30 -s 30 2 >> $SORTIE \
-        | grep 'PBKDF2'                                             \
+    { echo "$1"; echo "$1"; }                                          \
+        | LC_ALL=C grub-mkpasswd-pbkdf2 -c 30 -l 30 -s 30 2>>"$SORTIE" \
+        | grep 'PBKDF2'                                                \
         | sed 's/^.* is //'
 }
 
