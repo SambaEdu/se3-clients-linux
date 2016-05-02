@@ -1395,6 +1395,7 @@ modif_bloc_polkit()
 {
     # modification d'un bloc du fichier polkit
     # 1 argument : la référence du champ concerné
+    # on modifie les champs des balises allow_any, allow_inactive et allow_active
     sed -i '/'$1'\"/,/\/action/ {s/<allow_any>auth_admin_keep/<allow_any>no/; s/<allow_inactive>auth_admin_keep/<allow_inactive>yes/; s/<allow_active>yes/<allow_active>no/}' $fichier_polkit
 }
 
@@ -1402,16 +1403,16 @@ modif_bloc_polkit()
 configurer_polkit()
 {
     fichier_polkit="/usr/share/polkit-1/actions/org.freedesktop.login1.policy"
+    # on modifie les champs des 4 balises suivantes
     modif_bloc_polkit org.freedesktop.login1.suspend
     modif_bloc_polkit org.freedesktop.login1.suspend-multiple-sessions
     modif_bloc_polkit org.freedesktop.login1.hibernate
     modif_bloc_polkit org.freedesktop.login1.hibernate-multiple-sessions
     # on rajoute un commentaire pour signaler la modification
-      cat >> "$fichier_polkit" << END
+    cat >> "$fichier_polkit" << END
 
 # modification_intégration_se3
 END
-    fi
 }
 
 
