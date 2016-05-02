@@ -1082,20 +1082,27 @@ modifier_fichiers_pam()
             fichier_gdm="lightdm"
         ;;
     esac
-    # Insertion de la ligne « auth    optional    pam_script.so ».
-    # ligne issue du script pour Xenial
-    sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/${fichier_gdm}
-    
+    # Insertion de la ligne « auth    optional    pam_script.so » si elle n'y est pas
+    config_pam="/etc/pam.d/${fichier_gdm}"
+    if [ "$(cat "$config_pam" | grep pam_script)" = "" ]
+    then
+        sed -i '/@include common-account/i \auth optional pam_script.so' /etc/pam.d/${fichier_gdm}
+    fi
     # L'installation de libpam-script a ajouté des appels à pam_script.so
     # → est-ce un bug ou est-ce voulu par les concepteurs de libpam-script ?
     # Or cet appel ne doit se faire que dans le fichier /etc/pam.d/gdm-password ou /etc/pam.d/lightdm
     # dans tous les fichiers common-*, on les met donc en commentaire
-    sed -i '/pam_script/ s/^/#/g' /etc/pam.d/common-session \
-                                  /etc/pam.d/common-session-noninteractive \
-                                  /etc/pam.d/common-account \
-                                  /etc/pam.d/common-auth \
-                                  /etc/pam.d/common-password
-} 
+    # si ce n'est déjà fait : test sur le dernier fichier à modifier
+    config_pam="/etc/pam.d/common-password"
+    if [ "$(cat "$config_pam" | grep pam_script | grep ^#)" = "" ]
+    then
+        sed -i '/pam_script/ s/^/#/g' /etc/pam.d/common-session \
+                                      /etc/pam.d/common-session-noninteractive \
+                                      /etc/pam.d/common-account \
+                                      /etc/pam.d/common-auth \
+                                      /etc/pam.d/common-password
+    fi
+}
 
 creation_fichier_pam()
 {
@@ -1137,20 +1144,6 @@ END
     sed -r -i -e "s:__CREDENTIALS__:$CREDENTIALS:g" "$PAM_SCRIPT_AUTH"
     chown "root:root" "$PAM_SCRIPT_AUTH"
     chmod "555" "$PAM_SCRIPT_AUTH"
-}
-
-parametrer_gnome_screensaver()
-{
-    # fonction plus utilisée : à supprimer
-    
-    # Paramétrage de gnome-screensaver,
-    # utiliser quand une session doit être déverrouillée.
-    #
-    # NB : à modifier pour Jessie ! (20151026)
-    # → passer par une modification de dconf ?
-    #
-    restaurer_via_save "/etc/pam.d/gnome-screensaver"
-    sed -i -r 's/@include\s+(common\-[a-z]+)\s*$/@include \1\.AVEC-LDAP/' "/etc/pam.d/gnome-screensaver"
 }
 
 
@@ -1225,10 +1218,15 @@ configurer_gdm3 ()
     # de ce script, entre autres, que le partage NOM_PARTAGE_NETLOGON va
     # être monté.
     
-    # On supprime le « exit 0 » à la fin.
-    sed -i "s/^exit 0//" "/etc/gdm3/Init/Default"
-    # Puis on y ajoute ceci :
-    cat >> "/etc/gdm3/Init/Default" << END
+    # on teste si la modification a déjà eu lieu
+    # idempotence avec de très fortes chances : installation via pxe recommandée
+    config_gdm3="/etc/gdm3/Init/Default"
+    if [ "$(cat "$config_gdm3" | grep modification_intégration_se3)" = "" ]
+    then
+        # On supprime le « exit 0 » à la fin.
+        sed -i "s/^exit 0//" "/etc/gdm3/Init/Default"
+        # Puis on y ajoute ceci :
+        cat >> "/etc/gdm3/Init/Default" << END
 
 #####
 # Modification pour l'intégration au domaine
@@ -1243,7 +1241,9 @@ fi
 #####
 
 exit 0
+# modification_intégration_se3 "$ladate"
 END
+    fi
     # Modifications des droits
     # les droits par défaut me semblent trop permissifs
     chown "root:root" "/etc/gdm3/Init/Default"
