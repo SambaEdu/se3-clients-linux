@@ -21,10 +21,9 @@ then
     # Update the version number.
     commit_id=$(git log --format="%H" -n 1 | sed -r 's/^(.{10}).*$/\1/')
     epoch=$(date '+%s')
-    # It's better to prefix by "0." to have a version number
-    # lower than the version numbers of the stable and
-    # official releases.
-    version="0.${epoch}~${commit_id}"
+    # The "from-git" version must have a version number
+    # greater than the stable version.
+    version="${epoch}~${commit_id}"
     sed -i -r "s/^Version:.*$/Version: ${version}/" "$script_dir/se3-clients-linux/DEBIAN/control"
 fi
 
