@@ -28,6 +28,35 @@ then
     sed -i -r "s/^Version:.*$/Version: ${version}/" "$script_dir/se3-clients-linux/DEBIAN/control"
 fi
 
+
+# Insertion of lib.sh where it's needed.
+PROG_AWK_LIBSH_INSERTION=$(cat <<'EOS'
+{
+    if ($0 ~ /^###LIBSH###/) {
+      system("cat '__LIBSH__'")
+    } else {
+      print $0
+    }
+}
+EOS
+)
+
+PROG_AWK_LIBSH_INSERTION=$(
+    printf '%s\n' "$PROG_AWK_LIBSH_INSERTION" | sed "s|__LIBSH__|$script_dir/$pkg_name/home/netlogon/clients-linux/lib.sh|"
+)
+
+for f in "$script_dir/$pkg_name/home/netlogon/clients-linux/distribs/"*"/integration/integration_"*".bash"
+do
+    if grep -q '^###LIBSH###' "$f"
+    then
+        tmp_f=$(mktemp)
+        awk "$PROG_AWK_LIBSH_INSERTION" "$f" > "$tmp_f"
+        cat "$tmp_f" > "$f"
+        rm -f "$tmp_f"
+    fi
+done
+
+# Build.
 dpkg --build "$script_dir/$pkg_name" .
 
 # Cleaning.

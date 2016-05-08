@@ -18,6 +18,8 @@ BASE_DN="__BASE_DN__"
 SERVEUR_NTP="__SERVEUR_NTP__"
 #--%<----%<----%<----%<----%<----%<----%<----%<----%<----%<----%<--
 
+###LIBSH###
+
 #####
 # la distribution GNU/Linux
 version_debian="jessie"

@@ -17,6 +17,8 @@ BASE_DN="__BASE_DN__"
 SERVEUR_NTP="__SERVEUR_NTP__"
 #--%<----%<----%<----%<----%<----%<----%<----%<----%<----%<----%<--
 
+###LIBSH###
+
 ####
 # Pour avoir des sorties les plus simples possibles, c'est-à-dire
 # en anglais avec des caractères 100% ASCII ! Ce changement de locales
