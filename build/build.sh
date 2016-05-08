@@ -45,10 +45,19 @@ PROG_AWK_LIBSH_INSERTION=$(
     printf '%s\n' "$PROG_AWK_LIBSH_INSERTION" | sed "s|__LIBSH__|$script_dir/$pkg_name/home/netlogon/clients-linux/lib.sh|"
 )
 
-for f in "$script_dir/$pkg_name/home/netlogon/clients-linux/distribs/"*"/integration/integration_"*".bash"
+all_shell_scripts=$(
+    find "$script_dir/$pkg_name" -type f -print0 \
+        | xargs -0 -I'{}' file --mime-type '{}'  \
+        | grep -i ': text/x-shellscript$'        \
+        | cut -d':' -f1
+)
+
+for f in $all_shell_scripts
 do
     if grep -q '^###LIBSH###' "$f"
     then
+        shortname=${f#$script_dir/$pkg_name/}
+        echo "lib.sh inserted in ${shortname}"
         tmp_f=$(mktemp)
         awk "$PROG_AWK_LIBSH_INSERTION" "$f" > "$tmp_f"
         cat "$tmp_f" > "$f"
