@@ -14,7 +14,7 @@
 #           d'une phase d'initialisation qui correspond au démarrage du
 #           système (true) ou non (false).
 
-
+###LIBSH###
 
 # Le plus tôt possible dans le script, on procède aux redirections 
 # de stdout et de stderr.
