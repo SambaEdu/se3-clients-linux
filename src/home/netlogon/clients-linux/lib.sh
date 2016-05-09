@@ -6,6 +6,7 @@
 ###########################################
 
 ############################################################################################################################
+# Use in install_clients_linux_mise_en_place.sh
 # This function downloads amd64 et i386 ubuntu Precise packages to install Open-Sankore in Jessie et Xenial
 # (Open-Sankore are no more updated but still works quite well on Jessie and Xenial clients with old Ubuntu Precise packages)
 # deb package are moved to /var/www/install in order to be download in local by Jessie et Xenial clients
@@ -14,20 +15,22 @@
 download_open_sankore_deb()
 {
 url_open_sankore='http://www.cndp.fr/open-sankore/OpenSankore/Releases/v2.5.1'
-wget -q "$url_open_sankore/Open-Sankore_Ubuntu_12.04_2.5.1_amd64.zip"
-if [ "$?" = "0" ] 
+version_open_sankore='Open-Sankore_Ubuntu_12.04_2.5.1'
+
+if [ ! -e "${rep_lien}/${version_open_sankore}_amd64.zip" ] 
 then 
-	"Download Open-Sankore_Ubuntu_12.04_2.5.1_amd64.zip"
+	wget "$url_open_sankore/${version_open_sankore}_amd64.zip"
+	chmod 755 ${version_open_sankore}_amd64.zip
+	mv ${version_open_sankore}_amd64.zip "${rep_lien}/"
 fi
 
-wget -q "$url_open_sankore/Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip"
-if [ "$?" = "0" ] 
-then 
-	"Download Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip"
-fi
 
-chmod 755 Open-Sankore*.zip
-mv Open-Sankore*.zip "${rep_lien}/"
+if [ ! -e "${rep_lien}/${version_open_sankore}_i386.zip" ]
+then 
+	wget "$url_open_sankore/${version_open_sankore}_i386.zip"
+	chmod 755 ${version_open_sankore}_i386.zip
+	mv ${version_open_sankore}_i386.zip "${rep_lien}/"
+fi
 }
 
 
