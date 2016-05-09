@@ -22,22 +22,22 @@ then
 	mkdir -p /home/netlogon/clients-linux/divers/open-sankore
 fi
 
-if [ ! -e "/home/netlogon/clients-linux/divers/${version_open_sankore}_amd64.zip" ] 
+if [ ! -e "/home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_amd64.zip" ] 
 then 
 	wget "${url_open_sankore}/${version_open_sankore}_amd64.zip"
 	chmod 755 ${version_open_sankore}_amd64.zip
-	mv ${version_open_sankore}_amd64.zip "/home/netlogon/clients-linux/divers/"
+	mv ${version_open_sankore}_amd64.zip "/home/netlogon/clients-linux/divers/open-sankore"
 fi
 
 
-if [ ! -e "/home/netlogon/clients-linux/divers/${version_open_sankore}_i386.zip" ]
+if [ ! -e "/home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_i386.zip" ]
 then 
 	wget "${url_open_sankore}/${version_open_sankore}_i386.zip"
 	chmod 755 ${version_open_sankore}_i386.zip
-	mv ${version_open_sankore}_i386.zip "/home/netlogon/clients-linux/divers/"
+	mv ${version_open_sankore}_i386.zip "/home/netlogon/clients-linux/divers/open-sankore"
 fi
 
-cp /home/netlogon/clients-linux/divers/${version_open_sankore}_*.zip "$rep_install"
+cp /home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_*.zip "$rep_install"
 
 }
 
