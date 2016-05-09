@@ -17,24 +17,33 @@ download_open_sankore_deb()
 url_open_sankore='http://www.cndp.fr/open-sankore/OpenSankore/Releases/v2.5.1'
 version_open_sankore='Open-Sankore_Ubuntu_12.04_2.5.1'
 
-if [ ! -e "${rep_lien}/${version_open_sankore}_amd64.zip" ] 
+if [ ! -d "/home/netlogon/clients-linux/divers/open-sankore" ]
+then
+	mkdir -p /home/netlogon/clients-linux/divers/open-sankore
+fi
+
+if [ ! -e "/home/netlogon/clients-linux/divers/${version_open_sankore}_amd64.zip" ] 
 then 
-	wget "$url_open_sankore/${version_open_sankore}_amd64.zip"
+	wget "${url_open_sankore}/${version_open_sankore}_amd64.zip"
 	chmod 755 ${version_open_sankore}_amd64.zip
-	mv ${version_open_sankore}_amd64.zip "${rep_lien}/"
+	mv ${version_open_sankore}_amd64.zip "/home/netlogon/clients-linux/divers/"
 fi
 
 
-if [ ! -e "${rep_lien}/${version_open_sankore}_i386.zip" ]
+if [ ! -e "/home/netlogon/clients-linux/divers/${version_open_sankore}_i386.zip" ]
 then 
-	wget "$url_open_sankore/${version_open_sankore}_i386.zip"
+	wget "${url_open_sankore}/${version_open_sankore}_i386.zip"
 	chmod 755 ${version_open_sankore}_i386.zip
-	mv ${version_open_sankore}_i386.zip "${rep_lien}/"
+	mv ${version_open_sankore}_i386.zip "/home/netlogon/clients-linux/divers/"
 fi
+
+cp /home/netlogon/clients-linux/divers/${version_open_sankore}_*.zip "$rep_install"
+
 }
 
 
 ############################################################################################################################
+# Use in post-install scripts
 # This function installs Open-Sankore 2.5.1 on Jessie and Xenial clients durant post-install
 # Deb packages are previously being downloaded and stored in Apache Server of se3 
 ############################################################################################################################
