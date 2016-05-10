@@ -28,18 +28,18 @@ download_open_sankore_deb()
     if [ ! -e "/home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_amd64.zip" ] 
     then
         wget "${url_open_sankore}/${version_open_sankore}_amd64.zip"
-        chmod 755 ${version_open_sankore}_amd64.zip
-        mv ${version_open_sankore}_amd64.zip "/home/netlogon/clients-linux/divers/open-sankore"
+        chmod 755 "${version_open_sankore}_amd64.zip"
+        mv "${version_open_sankore}_amd64.zip" "/home/netlogon/clients-linux/divers/open-sankore"
     fi
 
     if [ ! -e "/home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_i386.zip" ]
     then
         wget "${url_open_sankore}/${version_open_sankore}_i386.zip"
-        chmod 755 ${version_open_sankore}_i386.zip
-        mv ${version_open_sankore}_i386.zip "/home/netlogon/clients-linux/divers/open-sankore"
+        chmod 755 "${version_open_sankore}_i386.zip"
+        mv "${version_open_sankore}_i386.zip" "/home/netlogon/clients-linux/divers/open-sankore"
     fi
 
-    cp /home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_*.zip "$repertoire_install"
+    cp "/home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_"*".zip" "$repertoire_install"
 
     return 0
 }
@@ -60,7 +60,7 @@ install_open_sankore()
     local test_arch="$(arch)"
     local version_open_sankore='Open-Sankore_Ubuntu_12.04_2.5.1'
 
-    echo "Installation d'Open-Sankore" | tee -a $compte_rendu
+    echo "Installation d'Open-Sankore" | tee -a "$compte_rendu"
 
     if [ "$test_arch" = "x86_64" ]
     then
