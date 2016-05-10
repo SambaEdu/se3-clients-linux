@@ -40,8 +40,6 @@ download_open_sankore_deb()
     fi
 
     cp "/home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_"*".zip" "$repertoire_install"
-
-    return 0
 }
 
 
