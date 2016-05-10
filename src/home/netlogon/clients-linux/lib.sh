@@ -64,8 +64,7 @@ install_open_sankore()
 
     if [ "$test_arch" = "x86_64" ]
     then
-        wget -q "http://${IP_SE3}/install/${version_open_sankore}_amd64.zip"
-        if [ "$?" = "0" ] 
+        if wget -q "http://${IP_SE3}/install/${version_open_sankore}_amd64.zip"
         then
             mkdir open-sankore
             unzip -d open-sankore "${version_open_sankore}_amd64.zip"
@@ -77,8 +76,7 @@ install_open_sankore()
 
     if [ "$test_arch" = "i686" ]
     then
-        wget -q "http://${IP_SE3}/install/${version_open_sankore}_i386.zip"
-        if [ "$?" = "0" ]
+        if wget -q "http://${IP_SE3}/install/${version_open_sankore}_i386.zip"
         then
             mkdir open-sankore
             unzip -d open-sankore "${version_open_sankore}_i386.zip"
