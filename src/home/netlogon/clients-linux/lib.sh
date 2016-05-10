@@ -5,8 +5,10 @@
 ###                                     ###
 ###########################################
 
+
+# 1. Funtions used in install_clients_linux_mise_en_place.sh script
+
 ############################################################################################################################
-# Use in install_clients_linux_mise_en_place.sh
 # This function downloads amd64 et i386 ubuntu Precise packages to install Open-Sankore in Jessie et Xenial
 # (Open-Sankore are no more updated but still works quite well on Jessie and Xenial clients with old Ubuntu Precise packages)
 # deb package are moved to /var/www/install in order to be download in local by Jessie et Xenial clients
@@ -14,8 +16,10 @@
 
 download_open_sankore_deb()
 {
-url_open_sankore='http://www.cndp.fr/open-sankore/OpenSankore/Releases/v2.5.1'
-version_open_sankore='Open-Sankore_Ubuntu_12.04_2.5.1'
+
+local repertoire_install="$1"
+local url_open_sankore='http://www.cndp.fr/open-sankore/OpenSankore/Releases/v2.5.1'
+local version_open_sankore='Open-Sankore_Ubuntu_12.04_2.5.1'
 
 if [ ! -d "/home/netlogon/clients-linux/divers/open-sankore" ]
 then
@@ -37,10 +41,12 @@ then
 	mv ${version_open_sankore}_i386.zip "/home/netlogon/clients-linux/divers/open-sankore"
 fi
 
-cp /home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_*.zip "$rep_install"
+cp /home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_*.zip "$repertoire_install"
 
 }
 
+
+# 2. Funtions used in post-install*.sh scripts
 
 ############################################################################################################################
 # Use in post-install scripts
@@ -50,31 +56,35 @@ cp /home/netlogon/clients-linux/divers/open-sankore/${version_open_sankore}_*.zi
 
 install_open_sankore()
 {
+	
+local compte_rendu="$1"
+local test_arch="$(arch)"
+local version_open_sankore='Open-Sankore_Ubuntu_12.04_2.5.1'
+
 echo "Installation d'Open-Sankore" | tee -a $compte_rendu
 
-test_archi=$(uname -r | grep -c amd64)
-if [ "$test_arch" = "1" ]
+
+if [ "$test_arch" = "x86_64" ]
 then
-	wget -q "http://${ip_se3}/install/Open-Sankore_Ubuntu_12.04_2.5.1_amd64.zip"
+	wget -q "http://${ip_se3}/install/${version_open_sankore}_amd64.zip"
 	if [ "$?" = "0" ] 
 	then
 		mkdir open-sankore
-		unzip -d open-sankore Open-Sankore_Ubuntu*.zip 
-		dpkg -i open-sankore/Open-Sankore*.deb > /dev/null
+		unzip -d open-sankore "${version_open_sankore}_amd64.zip"
+		dpkg -i open-sankore/${version_open_sankore}_amd64.deb > /dev/null
 		apt-get install -f 
 		rm -rf Open-Sankore_Ubuntu*.zip open-sankore
 	fi
 fi
 
-test_archi=$(uname -r | grep -c i386)
-if [ "$test_arch" = "1" ]
+if [ "$test_arch" = "i686" ]
 then
-	wget -q "http://${ip_se3}/install/Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip"
+	wget -q "http://${ip_se3}/install/${version_open_sankore}_i386.zip"
 	if [ "$?" = "0" ] 
 	then
 		mkdir open-sankore
-		unzip -d open-sankore Open-Sankore_Ubuntu*.zip 
-		dpkg -i open-sankore/Open-Sankore*.deb > /dev/null
+		unzip -d open-sankore "${version_open_sankore}_i386.zip"
+		dpkg -i open-sankore/${version_open_sankore}_i386.deb > /dev/null
 		apt-get install -f 
 		rm -rf Open-Sankore_Ubuntu*.zip open-sankore
 	fi
