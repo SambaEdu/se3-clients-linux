@@ -66,8 +66,8 @@ install_open_sankore()
         then
             mkdir open-sankore
             unzip -d open-sankore "${version_open_sankore}_amd64.zip"
-            dpkg -i open-sankore/Open-Sankore*_amd64.deb > /dev/null
-            apt-get install -f
+            dpkg -i open-sankore/Open-Sankore*_amd64.deb > /dev/null 2>&1
+            apt-get install -f -y
             find . -maxdepth 1 -type f -name 'Open-Sankore_Ubuntu*.zip' -delete
             rm --one-file-system -r  open-sankore
         fi
@@ -79,8 +79,8 @@ install_open_sankore()
         then
             mkdir open-sankore
             unzip -d open-sankore "${version_open_sankore}_i386.zip"
-            dpkg -i open-sankore/Open-Sankore*_i386.deb > /dev/null
-            apt-get install -f
+            dpkg -i open-sankore/Open-Sankore*_i386.deb > /dev/null 2>&1
+            apt-get install -f -y
             find . -maxdepth 1 -type f -name 'Open-Sankore_Ubuntu*.zip' -delete
             rm --one-file-system -r open-sankore
         fi
