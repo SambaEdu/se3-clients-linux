@@ -108,3 +108,8 @@ Janvier 2016
 - Ajout d'un script de renommage
 - Ajout suppression regle udev sur eth0 durant la phase initialisation
 
+Mai 2016
+- Ajout du support de la dernière version ubuntu Xenial
+- Correction de la conf ocs-agent
+
+
