@@ -420,13 +420,19 @@ DESKTOP=Desktop
 EOF
 
 echo "--------------------------------------------------------------------------------------"
-echo " 13-Reconstruction de l'image squashfs (spécifique à Xenial avec NBD)					"
+echo " 13-Copie du skel dans le chroot														"
+echo "--------------------------------------------------------------------------------------"
+rm -rf "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.config"								
+cp -rf /home/netlogon/clients-linux/skel/* "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"
+
+echo "--------------------------------------------------------------------------------------"
+echo " 14-Reconstruction de l'image squashfs (spécifique à Xenial avec NBD)					"
 echo "--------------------------------------------------------------------------------------"
 ltsp-update-image "$ENVIRONNEMENT"
 service nbd-server restart
 
 #echo "--------------------------------------------------------------------------------------"
-#echo " 14-Choisir le boot PXE par défaut des PC du réseau									"
+#echo " 15-Choisir le boot PXE par défaut des PC du réseau									"
 #echo "--------------------------------------------------------------------------------------"
 #echo " Voulez-vous que tous les PC de votre réseau démarrent en client lourd Xenial ? 		"
 #echo " Taper o pour oui  																	"
@@ -437,7 +443,7 @@ service nbd-server restart
 #fi
 
 echo "--------------------------------------"
-echo " 14-Sauvegarde du chroot des clients lourds (5 minutes)	    "
+echo " 16-Sauvegarde du chroot des clients lourds (5 minutes)	    "
 echo "--------------------------------------"
 if [ ! -d "/var/se3/ltsp/originale" ]
 then
@@ -447,7 +453,7 @@ rm -rf "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
 cp -a "/opt/ltsp/$ENVIRONNEMENT" "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
 
 echo "--------------------------------------------------------------------------------------"
-echo " 15-Redémarrage du serveur se3 dans 5 secondes ...										"
+echo " 17-Redémarrage du serveur se3 dans 5 secondes ...										"
 echo "--------------------------------------------------------------------------------------"
 sleep 5
 
