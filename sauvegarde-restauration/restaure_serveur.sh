@@ -7,7 +7,7 @@
 # ou pour une migration d'un ancien serveur à un nouveau serveur se3
 #
 # version du 16/04/2014
-# modifiée le 28/04/2016
+# modifiée le 23/05/2016
 #
 # Auteurs :     Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
 #               François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
@@ -32,6 +32,9 @@
 #    <http://www.gnu.org/licenses/>] 
 #
 # Fonctionnalités : à utiliser conjointement au script sauve_serveur.sh
+# ce script fonctionne dans 2 modes (restauration et test)
+#                    -r → lancement de la restauration
+#                    -t → permet de tester que tout est en place sans lancer la restauration
 #
 #############################################################################
 
@@ -70,6 +73,49 @@ neutre='\e[0;m'
 #----- -----
 # les fonctions
 #----- -----
+
+mode_texte()
+{
+    echo "Utilisation : $0 [-paramétre]"
+    echo "paramètres possibles :"
+    echo "   -h : afficher cet aide-mémoire"
+    echo "   -r : lancer la restauration"
+    echo "   -t : permet de tester que tout est en place, sans lancer la restauration"
+}
+
+mode_script()
+{
+    # on teste s'il y a ou non un paramètre
+    if [ ! "$#" = "0" ]
+    then
+        case $1 in
+            -r)
+                # mode de restauration
+                mode_test="r"
+            ;;
+            -t)
+                # mode de test
+                # la restauration ne sera pas lancée
+                mode_test="t"
+            ;;
+            -h)
+                # on affiche l'aide
+                mode_texte
+                exit 0
+            ;;
+            *)
+                echo "paramètre $1 incorrect"
+                # on affiche l'aide
+                mode_texte
+                exit 2
+            ;;
+        esac
+    else
+        echo "la commande doit avoir un paramètre"
+        mode_texte
+        exit 3
+    fi
+}
 
 recuperer_mail()
 {
@@ -558,6 +604,7 @@ restaurer_serveur()
 #####
 # Début du programme
 #
+mode_script "$@"
 echo -e "" > $COURRIEL
 echo -e "${bleu}Restauration du se3 ${neutre}${DATE_RESTAURATION}${neutre}\n" 2>&1 | tee -a $COURRIEL
 echo -e "Ce script va restaurer la configuration de votre SE3 à partir d'une sauvegarde"
@@ -577,13 +624,28 @@ case $REPONSE1 in
     oui|OUI)
         trouver_disque                  # une sauvegarde est-elle disponible ?
         [ "$?" != "0" ] && exit 1
-        # une sauvegarde est disponible, on peut lancer la restauration
-        mise_a_jour                     # mise à jour du se3 avant la restauration
-        restaurer_serveur               # on lance la restauration
-        menage                          # on revient dans l'état de départ du script
-        recuperer_mail                  # on récupére l'adresse de messagerie pour l'envoi du compte-rendu
-        courriel                        # on envoie le compte-rendu de la restauration
-        redemarrer                      # demande de redémarrage du serveur
+        # une sauvegarde est disponible,
+        # on peut lancer la restauration si le paramètre est -r
+        case $mode_test in
+            r)
+                # on lance la restauration
+                mise_a_jour                 # mise à jour du se3 avant la restauration
+                restaurer_serveur           # on lance la restauration
+                menage                      # on revient dans l'état de départ du script
+            ;;
+            t)
+                # on est en mode test : pas de restauration
+                echo "On est en mode de test : on ne lance pas la restauration" | tee -a $COURRIEL
+            ;;
+            *)
+                # cas non prévu
+                echo "cas non prévu avec mode_test=$mode_test"
+                exit 1
+            ;;
+        esac
+        recuperer_mail      # on récupére l'adresse de messagerie pour l'envoi du compte-rendu
+        courriel            # on envoie le compte-rendu de la restauration
+        redemarrer          # demande de redémarrage du serveur
         ;;
     *)
         # si un montage existe, on ne doit pas y toucher lors de l'abandon
