@@ -14,7 +14,7 @@ fi
 if [ "\$(ls /var/se3/ltsp/ --ignore=precedentes --ignore=originale | wc -l)" -ge 1 ]
 then
 	printf "Avant de faire la nouvelle sauvegarde, on deplace la sauvegarde precedente \n"
-	mv -f "/var/se3/ltsp/${ENVIRONNEMENT}*" /var/se3/ltsp/precedentes/
+	mv -f "/var/se3/ltsp/${ENVIRONNEMENT}-"* /var/se3/ltsp/precedentes/
 fi
 
 sleep 1

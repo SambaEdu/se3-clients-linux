@@ -22,12 +22,12 @@ systemctl stop nbd-server.service
 if [ "\$(ls /var/se3/ltsp/ --ignore=precedentes --ignore=originale | wc -l)" -eq 1 ]
 then
 	
-	mv "/var/se3/ltsp/${ENVIRONNEMENT}-*" "/opt/ltsp/"
+	mv "/var/se3/ltsp/${ENVIRONNEMENT}-"* "/opt/ltsp/"
 	
 	if [ "\$?" = "0" ] 
 	then
 		rm -rf "/opt/ltsp/$ENVIRONNEMENT"
-		mv "/opt/ltsp/${ENVIRONNEMENT}-*" "/opt/ltsp/${ENVIRONNEMENT}"
+		mv "/opt/ltsp/${ENVIRONNEMENT}-"* "/opt/ltsp/${ENVIRONNEMENT}"
 		
 		if [ "\$?" = "0" ] 
 		then
