@@ -9,7 +9,7 @@ then
 	mkdir -p "$CHEMIN_SKEL_BUREAU"
 fi
 
-rm -f "$CHEMIN_SKEL_BUREAU/"*".desktop"
+rm -f --one-file-system "$CHEMIN_SKEL_BUREAU/"*".desktop"
 cp /home/admin/Bureau/*.desktop "$CHEMIN_SKEL_BUREAU"
 
 xterm -e "ssh -o 'StrictHostKeyChecking no' -l root '$SE3' bash << EOF
