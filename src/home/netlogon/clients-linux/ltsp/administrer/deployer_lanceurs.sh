@@ -12,8 +12,10 @@ fi
 rm -f "$CHEMIN_SKEL_BUREAU/"*".desktop"
 cp /home/admin/Bureau/*.desktop "$CHEMIN_SKEL_BUREAU"
 
-
 xterm -e "ssh -o 'StrictHostKeyChecking no' -l root '$SE3' bash << EOF
+
+#systemctl stop nfs-kernel-server.service
+#systemctl stop nbd-server.service
 
 if [ ! -d "/opt/ltsp/$ENVIRONNEMENT/etc/skel/Bureau/" ]
 then
@@ -22,6 +24,9 @@ fi
 
 rm -f "/opt/ltsp/$ENVIRONNEMENT/etc/skel/Bureau/"*".desktop"
 cp /home/netlogon/clients-linux/ltsp/skel/Bureau/*.desktop "/opt/ltsp/$ENVIRONNEMENT/etc/skel/Bureau/"
+
+#systemctl start nfs-kernel-server.service
+#systemctl start nbd-server.service
 
 sleep 3
 exit 0
