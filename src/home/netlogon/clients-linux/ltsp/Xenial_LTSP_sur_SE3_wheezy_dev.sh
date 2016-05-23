@@ -3,8 +3,8 @@
 # Sous licence GNU
 
 # Choisir le bureau des clients lourds Xenial : ubuntu, ubuntu-mate, xubuntu ou lubuntu
-local ENVIRONNEMENT="i386" 			# Nom de l'environnement (du chroot) des clients lourds
-local BUREAU="ubuntu-mate"			# Bureau à installer dans le chroot des clients lourds
+ENVIRONNEMENT="i386" 			# Nom de l'environnement (du chroot) des clients lourds
+BUREAU="ubuntu-mate"			# Bureau à installer dans le chroot des clients lourds
 
 # Récupération des variables spécifiques au se3
 . /etc/se3/config_c.cache.sh
@@ -13,9 +13,9 @@ local BUREAU="ubuntu-mate"			# Bureau à installer dans le chroot des clients lo
 . /etc/se3/config_l.cache.sh
 . /etc/se3/config_s.cache.sh
 
-local IP_SE3="$se3ip"
-local IP_PROXY="$proxy_url"
-local BASE_DN="$ldap_base_dn"
+IP_SE3="$se3ip"
+IP_PROXY="$proxy_url"
+BASE_DN="$ldap_base_dn"
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " Ce script installe un serveur LTSP de clients lourds Xenial sur votre SE3 Wheezy												"
