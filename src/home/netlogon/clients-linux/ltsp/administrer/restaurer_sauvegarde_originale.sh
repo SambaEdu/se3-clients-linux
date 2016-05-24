@@ -15,7 +15,6 @@ then
 	rm -rf "/opt/ltsp/${ENVIRONNEMENT}"
 	printf 'Restauration de l environnement original (durée : de 5 à 10 minutes) \n'
 	cp -a  "/var/se3/ltsp/originale/${ENVIRONNEMENT}-originale" "/opt/ltsp/${ENVIRONNEMENT}"
-	
 else
 	printf 'Aucune restauration n a ete faite \n'
 	printf 'Le répertoire /var/se3/ltsp/originale ne contient pas la sauvegarde originale du chroot des clients lourds (faites à l installation de ltsp) \n'
