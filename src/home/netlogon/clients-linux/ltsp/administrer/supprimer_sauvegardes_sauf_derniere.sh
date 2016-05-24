@@ -2,7 +2,7 @@
 
 SE3="__SE3__"
 
-xterm -e "ssh -o 'StrictHostKeyChecking no' -l root '$SE3' bash << EOF
+xterm -e "ssh -o 'StrictHostKeyChecking no' -l root '$SE3' bash << 'EOF'
 
 rm -rf /var/se3/ltsp/precedentes/*
 printf 'Toutes les sauvegardes à l exception de la derniere realisee ont ete supprimees \n'
