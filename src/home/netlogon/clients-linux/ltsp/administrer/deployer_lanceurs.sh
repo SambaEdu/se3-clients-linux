@@ -25,8 +25,12 @@ fi
 rm -f "/opt/ltsp/$ENVIRONNEMENT/etc/skel/Bureau/"*".desktop"
 cp /home/netlogon/clients-linux/ltsp/skel/Bureau/*.desktop "/opt/ltsp/$ENVIRONNEMENT/etc/skel/Bureau/"
 
+chmod -R 700 "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"
+
 #systemctl start nfs-kernel-server.service
 #systemctl start nbd-server.service
+
+printf 'La copie des lanceurs est terminée'
 
 sleep 3
 exit 0

@@ -105,13 +105,19 @@ sleep 5
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 5- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Xenial 	    "
 echo "------------------------------------------------------------------------------------------------------------------------------"
+
+resultat=$(grep "Demarrer le pc en client lourd Xenial $BUREAU" "/tftpboot/pxelinux.cfg/default")
+
+if [ "$resultat" = "" ]
+then
 cat <<EOF >> "/tftpboot/pxelinux.cfg/default"
-LABEL ltspXenial
+LABEL ltsp
 	MENU LABEL ^Demarrer le pc en client lourd Xenial $BUREAU
 	KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
 	APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet splash nbdroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT root=/dev/nbd0
 	IPAPPEND 2
 EOF
+fi
 
 sleep 5
 
@@ -350,23 +356,30 @@ sleep 5
 #ServerName $IP_SE3
 #EOF
 
+sleep 5
+
 echo "--------------------------------------------------------------------------------------"
 echo " 9-Configuration du proxy															"
 echo "--------------------------------------------------------------------------------------"
 
-cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.profile"
+# Définition du proxy, s'il existe ...
+if [ "$IP_PROXY" != "" ]
+then
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.profile"
 export http_proxy="http://$IP_PROXY"
 export https_proxy="http://$IP_PROXY"
 export no_proxy="localhost,127.0.0.1,$IP_SE3"
 EOF
 
-cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/environment"
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/environment"
 http_proxy="http://$IP_PROXY"
 https_proxy="http://$IP_PROXY"
 no_proxy="localhost,127.0.0.1,$IP_SE3"
 EOF
 
+fi
 
+sleep 5
 
 echo "--------------------------------------------------------------------------------------"
 echo " 10-Configuration de lightdm 															"
@@ -388,6 +401,8 @@ greeter-hide-users=true
 allow-guest=false
 EOF
 fi
+
+sleep 5
 
 echo "--------------------------------------------------------------------------------------"
 echo " 11-Configuration de l environnement $ENVIRONNEMENT des clients lourds Xenial	 		"
@@ -419,17 +434,23 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/xdg/user-dirs.defaults"
 DESKTOP=Desktop
 EOF
 
+sleep 5
+
 echo "--------------------------------------------------------------------------------------"
 echo " 13-Copie du skel dans le chroot														"
 echo "--------------------------------------------------------------------------------------"
 rm -rf "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.config"								
 cp -rf /home/netlogon/clients-linux/skel/* "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"
 
+sleep 5
+
 echo "--------------------------------------------------------------------------------------"
 echo " 14-Reconstruction de l'image squashfs (spécifique à Xenial avec NBD)					"
 echo "--------------------------------------------------------------------------------------"
 ltsp-update-image "$ENVIRONNEMENT"
 service nbd-server restart
+
+sleep 5
 
 #echo "--------------------------------------------------------------------------------------"
 #echo " 15-Choisir le boot PXE par défaut des PC du réseau									"

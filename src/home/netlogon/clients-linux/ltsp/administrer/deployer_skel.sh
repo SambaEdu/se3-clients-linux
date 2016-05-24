@@ -16,8 +16,12 @@ fi
 rm -rf "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"*
 cp -r /home/netlogon/clients-linux/ltsp/skel/* "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"
 
+chmod -R 700 "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"
+
 #systemctl start nfs-kernel-server.service
 #systemctl start nbd-server.service
+
+printf 'Le déploiement du skel est terminé'
 
 sleep 3
 EOF"

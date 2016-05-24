@@ -13,24 +13,24 @@ fi
 
 if [ "\$(ls /var/se3/ltsp/ --ignore=precedentes --ignore=originale | wc -l)" -ge 1 ]
 then
-	printf "Avant de faire la nouvelle sauvegarde, on deplace la sauvegarde precedente \n"
+	echo 'Avant de faire la nouvelle sauvegarde, on deplace la sauvegarde precedente'
 	mv -f "/var/se3/ltsp/${ENVIRONNEMENT}-"* /var/se3/ltsp/precedentes/
 fi
 
 sleep 1
 
-printf "Realisation de la sauvegarde du chroot actuel des clients lourds (cette etape prend de 5 à 10 minutes) \n"
+echo 'Realisation de la sauvegarde du chroot actuel des clients lourds (cette etape prend de 5 à 10 minutes)'
 cp -a "/opt/ltsp/${ENVIRONNEMENT}" "/var/se3/${ENVIRONNEMENT}-${ladate}"
 
 if [ "\$?" = "0" ] 
 then
-	printf "Sauvegarde réussie \n"
+	echo 'Sauvegarde réussie'
 	exit 0
 else
-	printf "La sauvegarde a échoué \n"
+	echo 'La sauvegarde a échoué'
 	exit 1
 fi
 
-read REPONSE
+sleep 10
 
 EOF"
