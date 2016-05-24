@@ -25,12 +25,10 @@ cp -a "/opt/ltsp/${ENVIRONNEMENT}" "/var/se3/ltsp/${ENVIRONNEMENT}-${ladate}"
 if [ "$?" = "0" ] 
 then
 	echo 'Sauvegarde réussie'
-	exit 0
 else
 	echo 'La sauvegarde a échoué'
-	exit 1
 fi
 
 sleep 10
-
+exit 0
 EOF"
