@@ -102,24 +102,6 @@ EOF
 
 sleep 5
 
-echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 5- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Xenial 	    "
-echo "------------------------------------------------------------------------------------------------------------------------------"
-
-resultat=$(grep "Demarrer le pc en client lourd Xenial $BUREAU" "/tftpboot/pxelinux.cfg/default")
-
-if [ "$resultat" = "" ]
-then
-cat <<EOF >> "/tftpboot/pxelinux.cfg/default"
-LABEL ltsp
-	MENU LABEL ^Demarrer le pc en client lourd Xenial $BUREAU
-	KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
-	APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet splash nbdroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT root=/dev/nbd0
-	IPAPPEND 2
-EOF
-fi
-
-sleep 5
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 6-Paramétrer PAM pour qu il consulte l annuaire LDAP de se3 lors de l identification d un utilisateur sur un client lourd	"
@@ -472,6 +454,27 @@ then
 fi
 rm -rf "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
 cp -a "/opt/ltsp/$ENVIRONNEMENT" "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
+
+sleep 5
+
+echo "------------------------------------------------------------------------------------------------------------------------------"
+echo " 17- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Xenial 	    "
+echo "------------------------------------------------------------------------------------------------------------------------------"
+
+resultat=$(grep "Demarrer le pc en client lourd Xenial $BUREAU" "/tftpboot/pxelinux.cfg/default")
+
+if [ "$resultat" = "" ]
+then
+cat <<EOF >> "/tftpboot/pxelinux.cfg/default"
+LABEL ltsp
+	MENU LABEL ^Demarrer le pc en client lourd Xenial $BUREAU
+	KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
+	APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet splash nbdroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT root=/dev/nbd0
+	IPAPPEND 2
+EOF
+fi
+
+sleep 5
 
 echo "--------------------------------------------------------------------------------------"
 echo " 17-Redémarrage du serveur se3 dans 5 secondes ...										"
