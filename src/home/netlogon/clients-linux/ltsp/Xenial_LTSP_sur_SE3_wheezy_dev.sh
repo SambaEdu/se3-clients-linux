@@ -421,8 +421,7 @@ sleep 5
 echo "--------------------------------------------------------------------------------------"
 echo " 13-Copie du skel dans le chroot														"
 echo "--------------------------------------------------------------------------------------"
-rm -rf "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.config"								
-cp -rf /home/netlogon/clients-linux/skel/* "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"
+find /home/netlogon/clients-linux/ltsp/skel/ -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
 
 sleep 5
 

@@ -388,13 +388,25 @@ EOF
 echo "--------------------------------------------------------------------------------------"
 echo " 13-Copie du skel dans le chroot														"
 echo "--------------------------------------------------------------------------------------"
-rm -rf "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.config"								
-cp -rf /home/netlogon/clients-linux/skel/* "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"
+find /home/netlogon/clients-linux/ltsp/skel/ -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
+
+sleep 5
+
+
+echo "--------------------------------------"
+echo " 14-Sauvegarde du chroot des clients lourds (5 minutes)	    "
+echo "--------------------------------------"
+if [ ! -d "/var/se3/ltsp/originale" ]
+then
+	mkdir -p "/var/se3/ltsp/originale"
+fi
+rm -rf "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
+cp -a "/opt/ltsp/$ENVIRONNEMENT" "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
 
 sleep 5
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 14- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Jessie 	    "
+echo " 15- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Jessie 	    "
 echo "------------------------------------------------------------------------------------------------------------------------------"
 
 resultat=$(grep "Demarrer le pc en client lourd Jessie $BUREAU" "/tftpboot/pxelinux.cfg/default")
@@ -413,7 +425,7 @@ fi
 sleep 5
 
 echo "--------------------------------------------------------------------------------------"
-echo " 15-Redémarrage du serveur se3 dans 5 secondes ...										"
+echo " 16-Redémarrage du serveur se3 dans 5 secondes ...										"
 echo "--------------------------------------------------------------------------------------"
 sleep 5
 
