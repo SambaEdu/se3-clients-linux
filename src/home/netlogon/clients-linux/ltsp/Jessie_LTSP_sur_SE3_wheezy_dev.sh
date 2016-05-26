@@ -170,7 +170,7 @@ echo "--------------------------------------------------------------------------
 #ltsp-chroot -m -a "$ENVIRONNEMENT" apt-get install -y samba
 
 # Configuration des partages Samba "Docs" et "Classes"
-if [ "$ENVIRONNEMENT" = "mate" ]
+if [ "$BUREAU" = "mate" ]
 then
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 <?xml version="1.0" encoding="utf-8" ?>
