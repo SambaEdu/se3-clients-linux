@@ -344,19 +344,47 @@ echo "--------------------------------------------------------------------------
 echo " 9-Configuration du proxy															"
 echo "--------------------------------------------------------------------------------------"
 
-# Définition du proxy, s'il existe ...
-if [ "$IP_PROXY" != "" ]
+masque_reseau=$(($(echo "$se3mask" | grep -o "255" | wc -l)*8))
+ip_proxy="$(echo "$IP_PROXY" | cut -d ':' -f 1)"
+port_proxy="$(echo "$IP_PROXY" | cut -d ':' -f 2)"
+
+# Définition du proxy, si le port du proxy est défini
+if [ "$port_proxy" != "" ]
 then
 	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.profile"
 export http_proxy="http://$IP_PROXY"
 export https_proxy="http://$IP_PROXY"
-export no_proxy="localhost,127.0.0.1,$IP_SE3"
+export no_proxy="localhost,127.0.0.1,${IP_SE3}/${masque_reseau}"
 EOF
 
 	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/environment"
 http_proxy="http://$IP_PROXY"
 https_proxy="http://$IP_PROXY"
-no_proxy="localhost,127.0.0.1,$IP_SE3"
+no_proxy="localhost,127.0.0.1,${IP_SE3}/${masque_reseau}"
+EOF
+
+# On règle le proxy d'Iceweasel avec l'option "Configuration manuelle du proxy" et en cochant "Utilser ce proxy pour tous les protocoles"
+# On évite ainsi les problèmes d'accès aux sites en https, ...
+# Enfin, on désactive le proxy pour l'accès aux postes du réseau pédagogique (en particulier à l'interface web du se3)
+# On peut définir un paramètre de trois façons différentes :
+# - defaultPref : set new default value
+# - pref : set pref, but allow changes in current session
+# - lockPref : lock pref, disallow changes
+
+	cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/firefox/pref/proxy.js"
+lockPref("network.proxy.share_proxy_settings", true);
+lockPref("network.proxy.http", "${ip_proxy}");
+lockPref("network.proxy.http_port", ${port_proxy});
+lockPref("network.proxy.no_proxies_on", "localhost, 127.0.0.1, ${IP_SE3}/${masque_reseau}");
+lockPref("network.proxy.type", 1);
+EOF
+
+else
+
+# On règle le proxy d'Iceweasel avec l'option "Détection automatique des paramètres proxy pour ce réseau"
+# Cette option permet de gérer les réseaux qui n'ont pas de proxy (proxy transparent) ainsi que ceux gérés par un fichier wpad.dat (avec Amon par exemple)
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/etc/firefox/pref/proxy.js"
+lockPref("network.proxy.type", 4);
 EOF
 
 fi
@@ -384,6 +412,16 @@ allow-guest=false
 EOF
 fi
 
+# Sous certain bureau, comme MATE, le clavier n'est pas mis en azerty par le serveur X
+# On utilisa le commande xsetxkbmap fr pour forcer le layout du clavier en azerty
+# On enfonce le clou en exécutant la commande une 2de fois à l'ouverture de session
+# On en profite pour lancer le verrouillage numérique du clavier
+cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm.conf"
+display-setup-script=/usr/bin/setxkbmap fr
+greeter-setup-script=/usr/bin/numlockx on
+session-setup-script=/usr/bin/setxkbmap fr
+EOF
+
 sleep 5
 
 echo "--------------------------------------------------------------------------------------"
@@ -399,7 +437,7 @@ ttf-mscorefonts-installer	msttcorefonts/accepted-mscorefonts-eula	boolean	true
 ttf-mscorefonts-installer	msttcorefonts/present-mscorefonts-eula	note
 EOF
 
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y -f nano aptitude less wine vlc flashplugin-installer ubuntu-restricted-extras libavcodec-extra firefox-locale-fr xterm shutter
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y -f nano aptitude less wine vlc flashplugin-installer ubuntu-restricted-extras libavcodec-extra firefox-locale-fr xterm shutter numlockx
 
 
 # Pour mettre le clavier et certains éléments du bureau lubuntu en français ...
