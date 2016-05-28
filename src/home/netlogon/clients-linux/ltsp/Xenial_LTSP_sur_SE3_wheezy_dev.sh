@@ -371,7 +371,9 @@ EOF
 # - pref : set pref, but allow changes in current session
 # - lockPref : lock pref, disallow changes
 
-	cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/firefox/pref/proxy.js"
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/firefox/syspref.js"
+	
+// Define proxy when an IP and PORT are specified
 lockPref("network.proxy.share_proxy_settings", true);
 lockPref("network.proxy.http", "${ip_proxy}");
 lockPref("network.proxy.http_port", ${port_proxy});
@@ -383,7 +385,9 @@ else
 
 # On règle le proxy d'Iceweasel avec l'option "Détection automatique des paramètres proxy pour ce réseau"
 # Cette option permet de gérer les réseaux qui n'ont pas de proxy (proxy transparent) ainsi que ceux gérés par un fichier wpad.dat (avec Amon par exemple)
-cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/etc/firefox/pref/proxy.js"
+cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/etc/firefox/syspref.js"
+
+// Define proxy when no IP is specified for proxy
 lockPref("network.proxy.type", 4);
 EOF
 
