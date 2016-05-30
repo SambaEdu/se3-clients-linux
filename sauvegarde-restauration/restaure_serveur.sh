@@ -319,7 +319,8 @@ choix_archive_sauvegarde()
         echo "$Sauvegardedisponible" 2>&1 | tee -a $COURRIEL
         echo -e "${neutre}ne saisir que les trois premières lettres du jour : lun, mar,…"
         echo -e "ou bien q pour abandonner"
-        echo -e "${bleu}Vous souhaitez restaurer la sauvegarde de quel jour ?${vert} \c"
+        [ "$mode_test" = "t" ] && echo -e "${bleu}Vous souhaitez tester la restauration de la sauvegarde de quel jour ?${vert} \c"
+        [ "$mode_test" = "r" ] && echo -e "${bleu}Vous souhaitez restaurer la sauvegarde de quel jour ?${vert} \c"
         read JOUR
         # on vérifie que le choix est correct
         case "$JOUR" in
@@ -607,18 +608,20 @@ restaurer_serveur()
 mode_script "$@"
 echo -e "" > $COURRIEL
 echo -e "${bleu}Restauration du se3 ${neutre}${DATE_RESTAURATION}${neutre}\n" 2>&1 | tee -a $COURRIEL
-echo -e "Ce script va restaurer la configuration de votre SE3 à partir d'une sauvegarde"
+[ "$mode_test" = "r" ] && echo -e "Ce script va restaurer la configuration de votre SE3 à partir d'une sauvegarde"
+[ "$mode_test" = "t" ] && echo -e "Ce script va tester la restauration de votre SE3 à partir d'une sauvegarde"
 echo -e ""
-echo -e "${orange}Assurez-vous d'avoir installé tous les modules du se3 préalablement utilisés"
-echo -e "Si vous installez ces modules *après* la restauration,"
-echo -e "les fichiers de configuration seront remis à zéro"
-echo -e "${neutre}"
+[ "$mode_test" = "r" ] && echo -e "${orange}Assurez-vous d'avoir installé tous les modules du se3 préalablement utilisés"
+[ "$mode_test" = "r" ] && echo -e "Si vous installez ces modules *après* la restauration,"
+[ "$mode_test" = "r" ] && echo -e "les fichiers de configuration seront remis à zéro"
+[ "$mode_test" = "r" ] && echo -e "${neutre}"
 echo -e "N'oubliez pas de brancher, sur un port usb,"
 echo -e "→ le disque comportant une sauvegarde de votre se3"
 echo -e "ou bien de monter, dans le répertoire /mnt/sav,"
 echo -e "→ le NAS comportant une sauvegarde de votre se3"
 echo -e "-------------------"
-echo -e "${bleu}Souhaitez-vous procéder à la restauration maintenant ? ${neutre}(oui ou  OUI)${vert} \c"
+[ "$mode_test" = "r" ] && echo -e "${bleu}Souhaitez-vous procéder à la restauration maintenant ? ${neutre}(oui ou  OUI)${vert} \c"
+[ "$mode_test" = "t" ] && echo -e "${bleu}Souhaitez-vous procéder au test de la restauration maintenant ? ${neutre}(oui ou  OUI)${vert} \c"
 read REPONSE1
 case $REPONSE1 in
     oui|OUI)
