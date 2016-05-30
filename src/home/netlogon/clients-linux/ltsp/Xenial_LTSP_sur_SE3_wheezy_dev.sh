@@ -468,7 +468,22 @@ find /home/netlogon/clients-linux/ltsp/skel/ -mindepth 1 -maxdepth 1 -exec cp -r
 sleep 5
 
 echo "--------------------------------------------------------------------------------------"
-echo " 14-Reconstruction de l'image squashfs (spécifique à Xenial avec NBD)					"
+echo " 14-Extinction de tous les clients lourds à 19h par défaut							"
+echo "--------------------------------------------------------------------------------------"
+echo '0 19 * * * root /sbin/poweroff' > "/opt/ltsp/$ENVIRONNEMENT/etc/cron.d/extinction_clients_lourds"
+
+sleep 5
+
+
+echo "--------------------------------------------------------------------------------------"
+echo " 15-Desactivation d'apport (fenêtre qui peut indiquer de façon récurrente des erreurs souvent minimes) "
+echo "--------------------------------------------------------------------------------------"
+echo 'enabled=0' > /etc/default/apport
+
+sleep 5
+
+echo "--------------------------------------------------------------------------------------"
+echo " 15-Reconstruction de l'image squashfs (spécifique à Xenial avec NBD)					"
 echo "--------------------------------------------------------------------------------------"
 ltsp-update-image "$ENVIRONNEMENT"
 service nbd-server restart
@@ -518,7 +533,7 @@ fi
 sleep 5
 
 echo "--------------------------------------------------------------------------------------"
-echo " 17-Redémarrage du serveur se3 dans 5 secondes ...										"
+echo " 18-Redémarrage du serveur se3 dans 5 secondes ...										"
 echo "--------------------------------------------------------------------------------------"
 sleep 5
 

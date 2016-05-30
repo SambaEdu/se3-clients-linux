@@ -439,8 +439,15 @@ find /home/netlogon/clients-linux/ltsp/skel/ -mindepth 1 -maxdepth 1 -exec cp -r
 sleep 5
 
 
+echo "--------------------------------------------------------------------------------------"
+echo " 14-Extinction de tous les clients lourds à 19h par défaut							"
+echo "--------------------------------------------------------------------------------------"
+echo '0 19 * * * root /sbin/poweroff' > "/opt/ltsp/$ENVIRONNEMENT/etc/cron.d/extinction_clients_lourds"
+
+sleep 5
+
 echo "--------------------------------------"
-echo " 14-Sauvegarde du chroot des clients lourds (5 minutes)	    "
+echo " 15-Sauvegarde du chroot des clients lourds (5 minutes)	    "
 echo "--------------------------------------"
 if [ ! -d "/var/se3/ltsp/originale" ]
 then
@@ -452,7 +459,7 @@ cp -a "/opt/ltsp/$ENVIRONNEMENT" "/var/se3/ltsp/originale/$ENVIRONNEMENT-origina
 sleep 5
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 15- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Jessie 	    "
+echo " 16- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Jessie 	    "
 echo "------------------------------------------------------------------------------------------------------------------------------"
 
 resultat=$(grep "Demarrer le pc en client lourd Jessie $BUREAU" "/tftpboot/pxelinux.cfg/default")
@@ -471,7 +478,7 @@ fi
 sleep 5
 
 echo "--------------------------------------------------------------------------------------"
-echo " 16-Redémarrage du serveur se3 dans 5 secondes ...										"
+echo " 17-Redémarrage du serveur se3 dans 5 secondes ...										"
 echo "--------------------------------------------------------------------------------------"
 sleep 5
 
