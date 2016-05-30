@@ -570,7 +570,8 @@ redemarrer()
     case $REPONSE2 in
         oui|OUI)
             echo -e "${neutre}"
-            reboot
+            [ "$mode_test" = "t" ] && echo "on est en mode test : on ne redémarre pas"
+            [ "$mode_test" = "r" ] && reboot
             ;;
         *)
             echo -e ""
