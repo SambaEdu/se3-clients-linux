@@ -348,6 +348,14 @@ EOF
 
 bash /usr/share/se3/scripts/mettre_droits_sur_data_owncloud.sh >> "$SORTIE" 2>&1
 
+#######################################################################################################################################
+# Correction d'un bug (apparu suite à une upgrade d'Owncloud 9.0) sur les directives RewriteRule et RewriteBase du .htaccess d'owncloud 9
+# L'erreur sur RewriteRule impose de compléter l'url d'OC avec index.php (http://.../index.php) pour pouvoir accéder à la fenêtre d'identification
+# L'erreur du RewriteBase rend impossible la navigation dans l'interface web d'OC
+#######################################################################################################################################
+sed -i 's/RewriteRule . index.php/RewriteRule .* index.php/g' "$ocpath/.htaccess"
+sed -i -e 's/^.*RewriteBase \/.*$/  RewriteBase \/owncloud/g' "$ocpath/.htaccess"
+########################################################################################################################################
 
 #################################################################################################################
 echo "Etape 8.6 : On déplace le repertoire data d'Owncloud dans /var/se3 car il y a plus de place "
