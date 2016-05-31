@@ -482,6 +482,7 @@ echo "Pour réaliser une maj d'OC, il faudra lancer à la main le script /usr/sh
 #################################################################################################################
 
 rm -f /etc/apt/sources.list.d/owncloud.list /etc/apt/sources.list.d/php5-libsmbclient.list  >> "$SORTIE" 2>&1
+apt-get update >> "$SORTIE" 2>&1
 
 # Création du scritp pour faire un upgrade d'Owncloud
 cat << 'EOF' > "/usr/share/se3/scripts/upgrade_owncloud.sh"
