@@ -18,7 +18,7 @@ IP_PROXY="$proxy_url"
 BASE_DN="$ldap_base_dn"
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " Ce script installe un serveur LTSP de clients lourds Xenial sur votre SE3 Wheezy												"
+echo " Ce script installe un serveur LTSP de clients lourds Jessie sur votre SE3 Wheezy												"
 echo " Tout PC disposant d un boot PXE et d au moins 512 Mo de RAM pourra démarrer sur le reseau									"
 echo " Votre se3 n a pas besoin d être très puissant, juste d'une carte reseau 1Gbs													"
 echo "------------------------------------------------------------------------------------------------------------------------------"
@@ -421,6 +421,12 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano aptitude less fir
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y flashplugin-nonfree
 ltsp-chroot -m --arch "$ENVIRONNEMENT" update-flashplugin-nonfree --install
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y -t jessie-backports libreoffice libreoffice-l10n-fr
+
+# Ajout du navigateur Chromium et de flash pour Chromium
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y chromium chromium-l10n
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonfree
+ltsp-chroot -m --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
+
 
 echo "--------------------------------------------------------------------------------------"
 echo " 12-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"

@@ -11,6 +11,7 @@ REPERTOIRE_BIN="$REPERTOIRE_INSTALLATION/bin"
 REPERTOIRE_DEFAUT="$REPERTOIRE_INSTALLATION/.defaut"
 REPERTOIRE_DIVERS="$REPERTOIRE_INSTALLATION/divers"
 REPERTOIRE_DIVERS_DEFAUT="$REPERTOIRE_DEFAUT/divers"
+REPERTOIRE_LTSP_ADMINISTRER="$REPERTOIRE_INSTALLATION/ltsp/administrer"
 REPERTOIRE_UNEFOIS="$REPERTOIRE_INSTALLATION/unefois"
 REPERTOIRE_UNEFOIS_DEFAUT="$REPERTOIRE_DEFAUT/unefois"
 REPERTOIRE_SSHKEY="$REPERTOIRE_INSTALLATION/install"
@@ -90,6 +91,9 @@ function restaurer_droits ()
         chmod u+x "$f"
     done
     
+    # Le repertoire ltsp/administrer contient des exécutables.
+    chmod u+x "$REPERTOIRE_LTSP_ADMINISTRER"/*.sh
+
     # Pour rendre le contenu du répertoire inaccessible sur les clients
     # sauf par admin et root.
     chmod 750 "$REPERTOIRE_INSTALLATION"
@@ -184,6 +188,9 @@ function adapter_scripts ()
     sed -r -i -e "s/^SE3=\".+$/SE3=\"$IP_SE3\"/g" "$CONNEXION_SSH_SERVEUR"
     sed -r -i -e "s/^SE3=\".+$/SE3=\"$IP_SE3\"/g" "$RECONFIGURE_SSH"
     
+   # On adapte au serveur se3 les scripts permettant d'administrer ltsp
+    sed -i -e "s/__SE3__/$IP_SE3/g" "$REPERTOIRE_LTSP_ADMINISTRER"/*.sh
+
     # Adaptation de LOGON_DEFAUT.
     # Seul LOGON_DEFAUT est à adapter, c'est inutile pour LOGON
     # car il va être réécrit complètement à partir de LOGON_DEFAUT.
