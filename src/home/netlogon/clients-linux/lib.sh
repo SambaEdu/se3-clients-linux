@@ -125,9 +125,9 @@ return 0
 
 mount_fat_client_home_with_sshfs()
 {
-local ENVIRONNEMENT="$1"			# Name of chroot
+local ENVIRONNEMENT="$1"				# Name of chroot
 local IP_SE3="$2"
-local PROFIL_LINUX_NAME="$3"		# Name of linux profil in /home/$USER/ folder, on the se3
+local PROFIL_LINUX_NAME="profil-linux"  # Name of folder that contains user's linux profil, in /home/$USER/
 
 if [ -e "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml" ]
 then
@@ -137,7 +137,7 @@ then
 
 	# User's home must be created before se3 Samba mounts
 	sed -i "/^.*Volume definitions.*$/ a\
-<fd0ssh>sshpass</fd0ssh>
+<fd0ssh>sshpass</fd0ssh>\n\
 <volume\n\
 		user=\"*\"
 		fstype=\"fuse\"\n\
@@ -160,7 +160,7 @@ mount_fat_client_home_with_cifs()
 {
 local ENVIRONNEMENT="$1"			# Name of chroot
 local IP_SE3="$2"					
-local PROFIL_LINUX_NAME="$3"		# Name of linux profil in /home/$USER/ folder, on the se3
+local PROFIL_LINUX_NAME="profil-linux"  # Name of folder that contains user's linux profil, in /home/$USER/
 
 if [ -e "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml" ]
 then
