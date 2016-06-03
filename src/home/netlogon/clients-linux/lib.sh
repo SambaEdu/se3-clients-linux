@@ -194,6 +194,8 @@ find /home -mindepth 1 -maxdepth 1 -type d ! -name netlogon ! -name templates ! 
 -exec cp -r /home/netlogon/clients-linux/ltsp/skel/. {}/profil-linux/ \; \
 -exec chown -R --reference={} {}/profil-linux \; \
 -exec chmod -R 700 {}/profil-linux \;
+
+return 0
 }
 
 ############################################################################################################################
@@ -209,6 +211,8 @@ find /home -mindepth 1 -maxdepth 1 -type d ! -name netlogon ! -name templates ! 
 -exec cp -r /home/netlogon/clients-linux/ltsp/skel {}/profil-linux \; \
 -exec chown -R --reference={} {}/profil-linux \; \
 -exec chmod -R 700 {}/profil-linux \;
+
+return 0
 }
 
 ############################################################################################################################
@@ -220,6 +224,13 @@ deploy_one_particular_folder_in_profil_linux()
 {
 FOLDER_TO_DEPLOY="$1"		# file or folder to deploy in profil-linux
 
+# Verify that variable is not empty
+if [ -z "$FOLDER_TO_DEPLOY" ]
+then
+printf 'A name of folder (or file) must be specified as paramater to function \n'
+return 0
+fi
+
 # Deploy only if the folder existe in skel/$1
 if [ -e "/home/netlogon/clients-linux/ltsp/skel/$FOLDER_TO_DEPLOY" ]
 then
@@ -228,9 +239,10 @@ then
 -exec cp -r /home/netlogon/clients-linux/ltsp/skel/$FOLDER_TO_DEPLOY {}/profil-linux/$FOLDER_TO_DEPLOY \; \
 -exec chown -R --reference={} {}/profil-linux/$FOLDER_TO_DEPLOY \; \
 -exec chmod -R 700 {}/profil-linux/$FOLDER_TO_DEPLOY \;
-	exit 0
+	return 0
 else
-	exit 1
+	printf 'The folder (or file) to deploy is not present in /home/netlogon/clients-linux/ltps/skel/ \n'
+	return 1
 fi
 }
 
