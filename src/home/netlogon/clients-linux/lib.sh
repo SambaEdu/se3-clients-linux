@@ -191,8 +191,7 @@ create_profil_linux()
 {
 find /home -mindepth 1 -maxdepth 1 -type d ! -name netlogon ! -name templates ! -name profiles \
 -exec mkdir -p {}/profil-linux \; \
--exec cp -r /home/netlogon/clients-linux/ltsp/skel/* {}/profil-linux/ \; \
--exec cp /home/netlogon/clients-linux/ltsp/skel/.[!.]* {}/profil-linux/ \; \
+-exec cp -r /home/netlogon/clients-linux/ltsp/skel/. {}/profil-linux/ \; \
 -exec chown -R --reference={} {}/profil-linux \; \
 -exec chmod -R 700 {}/profil-linux \;
 }
