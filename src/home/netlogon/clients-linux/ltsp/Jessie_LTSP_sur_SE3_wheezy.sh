@@ -2,13 +2,12 @@
 # Rédigé par Nicolas Aldegheri, le 05/12/2015
 # Sous licence GNU
 
-# Insertion de toutes les fonctions la librairie lib.sh
-###LIBSH###
-
-
 # Choisir l'environnement des clients lourds : lxde, mate, xfce4, gnome, cinnamon
 ENVIRONNEMENT="i386"
 BUREAU="mate"						# Bureau à installer dans le chroot des clients lourds 
+
+# Insertion de toutes les fonctions la librairie lib.sh
+. /home/netlogon/clients-linux/lib.sh
 
 # Récupération de variables spécifiques au se3
 . /etc/se3/config_c.cache.sh
