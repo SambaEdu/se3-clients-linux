@@ -111,7 +111,7 @@ then
 		fstype=\"davfs\"\n\
 		path=\"http://$IP_SE3/owncloud/remote.php/webdav/\"\n\
 		mountpoint=\"~/$CLOUD_NAME\"\n\
-		options=\"nosuid,nodev\"\n\
+		options=\"username=%(USER),uid=%(USER),nosuid,nodev\"\n\
 />\n\
 " "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 fi
