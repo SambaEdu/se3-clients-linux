@@ -1455,7 +1455,7 @@ decompte_10s()
         reboot
         exit 0
     else
-        afficher "pour que le système soit opérationnel, vous devez le redémarrer." | tee -a $compte_rendu
+        #afficher "pour que le système soit opérationnel, vous devez le redémarrer." | tee -a $compte_rendu
         exit 0
     fi
 }
@@ -1648,10 +1648,6 @@ fi
 # suppression de la liste des paquets inutilisés
 apt-get autoremove -y >> $SORTIE 2>&1
 afficher "intégration terminée" | tee -a $compte_rendu
-afficher "si ce n'est pas déjà fait, pensez à effectuer" \
-         "une réservation d'adresse IP du client via" \
-         "le serveur DHCP du SambaÉdu, afin d'inscrire" \
-         "le nom de la machine cliente dans l'annuaire" | tee -a $compte_rendu
 decompte_10s
 
 # Fin du programme
