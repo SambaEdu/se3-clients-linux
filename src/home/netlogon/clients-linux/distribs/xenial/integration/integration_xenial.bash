@@ -1089,6 +1089,55 @@ renommer_nom_client()
     unset -v filtre_recherche resultat reponse
 }
 
+
+mot_de_passe_grub()
+{
+    # Le fichier /etc/grub.d/40_custom existe déjà. Il faut le rééditer
+    # en partant de zéro.
+    printf '#!/bin/sh\n'                                    >/etc/grub.d/40_custom
+    printf 'exec tail -n +3 $0\n'                          >>/etc/grub.d/40_custom
+    printf 'set superusers="admin"\n'                      >>/etc/grub.d/40_custom
+    printf 'password_pbkdf2 admin %s\n' "$hached_grub_pwd" >>/etc/grub.d/40_custom
+    
+    # Dans le fichier /etc/grub.d/10_linux, il faut chercher une ligne
+    # spécifique qui va générer les entrées de boot Grub dite "simples"
+    # (typiquement l'entrée de boot par défaut qui va lancer Jessie).
+    # Au niveau de cette ligne, il faudra ajouter « --unrestricted ».
+    # En effet, sans cela, par défaut avec seulement le compte "admin"
+    # créé, aucun boot ne sera possible sans les identifiants du compte
+    # admin (par exemple si on laisse le compteur de temps défiler, Grub
+    # lancera le boot par défaut mais il demandera des identifiants pour
+    # autoriser le boot ce qui n'est franchement pas pratique).
+    
+    local pattern="'gnulinux-simple-\$boot_device_id'"
+    
+    # Si, au niveau de la ligne, l'option est déjà présente alors
+    # on ne modifie pas le fichier. Sinon on le modifie.
+    if ! grep -- "$pattern" /etc/grub.d/10_linux | grep -q -- '--unrestricted'
+    then
+        # Ajout de l'option « --unrestricted ».
+        sed -i "s/$pattern/& --unrestricted/" /etc/grub.d/10_linux
+    fi
+    
+    # Dans le cas d'un double-boot,
+    # on fait de même dans le fichier /etc/grub.d/30_os-prober
+    # et cela pour tous les systèmes présents
+    pattern="\"\${DEVICE}\")'"
+    if ! grep -- "$pattern" /etc/grub.d/30_os-prober | grep -q -- '--unrestricted'
+    then
+        # Ajout de l'option « --unrestricted ».
+        sed -i "s/$pattern/& --unrestricted/" /etc/grub.d/30_os-prober
+    fi
+    # y compris les systèmes GNU/Linux
+    pattern="'osprober-gnulinux-simple-\$boot_device_id'"
+    if ! grep -- "$pattern" /etc/grub.d/30_os-prober | grep -q -- '--unrestricted'
+    then
+        # Ajout de l'option « --unrestricted ».
+        sed -i "s/$pattern/& --unrestricted/" /etc/grub.d/30_os-prober
+    fi
+}
+
+
 set_grub_pwd ()
 {
     # Si l'option --mdp-grub n'a pas été spécifiée, alors on passe
@@ -1097,7 +1146,7 @@ set_grub_pwd ()
     if "$OPTION_MDP_GRUB"
     then
         afficher "mise en place du mot de passe Grub (le login sera « admin »)." | tee -a $compte_rendu
-
+        
         if [ -z "$MDP_GRUB" ]
         then
             # MDP_GRUB est vide (l'option --mdp-grub a été spécifiée
@@ -1110,38 +1159,12 @@ set_grub_pwd ()
             # --mdp-grub. Il n'y a rien à faire dans ce cas.
             true
         fi
-
+        
         # On hache le mot de passe Grub.
         local hached_grub_pwd
         hached_grub_pwd=$(hash_grub_pwd "$MDP_GRUB")
-
-        # Le fichier /etc/grub.d/40_custom existe déjà. Il faut le rééditer
-        # en partant de zéro.
-        printf '#!/bin/sh\n'                                    >/etc/grub.d/40_custom
-        printf 'exec tail -n +3 $0\n'                          >>/etc/grub.d/40_custom
-        printf 'set superusers="admin"\n'                      >>/etc/grub.d/40_custom
-        printf 'password_pbkdf2 admin %s\n' "$hached_grub_pwd" >>/etc/grub.d/40_custom
-
-        # Dans le fichier /etc/grub.d/10_linux, il faut chercher une ligne
-        # spécifique qui va générer les entrées de boot Grub dite "simples"
-        # (typiquement l'entrée de boot par défaut qui va lancer Jessie).
-        # Au niveau de cette ligne, il faudra ajouter « --unrestricted ».
-        # En effet, sans cela, par défaut avec seulement le compte "admin"
-        # créé, aucun boot ne sera possible sans les identifiants du compte
-        # admin (par exemple si on laisse le compteur de temps défiler, Grub
-        # lancera le boot par défaut mais il demandera des identifiants pour
-        # autoriser le boot ce qui n'est franchement pas pratique).
-
-        local pattern="'gnulinux-simple-\$boot_device_id'"
-
-        # Si, au niveau de la ligne, l'option est déjà présente alors
-        # on ne modifie pas le fichier. Sinon on le modifie.
-        if ! grep -- "$pattern" /etc/grub.d/10_linux | grep -q -- '--unrestricted'
-        then
-            # Ajout de l'option « --unrestricted ».
-            sed -i "s/$pattern/& --unrestricted/" /etc/grub.d/10_linux
-        fi
-
+        mot_de_passe_grub
+        
         # On met à jour la configuration de Grub.
         if ! update-grub >> $SORTIE 2>&1
         then
@@ -1151,7 +1174,7 @@ set_grub_pwd ()
                      "Grub jusqu'à ce que la commande se déroule sans erreur." | tee -a $compte_rendu
             exit 1
         fi
-
+        
         unset -v mot_de_passe
     fi
 }
@@ -1698,7 +1721,7 @@ decompte_10s()
         reboot
         exit 0
     else
-        afficher "Pour pour que le système soit opérationnel, vous devez le redémarrer."
+        #afficher "Pour pour que le système soit opérationnel, vous devez le redémarrer."
         exit 0
     fi
 }
@@ -2076,10 +2099,6 @@ apt-get autoremove -y >> $SORTIE 2>&1
 # FIN DE L'INTÉGRATION
 #=====
 afficher "Fin de l'intégration." \
-         "Si ce n'est pas déjà fait, pensez à effectuer une réservation" \
-         "d'adresse IP du client via" \
-         "le serveur DHCP du SambaÉdu, afin d'inscrire le nom" \
-         "de la machine cliente dans l'annuaire."
 decompte_10s
 
 # fin du programme
