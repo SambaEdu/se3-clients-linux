@@ -139,11 +139,11 @@ then
 	sed -i "/^.*Volume definitions.*$/ a\
 <fd0ssh>sshpass</fd0ssh>\n\
 <volume\n\
-		user=\"*\"
+		user=\"*\"\n\
 		fstype=\"fuse\"\n\
 		path=\"sshfs#%(USER)@$IP_SE3:/home/%(USER)/$PROFIL_LINUX_NAME\"\n\
 		mountpoint=\"~\"\n\
-		ssh=\"1\"
+		ssh=\"1\"\n\
 		options=\"password_stdin,reconnect,nonempty\"\n\
 />\n\
 " "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
