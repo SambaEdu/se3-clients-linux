@@ -2,6 +2,10 @@
 # Rédigé par Nicolas Aldegheri, le 23/05/2016
 # Sous licence GNU
 
+# Insertion de toutes les fonctions la librairie lib.sh
+###LIBSH###
+
+
 # Choisir le bureau des clients lourds Xenial : ubuntu, ubuntu-mate, xubuntu ou lubuntu
 ENVIRONNEMENT="i386" 			# Nom de l'environnement (du chroot) des clients lourds
 BUREAU="ubuntu-mate"			# Bureau à installer dans le chroot des clients lourds

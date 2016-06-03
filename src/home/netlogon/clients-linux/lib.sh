@@ -89,6 +89,152 @@ install_open_sankore()
     return 0
 }
 
+# 3. Funtions used by ltsp 
+
+############################################################################################################################
+# 3.1 This function mounts owncloud folder on user's desktop with webdav (if owncloud has been installed on se3)
+# It can be executed on se3 as root
+############################################################################################################################
+
+mount_owncloud_on_fat_client_desktop()
+{	
+local ENVIRONNEMENT="$1"			# Name of chroot
+local IP_SE3="$2"
+local CLOUD_NAME="$3"				# the name of owncloud share on the fat client desktop
+
+if [ -e /etc/apache2/sites-available/owncloud.conf ] && [ -e "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml" ]
+then
+	ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
+	ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y davfs2
+	sed -i "/^.*pam_mount parameters: General tunables.*$/ i\
+<volume\n\
+		fstype=\"davfs\"\n\
+		path=\"http://$IP_SE3/owncloud/remote.php/webdav/\"\n\
+		mountpoint=\"~/$CLOUD_NAME\"\n\
+		options=\"nosuid,nodev\"\n\
+/>\n\
+" "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
+fi
+return 0
+}
+
+############################################################################################################################
+# 3.2 This function mounts user home on fat client with sshfs
+# It can be executed on se3 as root
+############################################################################################################################
+
+mount_fat_client_home_with_sshfs()
+{
+local ENVIRONNEMENT="$1"			# Name of chroot
+local IP_SE3="$2"
+local PROFIL_LINUX_NAME="$3"		# Name of linux profil in /home/$USER/ folder, on the se3
+
+if [ -e "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml" ]
+then
+	# Use sshpass instead of fs0ssh to realize sshfs mounting
+	ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
+	ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y sshpass
+
+	# User's home must be created before se3 Samba mounts
+	sed -i "/^.*Volume definitions.*$/ a\
+<fd0ssh>sshpass</fd0ssh>
+<volume\n\
+		user=\"*\"
+		fstype=\"fuse\"\n\
+		path=\"sshfs#%(USER)@$IP_SE3:/home/%(USER)/$PROFIL_LINUX_NAME\"\n\
+		mountpoint=\"~\"\n\
+		ssh=\"1\"
+		options=\"password_stdin,reconnect,nonempty\"\n\
+/>\n\
+" "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
+fi
+return 0
+}
+
+############################################################################################################################
+# 3.3 This function mounts user home on fat client with cifs
+# It can be executed on se3 as root
+############################################################################################################################
+
+mount_fat_client_home_with_cifs()
+{
+local ENVIRONNEMENT="$1"			# Name of chroot
+local IP_SE3="$2"					
+local PROFIL_LINUX_NAME="$3"		# Name of linux profil in /home/$USER/ folder, on the se3
+
+if [ -e "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml" ]
+then
+	# User's home must be created before se3 Samba mounts because the last one are mounted on ~ 
+	sed -i "/^.*Volume definitions.*$/ a\
+<volume\n\
+		user=\"*\"\n\
+		fstype=\"cifs\"\n\
+		server=\"$IP_SE3\"\n\
+		path=\"homes/$PROFIL_LINUX_NAME\"\n\
+		mountpoint=\"~\"\n\
+		options=\"nobrl,serverino,iocharset=utf8,sec=ntlmv2\"\n\
+/>\n\
+" "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
+fi
+return 0
+}
+
+############################################################################################################################
+# 3.4 This function create a linux profil folder in the home directory of each user on the se3
+# It can be executed on se3 as root
+# The linux-profil will be created in /home/$USER/profil-linux only if it doesn't exist
+# This linux-profil could be used by ltsp fat clients as "home" after login with pam-mount (mounted by sshfs or by cifs)
+# The goal is to make user's preferences persistent
+############################################################################################################################
+
+create_profil_linux()
+{
+find /home -mindepth 1 -maxdepth 1 -type d ! -name netlogon ! -name templates ! -name profiles \
+-exec mkdir -p {}/profil-linux \; \
+-exec cp -r /home/netlogon/clients-linux/ltsp/skel/* {}/profil-linux/ \; \
+-exec cp /home/netlogon/clients-linux/ltsp/skel/.[!.]* {}/profil-linux/ \; \
+-exec chown -R --reference={} {}/profil-linux \; \
+-exec chmod -R 700 {}/profil-linux \;
+}
+
+############################################################################################################################
+# 3.5 This function regenerate the linux profil of all se3 users according to /home/netlogon/clients-linux/ltsp/skel model
+# It can be executed on se3 as root
+# This will delete all user's preference and user's data stored in /home/$USER/profil-linux
+############################################################################################################################
+
+regenerate_all_profil_linux()
+{
+find /home -mindepth 1 -maxdepth 1 -type d ! -name netlogon ! -name templates ! -name profiles \
+-exec rm -Rf {}/profil-linux \; \
+-exec cp -r /home/netlogon/clients-linux/ltsp/skel {}/profil-linux \; \
+-exec chown -R --reference={} {}/profil-linux \; \
+-exec chmod -R 700 {}/profil-linux \;
+}
+
+############################################################################################################################
+# 3.6 This function deploy a particular folder in profil-linux of all se3 users and preserve user's preferences
+# It can be executed on se3 as root
+############################################################################################################################
+
+deploy_one_particular_folder_in_profil_linux()
+{
+FOLDER_TO_DEPLOY="$1"		# file or folder to deploy in profil-linux
+
+# Deploy only if the folder existe in skel/$1
+if [ -e "/home/netlogon/clients-linux/ltsp/skel/$FOLDER_TO_DEPLOY" ]
+then
+	find /home -mindepth 1 -maxdepth 1 -type d ! -name netlogon ! -name templates ! -name profiles \
+-exec rm -Rf {}/profil-linux/$FOLDER_TO_DEPLOY \; \
+-exec cp -r /home/netlogon/clients-linux/ltsp/skel/$FOLDER_TO_DEPLOY {}/profil-linux/$FOLDER_TO_DEPLOY \; \
+-exec chown -R --reference={} {}/profil-linux/$FOLDER_TO_DEPLOY \; \
+-exec chmod -R 700 {}/profil-linux/$FOLDER_TO_DEPLOY \;
+	exit 0
+else
+	exit 1
+fi
+}
+
 ###########################################
 ###                                     ###
 ###           End of lib.sh             ###
