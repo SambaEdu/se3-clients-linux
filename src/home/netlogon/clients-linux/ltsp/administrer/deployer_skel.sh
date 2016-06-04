@@ -8,13 +8,8 @@ xterm -e "ssh -o 'StrictHostKeyChecking no' -l root '$SE3' bash << 'EOF'
 #systemctl stop nfs-kernel-server.service
 #systemctl stop nbd-server.service
 
-if [ ! -d "/opt/ltsp/$ENVIRONNEMENT/etc/skel" ]
-then
-	mkdir -p "/opt/ltsp/$ENVIRONNEMENT/etc/skel"
-fi
-
-rm -rf "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"*
-cp -r /home/netlogon/clients-linux/ltsp/skel/* "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"
+rm -rf "/opt/ltsp/$ENVIRONNEMENT/etc/skel"
+cp -r /home/netlogon/clients-linux/ltsp/skel "/opt/ltsp/$ENVIRONNEMENT/etc/"
 
 chmod -R 700 "/opt/ltsp/$ENVIRONNEMENT/etc/skel/"
 

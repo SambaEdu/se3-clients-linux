@@ -102,6 +102,13 @@ local ENVIRONNEMENT="$1"			# Name of chroot
 local IP_SE3="$2"
 local CLOUD_NAME="$3"				# the name of owncloud share on the fat client desktop
 
+if [ -z "$ENVIRONNEMENT" ] || [ -z "$IP_SE3" ] || [ -z "$CLOUD_NAME" ] 
+then
+	printf 'One of the three paramaters (ENVIRONNEMENT, IP_SE3 or CLOUD_NAME) is missing \n'
+	printf 'The function is aborded \n'
+	return 1
+fi
+
 if [ -e /etc/apache2/sites-available/owncloud.conf ] && [ -e "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml" ]
 then
 	ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
@@ -119,37 +126,44 @@ return 0
 }
 
 ############################################################################################################################
-# 3.2 This function mounts user home on fat client with sshfs
+# 3.2 This function mounts user home on fat client with sshfs (don't work)
 # It can be executed on se3 as root
 ############################################################################################################################
 
-mount_fat_client_home_with_sshfs()
-{
-local ENVIRONNEMENT="$1"				# Name of chroot
-local IP_SE3="$2"
-local PROFIL_LINUX_NAME="profil-linux"  # Name of folder that contains user's linux profil, in /home/$USER/
+#mount_fat_client_home_with_sshfs()
+#{
+#local ENVIRONNEMENT="$1"				# Name of chroot
+#local IP_SE3="$2"
+#local PROFIL_LINUX_NAME="profil-linux"  # Name of folder that contains user's linux profil, in /home/$USER/
 
-if [ -e "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml" ]
-then
-	# Use sshpass instead of fs0ssh to realize sshfs mounting
-	ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
-	ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y sshpass
+#if [ -z "$ENVIRONNEMENT" ] || [ -z "$IP_SE3" ]
+#then
+	#printf 'One of the two paramaters (ENVIRONNEMENT or IP_SE3) is missing \n'
+	#printf 'The function is aborded \n'
+	#return 1
+#fi
 
-	# User's home must be created before se3 Samba mounts
-	sed -i "/^.*Volume definitions.*$/ a\
-<fd0ssh>sshpass</fd0ssh>\n\
-<volume\n\
-		user=\"*\"\n\
-		fstype=\"fuse\"\n\
-		path=\"sshfs#%(USER)@$IP_SE3:/home/%(USER)/$PROFIL_LINUX_NAME\"\n\
-		mountpoint=\"~\"\n\
-		ssh=\"1\"\n\
-		options=\"password_stdin,reconnect,nonempty\"\n\
-/>\n\
-" "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
-fi
-return 0
-}
+#if [ -e "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml" ]
+#then
+	## Use sshpass instead of fs0ssh to realize sshfs mounting
+	#ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
+	#ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y sshpass
+
+	## User's home must be created before se3 Samba mounts
+	#sed -i "/^.*Volume definitions.*$/ a\
+#<fd0ssh>sshpass</fd0ssh>\n\
+#<volume\n\
+		#user=\"*\"\n\
+		#fstype=\"fuse\"\n\
+		#path=\"sshfs#%(USER)@$IP_SE3:/home/%(USER)/$PROFIL_LINUX_NAME\"\n\
+		#mountpoint=\"~\"\n\
+		#ssh=\"1\"\n\
+		#options=\"password_stdin,reconnect,nonempty\"\n\
+#/>\n\
+#" "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
+#fi
+#return 0
+#}
 
 ############################################################################################################################
 # 3.3 This function mounts user home on fat client with cifs
@@ -161,6 +175,13 @@ mount_fat_client_home_with_cifs()
 local ENVIRONNEMENT="$1"			# Name of chroot
 local IP_SE3="$2"					
 local PROFIL_LINUX_NAME="profil-linux"  # Name of folder that contains user's linux profil, in /home/$USER/
+
+if [ -z "$ENVIRONNEMENT" ] || [ -z "$IP_SE3" ]
+then
+	printf 'One of the two paramaters (ENVIRONNEMENT or IP_SE3) is missing \n'
+	printf 'The function is aborded \n'
+	return 1
+fi
 
 if [ -e "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml" ]
 then
@@ -227,8 +248,9 @@ FOLDER_TO_DEPLOY="$1"		# file or folder to deploy in profil-linux
 # Verify that variable is not empty
 if [ -z "$FOLDER_TO_DEPLOY" ]
 then
-printf 'A name of folder (or file) must be specified as paramater to function \n'
-return 0
+	printf 'The parameter FOLDER_TO_DEPLOY of the function is missing \n'
+	printf 'The function is aborded \n'
+	return 1
 fi
 
 # Deploy only if the folder existe in skel/$1
