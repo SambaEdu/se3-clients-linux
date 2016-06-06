@@ -5,12 +5,12 @@
 # - installer la partie "Owncloud" uniquement : c'est possible avec un dépôt depuis la version 9 d'Owncloud.
 # - configurer le module ldap d'Owncloud pour qu'il consulte l'annuaire ldap du se3
 # - installer et configurer le module "Stockage Externe" d' Owncloud afin de pouvoir accéder aux partages Samba "Docs" et "Classes" du se3 depuis l'extérieur de l'établissement
-# - créer un partage Samba sur le cloud afin d'y accéder da façon efficace en interne.
+# - créer un partage Cloud spécifique à Owncloud, accessible en webdav (via un navigateur web par exemple), qui permettra le partage entre membres d'un même groupe
 # Par défaut : 
-# - seul les groupes "Profs" et "admins" ont accés à la fonctionnalité "Stockage Externe" du se3.
+# - tous les utilisateurs se3 ont accès aux partages Docs et Classes du se3.
 # - le compte administrateur d'Owncloud est identique au compte admin de l'interface web du se3
-# - les quotas par défaut des utilisateurs sont réglés par défaut à 100 Mo : ils pourront être ajustés par la suite
-# Une fois l'installation terminée, il est possible de personnaliser le cloud en se connectant à http://IP_SE3/owncloud avec un compte utilisateur du se3.
+# - les quotas par défaut des utilisateurs sur le partage Cloud sont réglés par défaut à 100 Mo : ils pourront être ajustés par la suite via l'interface d'administrateur d'Owncloud
+# Une fois l'installation terminée, il est possible de personnaliser le cloud en se connectant à http://IP_SE3/owncloud avec un compte admin du se3.
 
 # Pour de le débuggage :
 SORTIE="/root/compte_rendu_integration_owncloud.txt"
@@ -531,6 +531,10 @@ cd /var/www/owncloud
 sudo -u www-data php occ config:system:set datadirectory --value="/var/www/owncloud/data" 
 mv /var/se3/dataOC /var/www/owncloud/data
 
+# On remet les droits tels qu'ils étaient définis par l'installation d'Owncloud (on les resserera après la mise à jour)
+chown -R www-data:www-data /var/www/owncloud
+chmod -R 750 /var/www/owncloud
+
 # On rajoute temporairement les dépots pour faire la maj
 echo "deb http://download.owncloud.org/download/repositories/$VERSION_OC/$VERSION_SE3/ /" > /etc/apt/sources.list.d/owncloud.list
 echo "deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/$VERSION_SE3/ /" > /etc/apt/sources.list.d/php5-libsmbclient.list
@@ -545,10 +549,18 @@ echo "deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/$VE
 # On met à jour le paquet owncloud-files
 apt-get update && apt-get install owncloud-files
 
-# On finalise l'installation avec occ
+# On finalise la mise à jour avec occ
 sudo -u www-data php occ upgrade
 # ou sans le mode simulation (qui peut prendre plusieurs heures ...)
 # sudo -u www-data php occ upgrade --skip-migration-test
+
+#######################################################################################################################################
+# Correction d'un bug (apparu avec Owncloud 9.0.2) sur les directives RewriteRule et RewriteBase du .htaccess d'owncloud
+# Ce bug va peut-être disparaître dans les maj ultérieures d'OC mais dans le doute, on réécrit correctement ces directives
+#######################################################################################################################################
+sed -i 's/RewriteRule . index.php/RewriteRule .* index.php/g' "/var/www/owncloud/.htaccess"
+sed -i -e 's/^.*RewriteBase \/.*$/  RewriteBase \/owncloud/g' "/var/www/owncloud/.htaccess"
+########################################################################################################################################
 
 # On réactive les applications tierce (TODO : est-ce réellement nécessaire ? je ne les ai pas toutes désactivées ...)
 # sudo -u www-data php occ app:enable user_ldap
@@ -563,6 +575,8 @@ mv /var/www/owncloud/data /var/se3/dataOC
 
 # On supprime les depots d'OC pour éviter une maj d'OC non désirée (via un apt-get upgrade du se3 ...)
 rm -f /etc/apt/sources.list.d/owncloud.list /etc/apt/sources.list.d/php5-libsmbclient.list
+# On remet à jour apt-get
+apt-get update
 
 # On quitte le mode maintenance
 # sudo -u www-data php occ maintenance:mode --off
