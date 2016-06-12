@@ -596,26 +596,33 @@ chmod 550 /usr/share/se3/scripts/upgrade_owncloud.sh >> "$SORTIE" 2>&1
 echo " Etape 10 : Installation des applications bookmarks pour ajouter des favoris web, et de  l'application de messagerie/chat interne"
 ###########################################################################################################
 
+
 #installation de l'application favoris
-cd /var/www/owncloud/apps/
-wget https://ovin.schiwon.me/index.php/s/3ROfUXOtwYIEY47/download >> "$SORTIE" 2>&1
-mv download bookmarks.zip >> "$SORTIE" 2>&1
-unzip bookmarks.zip >> "$SORTIE" 2>&1
-chown -R www-data:www-data bookmarks >> "$SORTIE" 2>&1
-rm  -f bookmarks.zip >> "$SORTIE" 2>&1
-cd ..
+# l'application bookmarks est maintenant dans les applications officielles présentes il faut juste l activer
+# On se place dans le repertoire pour utiliser la commande occ
+cd /var/www/owncloud
 sudo -u www-data php occ app:enable bookmarks
 
+#cd /var/www/owncloud/apps/
+#wget https://ovin.schiwon.me/index.php/s/3ROfUXOtwYIEY47/download >> "$SORTIE" 2>&1
+#mv download bookmarks.zip >> "$SORTIE" 2>&1
+#unzip bookmarks.zip >> "$SORTIE" 2>&1
+#chown -R www-data:www-data bookmarks >> "$SORTIE" 2>&1
+#rm  -f bookmarks.zip >> "$SORTIE" 2>&1
+#cd ..
+#sudo -u www-data php occ app:enable bookmarks
+
 #installation de l'application messagerie/chat interne
-cd /var/www/owncloud/apps/
-wget https://github.com/simeonackermann/OC-User-Conversations/archive/master.zip >> "$SORTIE" 2>&1
-unzip master.zip >> "$SORTIE" 2>&1
-mv OC* conversations >> "$SORTIE" 2>&1
-chown -R www-data:www-data conversations/ >> "$SORTIE" 2>&1
-cd ..
-sudo -u www-data php occ app:enable conversations
-cd apps
-rm -f master.zip
+# En VM cela marche très bien. On rencontre de grosses lenteurs sur une serveur en prod avec un annuaire de 1000 personnes. A tester manuellement
+#cd /var/www/owncloud/apps/
+#wget https://github.com/simeonackermann/OC-User-Conversations/archive/master.zip >> "$SORTIE" 2>&1
+#unzip master.zip >> "$SORTIE" 2>&1
+#mv OC* conversations >> "$SORTIE" 2>&1
+#chown -R www-data:www-data conversations/ >> "$SORTIE" 2>&1
+#cd ..
+#sudo -u www-data php occ app:enable conversations
+#cd apps
+#rm -f master.zip
 
 
 #################################################################################################################
