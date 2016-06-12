@@ -627,49 +627,19 @@ sudo -u www-data php /var/www/owncloud/occ app:enable music >> "$SORTIE" 2>&1
 
 #app documents
 cd /var/www/owncloud/apps
-wget https://github.com/owncloud/documents/releases/download/v0.12.0/documents.zip
-unzip documents.zip
-rm documents.zip
-chown -R www-data:www-data /var/www/owncloud/apps
-sudo -u www-data php /var/www/owncloud/occ app:enable documents
+wget https://github.com/owncloud/documents/releases/download/v0.12.0/documents.zip >> "$SORTIE" 2>&1
+unzip documents.zip >> "$SORTIE" 2>&1
+rm documents.zip >> "$SORTIE" 2>&1
+chown -R www-data:www-data /var/www/owncloud/apps >> "$SORTIE" 2>&1
+sudo -u www-data php /var/www/owncloud/occ app:enable documents >> "$SORTIE" 2>&1
 
 #calendrier
 cd /var/www/owncloud/apps
-wget https://github.com/owncloud/calendar/releases/download/v1.2.2/calendar.tar.gz
-tar -xzvf calendar.tar.gz
-rm -r calendar.tar.gz
-chown -R www-data:www-data /var/www/owncloud/apps
-sudo -u www-data php /var/www/owncloud/occ app:enable calendarntcenter-1.1.2.zip
-unzip announcementcenter-1.1.2.zip
-rm announcementcenter-1.1.2.zip
-chown -R www-data:www-data /var/www/owncloud/apps
-sudo -u www-data php /var/www/owncloud/occ app:enable announcementcenter
-
-#application music
-cd /var/www/owncloud/apps/
-wget https://apps.owncloud.com/CONTENT/content-files/164319-music.zip
-unzip 164319-music.zip
-rm 164319-music.zip
-chown -R www-data:www-data /var/www/owncloud/apps
-sudo -u www-data php /var/www/owncloud/occ app:enable music
-
-#app documents
-cd /var/www/owncloud/apps
-wget https://github.com/owncloud/documents/releases/download/v0.12.0/documents.zip
-unzip documents.zip
-rm documents.zip
-chown -R www-data:www-data /var/www/owncloud/apps
-sudo -u www-data php /var/www/owncloud/occ app:enable documents
-
-#calendrier
-cd /var/www/owncloud/apps
-wget https://github.com/owncloud/calendar/releases/download/v1.2.2/calendar.tar.gz
-tar -xzvf calendar.tar.gz
-rm -r calendar.tar.gz
-chown -R www-data:www-data /var/www/owncloud/apps
-sudo -u www-data php /var/www/owncloud/occ app:enable calendar
-
-
+wget https://github.com/owncloud/calendar/releases/download/v1.2.2/calendar.tar.gz >> "$SORTIE" 2>&1
+tar -xzvf calendar.tar.gz >> "$SORTIE" 2>&1
+rm -r calendar.tar.gz >> "$SORTIE" 2>&1
+chown -R www-data:www-data /var/www/owncloud/apps >> "$SORTIE" 2>&1
+sudo -u www-data php /var/www/owncloud/occ app:enable calendar >> "$SORTIE" 2>&1
 
 
 #installation de l'application messagerie/chat interne
