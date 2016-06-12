@@ -593,24 +593,84 @@ chown www-se3:root /usr/share/se3/scripts/upgrade_owncloud.sh >> "$SORTIE" 2>&1
 chmod 550 /usr/share/se3/scripts/upgrade_owncloud.sh >> "$SORTIE" 2>&1
 
 ###########################################################################################################
-echo " Etape 10 : Installation des applications bookmarks pour ajouter des favoris web, et de  l'application de messagerie/chat interne"
+echo " Etape 10 : Installation des applications bookmarks et autres applications utiles"
 ###########################################################################################################
 
 
 #installation de l'application favoris
-# l'application bookmarks est maintenant dans les applications officielles présentes il faut juste l activer
-# On se place dans le repertoire pour utiliser la commande occ
-cd /var/www/owncloud
+# l'application bookmarks est maintenant dans les applications officielles présentes il faut la télécharger et l activer
+
+cd /var/www/owncloud/apps/
+wget https://ovin.schiwon.me/index.php/s/3ROfUXOtwYIEY47/download >> "$SORTIE" 2>&1
+mv download bookmarks.zip >> "$SORTIE" 2>&1
+unzip bookmarks.zip >> "$SORTIE" 2>&1
+chown -R www-data:www-data bookmarks >> "$SORTIE" 2>&1
+rm  -f bookmarks.zip >> "$SORTIE" 2>&1
+cd ..
 sudo -u www-data php occ app:enable bookmarks
 
-#cd /var/www/owncloud/apps/
-#wget https://ovin.schiwon.me/index.php/s/3ROfUXOtwYIEY47/download >> "$SORTIE" 2>&1
-#mv download bookmarks.zip >> "$SORTIE" 2>&1
-#unzip bookmarks.zip >> "$SORTIE" 2>&1
-#chown -R www-data:www-data bookmarks >> "$SORTIE" 2>&1
-#rm  -f bookmarks.zip >> "$SORTIE" 2>&1
-#cd ..
-#sudo -u www-data php occ app:enable bookmarks
+#announcement center pour envoyer une notification à tous les utilisateurs du cloud.
+cd /var/www/owncloud/apps/
+wget https://github.com/owncloud/announcementcenter/releases/download/v1.1.2/announcementcenter-1.1.2.zip >> "$SORTIE" 2>&1
+unzip announcementcenter-1.1.2.zip >> "$SORTIE" 2>&1
+rm announcementcenter-1.1.2.zip >> "$SORTIE" 2>&1
+chown -R www-data:www-data /var/www/owncloud/apps >> "$SORTIE" 2>&1
+sudo -u www-data php /var/www/owncloud/occ app:enable announcementcenter >> "$SORTIE" 2>&1
+
+#application music
+cd /var/www/owncloud/apps/
+wget https://apps.owncloud.com/CONTENT/content-files/164319-music.zip >> "$SORTIE" 2>&1
+unzip 164319-music.zip >> "$SORTIE" 2>&1
+rm 164319-music.zip >> "$SORTIE" 2>&1
+chown -R www-data:www-data /var/www/owncloud/apps >> "$SORTIE" 2>&1
+sudo -u www-data php /var/www/owncloud/occ app:enable music >> "$SORTIE" 2>&1
+
+#app documents
+cd /var/www/owncloud/apps
+wget https://github.com/owncloud/documents/releases/download/v0.12.0/documents.zip
+unzip documents.zip
+rm documents.zip
+chown -R www-data:www-data /var/www/owncloud/apps
+sudo -u www-data php /var/www/owncloud/occ app:enable documents
+
+#calendrier
+cd /var/www/owncloud/apps
+wget https://github.com/owncloud/calendar/releases/download/v1.2.2/calendar.tar.gz
+tar -xzvf calendar.tar.gz
+rm -r calendar.tar.gz
+chown -R www-data:www-data /var/www/owncloud/apps
+sudo -u www-data php /var/www/owncloud/occ app:enable calendarntcenter-1.1.2.zip
+unzip announcementcenter-1.1.2.zip
+rm announcementcenter-1.1.2.zip
+chown -R www-data:www-data /var/www/owncloud/apps
+sudo -u www-data php /var/www/owncloud/occ app:enable announcementcenter
+
+#application music
+cd /var/www/owncloud/apps/
+wget https://apps.owncloud.com/CONTENT/content-files/164319-music.zip
+unzip 164319-music.zip
+rm 164319-music.zip
+chown -R www-data:www-data /var/www/owncloud/apps
+sudo -u www-data php /var/www/owncloud/occ app:enable music
+
+#app documents
+cd /var/www/owncloud/apps
+wget https://github.com/owncloud/documents/releases/download/v0.12.0/documents.zip
+unzip documents.zip
+rm documents.zip
+chown -R www-data:www-data /var/www/owncloud/apps
+sudo -u www-data php /var/www/owncloud/occ app:enable documents
+
+#calendrier
+cd /var/www/owncloud/apps
+wget https://github.com/owncloud/calendar/releases/download/v1.2.2/calendar.tar.gz
+tar -xzvf calendar.tar.gz
+rm -r calendar.tar.gz
+chown -R www-data:www-data /var/www/owncloud/apps
+sudo -u www-data php /var/www/owncloud/occ app:enable calendar
+
+
+
 
 #installation de l'application messagerie/chat interne
 # En VM cela marche très bien. On rencontre de grosses lenteurs sur une serveur en prod avec un annuaire de 1000 personnes. A tester manuellement
