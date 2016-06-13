@@ -436,10 +436,12 @@ case $test in
         # on ne lance pas la sauvegarde : le script est en cours d'utilisation
         echo "La sauvegarde du $DATESAUVEGARDE n'est pas lancée." > $TEXTE
         echo "" >&4 && cat "$TEXTE" >&4
+        echo "" >&3 && cat "$TEXTE" >&3
+        OBJET="Sauvegarde en cours"
     ;;
     *)
         # autres cas à prévoir ?
-        true
+        OBJET="Cas inattendu"
     ;;
 esac
 gestion_temps       # calculer la durée de la sauvegarde
