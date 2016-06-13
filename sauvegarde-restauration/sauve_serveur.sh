@@ -126,7 +126,7 @@ tester_script_actif()
     # qui devrait être disponible sur les versions squeeze, wheezy et jessie de debian.
     # Faut-il donc tester la présence de cette commande ?
     
-    n=$(pgrep --full --count "$script_nom")
+    n=$(pgrep -f -c "$script_nom")
     if [ "$n" != "1" ]
     then
         echo "Une sauvegarde est déjà en cours." > $TEXTE
