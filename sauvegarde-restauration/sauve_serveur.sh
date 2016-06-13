@@ -5,7 +5,7 @@
 ##### Script permettant de sauvegarder les données importantes
 ##### pour une restauration du serveur SE3
 ##### version du 16/04/2014
-##### modifiée le 15/02/2016
+##### modifiée le 13/06/2016
 #
 # Auteurs :      Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
 #                François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
@@ -52,12 +52,13 @@ MONTAGE="/sauveserveur"     # Chemin vers les répertoires de sauvegarde
 SAV="SauveGarde"            # Nom du répertoire de sauvegarde de /var/se3/save
 SAVHOME="SauveGardeHome"    # Nom du répertoire de sauvegarde de /home et de /var/se3
 ##### #####
-DESTINATION=$MONTAGE/$SAV                # Destination de sauvegarde de /var/se3/save
-DESTINATIONHOME=$MONTAGE/$SAVHOME        # Destination de sauvegarde de /home et de /var/se3
-DATESAUVEGARDE=$(date +%F+%0kh%0Mmin)    # Date et heure de la sauvegarde
-DATEDEBUT=$(date +%s)                    # Début de la sauvegarde en secondes
-DATEJOUR=$(date +%A)                     # Jour de la sauvegarde
-TEXTE="texte.txt"                        # texte temporaire
+script_nom="$(basename ${0})"           # nom du script, sans le chemin
+DESTINATION=$MONTAGE/$SAV               # Destination de sauvegarde de /var/se3/save
+DESTINATIONHOME=$MONTAGE/$SAVHOME       # Destination de sauvegarde de /home et de /var/se3
+DATESAUVEGARDE=$(date +%F+%0kh%0Mmin)   # Date et heure de la sauvegarde
+DATEDEBUT=$(date +%s)                   # Début de la sauvegarde en secondes
+DATEJOUR=$(date +%A)                    # Jour de la sauvegarde
+TEXTE="texte.txt"                       # texte temporaire
 
 #----- -----
 # les fonctions
@@ -118,13 +119,75 @@ mode_script()
     fi
 }
 
+tester_script_actif()
+{
+    # on teste si une sauvegarde est en cours
+    # pour cela, on a besoin de la disponibilité de la commande pgrep
+    # qui devrait être disponible sur les versions squeeze, wheezy et jessie de debian.
+    # Faut-il donc tester la présence de cette commande ?
+    
+    n=$(pgrep --full --count "$script_nom")
+    if [ "$n" != "1" ]
+    then
+        echo "Une sauvegarde est déjà en cours." > $TEXTE
+        cat "$TEXTE" >&4  && echo "" >&4
+        [ "$test" = "1" ] && cat "$TEXTE" >&3 && echo "" >&3
+        return 1
+    else
+        # pas de sauvegarde en cours
+        return 0
+    fi
+}
+
+tester_tree()
+{
+    # bien que non indispensable,
+    # tree est nécessaire pour une partie du compte-rendu
+    # faut-il prévoir de l'installer dans le script ?
+    if ! which tree >/dev/null
+    then
+        echo "La commande tree n'est pas disponible" > $TEXTE
+        echo "Le paquet tree est-il installé ?" >> $TEXTE
+        echo "à effectuer : aptitude update && aptitude install tree" >> $TEXTE
+        cat "$TEXTE" >&4  && echo "" >&4
+        [ "$test" = "1" ] && cat "$TEXTE" >&3 && echo "" >&3
+        return 1
+    else
+        # tree est présent
+        return 0
+    fi
+}
+
+tester_pgrep()
+{
+    # faut-il tester si la commande pgrep est disponible
+    # ce qui est normalement le cas
+    # cette commande est indispensable pour vérifier si une sauvegarde est encore en cours
+    if ! which pgrep >/dev/null
+    then
+        echo "La commande pgrep n'est pas disponible" > $TEXTE
+        echo "Le paquet procps est-il installé ?" >> $TEXTE
+        cat "$TEXTE" >&4  && echo "" >&4
+        [ "$test" = "1" ] && cat "$TEXTE" >&3 && echo "" >&3
+        return 1
+    else
+        # pgrep est présent
+        return 0
+    fi
+}
+
+message_debut()
+{
+    # message de début de la sauvegarde
+    echo "Début de la sauvegarde du $DATESAUVEGARDE" > $TEXTE
+    cat "$TEXTE" >&4  && echo "" >&4
+    [ "$test" = "1" ] && cat "$TEXTE" >&3 && echo "" >&3
+}
+
 recuperer_mail()
 {
     # on récupère l'adresse mel de l'administrateur
     MAIL=$(cat /etc/ssmtp/ssmtp.conf | grep ^root | cut -d "=" -f 2)
-    echo "Début de la sauvegarde du $DATESAUVEGARDE" > $TEXTE
-    cat "$TEXTE" >&4  && echo "" >&4
-    [ "$test" = "1" ] && cat "$TEXTE" >&3 && echo "" >&3
 }
 
 presence_repertoire_se3()
@@ -245,13 +308,15 @@ rediger_compte_rendu()
     cat /root/logrsyncprinters.txt >&3
     echo "--------------------" >&3
     tree -a $DESTINATION >&3
+    echo "--------------------" >&3
+    echo "Fin de la sauvegarde"
     OBJET="Sauvegarde Se3 : compte-rendu"
 }
 
 envoi_courriel()
 {
     # on envoie le compte-rendu
-    echo "Fin de la sauvegarde : envoi du compte-rendu vers $MAIL" > $TEXTE
+    echo "Sauvegarde du $DATESAUVEGARDE : envoi du compte-rendu vers $MAIL" > $TEXTE
     echo "" >&4 && cat "$TEXTE" >&4
     cat $COURRIEL | mail $MAIL -s "$OBJET" -a "Content-type: text/plain; charset=UTF-8"
 }
@@ -329,14 +394,21 @@ efface_log()
 #
 
 mode_script $1                # déterminer mode silencieux, verbeux ou test
+message_debut
 recuperer_mail                # récupération de l'adresse mel de l'admnistrateur
 
 # on vérifie si tout est en place pour lancer la sauvegarde
+tester_tree                                 # commande nécessaire pour le compte-rendu
+[ "$?" != "0" ] && test="4"
+tester_pgrep                                # commande indispensable (détection sauvegarde en cours)
+[ "$?" != "0" ] && test="4"
 presence_repertoire_se3                     # présence d'un répertoire de sauvegarde
 [ "$?" != "0" ] && test="2"
 [ "$test" != "2" ] && trouver_disque        # présence d'un disque externe monté dans le répertoire de sauvegarde
 [ "$?" != "0" ] && test="2"
 [ "$test" != "2" ] && deux_repertoires      # présence des sous-répertoires de sauvegarde (création si nécessaire)
+[ "$test" != "2" ] && tester_script_actif   # on vérifie si une sauvegarde est en cours
+[ "$?" != "0" ] && test="3"
 
 case $test in
     0)
@@ -353,15 +425,26 @@ case $test in
         echo "" >&3 && cat "$TEXTE" >&3
         OBJET="Test pour la sauvegarde"
     ;;
-    *)
+    2|4)
         # on ne lance pas la sauvegarde : système non en place pour la sauvegarde
-        echo "Système non en place : on ne lance pas la sauvegarde" > $TEXTE
+        echo "Système non en place : on ne lance pas la sauvegarde du $DATESAUVEGARDE" > $TEXTE
+        echo "Tenez-compte des indications données ci-dessus" >> $TEXTE
+        echo "puis relancez un test avant de sauvegarder" >> $TEXTE
         echo "" >&4 && cat "$TEXTE" >&4
     ;;
+    3)
+        # on ne lance pas la sauvegarde : le script est en cours d'utilisation
+        echo "La sauvegarde du $DATESAUVEGARDE n'est pas lancée." > $TEXTE
+        echo "" >&4 && cat "$TEXTE" >&4
+    ;;
+    *)
+        # autres cas à prévoir ?
+        true
+    ;;
 esac
-gestion_temps                # calculer la durée de la sauvegarde
-envoi_courriel               # envoi du compte-rendu par la messagerie à l'aide de la variable $MAIL
-#efface_log                  # possibilité de garder ou de supprimer le fichier de log (on garde si ligne commentée)
+gestion_temps       # calculer la durée de la sauvegarde
+envoi_courriel      # envoi du compte-rendu par la messagerie à l'aide de la variable $MAIL
+#efface_log         # possibilité de garder ou de supprimer le fichier de log (on garde si ligne commentée)
 
 #####
 # Fin du programme
