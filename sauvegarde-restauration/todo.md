@@ -9,4 +9,6 @@
 * modifications pour utiliser un NAS ou une ip ou un disque externe usb
 * ajout de modes d'utilisation pour le script de restauration : test, aide et restauration
 * ajout de tests dont la présence d'une sauvegarde en cours
+* ajout d'un test au sujet de la commande pgrep
+* installation de tree si nécessaire
 
