@@ -7,7 +7,7 @@
 # ou pour une migration d'un ancien serveur à un nouveau serveur se3
 #
 # version du 16/04/2014
-# modifiée le 23/05/2016
+# modifiée le 18/06/2016
 #
 # Auteurs :     Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
 #               François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
@@ -45,17 +45,17 @@
 # Elles sont modifiables pour adaptation à la situation locale
 # Elles sont à faire correspondre avec celles du script de sauvegarde si elles ont été modifiées
 #
-#MAIL="votre_adresse_mel"    # Adresse mel d'envoi du compte-rendu
+#MAIL="votre_adresse_mel"   # Adresse mel d'envoi du compte-rendu
 # cette variable MAIL est récupérée directement sur le se3
 # voir la fonction recuperer_mail ci-dessous
 ##### #####
-SAUV="SauveGarde"            # Nom du répertoire de sauvegarde de /var/se3/save
-SAUVHOME="SauveGardeHome"    # Nom du répertoire de sauvegarde de /home et de /var/se3
+SAUV="SauveGarde"           # Nom du répertoire de sauvegarde de /var/se3/save
+SAUVHOME="SauveGardeHome"   # Nom du répertoire de sauvegarde de /home et de /var/se3
 ##### #####
-DATE_RESTAURATION=$(date +%F+%0kh%0M)   # Date de la restauration
-DATE_JOUR=$(date +%A)                   # Jour de la restauration
-COURRIEL="/root/restauration_${DATE_RESTAURATION}.txt"       # compte-rendu de la restauration
-MONTAGE="/mnt/sav"
+DATE_RESTAURATION=$(date +%F+%0kh%0M)                   # Date de la restauration
+DATE_JOUR=$(date +%A)                                   # Jour de la restauration
+COURRIEL="/root/restauration_${DATE_RESTAURATION}.txt"  # compte-rendu de la restauration
+MONTAGE="/restaurese3"                                  # répertoire de montage pour le disque usb ou le NAS
 SAUVEGARDE=$MONTAGE/$SAUV
 SAUVEGARDEHOME=$MONTAGE/$SAUVHOME
 
@@ -402,7 +402,7 @@ rechercher_montage()
         test_montage=$(mount | grep $MONTAGE)
         if [ -z "${test_montage}" ]
         then
-            # pas de montage sur le répertoire /mnt/sav
+            # pas de montage sur le répertoire $MONTAGE
             # on peut abandonner cette piste
             return 1
         else
@@ -493,7 +493,7 @@ examiner_liste_candidats()
 trouver_disque()
 {
     echo -e "${neutre}\c"
-    # on repère si un montage est réalisé dans /mnt/save (disque usb ou NAS)
+    # on repère si un montage est réalisé dans $MONTAGE (disque usb ou NAS)
     rechercher_montage
     if [ "$?" = "0" ]
     then
@@ -618,7 +618,7 @@ echo -e ""
 [ "$mode_test" = "r" ] && echo -e "${neutre}"
 echo -e "N'oubliez pas de brancher, sur un port usb,"
 echo -e "→ le disque comportant une sauvegarde de votre se3"
-echo -e "ou bien de monter, dans le répertoire /mnt/sav,"
+echo -e "ou bien de monter, dans le répertoire $MONTAGE,"
 echo -e "→ le NAS comportant une sauvegarde de votre se3"
 echo -e "-------------------"
 [ "$mode_test" = "r" ] && echo -e "${bleu}Souhaitez-vous procéder à la restauration maintenant ? ${neutre}(oui ou  OUI)${vert} \c"
