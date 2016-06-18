@@ -5,7 +5,7 @@
 ##### Script permettant de sauvegarder les données importantes
 ##### pour une restauration du serveur SE3
 ##### version du 16/04/2014
-##### modifiée le 15/06/2016
+##### modifiée le 18/06/2016
 #
 # Auteurs :      Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
 #                François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
@@ -46,9 +46,9 @@
 # voir la fonction recuperer_mail ci-dessous
 COURRIEL="CR_sauvegarde.txt"            # compte-rendu de la sauvegarde
 ##### #####
-# à la place de /sauveserveur, on peut utiliser le répertoire /var/lib/backuppc (voir la doc)
+# à la place de /sauvese3, on peut utiliser le répertoire /var/lib/backuppc (voir la doc)
 # sur ce répertoire devra être monté le disque dur externe avant de lancer le script
-MONTAGE="/sauveserveur"                 # Chemin vers les répertoires de sauvegarde
+MONTAGE="/sauvese3"                 # Chemin vers les répertoires de sauvegarde
 SAV="SauveGarde"                        # Nom du répertoire de sauvegarde de /var/se3/save
 SAVHOME="SauveGardeHome"                # Nom du répertoire de sauvegarde de /home et de /var/se3
 ##### #####
@@ -128,7 +128,7 @@ tester_script_actif()
     # pour cela, on a besoin de la disponibilité de la commande pgrep
     # qui devrait être disponible sur les versions squeeze, wheezy et jessie de debian.
     
-    n=$(pgrep -f -c "$script_nom")
+    n=$(pgrep -c "^${script_nom}$")
     if [ "$n" != "1" ]
     then
         echo "Une sauvegarde est déjà en cours."
