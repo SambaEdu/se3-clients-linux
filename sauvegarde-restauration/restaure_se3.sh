@@ -31,7 +31,7 @@
 #    avec ce programme. Si ce n'est pas le cas, consultez
 #    <http://www.gnu.org/licenses/>] 
 #
-# Fonctionnalités : à utiliser conjointement au script sauve_serveur.sh
+# Fonctionnalités : à utiliser conjointement au script sauve_se3.sh
 # ce script fonctionne dans 2 modes (restauration et test)
 #                    -r → lancement de la restauration
 #                    -t → permet de tester que tout est en place sans lancer la restauration
@@ -45,13 +45,14 @@
 # Elles sont modifiables pour adaptation à la situation locale
 # Elles sont à faire correspondre avec celles du script de sauvegarde si elles ont été modifiées
 #
-#MAIL="votre_adresse_mel"   # Adresse mel d'envoi du compte-rendu
+#MAIL="votre_adresse_mel"                   # Adresse mel d'envoi du compte-rendu
 # cette variable MAIL est récupérée directement sur le se3
 # voir la fonction recuperer_mail ci-dessous
 ##### #####
-SAUV="SauveGarde"           # Nom du répertoire de sauvegarde de /var/se3/save
-SAUVHOME="SauveGardeHome"   # Nom du répertoire de sauvegarde de /home et de /var/se3
+SAUV="SauveGarde"                           # Nom du répertoire de sauvegarde de /var/se3/save
+SAUVHOME="SauveGardeHome"                   # Nom du répertoire de sauvegarde de /home et de /var/se3
 ##### #####
+script_nom="$(basename ${0})"                           # nom du script, sans le chemin
 DATE_RESTAURATION=$(date +%F+%0kh%0M)                   # Date de la restauration
 DATE_JOUR=$(date +%A)                                   # Jour de la restauration
 COURRIEL="/root/restauration_${DATE_RESTAURATION}.txt"  # compte-rendu de la restauration
@@ -120,7 +121,6 @@ mode_script()
 recuperer_mail()
 {
     # on récupère l'adresse mel de l'administrateur
-    echo -e "${jaune}`date +%R` ${neutre}Récupération de l'adresse de messagerie de l'administrateur${neutre}" 2>&1 | tee -a $COURRIEL
     MAIL=$(cat /etc/ssmtp/ssmtp.conf | grep ^root | cut -d "=" -f 2)
     echo -e "l'adresse de messagerie est $MAIL" 2>&1 | tee -a $COURRIEL
 }
@@ -270,7 +270,7 @@ abandonner()
 {
     echo -e "${neutre}"
     echo -e "${orange}Restauration abandonnée," 2>&1 | tee -a $COURRIEL
-    echo -e "vous pourrez la relancer en utilisant ${neutre}restaure_serveur.sh" 2>&1 | tee -a $COURRIEL
+    echo -e "vous pourrez la relancer en utilisant ${neutre}$script_nom" 2>&1 | tee -a $COURRIEL
     echo -e "${neutre}"
     # cas d'un montage préalable au lancement du script
     if [ -z "${test_montage}" ]
@@ -565,20 +565,22 @@ courriel()
 redemarrer()
 {
     echo -e "${neutre}Un compte-rendu de la restauration a été envoyé par la messagerie" 2>&1 | tee -a $COURRIEL
-    echo -e "${bleu}Souhaitez-vous redémarrer maintenant ? ${neutre}(oui ou OUI)${vert} \c"
-    read REPONSE2
-    case $REPONSE2 in
-        oui|OUI)
-            echo -e "${neutre}"
-            [ "$mode_test" = "t" ] && echo "on est en mode test : on ne redémarre pas"
-            [ "$mode_test" = "r" ] && reboot
+    if [ "$mode_test" = "r" ]
+    then
+        echo -e "${bleu}Souhaitez-vous redémarrer maintenant ? ${neutre}(oui ou OUI)${vert} \c"
+        read REPONSE2
+        case $REPONSE2 in
+            oui|OUI)
+                echo -e "${neutre}"
+                reboot
             ;;
-        *)
-            echo -e ""
-            echo -e "${neutre}À bientôt ! N'oubliez pas de redémarrer…${neutre}" 2>&1 | tee -a $COURRIEL
-            echo -e ""
+            *)
+                echo -e ""
+                echo -e "${neutre}À bientôt ! N'oubliez pas de redémarrer…${neutre}" 2>&1 | tee -a $COURRIEL
+                echo -e ""
             ;;
-    esac
+        esac
+    fi
 }
 
 restaurer_serveur()
