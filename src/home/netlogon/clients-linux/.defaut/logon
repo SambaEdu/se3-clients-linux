@@ -501,7 +501,7 @@ function monter_netlogon ()
 
     while [ ! "$n" -eq 1 ] && [ "$c" -le 4 ] ; do
         if [ "$n" -eq 0 ]; then
-            timeout "--signal=SIGTERM" 2s \
+            timeout "--signal=SIGTERM" 5s \
                 mount -t cifs "$CHEMIN_PARTAGE_NETLOGON" "$REP_NETLOGON" -o ro,guest,"$OPTIONS_MOUNT_CIFS_BASE"
         else
             # différent de 1 et de 0, ça veut dire que n > 1.
