@@ -129,7 +129,7 @@ tester_script_actif()
     # qui devrait être disponible sur les versions squeeze, wheezy et jessie de debian.
     
     n=$(pgrep -c "^${script_nom}$")
-    if [ "$n" != "1" ]
+    if [ "$n" != "0" ]
     then
         echo "Une sauvegarde est déjà en cours."
         return 1
