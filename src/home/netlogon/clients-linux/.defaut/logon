@@ -499,7 +499,7 @@ function monter_netlogon ()
         fi
     fi
 
-    while [ ! "$n" -eq 1 ] && [ "$c" -le 4 ] ; do
+    while [ ! "$n" -eq 1 ] && [ "$c" -le 11 ] ; do
         if [ "$n" -eq 0 ]; then
             timeout "--signal=SIGTERM" 5s \
                 mount -t cifs "$CHEMIN_PARTAGE_NETLOGON" "$REP_NETLOGON" -o ro,guest,"$OPTIONS_MOUNT_CIFS_BASE"
@@ -509,7 +509,7 @@ function monter_netlogon ()
             # Ici il faut démonter une fois REP_NETLOGON.
             umount "$REP_NETLOGON"
         fi
-        sleep 0.5
+        sleep 4
         n=$(donner_liste_montages | grep -c -- "^$REP_NETLOGON$")
         c=$((c+1))
     done
