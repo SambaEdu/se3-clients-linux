@@ -524,7 +524,7 @@ function monter_netlogon ()
         # Montage pas réussi
         local msg
         msg="Attention le montage du partage netlogon n'a pas pu se faire."
-        LC_ALL="$LOCALE_FRANCAISE" zenity --error --title "Pas de montage netlogon" --text "$message"
+        LC_ALL="$LOCALE_FRANCAISE" zenity --error --title "Pas de montage netlogon" --text "$msg"
         return 1
     fi
 }
