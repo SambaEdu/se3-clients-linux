@@ -5,7 +5,7 @@
 ##### Script permettant de sauvegarder les données importantes
 ##### pour une restauration du serveur SE3
 ##### version du 16/04/2014
-##### modifiée le 18/06/2016
+##### modifiée le 27/06/2016
 #
 # Auteurs :      Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
 #                François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
@@ -53,6 +53,8 @@ SAV="SauveGarde"                        # Nom du répertoire de sauvegarde de /v
 SAVHOME="SauveGardeHome"                # Nom du répertoire de sauvegarde de /home et de /var/se3
 ##### #####
 script_nom="$(basename ${0})"           # nom du script, sans le chemin
+nom_attendu="sauve_se3.sh"
+verrou="/run/lock/${script_nom}.pid"
 DESTINATION=$MONTAGE/$SAV               # Destination de sauvegarde de /var/se3/save
 DESTINATIONHOME=$MONTAGE/$SAVHOME       # Destination de sauvegarde de /home et de /var/se3
 DATESAUVEGARDE=$(date +%F+%0kh%0Mmin)   # Date et heure de la sauvegarde
@@ -63,6 +65,17 @@ TEXTE="texte.txt"                       # texte temporaire
 #----- -----
 # les fonctions
 #----- -----
+
+verifier_script_nom()
+{
+    if [ ${script_nom} != "$nom_attendu" ]
+    then
+        echo "commande incorrecte !"
+        echo "utilisez, par exemple, la commande suivante :"
+        echo "/usr/share/se3/sbin/$nom_attendu"
+        exit 4
+    fi
+}
 
 mode_texte()
 {
@@ -122,8 +135,40 @@ mode_script()
     fi
 }
 
+creer_verrou()
+{
+    # Si un fichier verrou existe…
+    if [ -e ${verrou} ]
+    then
+        echo "Fichier de verrou antérieur trouvé…"
+        # Vérifions si le processus est en cours
+        if [ -d /proc/$(cat ${verrou}) ]
+        then
+            # Si oui, fin de script
+            echo "Une sauvegarde est déjà en cours !"
+            return 1
+        else
+            # Si non le fichier n'a pas été supprimé, ce qui est anormal
+            echo "Processus terminé mais verrou encore présent !"
+            return 2
+        fi
+    else
+        # pas de fichier verrou donc pas de sauvegarde en cours
+        # Création du fichier verrou
+        echo ${$} > ${verrou}
+        return 0
+    fi
+}
+
+supprimer_verrou()
+{
+    # Nettoyage du verrou :
+    [ -e ${verrou} ] && rm ${verrou} || echo "tiens, le verrou n'est plus là ? C'est anormal !"
+}
+
 tester_script_actif()
 {
+    # fonction inutilisée
     # on teste si une sauvegarde est en cours
     # pour cela, on a besoin de la disponibilité de la commande pgrep
     # qui devrait être disponible sur les versions squeeze, wheezy et jessie de debian.
@@ -403,12 +448,12 @@ efface_log()
 #####
 # Début du programme
 #
+verifier_script_nom
 recuperer_mail              # récupération de l'adresse mel de l'admnistrateur
-tester_pgrep                # commande indispensable pour détecter une sauvegarde en cours
-[ "$?" != "0" ] && exit 1
-tester_script_actif         # déterminer présence d'une sauvegarde en cours
 [ "$?" != "0" ] && exit 1
 mode_script $1              # déterminer mode silencieux, verbeux ou test
+creer_verrou                # pose d'un verrou avec détection d'un verrou antérieur
+[ "$?" != "0" ] && exit 5
 message_debut
 # on vérifie si tout est en place pour lancer la sauvegarde
 tester_tree                                 # commande nécessaire pour le compte-rendu
@@ -451,7 +496,7 @@ esac
 gestion_temps       # calculer la durée de la sauvegarde
 envoi_courriel      # envoi du compte-rendu par la messagerie à l'aide de la variable $MAIL
 #efface_log         # possibilité de garder ou de supprimer le fichier de log (on garde si ligne commentée)
-
+supprimer_verrou
 #####
 # Fin du programme
 exit 0
