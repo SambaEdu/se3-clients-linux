@@ -449,10 +449,10 @@ efface_log()
 # Début du programme
 #
 verifier_script_nom
-recuperer_mail              # récupération de l'adresse mel de l'admnistrateur
-[ "$?" != "0" ] && exit 1
 creer_verrou                # pose d'un verrou avec détection d'un verrou antérieur
 [ "$?" != "0" ] && exit 5
+recuperer_mail              # récupération de l'adresse mel de l'admnistrateur
+[ "$?" != "0" ] && exit 1
 mode_script $1              # déterminer mode silencieux, verbeux ou test
 message_debut
 # on vérifie si tout est en place pour lancer la sauvegarde
