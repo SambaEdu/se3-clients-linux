@@ -2098,7 +2098,7 @@ apt-get autoremove -y >> $SORTIE 2>&1
 #=====
 # FIN DE L'INTÉGRATION
 #=====
-afficher "Fin de l'intégration." \
+afficher "Fin de l'intégration."
 decompte_10s
 
 # fin du programme
