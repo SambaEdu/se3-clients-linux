@@ -5,7 +5,7 @@
 ##### Script permettant de sauvegarder les données importantes
 ##### pour une restauration du serveur SE3
 ##### version du 16/04/2014
-##### modifiée le 27/06/2016
+##### modifiée le 29/06/2016
 #
 # Auteurs :      Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
 #                François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
@@ -119,18 +119,24 @@ mode_script()
             -h)
                 # on affiche l'aide
                 mode_texte
+                # on supprime le verrou
+                supprimer_verrou
                 exit 0
             ;;
             *)
                 echo "paramètre $1 incorrect"
                 # on affiche l'aide
                 mode_texte
+                # on supprime le verrou
+                supprimer_verrou
                 exit 2
             ;;
         esac
     else
         echo "la commande doit avoir un paramètre"
         mode_texte
+        # on supprime le verrou
+        supprimer_verrou
         exit 3
     fi
 }
@@ -449,11 +455,11 @@ efface_log()
 # Début du programme
 #
 verifier_script_nom
-creer_verrou                # pose d'un verrou avec détection d'un verrou antérieur
+creer_verrou                                # pose d'un verrou avec détection d'un verrou antérieur
 [ "$?" != "0" ] && exit 5
-recuperer_mail              # récupération de l'adresse mel de l'admnistrateur
-[ "$?" != "0" ] && exit 1
-mode_script $1              # déterminer mode silencieux, verbeux ou test
+recuperer_mail                              # récupération de l'adresse mel de l'admnistrateur
+[ "$?" != "0" ] && supprimer_verrou && exit 1
+mode_script $1                              # déterminer mode silencieux, verbeux ou test
 message_debut
 # on vérifie si tout est en place pour lancer la sauvegarde
 tester_tree                                 # commande nécessaire pour le compte-rendu
