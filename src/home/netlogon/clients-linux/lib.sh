@@ -89,6 +89,14 @@ install_open_sankore()
     return 0
 }
 
+install_wine()
+{
+    echo "Installation de wine-development" | tee -a "$compte_rendu"
+    dpkg --add-architecture i386 && apt update -q2  > /dev/null 2>&1
+    apt-get install -y wine wine-development
+    return 0
+}
+
 # 3. Funtions used by ltsp 
 
 ############################################################################################################################
