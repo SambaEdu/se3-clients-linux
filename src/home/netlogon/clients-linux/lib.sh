@@ -91,6 +91,7 @@ install_open_sankore()
 
 install_wine()
 {
+	local compte_rendu="$1"
     echo "Installation de wine-development" | tee -a "$compte_rendu"
     dpkg --add-architecture i386 && apt update -q2  > /dev/null 2>&1
     apt-get install -y wine wine-development
