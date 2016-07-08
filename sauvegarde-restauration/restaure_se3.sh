@@ -118,6 +118,14 @@ mode_script()
     fi
 }
 
+recuperer_version_se3()
+{
+    # on récupère le n° de version de Debian
+    # 6 → squeeze
+    # 7 → wheezy
+    n_version_debian=$(cat /etc/debian_version | cut -f1 -d".")
+}
+
 recuperer_mail()
 {
     # on récupère l'adresse mel de l'administrateur
@@ -237,7 +245,16 @@ restaure_samba()
     echo -e "${jaune}`date +%R` ${neutre}Restauration de Samba" 2>&1 | tee -a $COURRIEL
     cp -ar $SAUVEGARDEHOME/samba/* /etc/samba
     echo -e "${jaune}`date +%R` ${neutre}Restauration du secrets.tdb" 2>&1 | tee -a $COURRIEL
-    cp $SAUVEGARDE/secrets.tdb /var/lib/samba/secrets.tdb
+    # le fichier secrets.tdb a été sauvegardé à partir du répertoire /var/se3/save
+    # si la version du se3 est inférieure à wheezy (7 → wheezy)
+    if [ "$n_version_debian" -lt "7" ]
+    then
+        # remise en place du fichier secrets.tdb
+        cp $SAUVEGARDE/secrets.tdb /var/lib/samba/secrets.tdb
+    else
+        # la place du fichier secrets.tdb a changé à partir de wheezy
+        cp $SAUVEGARDE/secrets.tdb /var/lib/samba/private/secrets.tdb
+    fi
 }
 
 restaure_imprimantes()
@@ -609,6 +626,7 @@ restaurer_serveur()
 # Début du programme
 #
 mode_script "$@"
+recuperer_version_se3
 echo -e "" > $COURRIEL
 echo -e "${bleu}Restauration du se3 ${neutre}${DATE_RESTAURATION}${neutre}\n" 2>&1 | tee -a $COURRIEL
 [ "$mode_test" = "r" ] && echo -e "Ce script va restaurer la configuration de votre SE3 à partir d'une sauvegarde"
