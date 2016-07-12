@@ -172,12 +172,23 @@ restaure_varse3home()
         read REPONSE
         case $REPONSE in
             oui|OUI)
+                if [ ! -e "/usr/bin/convmv" ]
+                then
+                    echo "convmv n'est pas installé, on l'installe"
+                    apt-get install convmv
+                fi
                 echo -e "${jaune}`date +%R` ${neutre}Restauration des homes" 2>&1 | tee -a $COURRIEL
-                cd /
-                cp -ar $SAUVEGARDEHOME/home/* /home
+                #cd /
+                #cp -ar $SAUVEGARDEHOME/home/* /home
+                # ne pas restaurer ni /home/netlogon/Default User, ni /home/profiles
+                rsync -a --del --ignore-errors --force --exclude="/netlogon/Default User" --exclude="/profiles" $SAUVEGARDEHOME/home/ /home > /root/logrsynchome.txt 2>&1
+                # conversion des fichiers utilisateurs en UTF-8
+                /usr/bin/convmv --notest -f iso-8859-15 -t utf-8 -r /home 2>&1 | grep -v Skipping | tee -a $COURRIEL
                 echo -e "${jaune}`date +%R` ${neutre}Restauration de /var/se3" 2>&1 | tee -a $COURRIEL
                 cd /
                 cp -ar $SAUVEGARDEHOME/se3/* /var/se3
+                # conversion des fichiers utilisateurs en UTF-8
+                /usr/bin/convmv --notest -f iso-8859-15 -t utf-8 -r /var/se3 2>&1 | grep -v Skipping | tee -a $COURRIEL
                 echo -e "${jaune}`date +%R` ${neutre}Restauration des ACL de /var/se3" 2>&1 | tee -a $COURRIEL
                 cd /var/se3
                 setfacl --restore=$SAUVEGARDEHOME/varse3.acl
