@@ -7,7 +7,7 @@
 # ou pour une migration d'un ancien serveur à un nouveau serveur se3
 #
 # version du 16/04/2014
-# modifiée le 12/07/2016
+# modifiée le 11/09/2016
 #
 # Auteurs :     Louis-Maurice De Sousa louis.de.sousa@crdp.ac-versailles.fr
 #               François-Xavier Vial Francois.Xavier.Vial@crdp.ac-versailles.fr
@@ -121,6 +121,7 @@ mode_script()
 recuperer_version_se3()
 {
     # on récupère le n° de version de Debian
+    # 5 → lenny
     # 6 → squeeze
     # 7 → wheezy
     n_version_debian=$(cat /etc/debian_version | cut -f1 -d".")
@@ -180,15 +181,25 @@ restaure_varse3home()
                 echo -e "${jaune}`date +%R` ${neutre}Restauration des homes" 2>&1 | tee -a $COURRIEL
                 #cd /
                 #cp -ar $SAUVEGARDEHOME/home/* /home
+                # pour une version du se3 à partir de wheezy
                 # ne pas restaurer ni /home/netlogon/Default User, ni /home/profiles
-                rsync -a --del --ignore-errors --force --exclude="/netlogon/Default User" --exclude="/profiles" $SAUVEGARDEHOME/home/ /home > /root/logrsynchome.txt 2>&1
-                # conversion des fichiers utilisateurs en UTF-8
-                /usr/bin/convmv --notest -f iso-8859-15 -t utf-8 -r /home 2>&1 | grep -v Skipping | tee -a $COURRIEL
+                # et convertir les fichiers utilisateurs en UTF-8
+                if [ "$n_version_debian" -ge "7" ]
+                then
+                    rsync -a --del --ignore-errors --force --exclude="/netlogon/Default User" --exclude="/profiles" $SAUVEGARDEHOME/home/ /home > /root/logrsynchome.txt 2>&1
+                    /usr/bin/convmv --notest -f iso-8859-15 -t utf-8 -r /home 2>&1 | grep -v Skipping | tee -a $COURRIEL
+                else
+                    rsync -a --del --ignore-errors --force $SAUVEGARDEHOME/home/ /home > /root/logrsynchome.txt 2>&1
+                fi
                 echo -e "${jaune}`date +%R` ${neutre}Restauration de /var/se3" 2>&1 | tee -a $COURRIEL
                 cd /
                 cp -ar $SAUVEGARDEHOME/se3/* /var/se3
+                # pour une version du se3 à partir de wheezy
                 # conversion des fichiers utilisateurs en UTF-8
-                /usr/bin/convmv --notest -f iso-8859-15 -t utf-8 -r /var/se3 2>&1 | grep -v Skipping | tee -a $COURRIEL
+                if [ "$n_version_debian" -ge "7" ]
+                then
+                    /usr/bin/convmv --notest -f iso-8859-15 -t utf-8 -r /var/se3 2>&1 | grep -v Skipping | tee -a $COURRIEL
+                fi
                 echo -e "${jaune}`date +%R` ${neutre}Restauration des ACL de /var/se3" 2>&1 | tee -a $COURRIEL
                 cd /var/se3
                 setfacl --restore=$SAUVEGARDEHOME/varse3.acl
