@@ -1,0 +1,44 @@
+[
+    {
+        "mount_id": 1,
+        "mount_point": "\/Classes (sur le se3)",
+        "storage": "\\OCA\\Files_External\\Lib\\Storage\\SMB",
+        "authentication_type": "password::sessioncredentials",
+        "configuration": {
+            "host": "__IPSE3__",
+            "share": "Classes",
+            "root": "",
+            "domain": ""
+        },
+        "options": {
+            "encrypt": true,
+            "previews": true,
+            "enable_sharing": false,
+            "filesystem_check_changes": 1,
+            "encoding_compatibility": false
+        },
+        "applicable_users": [],
+        "applicable_groups": []
+    },
+    {
+        "mount_id": 2,
+        "mount_point": "\/Docs (sur le se3)",
+        "storage": "\\OCA\\Files_External\\Lib\\Storage\\SMB",
+        "authentication_type": "password::sessioncredentials",
+        "configuration": {
+            "host": "__IPSE3__",
+            "share": "home",
+            "root": "Docs",
+            "domain": ""
+        },
+        "options": {
+            "encrypt": true,
+            "previews": true,
+            "enable_sharing": false,
+            "filesystem_check_changes": 1,
+            "encoding_compatibility": false
+        },
+        "applicable_users": [],
+        "applicable_groups": []
+    }
+]

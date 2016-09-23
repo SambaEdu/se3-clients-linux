@@ -29,9 +29,8 @@ case "$@" in
             ;;
             
             9.1)
-                echo "La version 9.1 d'Owncloud n'est pas encore sortie ... : on quitte le script d'installation" 
+                echo "La version 9.1 d'Owncloud va être installée sur votre se3" 
                 VERSION_OC="9.1"
-                exit 1
             ;;
             
             9.2)
@@ -41,8 +40,8 @@ case "$@" in
             ;;
             
             *) 
-                echo "La version stable d'Owncloud va être installée sur votre se3"
-                VERSION_OC="stable"
+                echo "La dernière version stable d'Owncloud va être installée sur votre se3"
+                VERSION_OC="9.1"
             ;;
 esac
 
@@ -76,10 +75,16 @@ rep_courant=$(pwd)
 
 echo "Etape 3 : Récupération sur github du fichier .json pour le Stockage externe"
 # Récupération du fichier .json décrivant les partages Samba du module Stockage externe
-wget https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/owncloud/partages_samba_se3.json > "$SORTIE" 2>&1
+if [ "$VERSION_OC"="9.0" ]
+then
+	wget https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/owncloud/partages_samba_se3_V90.json -O partages_samba_se3.json > "$SORTIE" 2>&1
+else
+	wget https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/owncloud/partages_samba_se3_V91.json -O partages_samba_se3.json > "$SORTIE" 2>&1
+fi
 
 echo "Etape 4 : Installation complémentaires de paquets web nécessaires à Owncloud"
 #  La procédure d'installation suivie ici est celle décrite pour un serveur Ubuntu Trusty dans la doc officielle d'OC
+apt-get update >> "$SORTIE" 2>&1
 apt-get install -y apache2 libapache2-mod-php5 >> "$SORTIE" 2>&1
 apt-get install -y php5-gd php5-json php5-mysql php5-curl >> "$SORTIE" 2>&1
 apt-get install -y php5-intl php5-mcrypt php5-imagick >> "$SORTIE" 2>&1
@@ -277,13 +282,17 @@ sudo -u "$htuser" php occ ldap:set-config "" ldapGroupFilter "$filtre_groupes2"
 echo "Etape 8.4 : Configuration du module Stockage Externe CIFS/SMB"
 ##################################################################
 
+###################################################################################################
+# Le paquet php5-libsmbclient n'est utile que pour les versions 8.x d'OC et semble intégré à 9.x
+###################################################################################################
 # Pour un bon fonctionnement de ce module, la documentation recommande d'installer php5-libsmbclient
-echo "deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/$VERSION_SE3/ /" > /etc/apt/sources.list.d/php5-libsmbclient.list
-wget "http://download.opensuse.org/repositories/isv:ownCloud:community/$VERSION_SE3/Release.key" >> "$SORTIE" 2>&1
-apt-key add - < Release.key
-rm -f Release.key
-apt-get update >> "$SORTIE" 2>&1
-apt-get install -y smbclient php5-libsmbclient >> "$SORTIE" 2>&1 
+#echo "deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/$VERSION_SE3/ /" > /etc/apt/sources.list.d/php5-libsmbclient.list
+#wget "http://download.opensuse.org/repositories/isv:ownCloud:community/$VERSION_SE3/Release.key" >> "$SORTIE" 2>&1
+#apt-key add - < Release.key
+#rm -f Release.key
+#apt-get update >> "$SORTIE" 2>&1
+#apt-get install -y smbclient php5-libsmbclient >> "$SORTIE" 2>&1 
+apt-get install -y smbclient >> "$SORTIE" 2>&1 
 
 # Activation du module de stockage externe 
 sudo -u "$htuser" php occ app:enable files_external
@@ -481,7 +490,7 @@ echo "Etape 9 : Suppression d'Owncloud de la liste des dépôts du se3 afin d'é
 echo "Pour réaliser une maj d'OC, il faudra lancer à la main le script /usr/share/se3/scripts/upgrade_owncloud.sh "
 #################################################################################################################
 
-rm -f /etc/apt/sources.list.d/owncloud.list /etc/apt/sources.list.d/php5-libsmbclient.list  >> "$SORTIE" 2>&1
+rm -f /etc/apt/sources.list.d/owncloud.list # /etc/apt/sources.list.d/php5-libsmbclient.list  >> "$SORTIE" 2>&1
 apt-get update >> "$SORTIE" 2>&1
 
 # Création du scritp pour faire un upgrade d'Owncloud
@@ -507,9 +516,8 @@ case "$@" in
             ;;
             
             9.1)
-                echo "La version 9.1 d'Owncloud n'est pas encore sortie ... : la maj n'est pas encore possible" 
+                echo "Mise à jour vers la version 9.1 d'OC" 
                 VERSION_OC="9.1"
-                exit 1
             ;;
             
             9.2)
@@ -520,7 +528,7 @@ case "$@" in
             
             *) 
                 echo "La maj va être réalisée vers la version stable d'Owncloud"
-                VERSION_OC="stable"
+                VERSION_OC="9.1"
             ;;
 esac
 
@@ -537,7 +545,7 @@ chmod -R 750 /var/www/owncloud
 
 # On rajoute temporairement les dépots pour faire la maj
 echo "deb http://download.owncloud.org/download/repositories/$VERSION_OC/$VERSION_SE3/ /" > /etc/apt/sources.list.d/owncloud.list
-echo "deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/$VERSION_SE3/ /" > /etc/apt/sources.list.d/php5-libsmbclient.list
+#echo "deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/$VERSION_SE3/ /" > /etc/apt/sources.list.d/php5-libsmbclient.list
 
 # On place OC en mode maintenance pour couper son accès aux utilisateurs
 # sudo -u www-data php occ maintenance:mode --on
@@ -574,7 +582,7 @@ sudo -u www-data php occ config:system:set datadirectory --value="/var/se3/dataO
 mv /var/www/owncloud/data /var/se3/dataOC
 
 # On supprime les depots d'OC pour éviter une maj d'OC non désirée (via un apt-get upgrade du se3 ...)
-rm -f /etc/apt/sources.list.d/owncloud.list /etc/apt/sources.list.d/php5-libsmbclient.list
+rm -f /etc/apt/sources.list.d/owncloud.list # /etc/apt/sources.list.d/php5-libsmbclient.list
 # On remet à jour apt-get
 apt-get update
 
@@ -598,6 +606,9 @@ echo " Etape 10 : Installation des applications bookmarks et autres applications
 
 
 #installation de l'application favoris
+# cette version de boomarks ne semble pas compatible avec OC 9.1
+if [ "$VERSION_OC"="9.0" ]
+then
 # l'application bookmarks est maintenant dans les applications officielles présentes il faut la télécharger et l activer
 
 cd /var/www/owncloud/apps/
@@ -608,6 +619,8 @@ chown -R www-data:www-data bookmarks >> "$SORTIE" 2>&1
 rm  -f bookmarks.zip >> "$SORTIE" 2>&1
 cd ..
 sudo -u www-data php occ app:enable bookmarks
+
+fi
 
 #announcement center pour envoyer une notification à tous les utilisateurs du cloud.
 cd /var/www/owncloud/apps/
