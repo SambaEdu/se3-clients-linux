@@ -1,4 +1,12 @@
 #!/bin/sh
+
+#Maj du 23/09/2016 :
+# - script mise à jour pour installer la version 9.1 d'OC
+# - la structure fichier .json décrivant les partages smb du se3 a été légerement modifié d'où la création de deux fichiers .json, l'un pour la V9.0 et un autre pour la V9.1
+# - suppression du paquet lib-phpsmbclient qui est inutile depuis la version 9.x d'OC
+# - le logiciel bookmark ne semble pas compatible avec la version 9.1 d'OC
+# - le script d'upgrade de 9.0 -> 9.1 semble fonctionnel à part un warning signalant à l'administrateur que la structure d'OC a été modifié à cause de la sauvegarde du skel original "core/skel_save" : peut-etre faudrait-il la supprimer.
+
 # Rédigé par Nicolas Aldegheri le 29/04/2016
 # Sous licence GNU/Linux
 # Ce script intégre Owncloud sur un serveur SE3 wheezy. L'intégration consiste à :
@@ -75,7 +83,7 @@ rep_courant=$(pwd)
 
 echo "Etape 3 : Récupération sur github du fichier .json pour le Stockage externe"
 # Récupération du fichier .json décrivant les partages Samba du module Stockage externe
-if [ "$VERSION_OC"="9.0" ]
+if [ "$VERSION_OC" = "9.0" ]
 then
 	wget https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/owncloud/partages_samba_se3_V90.json -O partages_samba_se3.json > "$SORTIE" 2>&1
 else
@@ -607,7 +615,7 @@ echo " Etape 10 : Installation des applications bookmarks et autres applications
 
 #installation de l'application favoris
 # cette version de boomarks ne semble pas compatible avec OC 9.1
-if [ "$VERSION_OC"="9.0" ]
+if [ "$VERSION_OC" = "9.0" ]
 then
 # l'application bookmarks est maintenant dans les applications officielles présentes il faut la télécharger et l activer
 
