@@ -628,8 +628,6 @@ rm  -f bookmarks.zip >> "$SORTIE" 2>&1
 cd ..
 sudo -u www-data php occ app:enable bookmarks
 
-fi
-
 #announcement center pour envoyer une notification à tous les utilisateurs du cloud.
 cd /var/www/owncloud/apps/
 wget https://github.com/owncloud/announcementcenter/releases/download/v1.1.2/announcementcenter-1.1.2.zip >> "$SORTIE" 2>&1
@@ -675,6 +673,7 @@ sudo -u www-data php /var/www/owncloud/occ app:enable calendar >> "$SORTIE" 2>&1
 #cd apps
 #rm -f master.zip
 
+fi
 
 #################################################################################################################
 echo " Fin de l'installation : vous devez pouvoir vous connecter à votre serveur owncloud à l'adresse http://IP_SE3/owncloud"
