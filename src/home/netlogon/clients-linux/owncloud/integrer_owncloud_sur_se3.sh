@@ -160,7 +160,8 @@ chown -R "$htuser":"$htgroup" "$ocpath" >> "$SORTIE" 2>&1
 cd "$ocpath" >> "$SORTIE" 2>&1
 
 # Création du skelette pour les utilisateurs d'OC
-mv "$ocpath/core/skeleton" "$ocpath/core/skeleton_save" 
+# mv "$ocpath/core/skeleton" "$ocpath/core/skeleton_save" 
+rm -rf "$ocpath/core/skeleton"
 mkdir -p "$ocpath/core/skeleton/Cloud"
 chown -R "$htuser":"$htgroup" "$ocpath/core/skeleton"
 
