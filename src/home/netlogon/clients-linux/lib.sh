@@ -5,6 +5,24 @@
 ###                                     ###
 ###########################################
 
+# 0. Funtions used by integration_xxxx scripts
+
+############################################################################################################################
+# This function configure polkit to prevent user desactivating network via Network Manager icon
+# with Network Manager, users can desactivate network and this persist when session is closed (and after rebooting the station under xenial)
+############################################################################################################################
+
+polkit_desactivate_network_manager_icon()
+{
+cat <<'EOF' >/etc/polkit-1/localauthority/30-site.d/network-manager-policy.pkla 
+[NetworkManager permissions]
+Identity=unix-user:*
+Action=org.freedesktop.NetworkManager.*
+ResultAny=no
+ResultInactive=no
+ResultActive=no
+EOF
+}
 
 # 1. Funtions used in install_clients_linux_mise_en_place.sh script
 

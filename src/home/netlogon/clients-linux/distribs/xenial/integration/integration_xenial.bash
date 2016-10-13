@@ -2091,6 +2091,13 @@ preconfigurer_libpam_runtime
 # pour ocs, cela est fait au niveau de la post-install
 #preconfigurer_ocsinventory
 
+#=====
+# Xenial : avec l'utilisation de Network Manager pour gérer le réseau, il est possible à un utilisateur non root de désactiver le réseau 
+# via l'icone de Network Manager et cela fait désactive de façon permanente le réseau pour tous les utilisateurs (même après un reboot 
+# de la machine ...). Pour éviter ce comportement, on désactive via polkit le bouton qui permet à l'utilisateur de désactiver le réseau
+#=====
+polkit_desactivate_network_manager_icon
+
 # Depuis Xenial :
 afficher "Suppression de la liste de paquets inutilisés"
 apt-get autoremove -y >> $SORTIE 2>&1

@@ -1643,6 +1643,13 @@ then
 fi
 
 #=====
+# Jessie : avec l'utilisation de Network Manager pour gérer le réseau, il est possible à un utilisateur non root de désactiver le réseau 
+# via l'icone de Network Manager et cela fait planter la fermeture de session ...
+# pour éviter ce comportement, on désactive via polkit le bouton qui permet à l'utilisateur de désactiver le réseau
+#=====
+polkit_desactivate_network_manager_icon
+
+#=====
 # Fin de l'intégration
 #=====
 # suppression de la liste des paquets inutilisés
