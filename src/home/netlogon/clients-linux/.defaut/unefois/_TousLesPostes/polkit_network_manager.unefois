@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#=====
+# Xenial et Jessie : avec l'utilisation de Network Manager pour gérer le réseau, il est possible à un utilisateur non root de désactiver le réseau 
+# via l'icone de Network Manager et cela fait désactive de façon permanente le réseau pour tous les utilisateurs (même après un reboot 
+# de la machine ...). Pour éviter ce comportement, on désactive via polkit le bouton qui permet à l'utilisateur de désactiver le réseau
+#=====
+
+
+cat <<'EOF' >/etc/polkit-1/localauthority/30-site.d/network-manager-policy.pkla 
+[NetworkManager permissions]
+Identity=unix-user:*
+Action=org.freedesktop.NetworkManager.*
+ResultAny=no
+ResultInactive=no
+ResultActive=no
+EOF
