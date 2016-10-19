@@ -1,9 +1,9 @@
 Package: se3-clients-linux
-Version: 2.1.1
+Version: 2.1.2
 Section: misc
 Priority: optional
 Architecture: all
-Depends: se3-domain, se3-logonpy (>>2.3.7216)
+Depends: se3-domain, se3-logonpy (>= 2.7)
 Maintainer: François Lafont <francois.lafont@ac-versailles.fr>
 Homepage: https://github.com/flaf/se3-clients-linux
 Description: To support Linux clients integration in a Se3 domain
