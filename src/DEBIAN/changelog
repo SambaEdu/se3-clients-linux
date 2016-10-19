@@ -116,5 +116,7 @@ Juin 2016
 - Correctifs et optimisations
 - Intégration ltsp et owncloud
 
+10/2016
+- Ajout de l'option raw NTLMv2 auth = yes pour compatibilité samba 4.4
 
 
