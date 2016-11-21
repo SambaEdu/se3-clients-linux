@@ -392,7 +392,7 @@ definir_paquets_a_installer()
     PAQUETS_MONTAGE_CIFS="cifs-utils"
     PAQUETS_CLIENT_LDAP="ldap-utils"
     #PAQUETS_AUTRES="libnss-ldapd libpam-ldapd nscd nslcd libpam-script rsync ntpdate xterm imagemagick"
-    PAQUETS_AUTRES="libnss-ldapd libpam-ldapd nscd nslcd libpam-script rsync ntpdate"
+    PAQUETS_AUTRES="libnss-ldapd libpam-ldapd nscd nslcd libpam-script rsync ntpdate nmap sudo"
     if "$OPTION_INSTALLER_SAMBA"
     then
         PAQUETS_AUTRES="$PAQUETS_AUTRES samba"
@@ -603,6 +603,15 @@ verifier_acces_ping_se3()
 
 verifier_acces_nmap_se3()
 {
+    # On vérifie si le paquet nmap est présent
+    if ! which nmap >/dev/null
+    then
+        apt-get install --yes  nmap >> $SORTIE 2>&1
+        return 0
+    else
+        # le paquet nmap est présent
+        return 0
+    fi
     # Certains réseaux comportent des vlans bloquant les pings
     # on utilise nmap, avec l'option -sP pour scan Ping (plus rapide !)
     test_se3=$(nmap -sP $SE3 | grep "1 host up")
@@ -612,7 +621,6 @@ verifier_acces_nmap_se3()
                  "Fin du script."
         exit 1
     fi
-    
 }
 
 
@@ -1082,7 +1090,14 @@ installer_paquet_sudo()
 {
     # Pour le script logon, l'installation du paquet sudo est nécessaire
     #
-    apt-get install --yes  sudo >> $SORTIE 2>&1
+    if ! which sudo >/dev/null
+    then
+        apt-get install --yes  sudo >> $SORTIE 2>&1
+        return 0
+    else
+        # le paquet sudo est présent
+        return 0
+    fi
 }
 
 
