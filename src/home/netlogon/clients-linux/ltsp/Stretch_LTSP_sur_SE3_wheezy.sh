@@ -361,7 +361,7 @@ EOF
 # - pref : set pref, but allow changes in current session
 # - lockPref : lock pref, disallow changes
 
-	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/iceweasel/pref/iceweasel.js"
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/firefox-esr/firefox-esr.js"
 
 // Define proxy when an IP and PORT are specified
 lockPref("network.proxy.share_proxy_settings", true);
@@ -375,7 +375,7 @@ else
 
 # On règle le proxy d'Iceweasel avec l'option "Détection automatique des paramètres proxy pour ce réseau"
 # Cette option permet de gérer les réseaux qui n'ont pas de proxy (proxy transparent) ainsi que ceux gérés par un fichier wpad.dat (avec Amon par exemple)
-cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/etc/iceweasel/pref/iceweasel.js"
+cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/etc/firefox-esr/firefox-esr.js"
 
 // Define proxy when no IP is specified for proxy
 lockPref("network.proxy.type", 4);
@@ -421,7 +421,7 @@ EOF
 
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade 
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano aptitude less firmware-linux wine gstreamer0.10-fluendo-mp3 ttf-mscorefonts-installer vlc iceweasel-l10n-fr system-config-printer numlockx
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano aptitude less firmware-linux wine gstreamer0.10-fluendo-mp3 ttf-mscorefonts-installer vlc firefox-esr-l10n-fr system-config-printer numlockx
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y flashplugin-nonfree
 ltsp-chroot -m --arch "$ENVIRONNEMENT" update-flashplugin-nonfree --install
 
