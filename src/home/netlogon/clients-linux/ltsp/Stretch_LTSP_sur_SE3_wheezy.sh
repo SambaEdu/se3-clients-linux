@@ -99,6 +99,7 @@ echo "--------------------------------------------------------------------------
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/lts.conf"
 [default]
 LTSP_CONFIG=true
+KEEP_SYSTEM_SERVICES="lightdm"      # Indique à l'environnement du client lourd de lancer lightdm lors du démarrage
 DEFAULT_DISPLAY_MANAGER=""          # Lance le gestionnaire d'affichage présent dans l'environnement des clients lourds (lightdm) à la place de LDM
 EOF
 
