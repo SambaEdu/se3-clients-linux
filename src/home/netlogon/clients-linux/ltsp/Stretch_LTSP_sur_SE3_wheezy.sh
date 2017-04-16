@@ -83,7 +83,7 @@ service nfs-kernel-server restart
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 3-Construction de l environnement $ENVIRONNEMENT pour les clients lourds Stretch														"
 echo "------------------------------------------------------------------------------------------------------------------------------"
-ltsp-build-client --arch i386 --chroot "$ENVIRONNEMENT" --fat-client-desktop "task-$BUREAU-desktop" --dist stretch --mirror http://ftp.fr.debian.org/debian/ --locale fr_FR.UTF-8 --prompt-rootpass --purge-chroot
+ltsp-build-client --arch i386 --chroot "$ENVIRONNEMENT" --fat-client-desktop "task-$BUREAU-desktop" --dist stretch --mirror http://ftp.fr.debian.org/debian/ --locale fr_FR.UTF-8 --kernel-packages linux-image-686 --prompt-rootpass --purge-chroot
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 4-Creation d'un compte local enseignant dans l'environnement des clients lourds												"
