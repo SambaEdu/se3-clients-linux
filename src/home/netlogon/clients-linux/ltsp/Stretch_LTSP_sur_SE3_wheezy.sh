@@ -421,7 +421,7 @@ EOF
 
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade 
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano aptitude less firmware-linux wine gstreamer0.10-fluendo-mp3 ttf-mscorefonts-installer vlc firefox-esr-l10n-fr system-config-printer numlockx
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano aptitude less firmware-linux wine ttf-mscorefonts-installer vlc firefox-esr-l10n-fr system-config-printer numlockx
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y flashplugin-nonfree
 ltsp-chroot -m --arch "$ENVIRONNEMENT" update-flashplugin-nonfree --install
 
