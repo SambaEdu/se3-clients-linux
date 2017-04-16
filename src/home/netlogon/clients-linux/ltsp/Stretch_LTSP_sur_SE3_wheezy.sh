@@ -427,9 +427,12 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" update-flashplugin-nonfree --install
 
 # Ajout du navigateur Chromium et de flash pour Chromium
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y chromium chromium-l10n
+
+if [ "$ENVIRONNEMENT" = "amd64" ]
+then 
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonfree
 ltsp-chroot -m --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
-
+fi
 
 echo "--------------------------------------------------------------------------------------"
 echo " 12-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
