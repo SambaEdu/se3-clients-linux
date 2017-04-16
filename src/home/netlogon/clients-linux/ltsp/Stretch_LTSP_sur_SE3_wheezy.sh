@@ -477,7 +477,7 @@ if [ "$resultat" = "" ]
 then
 cat <<EOF >> "/tftpboot/pxelinux.cfg/default"
 LABEL ltspStretch
-	MENU LABEL ^Demarrer le pc en client lourd Stretch $ENVIRONNEMENT
+	MENU LABEL ^Demarrer le pc en client lourd Stretch $BUREAU
 	KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
 	APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet ip=dhcp boot=nfs nfsroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT
 	IPAPPEND 2
