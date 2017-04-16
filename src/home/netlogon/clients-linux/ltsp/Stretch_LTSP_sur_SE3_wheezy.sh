@@ -364,11 +364,11 @@ EOF
 	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/firefox-esr/firefox-esr.js"
 
 // Define proxy when an IP and PORT are specified
-lockPref("network.proxy.share_proxy_settings", true);
-lockPref("network.proxy.http", "${ip_proxy}");
-lockPref("network.proxy.http_port", ${port_proxy});
-lockPref("network.proxy.no_proxies_on", "localhost, 127.0.0.1, ${IP_SE3}/${masque_reseau}");
-lockPref("network.proxy.type", 1);
+pref("network.proxy.share_proxy_settings", true);
+pref("network.proxy.http", "${ip_proxy}");
+pref("network.proxy.http_port", ${port_proxy});
+pref("network.proxy.no_proxies_on", "localhost, 127.0.0.1, ${IP_SE3}/${masque_reseau}");
+pref("network.proxy.type", 1);
 EOF
 
 else
@@ -378,7 +378,7 @@ else
 cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/etc/firefox-esr/firefox-esr.js"
 
 // Define proxy when no IP is specified for proxy
-lockPref("network.proxy.type", 4);
+pref("network.proxy.type", 4);
 EOF
 
 fi
