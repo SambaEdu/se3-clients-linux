@@ -432,13 +432,13 @@ fi
 # Afin de pouvoir imprimer et scanner :
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y cups system-config-printer sane
 
-# Logiciels "bureautique":
+# Logiciels bureautique:
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y libreoffice libreoffice-l10n-fr scribus freeplane
 
 # Logiciels pour le son/video:
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y vlc audacity openshot kdenlive imagination
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y vlc audacity openshot kdenlive breeze-icon-theme imagination
 
-# Logiciels "mathématiques":
+# Logiciels mathématiques :
 # Dépot pour install geogebra 5 avec la commande apt-get :
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/geogebra.list
 deb http://www.geogebra.net/linux/ stable main
