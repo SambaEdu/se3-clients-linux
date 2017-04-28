@@ -434,6 +434,9 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonf
 ltsp-chroot -m --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
 fi
 
+# Afin de pouvoir imprimer: 
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y cups
+
 echo "--------------------------------------------------------------------------------------"
 echo " 12-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
 echo "--------------------------------------------------------------------------------------"
