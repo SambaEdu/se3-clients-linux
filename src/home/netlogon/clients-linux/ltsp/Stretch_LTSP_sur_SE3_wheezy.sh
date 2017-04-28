@@ -430,7 +430,7 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --instal
 fi
 
 # Afin de pouvoir imprimer: 
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y cups
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y cups sane
 
 # Logiciels "bureautique":
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y libreoffice libreoffice-l10n-fr scribus freeplane
