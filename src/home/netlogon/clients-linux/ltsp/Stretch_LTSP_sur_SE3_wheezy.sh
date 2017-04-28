@@ -416,7 +416,7 @@ EOF
 
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade 
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano aptitude less firmware-linux wine ttf-mscorefonts-installer vlc firefox-esr-l10n-fr system-config-printer numlockx
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano aptitude less firmware-linux wine ttf-mscorefonts-installer firefox-esr-l10n-fr numlockx
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y flashplugin-nonfree
 ltsp-chroot -m --arch "$ENVIRONNEMENT" update-flashplugin-nonfree --install
 
@@ -429,11 +429,14 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonf
 ltsp-chroot -m --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
 fi
 
-# Afin de pouvoir imprimer: 
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y cups sane
+# Afin de pouvoir imprimer et scanner :
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y cups system-config-printer sane
 
 # Logiciels "bureautique":
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y libreoffice libreoffice-l10n-fr scribus freeplane
+
+# Logiciels pour le son/video:
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y vlc audacity openshot kdenlive imagination
 
 # Logiciels "mathématiques":
 # Dépot pour install geogebra 5 avec la commande apt-get :
