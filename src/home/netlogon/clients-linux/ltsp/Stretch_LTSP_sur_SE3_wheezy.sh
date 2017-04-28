@@ -437,6 +437,14 @@ fi
 # Afin de pouvoir imprimer: 
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y cups
 
+# Logiciels "mathématiques":
+# Dépot pour install geogebra 5 avec la commande apt-get :
+cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/geogebra.list
+deb http://www.geogebra.net/linux/ stable main
+EOF
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y algobox scilab geogebra5
+
 echo "--------------------------------------------------------------------------------------"
 echo " 12-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
 echo "--------------------------------------------------------------------------------------"
