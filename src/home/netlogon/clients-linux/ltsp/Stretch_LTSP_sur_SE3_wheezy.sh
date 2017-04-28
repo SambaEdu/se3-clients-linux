@@ -438,6 +438,12 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y libreoffice libreoffic
 # Logiciels pour le son/video:
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y vlc audacity openshot kdenlive breeze-icon-theme imagination
 
+# Logiciels pour la physique:
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install stellarium avogadro 
+
+# Logiciels pour ICN/ISN (à compléter):
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install scratch ghex geany # sonic-pi : faire une préconfiguration 
+
 # Logiciels mathématiques :
 # Dépot pour install geogebra 5 avec la commande apt-get :
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/geogebra.list
