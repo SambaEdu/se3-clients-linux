@@ -16,10 +16,6 @@ BUREAU="mate"						# Bureau à installer dans le chroot des clients lourds
 . /etc/se3/config_l.cache.sh
 . /etc/se3/config_s.cache.sh
 
-IP_SE3="$se3ip"
-IP_PROXY="$proxy_url"
-BASE_DN="$ldap_base_dn"
-
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " Ce script installe un serveur LTSP de clients lourds Stretch sur votre SE3 Wheezy												"
 echo " Tout PC disposant d un boot PXE et d au moins 512 Mo de RAM pourra démarrer sur le reseau									"
@@ -59,6 +55,19 @@ then
 	echo "Installation du paquet se3-client-linux pour le montage des partages Samba"
 	apt-get install se3-clients-linux -y --force-yes
 fi
+
+if [ "$se3ip" = "" ] || [ "$ldap_base_dn" = ""] || [ "$se3mask" != "" ]
+then
+	echo 'Une des variables se3ip ou ldap_base_dn ou se3mask est vide'
+	echo 'L installation de ltsp ne peut pas se poursuivre ...'
+	echo 'Vérifier la définition de ces variables dans les fichiers de confs /etc/se3/config_* de votre se3'
+	exit 1
+fi
+
+IP_SE3="$se3ip"
+IP_PROXY="$proxy_url"
+BASE_DN="$ldap_base_dn"
+
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 1-Installation du serveur ltsp (nfs, nbd, debootstrap, squashfs et la doc) :																							"
