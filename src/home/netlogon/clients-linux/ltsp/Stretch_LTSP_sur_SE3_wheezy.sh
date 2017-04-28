@@ -76,26 +76,12 @@ apt-get update
 apt-get install -y ltsp-server ltsp-docs
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 2-Configuration du service NFS (/etc/exports) :																				"
+echo " 2-Construction de l environnement $ENVIRONNEMENT pour les clients lourds Stretch														"
 echo "------------------------------------------------------------------------------------------------------------------------------"
-
-if [ ! -d /opt/ltsp ]
-then
-mkdir /opt/ltsp
-fi
-
-cat <<EOF > "/etc/exports"
-/opt/ltsp *(ro,no_root_squash,async,no_subtree_check)				  
-EOF
-service nfs-kernel-server restart
+CONFIG_NBD=true ltsp-build-client --arch i386 --chroot "$ENVIRONNEMENT" --fat-client-desktop "task-$BUREAU-desktop" --dist stretch --mirror http://ftp.fr.debian.org/debian/ --locale fr_FR.UTF-8 --kernel-packages linux-image-686 --prompt-rootpass --purge-chroot
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 3-Construction de l environnement $ENVIRONNEMENT pour les clients lourds Stretch														"
-echo "------------------------------------------------------------------------------------------------------------------------------"
-ltsp-build-client --arch i386 --chroot "$ENVIRONNEMENT" --fat-client-desktop "task-$BUREAU-desktop" --dist stretch --mirror http://ftp.fr.debian.org/debian/ --locale fr_FR.UTF-8 --kernel-packages linux-image-686 --prompt-rootpass --purge-chroot
-
-echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 4-Creation d'un compte local enseignant dans l'environnement des clients lourds												"
+echo " 3-Creation d'un compte local enseignant dans l'environnement des clients lourds												"
 echo "------------------------------------------------------------------------------------------------------------------------------"
 #mdp = "$(mkpasswd enseignant)"
 #ltsp-chroot -m --arch "$ENVIRONNEMENT" useradd --create-home --password "$mdp" enseignant
@@ -103,7 +89,7 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" adduser enseignant
 ltsp-chroot -m --arch "$ENVIRONNEMENT" chmod -R 700 /home/enseignant
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 5-Configuration de lts.conf afin que les clients lourds démarrent de façon complément autonome 								"
+echo " 4-Configuration de lts.conf afin que les clients lourds démarrent de façon complément autonome 								"
 echo "------------------------------------------------------------------------------------------------------------------------------"
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/lts.conf"
 [default]
@@ -115,7 +101,7 @@ EOF
 sleep 5
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 6-Paramétrer PAM pour qu il consulte l annuaire LDAP de se3 lors de l identification d un utilisateur sur un client lourd	"
+echo " 5-Paramétrer PAM pour qu il consulte l annuaire LDAP de se3 lors de l identification d un utilisateur sur un client lourd	"
 echo "   et pour qu'il réalise le montage automatique des partages Samba du se3 grace à pam_mount									"
 echo "------------------------------------------------------------------------------------------------------------------------------"
 
@@ -173,7 +159,7 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" chmod -R 700 /etc/skel
 sleep 5
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 8-Utilisation de pam_mount pour monter automatiquement les partages Samba du se3 à l ouverture de session d un utilisateur de client lourd "
+echo " 6-Utilisation de pam_mount pour monter automatiquement les partages Samba du se3 à l ouverture de session d un utilisateur de client lourd "
 echo "------------------------------------------------------------------------------------------------------------------------------"
 
 # Installation des paquets nécessaires pour réaliser les montages automatiques des partages Samba à l'ouverture de session d'un utilisateur de clients lourds
@@ -330,7 +316,7 @@ fi
 
 
 #echo "--------------------------------------------------------------------------------------"
-#echo " 9-Configuration pour l'impression avec le serveur CUPS du SE3				 		"
+#echo " -Configuration pour l'impression avec le serveur CUPS du SE3				 		"
 #echo "--------------------------------------------------------------------------------------"
 
 #mkdir "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.cups"
@@ -340,7 +326,7 @@ fi
 #EOF
 
 echo "--------------------------------------------------------------------------------------"
-echo " 9-Configuration du proxy															"
+echo " 7-Configuration du proxy															"
 echo "--------------------------------------------------------------------------------------"
 
 masque_reseau=$(($(echo "$se3mask" | grep -o "255" | wc -l)*8))
@@ -395,7 +381,7 @@ fi
 sleep 5
 
 echo "--------------------------------------------------------------------------------------"
-echo " 10-Configuration de lightdm 															"
+echo " 8-Configuration de lightdm 															"
 echo "--------------------------------------------------------------------------------------"
 
 # Activation du verrouillage numérique du clavier
@@ -409,7 +395,7 @@ EOF
 sleep 5
 
 echo "--------------------------------------------------------------------------------------"
-echo " 11-Configuration de l environnement $ENVIRONNEMENT des clients lourds stretch	 		"
+echo " 9-Configuration de l environnement $ENVIRONNEMENT des clients lourds stretch	 		"
 echo "--------------------------------------------------------------------------------------"
 
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list"
@@ -455,7 +441,7 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y algobox scilab geogebra5
 
 echo "--------------------------------------------------------------------------------------"
-echo " 12-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
+echo " 10-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
 echo "--------------------------------------------------------------------------------------"
 
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/xdg/user-dirs.defaults"
@@ -464,7 +450,7 @@ EOF
 
 
 echo "--------------------------------------------------------------------------------------"
-echo " 13-Copie du skel dans le chroot														"
+echo " 11-Copie du skel dans le chroot														"
 echo "--------------------------------------------------------------------------------------"
 find /home/netlogon/clients-linux/ltsp/skel/ -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
 
@@ -472,14 +458,20 @@ sleep 5
 
 
 echo "--------------------------------------------------------------------------------------"
-echo " 14-Extinction de tous les clients lourds à 19h par défaut							"
+echo " 12-Extinction de tous les clients lourds à 19h par défaut							"
 echo "--------------------------------------------------------------------------------------"
 echo '0 19 * * * root /sbin/poweroff' > "/opt/ltsp/$ENVIRONNEMENT/etc/cron.d/extinction_clients_lourds"
 
 sleep 5
 
+echo "--------------------------------------------------------------------------------------"
+echo " 13-Reconstruction de l'image squashfs (spécifique à NBD)					"
+echo "--------------------------------------------------------------------------------------"
+ltsp-update-image --config-nbd "$ENVIRONNEMENT"
+service nbd-server restart
+
 echo "--------------------------------------"
-echo " 15-Sauvegarde du chroot des clients lourds (5 minutes)	    "
+echo " 14-Sauvegarde du chroot des clients lourds (5 minutes)	    "
 echo "--------------------------------------"
 if [ ! -d "/var/se3/ltsp/originale" ]
 then
@@ -491,7 +483,7 @@ cp -a "/opt/ltsp/$ENVIRONNEMENT" "/var/se3/ltsp/originale/$ENVIRONNEMENT-origina
 sleep 5
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 16- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Jessie 	    "
+echo " 15- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Jessie 	    "
 echo "------------------------------------------------------------------------------------------------------------------------------"
 
 resultat=$(grep "Demarrer le pc en client lourd Stretch $BUREAU" "/tftpboot/pxelinux.cfg/default")
