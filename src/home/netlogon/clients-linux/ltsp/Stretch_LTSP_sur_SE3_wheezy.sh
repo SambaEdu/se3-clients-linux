@@ -452,6 +452,9 @@ EOF
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y algobox scilab geogebra5
 
+# Logiciels graphisme:
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install inkscape xia blender sweethome3d mypaint pinta 
+
 echo "--------------------------------------------------------------------------------------"
 echo " 10-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
 echo "--------------------------------------------------------------------------------------"
