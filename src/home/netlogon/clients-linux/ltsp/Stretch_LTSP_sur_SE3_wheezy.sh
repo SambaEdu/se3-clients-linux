@@ -432,6 +432,9 @@ fi
 # Afin de pouvoir imprimer: 
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y cups
 
+# Logiciels "bureautique":
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y libreoffice libreoffice-l10n-fr scribus freeplane
+
 # Logiciels "mathématiques":
 # Dépot pour install geogebra 5 avec la commande apt-get :
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/geogebra.list
