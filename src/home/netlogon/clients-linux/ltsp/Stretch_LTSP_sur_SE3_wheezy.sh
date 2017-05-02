@@ -56,7 +56,7 @@ then
 	apt-get install se3-clients-linux -y --force-yes
 fi
 
-if [ "$se3ip" = "" ] || [ "$ldap_base_dn" = ""] || [ "$se3mask" != "" ]
+if [ "$se3ip" = "" ] || [ "$ldap_base_dn" = ""] || [ "$se3mask" = "" ]
 then
 	echo 'Une des variables se3ip ou ldap_base_dn ou se3mask est vide'
 	echo 'L installation de ltsp ne peut pas se poursuivre ...'
