@@ -446,7 +446,7 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install scratch ghex geany # s
 
 # Logiciels mathématiques :
 # Dépot pour install geogebra 5 avec la commande apt-get :
-cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/geogebra.list
+cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/geogebra.list"
 deb http://www.geogebra.net/linux/ stable main
 EOF
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
