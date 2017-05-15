@@ -30,11 +30,11 @@ echo " - ajouter une entrée au menu /tftpboot/pxelinux.cfg/default pour pouvoir
 echo " - configurer le chroot des clients lourds Stretch pour l'identification avec l annuaire ldap et le montage automatique des partages Samba du se3  "
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " Etes-vous sur de vouloir débuter l installation ? o ou n ? :																				"
-#read REPONSE
-#if [ "$REPONSE" != "o" ]
-#then
-#	exit 0;
-#fi
+read REPONSE
+if [ "$REPONSE" != "o" ]
+then
+	exit 0;
+fi
 
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
