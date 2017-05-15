@@ -30,11 +30,11 @@ echo " - ajouter une entrée au menu /tftpboot/pxelinux.cfg/default pour pouvoir
 echo " - configurer le chroot des clients lourds Stretch pour l'identification avec l annuaire ldap et le montage automatique des partages Samba du se3  "
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " Etes-vous sur de vouloir débuter l installation ? o ou n ? :																				"
-read REPONSE
-if [ "$REPONSE" != "o" ]
-then
-	exit 0;
-fi
+#read REPONSE
+#if [ "$REPONSE" != "o" ]
+#then
+#	exit 0;
+#fi
 
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
@@ -74,6 +74,21 @@ echo " 1-Installation du serveur ltsp (nfs, nbd, debootstrap, squashfs et la doc
 echo "------------------------------------------------------------------------------------------------------------------------------"
 apt-get update
 apt-get install -y ltsp-server ltsp-docs
+
+# Finalement, on garde le service NFS dans un sous-menu de maintenance car c'est bien pratique pour faire des tests 
+if [ ! -d /opt/ltsp ]
+then
+	mkdir /opt/ltsp
+fi
+
+echo "------------------------------------------------------------------------------------------------------------------------------"
+echo " 1.5- Configuration du service NFS (accessible depuis le sous-menu perso du menu maintenance du se3)							"
+echo "------------------------------------------------------------------------------------------------------------------------------"
+cat <<EOF > "/etc/exports"
+/opt/ltsp *(ro,no_root_squash,async,no_subtree_check)                             
+EOF
+service nfs-kernel-server restart
+
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 2-Construction de l environnement $ENVIRONNEMENT pour les clients lourds Stretch														"
@@ -501,17 +516,37 @@ echo "--------------------------------------------------------------------------
 echo " 15- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Jessie 	    "
 echo "------------------------------------------------------------------------------------------------------------------------------"
 
-resultat=$(grep "Demarrer le pc en client lourd Stretch $BUREAU" "/tftpboot/pxelinux.cfg/default")
+# En "production", c'est le service NBD qui est utilisé pour monter l'environnement des clients lourds
+resultat=$(grep "Demarrer le pc en client lourd Stretch $ENVIRONNEMENT avec NBD" "/tftpboot/pxelinux.cfg/default")
 
-if [ "$resultat" = "" ]
+if [ -z "$resultat" ]
 then
 cat <<EOF >> "/tftpboot/pxelinux.cfg/default"
 LABEL ltspStretch
-	MENU LABEL ^Demarrer le pc en client lourd Stretch $BUREAU
+	MENU LABEL ^Demarrer le pc en client lourd Stretch $ENVIRONNEMENT avec NBD
 	KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
 	APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet splash nbdroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT root=/dev/nbd0
 	IPAPPEND 2
 EOF
 fi
+
+# Mais, on garde quand le service NFS pour sa souplesse dans le sous-menu perso du menu maintenance.
+# Ce menu n'est accessible qu'à l'admin du se3 et évite de reconstruire l'image squashfs après un modif dans le chroot (pratique pour tester des installations).
+resultat=$(grep "Demarrer le pc en client lourd Stretch $ENVIRONNEMENT avec NFS" "/tftpboot/pxelinux.cfg/perso.menu")
+
+if [ -z "$resultat" ]
+then
+cat <<EOF >> "/tftpboot/pxelinux.cfg/perso.menu"
+LABEL ltspStretch
+        MENU LABEL ^Demarrer le pc en client lourd Stretch $ENVIRONNEMENT avec NFS
+        KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
+        APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet ip=dhcp boot=nfs nfsroot=$IP_SE3:/o$
+        IPAPPEND 2
+EOF
+fi
+
+# On active (éventuellement) le sous-menu perso dans le menu maintenance
+sed -i 's/'^###perso###'//' '/tftpboot/pxelinux.cfg/maintenance.menu'
+
 
 exit 0
