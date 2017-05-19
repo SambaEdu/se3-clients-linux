@@ -229,15 +229,6 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
 />
 
-<volume
-		user="*"
-		sgrp="Profs"
-		fstype="cifs"
-		server="$IP_SE3"
-		path="homes/profil/appdata/Mozilla/Firefox"
-		mountpoint="~/.mozilla/firefox"
-		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
-/>
 		<!-- pam_mount parameters: General tunables -->
 
 <!--
@@ -310,15 +301,6 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
 />
 
-<volume
-		user="*"
-		sgrp="Profs"
-		fstype="cifs"
-		server="$IP_SE3"
-		path="homes/profil/appdata/Mozilla/Firefox"
-		mountpoint="~/.mozilla/firefox"
-		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
-/>
 		<!-- pam_mount parameters: General tunables -->
 
 <!--
