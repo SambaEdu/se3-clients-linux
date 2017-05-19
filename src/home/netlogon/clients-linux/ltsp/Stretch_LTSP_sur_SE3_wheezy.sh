@@ -560,7 +560,7 @@ cat <<EOF >> "/tftpboot/pxelinux.cfg/perso.menu"
 LABEL ltspStretch
         MENU LABEL ^Demarrer le pc en client lourd Stretch $ENVIRONNEMENT avec NFS
         KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
-        APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet ip=dhcp boot=nfs nfsroot=$IP_SE3:/o$
+        APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet ip=dhcp boot=nfs nfsroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT
         IPAPPEND 2
 EOF
 fi
