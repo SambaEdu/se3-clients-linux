@@ -115,6 +115,15 @@ EOF
 
 sleep 5
 
+echo " 4.5 - Configuration du timezone (paquet tzdata) pour éviter un décalage horaire"
+ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
+tzdata	tzdata/Zones/Etc	select	UTC
+tzdata	tzdata/Zones/Europe	select	Paris
+EOF
+dpkg-reconfigure tzdata --frontend=noninteractive --priority=critical
+
+sleep 1
+
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 5-Paramétrer PAM pour qu il consulte l annuaire LDAP de se3 lors de l identification d un utilisateur sur un client lourd	"
 echo "   et pour qu'il réalise le montage automatique des partages Samba du se3 grace à pam_mount									"
