@@ -124,6 +124,48 @@ dpkg-reconfigure tzdata --frontend=noninteractive --priority=critical
 
 sleep 1
 
+echo " 4.6 - Définir les règles polkit-1 pour désactiver la mise en veille (suspend) et l'hibernation"
+# Version de polkit sur Stretch : 0.105 => possibilité de définir les règles avec des fichiers .pkla dans /etc/polkit-1/localauthority/
+# Desactivation "complète" de l'hibernation
+cat << 'EOF' > /etc/polkit-1/localauthority/90-mandatory.d/disable-hibernate.pkla
+[Disable hibernate (upower)]
+Identity=unix-user:*
+Action=org.freedesktop.upower.hibernate
+ResultActive=no
+ResultInactive=no
+ResultAny=no
+
+[Disable hibernate (logind)]
+Identity=unix-user:*
+Action=org.freedesktop.login1.hibernate
+ResultActive=no
+
+[Disable hibernate for all sessions (logind)]
+Identity=unix-user:*
+Action=org.freedesktop.login1.hibernate-multiple-sessions
+ResultActive=no
+EOF
+
+# Desactivation "complète" de la mise en veille (suspend)
+cat << 'EOF' >  /etc/polkit-1/localauthority/90-mandatory.d/disable-suspend.pkla
+[Disable suspend (upower)]
+Identity=unix-user:*
+Action=org.freedesktop.upower.suspend
+ResultActive=no
+ResultInactive=no
+ResultAny=no
+
+[Disable suspend (logind)]
+Identity=unix-user:*
+Action=org.freedesktop.login1.suspend
+ResultActive=no
+
+[Disable suspend for all sessions (logind)]
+Identity=unix-user:*
+Action=org.freedesktop.login1.suspend-multiple-sessions
+ResultActive=no
+EOF
+
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 5-Paramétrer PAM pour qu il consulte l annuaire LDAP de se3 lors de l identification d un utilisateur sur un client lourd	"
 echo "   et pour qu'il réalise le montage automatique des partages Samba du se3 grace à pam_mount									"
