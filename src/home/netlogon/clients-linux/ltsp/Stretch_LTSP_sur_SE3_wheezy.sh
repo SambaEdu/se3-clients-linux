@@ -84,12 +84,13 @@ fi
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 1.5- Configuration du service NFS (accessible depuis le sous-menu perso du menu maintenance du se3)							"
 echo "------------------------------------------------------------------------------------------------------------------------------"
-resultat=$(grep '/opt/ltsp *(ro,no_root_squash,async,no_subtree_check)' "/etc/exports")
+resultat=$(grep -F '/opt/ltsp *(ro,no_root_squash,async,no_subtree_check)' /etc/exports)
 if [ -z "$resultat" ]
 then
 cat <<EOF >> "/etc/exports"
 /opt/ltsp *(ro,no_root_squash,async,no_subtree_check)                             
 EOF
+fi
 service nfs-kernel-server restart
 
 
