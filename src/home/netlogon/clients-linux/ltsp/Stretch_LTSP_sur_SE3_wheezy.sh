@@ -526,8 +526,7 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y arduino
 
 # On déplace le dossier sketchbook (contenant ardublock) dans le repertoire /opt/arduino/
 cp -rf /home/netlogon/clients-linux/ltsp/stretch/opt/arduino "/opt/ltsp/$ENVIRONNEMENT/opt/"
-chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
-chmod -R 755 "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
+chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/arduino" && chmod -R 755 "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
 
 # Utilisation du module pam_group.so pour ajouter les utilisateurs au groupe dialout (nécessaire pour pouvoir communiquer avec la carte arduino)
 sed -i '/pam_mount.so/i \auth	optional	pam_group.so' "/opt/ltsp/$ENVIRONNEMENT/etc/pam.d/common-auth"
@@ -535,6 +534,11 @@ sed -i '/pam_mount.so/i \auth	optional	pam_group.so' "/opt/ltsp/$ENVIRONNEMENT/e
 # Configuration du fichier de conf de pam_group.so
 echo '*;*;*;Al0000-2400;dialout' >> "/opt/ltsp/$ENVIRONNEMENT/etc/security/group.conf"
 
+# Blockly arduino en local
+blockly_archive='gh-pages.zip'
+wget "https://github.com/technologiescollege/Blockly-at-rduino/archive/$blockly_archive"
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install unzip
+unzip "$blockly_archive" -d "/opt/ltsp/$ENVIRONNEMENT/opt/" && rm -f "$blockly_archive"
 ### Fin Arduino ###
 
 ### Installation Processing ###
