@@ -521,6 +521,20 @@ jackd2   jackd/tweak_rt_limits   boolean false
 EOF
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y sonic-pi
 
+# Arduino
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y arduino
+
+# On déplace le dossier sketchbook (contenant ardublock) dans le repertoire /opt/arduino/
+cp -rf /home/netlogon/clients-linux/ltsp/stretch/opt/arduino "/opt/ltsp/$ENVIRONNEMENT/opt/"
+chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
+chmod -R 755 "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
+
+# Utilisation du module pam_group.so pour ajouter les utilisateurs au groupe dialout (nécessaire pour pouvoir communiquer avec la carte arduino)
+sed -i '/pam_mount.so/i \auth	optional	pam_group.so' "/opt/ltsp/$ENVIRONNEMENT/etc/pam.d/common-auth"
+
+# Configuration du fichier de conf de pam_group.so
+echo '*;*;*;Al0000-2400;dialout' >> "/opt/ltsp/$ENVIRONNEMENT/etc/security/group.conf"
+
 # Logiciels mathématiques :
 # Dépot pour install geogebra 5 avec la commande apt-get :
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/geogebra.list"
@@ -544,7 +558,7 @@ EOF
 echo "--------------------------------------------------------------------------------------"
 echo " 11-Copie du skel dans le chroot														"
 echo "--------------------------------------------------------------------------------------"
-find /home/netlogon/clients-linux/ltsp/skel/ -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
+find /home/netlogon/clients-linux/ltsp/stretch/skel/ -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
 
 sleep 5
 
