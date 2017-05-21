@@ -567,6 +567,9 @@ ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/processing && ltsp-c
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/geogebra.list"
 deb http://www.geogebra.net/linux/ stable main
 EOF
+# Ajouter la clé du dépot geogebra5
+wget -O- https://static.geogebra.org/linux/office@geogebra.org.gpg.key | apt-key add -
+
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y algobox scilab geogebra5
 
