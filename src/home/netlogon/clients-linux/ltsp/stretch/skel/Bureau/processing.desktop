@@ -1,0 +1,8 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Name=Processing IDE
+Exec=bash /opt/processing/processing
+Icon=/opt/processing/lib/icons/pde-64.png
+Terminal=false
+Categories=Development;Engineering;

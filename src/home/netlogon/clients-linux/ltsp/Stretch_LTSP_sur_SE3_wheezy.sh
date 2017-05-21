@@ -521,7 +521,7 @@ jackd2   jackd/tweak_rt_limits   boolean false
 EOF
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y sonic-pi
 
-# Arduino
+### Installation Arduino ###
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y arduino
 
 # On déplace le dossier sketchbook (contenant ardublock) dans le repertoire /opt/arduino/
@@ -534,6 +534,33 @@ sed -i '/pam_mount.so/i \auth	optional	pam_group.so' "/opt/ltsp/$ENVIRONNEMENT/e
 
 # Configuration du fichier de conf de pam_group.so
 echo '*;*;*;Al0000-2400;dialout' >> "/opt/ltsp/$ENVIRONNEMENT/etc/security/group.conf"
+
+### Fin Arduino ###
+
+### Installation Processing ###
+archive_processing='processing-3.3.3'
+version_processing="$archive_processing"
+
+if [ "$ENVIRONNEMNET" = "amd64" ]
+then
+	version_processing="${archive_processing}-linux64"
+fi
+
+if [ "$ENVIRONNEMNET" = "i386" ]
+then
+	version_processing="${archive_processing}-linux32"
+fi
+
+# Nettoyage avant installation
+rm -rf "$archive_processing" "${version_processing}.tgz"
+
+# Téléchargement de l'archive et désarchivage
+wget "http://download.processing.org/${version_processing}.tgz"
+tar zxvf "${version_processing}.tgz" && rm -f "${version_processing}.tgz"
+mv -f "$archive_processing" "/opt/ltsp/$ENVIRONNEMENT/opt/processing"
+cp -rf /home/netlogon/clients-linux/ltsp/stretch/opt/processing/sketchbook "/opt/ltsp/$ENVIRONNEMENT/opt/processing/"
+ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/processing && ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 755 /opt/processing
+### Fin Processing ###
 
 # Logiciels mathématiques :
 # Dépot pour install geogebra 5 avec la commande apt-get :
