@@ -537,7 +537,7 @@ echo '*;*;*;Al0000-2400;dialout' >> "/opt/ltsp/$ENVIRONNEMENT/etc/security/group
 # Blockly arduino en local
 blockly_archive='gh-pages.zip'
 wget "https://github.com/technologiescollege/Blockly-at-rduino/archive/$blockly_archive"
-ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install unzip
+apt-get -y install unzip  # en principe, ... déjà installé
 unzip "$blockly_archive" -d "/opt/ltsp/$ENVIRONNEMENT/opt/" && rm -f "$blockly_archive"
 ### Fin Arduino ###
 
