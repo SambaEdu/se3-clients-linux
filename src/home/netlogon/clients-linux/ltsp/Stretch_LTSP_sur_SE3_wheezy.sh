@@ -514,7 +514,7 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y vlc audacity openshot 
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install stellarium avogadro 
 
 # Logiciels pour ICN/ISN (à compléter):
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install scratch ghex geany
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install scratch ghex geany rurple-ng
 
 ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
 jackd2   jackd/tweak_rt_limits   boolean false
