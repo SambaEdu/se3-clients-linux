@@ -504,6 +504,10 @@ fi
 # Afin de pouvoir imprimer et scanner :
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y cups system-config-printer sane
 
+# Problème : 	pour les TNI/VPI, Openboard (successeur d'Open Sankore 2.5) n'est disponible qu'en .deb sur Ubuntu 14.04 et 16.04 en architecture 64
+#				et le paquet ne semble pas facilemenet installable sur Stretch amd 64:  des dépendances sont non satisfaites non résolvables 
+#																			  			et un "apt-get install -f" ne les résout pas ...
+
 # Logiciels bureautique:
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y libreoffice libreoffice-l10n-fr scribus freeplane
 
