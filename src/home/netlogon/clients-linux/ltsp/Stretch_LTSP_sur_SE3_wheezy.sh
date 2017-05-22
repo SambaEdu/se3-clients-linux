@@ -516,6 +516,16 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install stellarium avogadro
 # Logiciels pour ICN/ISN (à compléter):
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install scratch ghex geany rurple-ng
 
+# Ajout du dépôt sid (unstable) pour tester python3-pygame
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install idle-python3.5
+cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/sid.list"
+deb http://ftp.fr.debian.org/debian/ unstable main
+EOF
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update && ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install python3-pygame/unstable
+# Pour éviter d'installer d'autres paquets de la branche unstable :
+rm -f "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/sid.list"
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
+
 ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
 jackd2   jackd/tweak_rt_limits   boolean false
 EOF
