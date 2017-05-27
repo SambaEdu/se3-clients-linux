@@ -635,6 +635,9 @@ then
 	ltsp-chroot --arch "$ENVIRONNEMENT"	wget -O "adobe-air_${ENVIRONNEMENT}.deb" "http://drive.noobslab.com/data/apps/AdobeAir/adobeair_2.6.0.2_${ENVIRONNEMENT}.deb"
 	ltsp-chroot --arch "$ENVIRONNEMENT"	dpkg -i "adobe-air_${ENVIRONNEMENT}.deb" && ltsp-chroot --arch "$ENVIRONNEMENT"	apt-get install -f
 	ltsp-chroot --arch "$ENVIRONNEMENT"	rm -f "adobe-air_${ENVIRONNEMENT}.deb"
+	
+	# Desactivation d'apport (fenêtre de signalement de bug logiciel)
+	echo 'enabled=0' > "/opt/ltsp/$ENVIRONNEMENT/etc/default/apport"
 fi
 #### Fin de l'installation d'Adobe Air
 # Pour installer Scratch 2, il suffira de lancer un client lourd, puis d'ouvrir un émulateur de console et saisir en tant que root :
@@ -759,12 +762,7 @@ sed -i 's/'^###perso###'//' '/tftpboot/pxelinux.cfg/maintenance.menu'
 if [ "$DISTRIB" = "xenial" ]
 then
 echo "-------------------------------------------------------------------------------------------------------"
-echo " 16-Desactivation d'apport (fenêtre qui peut indiquer de façon récurrente des erreurs souvent minimes) "
-echo "-------------------------------------------------------------------------------------------------------"
-echo 'enabled=0' > "/opt/ltsp/$ENVIRONNEMENT/etc/default/apport"
-
-echo "-------------------------------------------------------------------------------------------------------"
-echo " 17-Redemarrage dans 5 secondes du serveur pour remettre la local en français (pour Ubuntu uniquement) "
+echo " 16-Redemarrage dans 5 secondes du serveur pour remettre la local en français (pour Ubuntu uniquement) "
 echo "-------------------------------------------------------------------------------------------------------"
 sleep 5	&& reboot
 fi
