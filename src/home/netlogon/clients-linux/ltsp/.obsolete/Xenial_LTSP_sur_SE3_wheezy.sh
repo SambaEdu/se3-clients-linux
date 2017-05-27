@@ -1,9 +1,13 @@
 #!/bin/bash
-# Rédigé par Nicolas Aldegheri, le 07/04/2016
+# Rédigé par Nicolas Aldegheri, le 23/05/2016
 # Sous licence GNU
 
-# Choisir l'environnement des clients lourds Xenial : ubuntu, ubuntu-mate, xubuntu ou lubuntu
-ENVIRONNEMENT="lubuntu" 
+# Choisir le bureau des clients lourds Xenial : ubuntu, ubuntu-mate, xubuntu ou lubuntu
+ENVIRONNEMENT="i386" 			# Nom de l'environnement (du chroot) des clients lourds
+BUREAU="ubuntu-mate"			# Bureau à installer dans le chroot des clients lourds
+
+# Insertion de toutes les fonctions la librairie lib.sh
+. /home/netlogon/clients-linux/lib.sh
 
 # Récupération des variables spécifiques au se3
 . /etc/se3/config_c.cache.sh
@@ -22,7 +26,8 @@ echo " Tout PC disposant d un boot PXE et d au moins 512 Mo de RAM pourra démar
 echo " Votre se3 n a pas besoin d être très puissant, juste d'une carte reseau 1Gbs													"
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " Ce script va simplement, sur votre se3 :																						"
-echo " - créer un répertoire /opt/ltsp/lubuntu (le chroot) contenant la racine / des clients lourds xenial							"
+echo " - créer un répertoire /opt/ltsp/i386 (le chroot) contenant la racine / des clients lourds xenial								"
+echo " - Faire une sauvegarde de ce chroot dans /var/se3/ltsp																		"
 echo " - installer et configurer les services NFS et NBD pour distribuer l'environnement (le chroot) des clients lourds 			"
 echo " - créer un répertoire /tftpboot/ltsp contenant l'initrd et le kernel pour le boot PXE des clients lourds	xenial 				"
 echo " - ajouter une entrée au menu /tftpboot/pxelinux.cfg/default pour pouvoir démarrer un PC PXE en client lourd Xenial 			"
@@ -64,27 +69,21 @@ echo "--------------------------------------------------------------------------
 echo " 2-Construction de l environnement $ENVIRONNEMENT pour les clients lourds Xenial												"
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " ATTENTION : la construction du chroot xenial change la locale du serveur ...													"
-echo " A la fin, les mots de passe saisis pour les comptes root et enseignant sont en mode querty !!!								"
+echo " Les mots de passe saisis pour les comptes root des clients lourds et pour le compte local enseignant sont en mode querty !!!	"
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo "Appuyer sur une touche pour continuer"
 read REPONSE
 
 
-# Le script de construction du chroot de Xenial n'existe pas dans le paquet ltsp de wheezy
-# Mais en regardant le paquet ltsp pour Jessie, on remarque que c'est simplement un lien vers le script gutsy
-# Et en testant gutsy sous wheezy, on remarque que le script est fonctionnel pour xenial ...
+# Le script de construction du chroot de Xenial n'existe pas mais celui de gutsy est parfaitement fonctionnel
 
 if [ ! -e "/usr/share/debootstrap/scripts/xenial" ]
 then
 	ln -s /usr/share/debootstrap/scripts/gutsy /usr/share/debootstrap/scripts/xenial
 fi
 
-VENDOR=Ubuntu CONFIG_NBD=true ltsp-build-client --arch i386 --chroot "$ENVIRONNEMENT" --fat-client-desktop "$ENVIRONNEMENT-desktop" --dist xenial --mirror http://fr.archive.ubuntu.com/ubuntu/ --locale fr_FR.UTF-8 --prompt-rootpass --purge-chroot
+VENDOR=Ubuntu CONFIG_NBD=true ltsp-build-client --arch i386 --chroot "$ENVIRONNEMENT" --fat-client-desktop "$BUREAU-desktop" --dist xenial --mirror http://fr.archive.ubuntu.com/ubuntu/ --locale fr_FR.UTF-8 --prompt-rootpass --purge-chroot
 
-echo "--------------------------------------"
-echo " Sauvegarde du chroot (5 minutes)	    "
-echo "--------------------------------------"
-cp -a "/opt/ltsp/$ENVIRONNEMENT" /opt/ltsp/xenial_save
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 3-Creation d'un compte local enseignant dans l'environnement des clients lourds												"
@@ -104,17 +103,8 @@ DEFAULT_DISPLAY_MANAGER=""                  # Lance lightdm à la place de LDM
 XKBLAYOUT=fr
 EOF
 
+sleep 5
 
-echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 5- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Xenial 	    "
-echo "------------------------------------------------------------------------------------------------------------------------------"
-cat <<EOF >> "/tftpboot/pxelinux.cfg/default"
-LABEL ltspXenial
-	MENU LABEL ^Demarrer le pc en client lourd Xenial $ENVIRONNEMENT
-	KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
-	APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet splash nbdroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT root=/dev/nbd0
-	IPAPPEND 2
-EOF
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 6-Paramétrer PAM pour qu il consulte l annuaire LDAP de se3 lors de l identification d un utilisateur sur un client lourd	"
@@ -187,12 +177,14 @@ sed -i '/@include common-session/i \session required pam_mkhomedir.so skel=/etc/
 # Mise des droits sur le skelette des home directory des utilisateurs de clients lourds
 ltsp-chroot -m --arch "$ENVIRONNEMENT" chmod -R 700 /etc/skel
 
+sleep 5
+
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 7-Configuration de pam_mount pour monter automatiquement les partages Samba du se3 à l ouverture de session d un utilisateur de client lourd "
 echo "------------------------------------------------------------------------------------------------------------------------------"
 
 # Configuration des partages Samba "Docs" et "Classes"
-if [ "$ENVIRONNEMENT" = "ubuntu-mate" ]
+if [ "$BUREAU" = "ubuntu-mate" ]
 then
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 <?xml version="1.0" encoding="utf-8" ?>
@@ -212,17 +204,15 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 		<!-- Volume definitions -->
 <volume
 		user="admin"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="netlogon-linux"
-		mountpoint="~/Clients-linux (sur le reseau)"
+		mountpoint="~/Clients-linux"
 		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
 />
 
 <volume
 		user="*"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="homes/Docs"
@@ -232,7 +222,6 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 
 <volume
 		user="*"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="Classes"
@@ -286,17 +275,15 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 		<!-- Volume definitions -->
 <volume
 		user="admin"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="netlogon-linux"
-		mountpoint="~/Bureau/Clients-linux (sur le reseau)"
+		mountpoint="~/Bureau/Clients-linux"
 		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
 />
 
 <volume
 		user="*"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="homes/Docs"
@@ -306,7 +293,6 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 
 <volume
 		user="*"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="Classes"
@@ -343,40 +329,80 @@ EOF
 
 fi
 
+sleep 5
 
-echo "--------------------------------------------------------------------------------------"
-echo " 8-Configuration pour l'impression avec le serveur CUPS du SE3				 		"
-echo "--------------------------------------------------------------------------------------"
+#echo "--------------------------------------------------------------------------------------"
+#echo " 8-Configuration pour l'impression avec le serveur CUPS du SE3				 		"
+#echo "--------------------------------------------------------------------------------------"
 
-mkdir "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.cups"
+#mkdir "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.cups"
 
-cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.cups/client.conf"
-ServerName $IP_SE3
-EOF
+#cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.cups/client.conf"
+#ServerName $IP_SE3
+#EOF
+
+sleep 5
 
 echo "--------------------------------------------------------------------------------------"
 echo " 9-Configuration du proxy															"
 echo "--------------------------------------------------------------------------------------"
 
-cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.profile"
+masque_reseau=$(($(echo "$se3mask" | grep -o "255" | wc -l)*8))
+ip_proxy="$(echo "$IP_PROXY" | cut -d ':' -f 1)"
+port_proxy="$(echo "$IP_PROXY" | cut -d ':' -f 2)"
+
+# Définition du proxy, si le port du proxy est défini
+if [ "$port_proxy" != "" ]
+then
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.profile"
 export http_proxy="http://$IP_PROXY"
 export https_proxy="http://$IP_PROXY"
-export no_proxy="localhost,127.0.0.1,$IP_SE3"
+export no_proxy="localhost,127.0.0.1,${IP_SE3}/${masque_reseau}"
 EOF
 
-cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/environment"
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/environment"
 http_proxy="http://$IP_PROXY"
 https_proxy="http://$IP_PROXY"
-no_proxy="localhost,127.0.0.1,$IP_SE3"
+no_proxy="localhost,127.0.0.1,${IP_SE3}/${masque_reseau}"
 EOF
 
+# On règle le proxy d'Iceweasel avec l'option "Configuration manuelle du proxy" et en cochant "Utilser ce proxy pour tous les protocoles"
+# On évite ainsi les problèmes d'accès aux sites en https, ...
+# Enfin, on désactive le proxy pour l'accès aux postes du réseau pédagogique (en particulier à l'interface web du se3)
+# On peut définir un paramètre de trois façons différentes :
+# - defaultPref : set new default value
+# - pref : set pref, but allow changes in current session
+# - lockPref : lock pref, disallow changes
 
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/firefox/syspref.js"
+	
+// Define proxy when an IP and PORT are specified
+lockPref("network.proxy.share_proxy_settings", true);
+lockPref("network.proxy.http", "${ip_proxy}");
+lockPref("network.proxy.http_port", ${port_proxy});
+lockPref("network.proxy.no_proxies_on", "localhost, 127.0.0.1, ${IP_SE3}/${masque_reseau}");
+lockPref("network.proxy.type", 1);
+EOF
+
+else
+
+# On règle le proxy d'Iceweasel avec l'option "Détection automatique des paramètres proxy pour ce réseau"
+# Cette option permet de gérer les réseaux qui n'ont pas de proxy (proxy transparent) ainsi que ceux gérés par un fichier wpad.dat (avec Amon par exemple)
+cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/etc/firefox/syspref.js"
+
+// Define proxy when no IP is specified for proxy
+lockPref("network.proxy.type", 4);
+EOF
+
+fi
+
+sleep 5
 
 echo "--------------------------------------------------------------------------------------"
 echo " 10-Configuration de lightdm 															"
 echo "--------------------------------------------------------------------------------------"
 
-if [ "$ENVIRONNEMENT" = "ubuntu" ] 
+if [ "$BUREAU" = "ubuntu" ] 
 then
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm.conf"
 [SeatDefaults]
@@ -393,26 +419,36 @@ allow-guest=false
 EOF
 fi
 
+# Sous certain bureau, comme MATE, le clavier n'est pas mis en azerty par le serveur X
+# On utilisa le commande xsetxkbmap fr pour forcer le layout du clavier en azerty
+# On enfonce le clou en exécutant la commande une 2de fois à l'ouverture de session
+# On en profite pour lancer le verrouillage numérique du clavier
+cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm.conf"
+display-setup-script=/usr/bin/setxkbmap fr
+greeter-setup-script=/usr/bin/numlockx on
+session-setup-script=/usr/bin/setxkbmap fr
+EOF
+
+sleep 5
+
 echo "--------------------------------------------------------------------------------------"
 echo " 11-Configuration de l environnement $ENVIRONNEMENT des clients lourds Xenial	 		"
 echo "--------------------------------------------------------------------------------------"
 
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade
-ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
-wolfram-engine shared/accepted-wolfram-eula boolean true
+ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<'EOF'
+ttf-mscorefonts-installer	msttcorefonts/dldir	string	
+ttf-mscorefonts-installer	msttcorefonts/dlurl	string	
+ttf-mscorefonts-installer	msttcorefonts/accepted-mscorefonts-eula	boolean	true
+ttf-mscorefonts-installer	msttcorefonts/present-mscorefonts-eula	note
 EOF
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y -f nano aptitude less wine vlc flashplugin-installer ubuntu-restricted-extras libavcodec-extra firefox-locale-fr
 
-# Inutile pour xenial qui possede nativement la version 5 de LO
-#ltsp-chroot --arch "$ENVIRONNEMENT" apt-get remove -y libreoffice*
-#ltsp-chroot --arch "$ENVIRONNEMENT" add-apt-repository -y ppa:libreoffice/ppa
-#ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update 
-#ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y -f install libreoffice libreoffice-l10n-fr
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y -f nano aptitude less wine vlc flashplugin-installer ubuntu-restricted-extras libavcodec-extra firefox-locale-fr xterm shutter numlockx
 
 
 # Pour mettre le clavier et certains éléments du bureau lubuntu en français ...
-if [ "$ENVIRONNEMENT" = "lubuntu" ] 
+if [ "$BUREAU" = "lubuntu" ] 
 then
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y ubuntu-keyboard-french language-pack-fr-base language-pack-gnome-fr-base
 fi
@@ -425,25 +461,84 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/xdg/user-dirs.defaults"
 DESKTOP=Desktop
 EOF
 
+sleep 5
+
 echo "--------------------------------------------------------------------------------------"
-echo " 13-Reconstruction de l'image squashfs (spécifique à Xenial avec NBD)					"
+echo " 13-Copie du skel dans le chroot														"
+echo "--------------------------------------------------------------------------------------"
+find /home/netlogon/clients-linux/ltsp/skel/ -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
+
+sleep 5
+
+echo "--------------------------------------------------------------------------------------"
+echo " 14-Extinction de tous les clients lourds à 19h par défaut							"
+echo "--------------------------------------------------------------------------------------"
+echo '0 19 * * * root /sbin/poweroff' > "/opt/ltsp/$ENVIRONNEMENT/etc/cron.d/extinction_clients_lourds"
+
+sleep 5
+
+
+echo "--------------------------------------------------------------------------------------"
+echo " 15-Desactivation d'apport (fenêtre qui peut indiquer de façon récurrente des erreurs souvent minimes) "
+echo "--------------------------------------------------------------------------------------"
+echo 'enabled=0' > /etc/default/apport
+
+sleep 5
+
+echo "--------------------------------------------------------------------------------------"
+echo " 15-Reconstruction de l'image squashfs (spécifique à Xenial avec NBD)					"
 echo "--------------------------------------------------------------------------------------"
 ltsp-update-image "$ENVIRONNEMENT"
 service nbd-server restart
 
-echo "--------------------------------------------------------------------------------------"
-echo " 14-Choisir le boot PXE par défaut des PC du réseau									"
-echo "--------------------------------------------------------------------------------------"
-echo " Voulez-vous que tous les PC de votre réseau démarrent en client lourd Xenial ? 		"
-echo " Taper o pour oui  																	"
-read REPONSE
-if [ "$REPONSE" = "o" ]
+sleep 5
+
+#echo "--------------------------------------------------------------------------------------"
+#echo " 15-Choisir le boot PXE par défaut des PC du réseau									"
+#echo "--------------------------------------------------------------------------------------"
+#echo " Voulez-vous que tous les PC de votre réseau démarrent en client lourd Xenial ? 		"
+#echo " Taper o pour oui  																	"
+#read REPONSE
+#if [ "$REPONSE" = "o" ]
+#then
+#	sed -i -e "s/^ONTIMEOUT*/ONTIMEOUT ltspXenial/g" /tftpboot/pxelinux.cfg/default		
+#fi
+
+echo "--------------------------------------"
+echo " 16-Sauvegarde du chroot des clients lourds (5 minutes)	    "
+echo "--------------------------------------"
+if [ ! -d "/var/se3/ltsp/originale" ]
 then
-	sed -i -e "s/^ONTIMEOUT*/ONTIMEOUT ltspXenial/g" /tftpboot/pxelinux.cfg/default		
+	mkdir -p "/var/se3/ltsp/originale"
+fi
+rm -rf "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
+cp -a "/opt/ltsp/$ENVIRONNEMENT" "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
+
+sleep 5
+
+echo "------------------------------------------------------------------------------------------------------------------------------"
+echo " 17- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Xenial 	    "
+echo "------------------------------------------------------------------------------------------------------------------------------"
+
+resultat=$(grep "Demarrer le pc en client lourd Xenial $BUREAU" "/tftpboot/pxelinux.cfg/default")
+
+if [ "$resultat" = "" ]
+then
+cat <<EOF >> "/tftpboot/pxelinux.cfg/default"
+LABEL ltsp
+	MENU LABEL ^Demarrer le pc en client lourd Xenial $BUREAU
+	KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
+	APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet splash nbdroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT root=/dev/nbd0
+	IPAPPEND 2
+EOF
 fi
 
+sleep 5
+
 echo "--------------------------------------------------------------------------------------"
-echo " 15-Redémarrage du serveur se3 dans 5 secondes ...										"
+echo " 18-Redémarrage du serveur se3 dans 5 secondes ...										"
 echo "--------------------------------------------------------------------------------------"
 sleep 5
+
+
 reboot
