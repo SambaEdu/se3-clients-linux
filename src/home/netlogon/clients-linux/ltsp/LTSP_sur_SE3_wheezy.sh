@@ -540,6 +540,7 @@ then
     *)
 		true
     ;;
+    esac
 fi
 
 # Logiciels bureautique:
@@ -625,7 +626,8 @@ rm -rf "$archive_processing" "${version_processing}.tgz"
 wget "http://download.processing.org/${version_processing}.tgz"
 tar zxvf "${version_processing}.tgz" && rm -f "${version_processing}.tgz"
 mv -f "$archive_processing" "/opt/ltsp/$ENVIRONNEMENT/opt/processing"
-cp -rf "/home/netlogon/clients-linux/ltsp/$DISTRIB/opt/processing/sketchbook" "/opt/ltsp/$ENVIRONNEMENT/opt/processing/"
+#cp -rf "/home/netlogon/clients-linux/ltsp/$DISTRIB/opt/processing/sketchbook" "/opt/ltsp/$ENVIRONNEMENT/opt/processing/"
+mkdir -p /opt/processing/sketchbook
 ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/processing && ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 755 /opt/processing
 ### Fin Processing ###
 
@@ -749,7 +751,7 @@ if [ -z "$resultat" ]
 then
 cat <<EOF >> "/tftpboot/pxelinux.cfg/perso.menu"
 LABEL ltsp"$DISTRIB"
-        MENU LABEL ^Demarrer le pc en client lourd DISTRIB $ENVIRONNEMENT avec NFS
+        MENU LABEL ^Demarrer le pc en client lourd $DISTRIB $ENVIRONNEMENT avec NFS
         KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
         APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet ip=dhcp boot=nfs nfsroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT
         IPAPPEND 2
