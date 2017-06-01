@@ -643,7 +643,7 @@ then
 fi
 #### Fin de l'installation d'Adobe Air
 # Pour installer Scratch 2, il suffira de lancer un client lourd, puis d'ouvrir un émulateur de console et saisir en tant que root :
-#version_scratch2='Scratch-456.0.1'
+#version_scratch2='Scratch-455'
 # wget "https://scratch.mit.edu/scratchr2/static/sa/${version_scratch2}.air"
 # Adobe\ AIR\ Application\ Installer
 # Selectionner le paquet .air de scrath2 puis une fois l'installation terminée et scratch 2 configurée comme souhaité, faire un:
