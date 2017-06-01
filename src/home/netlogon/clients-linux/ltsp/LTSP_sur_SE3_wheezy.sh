@@ -654,12 +654,12 @@ fi
 
 
 ### Installation de mBlock pour le robot mbot
-if [ "$ENVIRONNEMENT" = "amd64" ]   # La version 4 de mblock est disponible seulement en architecture amd64
+if [ "$ENVIRONNEMENT" = "amd64" ]   # La version 4 de mblock est disponible sous forme d'archive seulement pour une architecture amd64
 then
 	wget -O mBlock-4.0.0-linux-4.0.0.tar.gz 'https://github.com/Makeblock-official/mBlock/releases/download/V4.0.0-Linux/mBlock-4.0.0-linux-4.0.0.tar.gz'
 	tar zxvf mBlock-4.0.0-linux-4.0.0.tar.gz && rm -f mBlock-4.0.0-linux-4.0.0.tar.gz
 	mv -f mBlock "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock" && chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock"
-else	 							# Version en architecture i386
+else	 							# Mais un paquet .deb existe tout de même pour les architectures i386
 	ltsp-chroot --arch "$ENVIRONNEMENT" wget -O mBlock.deb 'https://mblockdev.blob.core.chinacloudapi.cn/mblock-src/mBlock.deb'
 	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i mBlock.deb && ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y
 	ltsp-chroot --arch "$ENVIRONNEMENT" rm -f mBlock.deb && chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/makeblock"
@@ -710,7 +710,12 @@ sleep 5
 echo "--------------------------------------------------------------------------------------"
 echo " 13-Reconstruction de l'image squashfs (pour NBD)					"
 echo "--------------------------------------------------------------------------------------"
-ltsp-update-image --config-nbd "$ENVIRONNEMENT"
+if [ "$DISTRIB" = "stretch" ]
+then	# Sous ltsp wheezy, pour un chroot debian, c'est nfs qui est utilisé par défaut, il faut utiliser l'option --config-nbd pour configurer nbd
+	ltsp-update-image --config-nbd "$ENVIRONNEMENT"
+else    # pour un chroot ubuntu, nbd est configuré par défaut pendant la construction du chroot donc l'option --config-nbd est inutile ...
+	ltsp-update-image "$ENVIRONNEMENT"
+fi
 service nbd-server restart
 
 echo "--------------------------------------"
