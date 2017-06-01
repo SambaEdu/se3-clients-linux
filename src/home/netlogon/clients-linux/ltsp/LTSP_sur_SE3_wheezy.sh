@@ -635,7 +635,7 @@ ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/processing && ltsp-c
 if [ "$DISTRIB" = "xenial" ]
 then
 	ltsp-chroot --arch "$ENVIRONNEMENT"	wget -O "adobe-air_${ENVIRONNEMENT}.deb" "http://drive.noobslab.com/data/apps/AdobeAir/adobeair_2.6.0.2_${ENVIRONNEMENT}.deb"
-	ltsp-chroot --arch "$ENVIRONNEMENT"	dpkg -i "adobe-air_${ENVIRONNEMENT}.deb" && ltsp-chroot --arch "$ENVIRONNEMENT"	apt-get install -f
+	ltsp-chroot --arch "$ENVIRONNEMENT"	dpkg -i "adobe-air_${ENVIRONNEMENT}.deb" && ltsp-chroot --arch "$ENVIRONNEMENT"	apt-get install -f -y
 	ltsp-chroot --arch "$ENVIRONNEMENT"	rm -f "adobe-air_${ENVIRONNEMENT}.deb"
 	
 	# Desactivation d'apport (fenêtre de signalement de bug logiciel)
@@ -658,11 +658,11 @@ if [ "$ENVIRONNEMENT" = "amd64" ]   # La version 4 de mblock est disponible seul
 then
 	wget -O mBlock-4.0.0-linux-4.0.0.tar.gz 'https://github.com/Makeblock-official/mBlock/releases/download/V4.0.0-Linux/mBlock-4.0.0-linux-4.0.0.tar.gz'
 	tar zxvf mBlock-4.0.0-linux-4.0.0.tar.gz && rm -f mBlock-4.0.0-linux-4.0.0.tar.gz
-	mv -f mBlock "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock" && chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock" && chmod -R 775 "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock"
+	mv -f mBlock "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock" && chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock"
 else	 							# Version en architecture i386
 	ltsp-chroot --arch "$ENVIRONNEMENT" wget -O mBlock.deb 'https://mblockdev.blob.core.chinacloudapi.cn/mblock-src/mBlock.deb'
-	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i mBlock.deb && ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f
-	ltsp-chroot --arch "$ENVIRONNEMENT" rm -f mBlock.deb
+	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i mBlock.deb && ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y
+	ltsp-chroot --arch "$ENVIRONNEMENT" rm -f mBlock.deb && chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/makeblock"
 fi
 # Créer le lanceur mblock et le mettre dans le dash du bureau mate
 ## Fin de l'installation de mblock
