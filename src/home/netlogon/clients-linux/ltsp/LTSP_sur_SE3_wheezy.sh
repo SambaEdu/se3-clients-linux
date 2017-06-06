@@ -464,6 +464,12 @@ echo "--------------------------------------------------------------------------
 echo " 9-Configuration de l environnement $ENVIRONNEMENT des clients lourds $DISTRIB	 	"
 echo "--------------------------------------------------------------------------------------"
 
+if [ "$ENVIRONNEMENT" = "amd64" ]
+then	# Prise en charge de l'architecture i386 pour 'installation de wine
+	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg --add-architecture i386
+	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
+fi
+
 if [ "$DISTRIB" = "xenial" ]
 then
 # Add _apt permissions on update-notifier
@@ -533,7 +539,8 @@ then
     amd64)		# Open-board (le successeur d'Open-Sankoro) n'est disponible qu'en version amd64
 		ltsp-chroot --arch "$ENVIRONNEMENT"	rm -f openboard_ubuntu_16.04_1.3.5_amd64.deb
 		ltsp-chroot --arch "$ENVIRONNEMENT"	wget 'https://github.com/OpenBoard-org/OpenBoard/releases/download/v1.3.5/openboard_ubuntu_16.04_1.3.5_amd64.deb'
-		ltsp-chroot --arch "$ENVIRONNEMENT"	dpkg -i openboard_ubuntu_16.04_1.3.5_amd64.deb && ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y 
+		ltsp-chroot --arch "$ENVIRONNEMENT"	dpkg -i openboard_ubuntu_16.04_1.3.5_amd64.deb 
+		ltsp-chroot --arch "$ENVIRONNEMENT"	apt-get install -f -y 
 		ltsp-chroot --arch "$ENVIRONNEMENT"	rm -f openboard_ubuntu_16.04_1.3.5_amd64.deb
     ;;
 
@@ -620,7 +627,7 @@ then
 fi
 
 # Nettoyage avant installation
-rm -rf "$archive_processing" "${version_processing}.tgz"
+rm -rf --one-file-system "$archive_processing" "${version_processing}.tgz"
 
 # Téléchargement de l'archive et désarchivage
 wget "http://download.processing.org/${version_processing}.tgz"
@@ -635,7 +642,8 @@ ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/processing && ltsp-c
 if [ "$DISTRIB" = "xenial" ]
 then
 	ltsp-chroot --arch "$ENVIRONNEMENT"	wget -O "adobe-air_${ENVIRONNEMENT}.deb" "http://drive.noobslab.com/data/apps/AdobeAir/adobeair_2.6.0.2_${ENVIRONNEMENT}.deb"
-	ltsp-chroot --arch "$ENVIRONNEMENT"	dpkg -i "adobe-air_${ENVIRONNEMENT}.deb" && ltsp-chroot --arch "$ENVIRONNEMENT"	apt-get install -f -y
+	ltsp-chroot --arch "$ENVIRONNEMENT"	dpkg -i "adobe-air_${ENVIRONNEMENT}.deb"
+	ltsp-chroot --arch "$ENVIRONNEMENT"	apt-get install -f -y
 	ltsp-chroot --arch "$ENVIRONNEMENT"	rm -f "adobe-air_${ENVIRONNEMENT}.deb"
 	
 	# Desactivation d'apport (fenêtre de signalement de bug logiciel)
