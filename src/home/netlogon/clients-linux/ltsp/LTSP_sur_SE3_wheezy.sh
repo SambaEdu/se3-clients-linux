@@ -741,12 +741,66 @@ EOF
 
 
 echo "--------------------------------------------------------------------------------------"
-echo " 11-Copie du skel dans le chroot														"
+echo " 11-Copie du skel dans le chroot (création des lanceurs)								"
 echo "--------------------------------------------------------------------------------------"
-find "/home/netlogon/clients-linux/ltsp/${DISTRIB}/skel/" -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
+#find "/home/netlogon/clients-linux/ltsp/${DISTRIB}/skel/" -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
+# Création des lanceurs dans les menus d'applications :
+
+# Pour Blockly Arduino :
+if [ "$DISTRIB" = "stretch" ]
+then # sous debian, c'est le navigateur s'appelle firefox-esr 
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/blockly.desktop "
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Type=Application
+Terminal=false
+Name=Blockly Arduino
+Name[fr_FR]=Blockly Arduino
+Comment=Logiciel de programmation
+Exec=firefox-esr %u file:///opt/Blockly-at-rduino-gh-pages/index.html?lang=fr&card=arduino_uno&webaccess=true&localcodebender=false&toolbox=toolbox_arduino_all&toolboxids=CAT_LOGIC,CAT_LOOPS,CAT_MATH,CAT_VARIABLES,CAT_FUNCTIONS,CAT_ARDUINO
+Icon=/opt/Blockly-at-rduino-gh-pages/favicon.png
+Icon[fr_FR]=/opt/Blockly-at-rduino-gh-pages/favicon.png
+Categories=Education;Programmation
+EOF
+else  # sous ubuntu, c'est le navigateur s'appelle firefox 
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/blockly.desktop "
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Type=Application
+Terminal=false
+Name=Blockly Arduino
+Name[fr_FR]=Blockly Arduino
+Comment=Logiciel de programmation
+Exec=firefox-esr %u file:///opt/Blockly-at-rduino-gh-pages/index.html?lang=fr&card=arduino_uno&webaccess=true&localcodebender=false&toolbox=toolbox_arduino_all&toolboxids=CAT_LOGIC,CAT_LOOPS,CAT_MATH,CAT_VARIABLES,CAT_FUNCTIONS,CAT_ARDUINO
+Icon=/opt/Blockly-at-rduino-gh-pages/favicon.png
+Icon[fr_FR]=/opt/Blockly-at-rduino-gh-pages/favicon.png
+Categories=Education;Programmation
+EOF
+fi
+
+# Pour processing :
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/processing.desktop "
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[fr_FR]=/opt/processing/lib/icons/pde-48.png
+Name[fr_FR]=processing
+Exec=sh /opt/processing/processing
+Name=processing
+Icon=/opt/processing/lib/icons/pde-48.png
+Categories=Education;Programmation
+EOF
 
 sleep 5
-
 
 echo "--------------------------------------------------------------------------------------"
 echo " 12-Extinction de tous les clients lourds à 19h par défaut							"
