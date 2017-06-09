@@ -749,7 +749,7 @@ echo "--------------------------------------------------------------------------
 # Pour Blockly Arduino :
 if [ "$DISTRIB" = "stretch" ]
 then # sous debian, c'est le navigateur s'appelle firefox-esr 
-cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/blockly.desktop "
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/blockly.desktop"
 #!/usr/bin/env xdg-open
 
 [Desktop Entry]
@@ -766,7 +766,7 @@ Icon[fr_FR]=/opt/Blockly-at-rduino-gh-pages/favicon.png
 Categories=Education;Programmation
 EOF
 else  # sous ubuntu, c'est le navigateur s'appelle firefox 
-cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/blockly.desktop "
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/blockly.desktop"
 #!/usr/bin/env xdg-open
 
 [Desktop Entry]
