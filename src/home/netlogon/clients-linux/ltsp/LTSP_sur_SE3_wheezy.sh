@@ -160,8 +160,8 @@ fi
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 3-Creation d'un compte local enseignant dans l'environnement des clients lourds												"
 echo "------------------------------------------------------------------------------------------------------------------------------"
-ltsp-chroot -m --arch "$ENVIRONNEMENT" adduser enseignant
-ltsp-chroot -m --arch "$ENVIRONNEMENT" chmod -R 700 /home/enseignant
+ltsp-chroot --arch "$ENVIRONNEMENT" adduser enseignant
+ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 700 /home/enseignant
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 4-Configuration de lts.conf afin que les clients lourds démarrent de façon complément autonome 								"
@@ -238,14 +238,7 @@ echo "--------------------------------------------------------------------------
 ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
 libnss-ldapd    libnss-ldapd/nsswitch    multiselect    group, passwd, shadow
 libnss-ldapd    libnss-ldapd/clean_nsswitch    boolean    false
-libpam-ldapd    libpam-ldapd/enable_shadow    boolean    true
-# Xenial : preseed responses for nslcd must be completed ...
-#nslcd    nslcd/ldap-bindpw    password    
-#nslcd    nslcd/ldap-starttls    boolean    true
-#nslcd    nslcd/ldap-base    string    $BASE_DN
-#nslcd    nslcd/ldap-reqcert    select   
-#nslcd    nslcd/ldap-uris    string    ldap://$IP_SE3/
-#nslcd    nslcd/ldap-binddn    string    
+libpam-ldapd    libpam-ldapd/enable_shadow    boolean    true 
 nslcd	nslcd/ldap-bindpw	password
 nslcd	nslcd/ldap-starttls	boolean	true
 nslcd	nslcd/ldap-sasl-authcid	string	
@@ -267,9 +260,9 @@ samba-common    samba-common/workgroup    string    $se3_domain
 samba-common    samba-common/do_debconf    boolean    true
 EOF
 
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y --no-install-recommends nslcd libnss-ldapd libpam-ldapd
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y --no-install-recommends libpam-mount cifs-utils
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y samba
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y --no-install-recommends nslcd libnss-ldapd libpam-ldapd
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y --no-install-recommends libpam-mount cifs-utils
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y samba
     
 # Sécurisation des communications entre le module PAM du client lourd et l'annuaire LDAP du se3
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/nslcd.conf"
@@ -298,7 +291,7 @@ sed -i -r -e "s/^.*wins +server +=.*$/wins server = $IP_SE3/" "/opt/ltsp/$ENVIRO
 sed -i '/@include common-session/i \session required pam_mkhomedir.so skel=/etc/skel umask=0077' "/opt/ltsp/$ENVIRONNEMENT/etc/pam.d/lightdm"
 
 # Mise des droits sur le skelette des home directory des utilisateurs de clients lourds
-ltsp-chroot -m --arch "$ENVIRONNEMENT" chmod -R 700 /etc/skel
+ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 700 /etc/skel
 
 sleep 5
 
@@ -464,12 +457,6 @@ echo "--------------------------------------------------------------------------
 echo " 9-Configuration de l environnement $ENVIRONNEMENT des clients lourds $DISTRIB	 	"
 echo "--------------------------------------------------------------------------------------"
 
-if [ "$ENVIRONNEMENT" = "amd64" ]
-then	# Prise en charge de l'architecture i386 pour 'installation de wine
-	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg --add-architecture i386
-	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
-fi
-
 if [ "$DISTRIB" = "xenial" ]
 then
 # Add _apt permissions on update-notifier
@@ -483,12 +470,43 @@ ttf-mscorefonts-installer	msttcorefonts/dlurl	string
 ttf-mscorefonts-installer	msttcorefonts/accepted-mscorefonts-eula	boolean	true
 ttf-mscorefonts-installer	msttcorefonts/present-mscorefonts-eula	note
 EOF
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y -f nano unzip aptitude less wine flashplugin-installer ubuntu-restricted-extras libavcodec-extra firefox-locale-fr xterm shutter numlockx
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y chromium-browser chromium-browser-l10n
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonfree
-ltsp-chroot -m --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
+
+# Dépots Ubuntu
+echo 'deb http://archive.canonical.com/ubuntu xenial partner' >> "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list"
+
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
+#ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y -f nano unzip aptitude less wine flashplugin-installer libavcodec-extra firefox-locale-fr xterm shutter numlockx
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y chromium-browser chromium-browser-l10n
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonfree
+ltsp-chroot --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
+
+	case "$BUREAU" in
+    ubuntu-mate)	# Sous le bureau Mate (Bureau par défaut)
+		ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y ubuntu-restricted-extras mate-desktop-environment-extras
+    ;;
+    
+    ubuntu)			# Sous le bureau Unity
+		ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y ubuntu-restricted-extras ubuntu-restricted-addons
+    ;;
+    
+    xubuntu)		# Sous le bureau Xubuntu
+		ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y xubuntu-restricted-extras xubuntu-restricted-addons xfce4-goodies xfwm4-themes
+    ;;
+    
+    lubuntu)		# Sous le bureau Lubuntu
+		ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y lubuntu-restricted-extras lubuntu-restricted-addons
+    ;;
+    
+    cinnamon)		
+		ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y cinnamon-desktop-environment cinnamon-l10n
+    ;;
+
+    *)
+		true
+    ;;
+    esac
+
 else 
 # Définitions des dépôts Debian
 cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list"
@@ -504,21 +522,21 @@ deb-src http://ftp.fr.debian.org/debian stretch-updates main non-free contrib
 deb http://ftp.fr.debian.org/debian stretch-backports main non-free contrib
 deb-src http://ftp.fr.debian.org/debian stretch-backports main non-free contrib
 EOF
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade 
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano unzip aptitude less firmware-linux wine ttf-mscorefonts-installer firefox-esr-l10n-fr numlockx system-config-printer
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y flashplugin-nonfree
-ltsp-chroot -m --arch "$ENVIRONNEMENT" update-flashplugin-nonfree --install				# Ne semble plus fonctionnelle sous Stretch ...
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y chromium chromium-l10n
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
+#ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade 
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y nano unzip aptitude less firmware-linux ttf-mscorefonts-installer firefox-esr-l10n-fr numlockx system-config-printer
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y flashplugin-nonfree
+ltsp-chroot --arch "$ENVIRONNEMENT" update-flashplugin-nonfree --install				# Ne semble plus fonctionnelle sous Stretch ...
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y chromium chromium-l10n
 	if [ "$ENVIRONNEMENT" = "amd64" ] # Depuis Jessie, le paquet pepperflashplugin-nonfree n'est dispo que sous architecture amd64
 	then 
-		ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonfree
-		ltsp-chroot -m --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
+		ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonfree
+		ltsp-chroot --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
 	fi
 fi
 
 # Afin de pouvoir imprimer et scanner :
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y cups sane
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y cups sane
 
 # Problème : 	pour les TNI/VPI, Openboard (successeur d'Open Sankore 2.5) n'est disponible qu'en .deb sur Ubuntu 14.04 et 16.04 en architecture 64
 #				et le paquet ne semble pas facilemenet installable sur Stretch Amd64:  des dépendances sont non satisfaites et un "apt-get install -f" ne les résout pas ...
@@ -528,20 +546,18 @@ then
 
     i386)		# le parquet Open-Sankore 2.5 de Precise fonctionne encore sur xenial : on l'utiliser car Open-board n'est pas dispo en i386
 		# Penser à activer le composing, sous Mate : Menu > Centre de Contrôle > Paramètres du bureau > Fenêtres > Cocher "Use compositing/Utiliser le compositing"
-		ltsp-chroot --arch "$ENVIRONNEMENT"	apt-get install -y libphonon4
-		ltsp-chroot --arch "$ENVIRONNEMENT"	rm -f 'Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip' && rm -rf --one-file-system opensankore 
-		ltsp-chroot --arch "$ENVIRONNEMENT"	wget 'http://www.cndp.fr/open-sankore/OpenSankore/Releases/v2.5.1/Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip'
-		ltsp-chroot --arch "$ENVIRONNEMENT"	unzip -d opensankore 'Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip' && rm -f 'Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip'
-		ltsp-chroot --arch "$ENVIRONNEMENT"	dpkg -i /opensankore/Open-Sankore_2.5.1_i386.deb
-        ltsp-chroot --arch "$ENVIRONNEMENT"	rm -rf --one-file-system /opensankore
+		ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y libphonon4
+		ltsp-chroot --arch "$ENVIRONNEMENT" rm rf --one-file-system 'Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip' opensankore
+		ltsp-chroot --arch "$ENVIRONNEMENT" wget -O 'Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip' 'http://www.cndp.fr/open-sankore/OpenSankore/Releases/v2.5.1/Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip' && ltsp-chroot --arch "$ENVIRONNEMENT" unzip -d opensankore 'Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip' && ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i /opensankore/Open-Sankore_2.5.1_i386.deb
+		ltsp-chroot --arch "$ENVIRONNEMENT" rm -f "Open-Sankore_Ubuntu_12.04_2.5.1_i386.zip"
+        ltsp-chroot --arch "$ENVIRONNEMENT" rm -rf --one-file-system /opensankore
     ;;
     
-    amd64)		# Open-board (le successeur d'Open-Sankoro) n'est disponible qu'en version amd64
-		ltsp-chroot --arch "$ENVIRONNEMENT"	rm -f openboard_ubuntu_16.04_1.3.5_amd64.deb
-		ltsp-chroot --arch "$ENVIRONNEMENT"	wget 'https://github.com/OpenBoard-org/OpenBoard/releases/download/v1.3.5/openboard_ubuntu_16.04_1.3.5_amd64.deb'
-		ltsp-chroot --arch "$ENVIRONNEMENT"	dpkg -i openboard_ubuntu_16.04_1.3.5_amd64.deb 
-		ltsp-chroot --arch "$ENVIRONNEMENT"	apt-get install -f -y 
-		ltsp-chroot --arch "$ENVIRONNEMENT"	rm -f openboard_ubuntu_16.04_1.3.5_amd64.deb
+    amd64)		# Open-board (le successeur d'Open-Sankoré) n'est disponible qu'en version amd64 ...
+		ltsp-chroot --arch "$ENVIRONNEMENT" rm -f openboard_ubuntu_16.04_1.3.5_amd64.deb
+		ltsp-chroot --arch "$ENVIRONNEMENT" wget -O 'openboard_ubuntu_16.04_1.3.5_amd64.deb' 'https://github.com/OpenBoard-org/OpenBoard/releases/download/v1.3.5/openboard_ubuntu_16.04_1.3.5_amd64.deb' && ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i openboard_ubuntu_16.04_1.3.5_amd64.deb
+		ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y
+		ltsp-chroot --arch "$ENVIRONNEMENT" rm -f openboard_ubuntu_16.04_1.3.5_amd64.deb
     ;;
 
     *)
@@ -551,16 +567,31 @@ then
 fi
 
 # Logiciels bureautique:
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y libreoffice libreoffice-l10n-fr scribus freeplane
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y libreoffice libreoffice-l10n-fr scribus freeplane
 
 # Logiciels pour le son/video:
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y vlc audacity openshot kdenlive breeze-icon-theme imagination
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y vlc audacity openshot kdenlive breeze-icon-theme imagination libav-tools
 
 # Logiciels pour la physique:
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install stellarium avogadro 
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install stellarium avogadro 
+
+# Logiciels mathématiques :
+# Dépot pour install geogebra 5 avec la commande apt-get :
+cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/geogebra.list"
+deb http://www.geogebra.net/linux/ stable main
+EOF
+# Ajouter la clé du dépot geogebra5
+ltsp-chroot --arch "$ENVIRONNEMENT" wget https://static.geogebra.org/linux/office@geogebra.org.gpg.key && ltsp-chroot --arch "$ENVIRONNEMENT" apt-key add office@geogebra.org.gpg.key
+ltsp-chroot --arch "$ENVIRONNEMENT" rm -f office@geogebra.org.gpg.key
+
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y algobox scilab geogebra5
+
+# Logiciels graphisme:
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install inkscape xia blender sweethome3d mypaint pinta 
 
 # Logiciels pour ICN/ISN (à compléter):
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install scratch ghex geany rurple-ng
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install scratch ghex geany rurple-ng
 
 if [ "$DISTRIB" = "stretch" ]
 then
@@ -576,22 +607,24 @@ EOF
 else
 	# Installation de pygame (1.9.2) pour Python 3 mais avec un dépôt non officiel ... A décommenter.
 	#ltsp-chroot --arch "$ENVIRONNEMENT" add-apt-repository -y ppa:thopiekar/pygame
-	#ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update 
-	#ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y idle-python3.5 python3-pygame
+	#ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update && ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y idle-python3.5 python3-pygame
 	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y idle-python3.5
 fi
 
+# sonic-pi
 ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
 jackd2   jackd/tweak_rt_limits   boolean false
 EOF
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install sonic-pi
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install sonic-pi
 
 ### Installation Arduino ###
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install arduino
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install arduino
 
-# On déplace le dossier sketchbook (contenant ardublock) dans le repertoire /opt/arduino/
-cp -rf "/home/netlogon/clients-linux/ltsp/${DISTRIB}/opt/arduino" "/opt/ltsp/$ENVIRONNEMENT/opt/"
-chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/arduino" && chmod -R 755 "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
+# On déplace le dossier sketchbook (contenant ardublock) dans le repertoire /opt/arduino/ et on récupère ardublock
+mkdir -p "/opt/ltsp/$ENVIRONNEMENT/opt/arduino/sketchbook/tools/ArduBlockTool/tool" "/opt/ltsp/$ENVIRONNEMENT/opt/arduino/sketchbook/libraries"
+wget -P "/opt/ltsp/$ENVIRONNEMENT/opt/arduino/sketchbook/tools/ArduBlockTool/tool" 'https://github.com/SambaEdu/se3-clients-linux/raw/master/src/home/netlogon/clients-linux/ltsp/stretch/opt/arduino/sketchbook/tools/ArduBlockTool/tool/ardublock-all-20130712.jar'
+chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
+chmod -R 755 "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
 
 # Utilisation du module pam_group.so pour ajouter les utilisateurs au groupe dialout (nécessaire pour pouvoir communiquer avec la carte arduino)
 sed -i '/pam_mount.so/i \auth	optional	pam_group.so' "/opt/ltsp/$ENVIRONNEMENT/etc/pam.d/common-auth"
@@ -608,8 +641,8 @@ EOF
 echo '*;*;*;Al0000-2400;dialout' >> "/opt/ltsp/$ENVIRONNEMENT/etc/security/group.conf"
 
 # Blockly arduino en local
-ltsp-chroot --arch "$ENVIRONNEMENT"	wget "https://github.com/technologiescollege/Blockly-at-rduino/archive/gh-pages.zip"
-ltsp-chroot --arch "$ENVIRONNEMENT"	unzip "gh-pages.zip" -d "/opt/" && ltsp-chroot --arch "$ENVIRONNEMENT"	rm -f "gh-pages.zip"
+ltsp-chroot --arch "$ENVIRONNEMENT" wget -O gh-pages.zip "https://github.com/technologiescollege/Blockly-at-rduino/archive/gh-pages.zip" && ltsp-chroot --arch "$ENVIRONNEMENT" unzip "gh-pages.zip" -d "/opt/"
+ltsp-chroot --arch "$ENVIRONNEMENT" rm -f "gh-pages.zip"
 ### Fin Arduino ###
 
 ### Installation Processing ###
@@ -630,21 +663,22 @@ fi
 rm -rf --one-file-system "$archive_processing" "${version_processing}.tgz"
 
 # Téléchargement de l'archive et désarchivage
-wget "http://download.processing.org/${version_processing}.tgz"
-tar zxvf "${version_processing}.tgz" && rm -f "${version_processing}.tgz"
+wget -O "${version_processing}.tgz" "http://download.processing.org/${version_processing}.tgz" && tar zxvf "${version_processing}.tgz"
+rm -f "${version_processing}.tgz"
 mv -f "$archive_processing" "/opt/ltsp/$ENVIRONNEMENT/opt/processing"
-#cp -rf "/home/netlogon/clients-linux/ltsp/$DISTRIB/opt/processing/sketchbook" "/opt/ltsp/$ENVIRONNEMENT/opt/processing/"
-mkdir -p /opt/processing/sketchbook
-ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/processing && ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 755 /opt/processing
+# Le repertoire sketchbook est créé dans /opt/processing/
+mkdir -p "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/examples" "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/libraries" 
+mkdir "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/modes" "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/tools" 
+ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/processing
+ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 755 /opt/processing
 ### Fin Processing ###
 
 ### Installation d'Adobe Air (un paquet .deb semble n'exister que sous Ubuntu)
 if [ "$DISTRIB" = "xenial" ]
 then
-	ltsp-chroot --arch "$ENVIRONNEMENT"	wget -O "adobe-air_${ENVIRONNEMENT}.deb" "http://drive.noobslab.com/data/apps/AdobeAir/adobeair_2.6.0.2_${ENVIRONNEMENT}.deb"
-	ltsp-chroot --arch "$ENVIRONNEMENT"	dpkg -i "adobe-air_${ENVIRONNEMENT}.deb"
-	ltsp-chroot --arch "$ENVIRONNEMENT"	apt-get install -f -y
-	ltsp-chroot --arch "$ENVIRONNEMENT"	rm -f "adobe-air_${ENVIRONNEMENT}.deb"
+	ltsp-chroot --arch "$ENVIRONNEMENT" wget -O "adobe-air_${ENVIRONNEMENT}.deb" "http://drive.noobslab.com/data/apps/AdobeAir/adobeair_2.6.0.2_${ENVIRONNEMENT}.deb" && ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i "adobe-air_${ENVIRONNEMENT}.deb"
+	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y
+	ltsp-chroot --arch "$ENVIRONNEMENT" rm -f "adobe-air_${ENVIRONNEMENT}.deb"
 	
 	# Desactivation d'apport (fenêtre de signalement de bug logiciel)
 	echo 'enabled=0' > "/opt/ltsp/$ENVIRONNEMENT/etc/default/apport"
@@ -660,36 +694,32 @@ fi
 # scp ~/Bureau/scratch2.desktop "root@IP_SERVEUR_LTSP:/opt/$ENVIRONEMENT/etc/skel/Bureau"
 ### Fin de l'installation de scratch 2
 
-
 ### Installation de mBlock pour le robot mbot
 if [ "$ENVIRONNEMENT" = "amd64" ]   # La version 4 de mblock est disponible sous forme d'archive seulement pour une architecture amd64
 then
-	wget -O mBlock-4.0.0-linux-4.0.0.tar.gz 'https://github.com/Makeblock-official/mBlock/releases/download/V4.0.0-Linux/mBlock-4.0.0-linux-4.0.0.tar.gz'
-	tar zxvf mBlock-4.0.0-linux-4.0.0.tar.gz && rm -f mBlock-4.0.0-linux-4.0.0.tar.gz
-	mv -f mBlock "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock" && chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock"
+	wget -O 'mBlock-4.0.0-linux-4.0.0.tar.gz' 'https://github.com/Makeblock-official/mBlock/releases/download/V4.0.0-Linux/mBlock-4.0.0-linux-4.0.0.tar.gz' && tar zxvf 'mBlock-4.0.0-linux-4.0.0.tar.gz'
+	rm -f 'mBlock-4.0.0-linux-4.0.0.tar.gz'
+	mv -f mBlock "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock"
+	chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock"
 else	 							# Mais un paquet .deb existe tout de même pour les architectures i386
 	ltsp-chroot --arch "$ENVIRONNEMENT" wget -O mBlock.deb 'https://mblockdev.blob.core.chinacloudapi.cn/mblock-src/mBlock.deb'
-	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i mBlock.deb && ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y
+	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i mBlock.deb
+	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y
 	ltsp-chroot --arch "$ENVIRONNEMENT" rm -f mBlock.deb && chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/makeblock"
 fi
 # Créer le lanceur mblock et le mettre dans le dash du bureau mate
 ## Fin de l'installation de mblock
 
-# Logiciels mathématiques :
-# Dépot pour install geogebra 5 avec la commande apt-get :
-cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/geogebra.list"
-deb http://www.geogebra.net/linux/ stable main
-EOF
-# Ajouter la clé du dépot geogebra5
-ltsp-chroot --arch "$ENVIRONNEMENT" wget https://static.geogebra.org/linux/office@geogebra.org.gpg.key
-ltsp-chroot --arch "$ENVIRONNEMENT" apt-key add office@geogebra.org.gpg.key
-ltsp-chroot --arch "$ENVIRONNEMENT" rm -f office@geogebra.org.gpg.key
-
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y algobox scilab geogebra5
-
-# Logiciels graphisme:
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install inkscape xia blender sweethome3d mypaint pinta 
+if [ "$ENVIRONNEMENT" = "amd64" ]
+then	# Prise en charge de l'architecture i386 pour 'installation de wine
+	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg --add-architecture i386
+	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
+	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y wine
+	#ltsp-chroot --arch "$ENVIRONNEMENT" dpkg --remove-architecture i386
+	#ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
+else
+	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y wine
+fi
 
 echo "--------------------------------------------------------------------------------------"
 echo " 10-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
