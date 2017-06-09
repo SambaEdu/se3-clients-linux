@@ -182,6 +182,7 @@ echo " 4.5 - Configuration du timezone (paquet tzdata) pour éviter un décalage
 ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
 tzdata	tzdata/Zones/Etc	select	UTC
 tzdata	tzdata/Zones/Europe	select	Paris
+tzdata  tzdata/Areas	select  Europe
 EOF
 dpkg-reconfigure tzdata --frontend=noninteractive --priority=critical
 
