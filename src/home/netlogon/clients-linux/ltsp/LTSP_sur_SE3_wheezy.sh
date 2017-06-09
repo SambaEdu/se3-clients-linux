@@ -626,6 +626,10 @@ wget -P "/opt/ltsp/$ENVIRONNEMENT/opt/arduino/sketchbook/tools/ArduBlockTool/too
 chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
 chmod -R 755 "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
 
+# On copie le fichier de de préférence dans le skel :
+mkdir "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.arduino"
+wget -P "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.arduino" 'https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/ltsp/skel/.arduino/preferences.txt'
+
 # Utilisation du module pam_group.so pour ajouter les utilisateurs au groupe dialout (nécessaire pour pouvoir communiquer avec la carte arduino)
 sed -i '/pam_mount.so/i \auth	optional	pam_group.so' "/opt/ltsp/$ENVIRONNEMENT/etc/pam.d/common-auth"
 
@@ -671,6 +675,12 @@ mkdir -p "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/examples" "/opt/lts
 mkdir "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/modes" "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/tools" 
 ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/processing
 ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 755 /opt/processing
+
+# On copie les fichier de conf de processing dans le skel :
+mkdir -p "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.processing/console" 
+echo 'fr' > "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.processing/language.txt"
+wget -P "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.processing" 'https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/ltsp/skel/.processing/preferences.txt'
+
 ### Fin Processing ###
 
 ### Installation d'Adobe Air (un paquet .deb semble n'exister que sous Ubuntu)
