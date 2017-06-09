@@ -785,7 +785,7 @@ EOF
 fi
 
 # Pour processing :
-cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/processing.desktop "
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/processing.desktop"
 #!/usr/bin/env xdg-open
 
 [Desktop Entry]
