@@ -589,7 +589,7 @@ ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y algobox scilab geogebra5
 
 # Logiciels graphisme:
-ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install inkscape xia blender sweethome3d mypaint pinta 
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install inkscape xia blender sweethome3d mypaint pinta 
 
 # Logiciels pour ICN/ISN (à compléter):
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install scratch ghex geany rurple-ng
