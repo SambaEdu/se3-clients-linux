@@ -477,7 +477,7 @@ echo 'deb http://archive.canonical.com/ubuntu xenial partner' >> "/opt/ltsp/$ENV
 
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
 #ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade
-ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y -f nano unzip aptitude less wine flashplugin-installer libavcodec-extra firefox-locale-fr xterm shutter numlockx
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y -f nano unzip aptitude less flashplugin-installer libavcodec-extra firefox-locale-fr xterm shutter numlockx
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y chromium-browser chromium-browser-l10n
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonfree
 ltsp-chroot --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
