@@ -404,18 +404,18 @@ EOF
 
 	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/$PREF_FIREFOX"
 // Define proxy when an IP and PORT are specified
-defaultPref("network.proxy.share_proxy_settings", true);
-defaultPref("network.proxy.http", "${ip_proxy}");
-defaultPref("network.proxy.http_port", ${port_proxy});
-defaultPref("network.proxy.no_proxies_on", "localhost, 127.0.0.1, ${IP_SE3}/${masque_reseau}");
-defaultPref("network.proxy.type", 1);
+pref("network.proxy.share_proxy_settings", true);
+pref("network.proxy.http", "${ip_proxy}");
+pref("network.proxy.http_port", ${port_proxy});
+pref("network.proxy.no_proxies_on", "localhost, 127.0.0.1, ${IP_SE3}/${masque_reseau}");
+pref("network.proxy.type", 1);
 EOF
 else
 # On règle le proxy d'Iceweasel avec l'option "Détection automatique des paramètres proxy pour ce réseau"
 # Cette option permet de gérer les réseaux qui n'ont pas de proxy (proxy transparent) ainsi que ceux gérés par un fichier wpad.dat (avec Amon par exemple)
 	cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/etc/$PREF_FIREFOX"
 // Define proxy when no IP is specified for proxy
-defaultPref("network.proxy.type", 4);
+pref("network.proxy.type", 4);
 EOF
 fi
 
@@ -472,19 +472,19 @@ ttf-mscorefonts-installer	msttcorefonts/accepted-mscorefonts-eula	boolean	true
 ttf-mscorefonts-installer	msttcorefonts/present-mscorefonts-eula	note
 EOF
 
-# Dépots Ubuntu
-echo 'deb http://archive.canonical.com/ubuntu xenial partner' >> "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list"
+# Dépots Ubuntu partenaire
+# echo 'deb http://archive.canonical.com/ubuntu xenial partner' >> "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list"
 
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
 #ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade
-ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y -f nano unzip aptitude less flashplugin-installer libavcodec-extra firefox-locale-fr xterm shutter numlockx
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y -f nano unzip aptitude less flashplugin-installer firefox-locale-fr xterm shutter numlockx
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y chromium-browser chromium-browser-l10n
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonfree
 ltsp-chroot --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
 
 	case "$BUREAU" in
     ubuntu-mate)	# Sous le bureau Mate (Bureau par défaut)
-		ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y ubuntu-restricted-extras mate-desktop-environment-extras
+		ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y ubuntu-restricted-extras
     ;;
     
     ubuntu)			# Sous le bureau Unity
@@ -636,9 +636,9 @@ sed -i '/pam_mount.so/i \auth	optional	pam_group.so' "/opt/ltsp/$ENVIRONNEMENT/e
 
 # le fichier pam common-auth a été modifié : il est nécessaire de préconfigurer le module libpam-runtime afin qu'il accepte les modifs apportées
 ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<'EOF'
-libpam-runtime	libpam-runtime/no_profiles_chosen	error	
+libpam-runtime	libpam-runtime/no_profiles_chosen	error
 libpam-runtime	libpam-runtime/override	boolean	false
-libpam-runtime	libpam-runtime/conflicts	error	
+libpam-runtime	libpam-runtime/conflicts	error
 libpam-runtime	libpam-runtime/profiles	multiselect	unix, libpam-mount, ldap, systemd, gnome-keyring
 EOF
 
@@ -684,27 +684,6 @@ wget -P "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.processing" 'https://raw.githubuserc
 
 ### Fin Processing ###
 
-### Installation d'Adobe Air (un paquet .deb semble n'exister que sous Ubuntu)
-if [ "$DISTRIB" = "xenial" ]
-then
-	ltsp-chroot --arch "$ENVIRONNEMENT" wget -O "adobe-air_${ENVIRONNEMENT}.deb" "http://drive.noobslab.com/data/apps/AdobeAir/adobeair_2.6.0.2_${ENVIRONNEMENT}.deb" && ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i "adobe-air_${ENVIRONNEMENT}.deb"
-	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y
-	ltsp-chroot --arch "$ENVIRONNEMENT" rm -f "adobe-air_${ENVIRONNEMENT}.deb"
-	
-	# Desactivation d'apport (fenêtre de signalement de bug logiciel)
-	echo 'enabled=0' > "/opt/ltsp/$ENVIRONNEMENT/etc/default/apport"
-fi
-#### Fin de l'installation d'Adobe Air
-# Pour installer Scratch 2, il suffira de lancer un client lourd, puis d'ouvrir un émulateur de console et saisir en tant que root :
-#version_scratch2='Scratch-455'
-# wget "https://scratch.mit.edu/scratchr2/static/sa/${version_scratch2}.air"
-# Adobe\ AIR\ Application\ Installer
-# Selectionner le paquet .air de scrath2 puis une fois l'installation terminée et scratch 2 configurée comme souhaité, faire un:
-# scp -r '/opt/scratch 2' "root@IP_SERVEUR_LTSP:/opt/$ENVIRONEMENT/opt/"
-# Copie le lanceur Sratch 2 disponible sur le bureau :
-# scp ~/Bureau/scratch2.desktop "root@IP_SERVEUR_LTSP:/opt/$ENVIRONEMENT/etc/skel/Bureau"
-### Fin de l'installation de scratch 2
-
 ### Installation de mBlock pour le robot mbot
 if [ "$ENVIRONNEMENT" = "amd64" ]   # La version 4 de mblock est disponible sous forme d'archive seulement pour une architecture amd64
 then
@@ -725,12 +704,33 @@ if [ "$ENVIRONNEMENT" = "amd64" ]
 then	# Prise en charge de l'architecture i386 pour 'installation de wine
 	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg --add-architecture i386
 	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
-	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y wine
+	ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y wine
 	#ltsp-chroot --arch "$ENVIRONNEMENT" dpkg --remove-architecture i386
 	#ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
 else
-	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y wine
+	ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y wine
 fi
+
+### Installation d'Adobe Air (un paquet .deb semble n'exister que sous Ubuntu)
+if [ "$DISTRIB" = "xenial" ]
+then
+	ltsp-chroot --arch "$ENVIRONNEMENT" wget -O "adobe-air_${ENVIRONNEMENT}.deb" "http://drive.noobslab.com/data/apps/AdobeAir/adobeair_2.6.0.2_${ENVIRONNEMENT}.deb" && ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i "adobe-air_${ENVIRONNEMENT}.deb"
+	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y
+	ltsp-chroot --arch "$ENVIRONNEMENT" rm -f "adobe-air_${ENVIRONNEMENT}.deb"
+	
+	# Desactivation d'apport (fenêtre de signalement de bug logiciel)
+	echo 'enabled=0' > "/opt/ltsp/$ENVIRONNEMENT/etc/default/apport"
+fi
+#### Fin de l'installation d'Adobe Air
+# Pour installer Scratch 2, il suffira de lancer un client lourd, puis d'ouvrir un émulateur de console et saisir en tant que root :
+#version_scratch2='Scratch-455'
+# wget "https://scratch.mit.edu/scratchr2/static/sa/${version_scratch2}.air"
+# Adobe\ AIR\ Application\ Installer
+# Selectionner le paquet .air de scrath2 puis une fois l'installation terminée et scratch 2 configurée comme souhaité, faire un:
+# scp -r '/opt/scratch 2' "root@IP_SERVEUR_LTSP:/opt/$ENVIRONEMENT/opt/"
+# Copie le lanceur Sratch 2 disponible sur le bureau :
+# scp ~/Bureau/scratch2.desktop "root@IP_SERVEUR_LTSP:/opt/$ENVIRONEMENT/etc/skel/Bureau"
+### Fin de l'installation de scratch 2
 
 echo "--------------------------------------------------------------------------------------"
 echo " 10-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
