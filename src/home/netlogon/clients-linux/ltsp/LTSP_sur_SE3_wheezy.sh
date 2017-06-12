@@ -174,7 +174,6 @@ LTSP_CONFIG=true
 KEEP_SYSTEM_SERVICES="lightdm"      # Indique à l'environnement du client lourd de lancer lightdm lors du démarrage
 DEFAULT_DISPLAY_MANAGER=""          # Lance le gestionnaire d'affichage présent dans l'environnement des clients lourds (lightdm) à la place de LDM
 XKBLAYOUT=fr						# Peut être util sur Ubuntu, pour certains bureaux (lubuntu)
-NBD_SWAP=False						# Normalement à False par défaut mais sait-on jamais ...
 USE_LOCAL_SWAP=true					# Pour utiliser une éventuelle partition swap présente sur le disque dur local du client lourd
 EOF
 
@@ -817,7 +816,7 @@ Icon=/opt/Blockly-at-rduino-gh-pages/favicon.png
 Icon[fr_FR]=/opt/Blockly-at-rduino-gh-pages/favicon.png
 Categories=Education;Programmation
 EOF
-else  # sous ubuntu, c'est le navigateur s'appelle firefox 
+else  # sous ubuntu, le navigateur s'appelle firefox et non firefox-esr
 cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/blockly.desktop"
 #!/usr/bin/env xdg-open
 
@@ -846,11 +845,30 @@ Type=Application
 Terminal=false
 Icon[fr_FR]=/opt/processing/lib/icons/pde-48.png
 Name[fr_FR]=processing
-Exec=sh /opt/processing/processing
+Exec=/opt/processing/processing
 Name=processing
 Icon=/opt/processing/lib/icons/pde-48.png
 Categories=Education;Programmation
 EOF
+
+# Pour mBlock (V4) sous architecture amd64 (en architecture i386, le .deb se charge de créer le lanceur)
+if [ "$ENVIRONNEMENT" = "amd64" ]
+then
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/mblock.desktop"
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[fr_FR]=/opt/mBlock/resources/web/images/loading_panda.png
+Name[fr_FR]=mBlock
+Exec=/opt/mBlock/mblock
+Name=mBlock
+Icon=/opt/mBlock/resources/web/images/loading_panda.png
+Categories=Education;Programmation
+EOF
+fi
 
 sleep 5
 
