@@ -104,9 +104,11 @@ else # Sous Xenial
 fi
 
 REP_MONTAGE='~/Bureau'											# Valeur par défaut
+FF_MONTAGE='/home/$USER/Bureau'									# Valeur par défaut	
 if [ "$BUREAU" = "mate" ] || [ "$BUREAU" = "ubuntu-mate" ]		# Sous mate, les partages doivent être montés dans ~ à la place de ~/Bureau
 then
 	REP_MONTAGE='~'
+	FF_MONTAGE='/home/$USER'
 fi
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
@@ -450,6 +452,55 @@ cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm.conf"
 display-setup-script=/usr/bin/setxkbmap fr
 greeter-setup-script=/usr/bin/numlockx on
 session-setup-script=/usr/bin/setxkbmap fr
+EOF
+
+# Création d'un lanceur qui va se charger de créer un profil firefox persistant dans le partage Docs de l'utilisateur qui se loggue
+# La logique est la suivante :
+# Si un répertoire .mozilla est présent dans le "~" alors on ne fait rien car cela signifie que l'administrateur a déposé un .mozilla modèle sur le serveur ltsp dans /etc/skel/.mozilla afin de le rendre non persistant
+# Sinon, on créé un profil .mozilla persistant dans le partage Docs/.ltsp/.mozilla en copiant, s'il existe, un éventuel modèle mis par l'administrateur dans /home/.mozilla sur le serveur ltsp.
+# Restera à voir comment gérer les maj des profils firefox persistants ...
+
+# On crée la partie "variable" du script (FF_MONTAGE vaut ~ ou ~/Bureau selon le bureau installé dans le chroot)
+cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/logon.sh"
+#!/bin/sh
+# Script executé en tant qu utilisateur apres l ouverture de session et qui se charge de créer un profil firefox persistant par utilisateur dans le partage samba Docs/.ltsp/.mozilla
+local REP="$FF_MONTAGE"
+EOF
+
+# On crée la partie "fixe" du script:
+cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/logon.sh"
+exec > "/home/$USER/.logon.log" 2>&1
+set -x
+
+if [ ! -d "/home/$USER/.mozilla" ] && [ -d "$REP/Docs (sur le reseau)" ]
+then
+        if [ ! -d "$REP/Docs (sur le reseau)/.ltsp/.mozilla" ]
+        then
+                [ ! -d "$REP/Docs (sur le reseau)/.ltsp" ] && mkdir "$REP/Docs (sur le reseau)/.ltsp"
+                if [ -d '/home/.mozilla' ]
+                then
+                        cp -r "/home/.mozilla" "$REP/Docs (sur le reseau)/.ltsp/.mozilla"
+                else
+						mkdir "$REP/Docs (sur le reseau)/.ltsp/.mozilla"
+                fi
+        fi
+        ln -s "$REP/Docs (sur le reseau)/.ltsp/.mozilla" "/home/$USER/.mozilla" 
+fi
+exit 0
+EOF
+
+ltsp-chroot --arch "$ENVIRONNEMENT" chmod 755 /usr/local/bin/logon.sh
+
+# Création du lanceur .desktop qui se chargera d'exécuter le script précédent à l'ouverture de session
+rm -rf "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.config/autostart"
+mkdir -p "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.config/autostart"
+
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.config/autostart/logon.desktop"
+[Desktop Entry]
+Type=Application
+Name=FirefoxProfil
+Exec=/usr/local/bin/logon.sh
+Terminal=false
 EOF
 
 sleep 5
