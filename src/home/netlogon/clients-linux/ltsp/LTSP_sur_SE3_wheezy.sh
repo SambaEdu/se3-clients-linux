@@ -384,15 +384,22 @@ port_proxy="$(echo "$IP_PROXY" | cut -d ':' -f 2)"
 if [ ! -z "$port_proxy" ]
 then
 	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.profile"
-export http_proxy="http://$IP_PROXY"
 export https_proxy="http://$IP_PROXY"
 export no_proxy="localhost,127.0.0.1,${IP_SE3}/${masque_reseau}"
 EOF
 
 	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/environment"
-http_proxy="http://$IP_PROXY"
 https_proxy="http://$IP_PROXY"
 no_proxy="localhost,127.0.0.1,${IP_SE3}/${masque_reseau}"
+EOF
+
+	cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/apt.conf.d/95proxy"
+Acquire::https::proxy "https://$IP_PROXY/";
+EOF
+
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/wgetrc"
+https_proxy = http://$IP_PROXY/
+use_proxy = on
 EOF
 
 # On règle le proxy de Firefox avec l'option "Configuration manuelle du proxy" et en cochant "Utilser ce proxy pour tous les protocoles"
