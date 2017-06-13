@@ -470,7 +470,7 @@ EOF
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/logon.sh"
 #!/bin/sh
 # Script executé en tant qu utilisateur apres l ouverture de session et qui se charge de créer un profil firefox persistant par utilisateur dans le partage samba Docs/.ltsp/.mozilla
-local REP="$FF_MONTAGE"
+REP="$FF_MONTAGE"
 EOF
 
 # On crée la partie "fixe" du script:
