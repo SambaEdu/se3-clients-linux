@@ -598,7 +598,7 @@ ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y cups sane
 
 # Problème : 	pour les TNI/VPI, Openboard (successeur d'Open Sankore 2.5) n'est disponible qu'en .deb sur Ubuntu 14.04 et 16.04 en architecture 64
 #				et le paquet ne semble pas facilemenet installable sur Stretch Amd64:  des dépendances sont non satisfaites et un "apt-get install -f" ne les résout pas ...
-if [ "$DISTRIB=xenial" ]
+if [ "$DISTRIB" = "xenial" ]
 then
 	case "$ENVIRONNEMENT" in
 
