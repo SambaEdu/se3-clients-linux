@@ -804,9 +804,9 @@ echo "--------------------------------------------------------------------------
 #find "/home/netlogon/clients-linux/ltsp/${DISTRIB}/skel/" -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
 # Création des lanceurs dans les menus d'applications :
 
-# Pour Blockly Arduino :
 if [ "$DISTRIB" = "stretch" ]
 then # sous debian, c'est le navigateur s'appelle firefox-esr 
+# Pour Blockly Arduino :
 cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/blockly.desktop"
 #!/usr/bin/env xdg-open
 
@@ -823,7 +823,27 @@ Icon=/opt/Blockly-at-rduino-gh-pages/favicon.png
 Icon[fr_FR]=/opt/Blockly-at-rduino-gh-pages/favicon.png
 Categories=Education;Programmation
 EOF
+
+# Pour Xcas online :
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/xcas.desktop"
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Type=Application
+Terminal=false
+Name=Xcas Online
+Name[fr_FR]=Xcas Online
+Comment=Logiciel de calcul formel
+Exec=firefox-esr %u http://www.xcasenligne.fr/giac_online/demoGiacPhp.php
+Icon=/usr/share/icons/hicolor/256x256/apps/Xcaslogo.png
+Icon[fr_FR]=/usr/share/icons/hicolor/256x256/apps/Xcaslogo.png
+Categories=Education;Programmation
+EOF
+
 else  # sous ubuntu, le navigateur s'appelle firefox et non firefox-esr
+# Pour Blockly Arduino :
 cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/blockly.desktop"
 #!/usr/bin/env xdg-open
 
@@ -840,7 +860,29 @@ Icon=/opt/Blockly-at-rduino-gh-pages/favicon.png
 Icon[fr_FR]=/opt/Blockly-at-rduino-gh-pages/favicon.png
 Categories=Education;Programmation
 EOF
+
+# Pour Xcas online :
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/xcas.desktop"
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Type=Application
+Terminal=false
+Name=Xcas Online
+Name[fr_FR]=Xcas Online
+Comment=Logiciel de calcul formel
+Exec=firefox %u http://www.xcasenligne.fr/giac_online/demoGiacPhp.php
+Icon=/usr/share/icons/hicolor/256x256/apps/Xcaslogo.png
+Icon[fr_FR]=/usr/share/icons/hicolor/256x256/apps/Xcaslogo.png
+Categories=Education;Programmation
+EOF
+
 fi
+
+# Icones pour Xcas
+ltsp-chroot --arch "$ENVIRONNEMENT" wget -P "/usr/share/icons/hicolor/256x256/apps" 'https://upload.wikimedia.org/wikipedia/fr/2/2d/Xcaslogo.png'
 
 # Pour processing :
 cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/processing.desktop"
