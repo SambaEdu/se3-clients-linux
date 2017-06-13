@@ -747,7 +747,8 @@ then
 	wget -O 'mBlock-4.0.0-linux-4.0.0.tar.gz' 'https://github.com/Makeblock-official/mBlock/releases/download/V4.0.0-Linux/mBlock-4.0.0-linux-4.0.0.tar.gz' && tar zxvf 'mBlock-4.0.0-linux-4.0.0.tar.gz'
 	rm -f 'mBlock-4.0.0-linux-4.0.0.tar.gz'
 	mv -f mBlock "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock"
-	chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock"
+	ltsp-chroot --arch "$ENVIRONNEMENT" mkdir /opt/mBlock/mblock-setting
+	ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/mBlock
 else	 							# Mais un paquet .deb existe tout de même pour les architectures i386
 	ltsp-chroot --arch "$ENVIRONNEMENT" wget -O mBlock.deb 'https://mblockdev.blob.core.chinacloudapi.cn/mblock-src/mBlock.deb'
 	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i mBlock.deb
