@@ -773,10 +773,13 @@ then
 	ltsp-chroot --arch "$ENVIRONNEMENT" mkdir /opt/mBlock/mblock-setting
 	ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/mBlock
 else	 							# Mais un paquet .deb existe tout de même pour les architectures i386
-	ltsp-chroot --arch "$ENVIRONNEMENT" wget -O mBlock.deb 'https://mblockdev.blob.core.chinacloudapi.cn/mblock-src/mBlock.deb'
-	ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i mBlock.deb
-	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y
-	ltsp-chroot --arch "$ENVIRONNEMENT" rm -f mBlock.deb && chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/makeblock"
+	# Le téléchargement de ce paquet (disponible sur le site officiel de mblock) est très lent et échoue très souvent ... 
+	# De plus, le paquet ajoute et lance au démarrage du client, un service ideserviceplus dont le rôle n'est pas documenté sur internet
+	#ltsp-chroot --arch "$ENVIRONNEMENT" wget -O mBlock.deb 'https://mblockdev.blob.core.chinacloudapi.cn/mblock-src/mBlock.deb'
+	#ltsp-chroot --arch "$ENVIRONNEMENT" dpkg -i mBlock.deb
+	#ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -f -y
+	#ltsp-chroot --arch "$ENVIRONNEMENT" rm -f mBlock.deb && chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/makeblock"
+	echo 'Pas de version de mblock installable pour architecture i386'
 fi
 # Créer le lanceur mblock et le mettre dans le dash du bureau mate
 ## Fin de l'installation de mblock
