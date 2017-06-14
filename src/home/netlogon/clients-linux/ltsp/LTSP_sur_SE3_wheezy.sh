@@ -186,7 +186,7 @@ tzdata	tzdata/Zones/Europe	select	Paris
 tzdata  tzdata/Areas	select  Europe
 EOF
 echo 'Europe/Paris' > /etc/timezone
-dpkg-reconfigure tzdata --frontend=noninteractive --priority=critical
+dpkg-reconfigure tzdata --frontend=noninteractive
 
 sleep 1
 
@@ -697,6 +697,24 @@ ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
 jackd2   jackd/tweak_rt_limits   boolean false
 EOF
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install sonic-pi
+
+# wireshark 
+# Il n'est pas possible de faire un setuid dans un chroot pour des raisons de sécurité
+ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
+wireshark-common	wireshark-common/install-setuid	boolean	false
+EOF
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install wireshark
+
+# Pour désactiver le "warning" qui s'affiche au lancement de wireshark ... 
+# sed -i 's/disable_lua = false/disable_lua = true/' "/opt/ltsp/$ENVIRONNEMENT/usr/share/wireshark/init.lua"
+
+# On utilisera donc sudo pour lancer wireshark : par défaut, seul les membres du groupe admins du se3 pourront le lancer
+# Mais il est possible d'ajouter un groupe classe (ICN/ISN) en ajoutant une ligne au fichier ci-dessous
+echo '%admins	ALL=(root) NOPASSWD: /usr/bin/wireshark' > /etc/sudoers.d/wireshark
+
+# On modifie le lanceur de wireshark pour le lancer avec sudo
+sed -i 's/Exec=wireshark %f/Exec=sudo wireshark %f/' "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/wireshark.desktop"
+# Fin de wireshark
 
 ### Installation Arduino ###
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install arduino
