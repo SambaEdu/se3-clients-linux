@@ -185,6 +185,7 @@ tzdata	tzdata/Zones/Etc	select	UTC
 tzdata	tzdata/Zones/Europe	select	Paris
 tzdata  tzdata/Areas	select  Europe
 EOF
+echo 'Europe/Paris' > /etc/timezone
 dpkg-reconfigure tzdata --frontend=noninteractive --priority=critical
 
 sleep 1
@@ -300,6 +301,18 @@ sleep 5
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 6-Utilisation de pam_mount pour monter automatiquement les partages Samba du se3 à l ouverture de session d un utilisateur de client lourd "
 echo "------------------------------------------------------------------------------------------------------------------------------"
+
+# Afin de pouvoir monter des partages webdav
+ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
+davfs2	davfs2/user_name	string	davfs2
+davfs2	davfs2/new_user	boolean	true
+davfs2	davfs2/new_group	boolean	true
+davfs2	davfs2/suid_file	boolean	false
+davfs2	davfs2/non_root_users_confimed	note	
+davfs2	davfs2/group_name	string	davfs2
+EOF
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y davfs2
+
 # Configuration des partages Samba "Docs" et "Classes"
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 <?xml version="1.0" encoding="utf-8" ?>
@@ -343,6 +356,16 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 		mountpoint="$REP_MONTAGE/Classes (sur le reseau)"
 		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
 />
+
+<!-- Example de volume réalisant le montage automatique d'un partage webdav à l'ouverture de session : à décommenter et renseigner l'url du serveur webdav
+<volume
+        user="*"
+        fstype="davfs"
+        path="http://URL_SERVEUR_WEBDAV/remote.php/webdav/"
+        mountpoint="~/Owncloud"
+        options="username=%(USER),uid=%(USER),gid=%(GROUP),noexec,nodev,nosuid,dir_mode=0700,file_mode=0700"
+/>
+-->
 
 		<!-- pam_mount parameters: General tunables -->
 
