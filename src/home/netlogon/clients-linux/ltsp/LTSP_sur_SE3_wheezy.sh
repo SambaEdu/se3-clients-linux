@@ -55,6 +55,7 @@ fi
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 0-Vérifications avant installation de ltsp																					"
 echo "------------------------------------------------------------------------------------------------------------------------------"
+sleep 5
 
 if [ "$ENVIRONNEMENT" != "i386" ] && [ "$ENVIRONNEMENT" != "amd64" ]
 then
@@ -103,17 +104,19 @@ else # Sous Xenial
 	PREF_FIREFOX='firefox/syspref.js'
 fi
 
-REP_MONTAGE='~/Bureau'											# Valeur par défaut
-FF_MONTAGE='/home/$USER/Bureau'									# Valeur par défaut	
+REP_MONTAGE='~/Bureau'											# Valeur par défaut pour le montage des partages Samba via pam-mount
+FF_MONTAGE='/home/$USER/Bureau'									# Valeur par défaut	pour la création du profil FF persistant
 if [ "$BUREAU" = "mate" ] || [ "$BUREAU" = "ubuntu-mate" ]		# Sous mate, les partages doivent être montés dans ~ à la place de ~/Bureau
 then
-	REP_MONTAGE='~'
-	FF_MONTAGE='/home/$USER'
+	REP_MONTAGE='~'												# Valeur pour le bureau mate
+	FF_MONTAGE='/home/$USER'									# Valeur pour le bureau mate
 fi
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 1-Installation du serveur ltsp (nfs, nbd, debootstrap, squashfs et la doc) :																							"
 echo "------------------------------------------------------------------------------------------------------------------------------"
+sleep 5
+
 apt-get update
 apt-get install -y ltsp-server ltsp-docs
 
@@ -124,8 +127,10 @@ then
 fi
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 1.5- Configuration du service NFS (accessible depuis le sous-menu perso du menu maintenance du se3)							"
+echo " 2-Configuration du service NFS (accessible depuis le sous-menu perso du menu maintenance du se3)								"
 echo "------------------------------------------------------------------------------------------------------------------------------"
+sleep 5
+
 resultat=$(grep -F '/opt/ltsp *(ro,no_root_squash,async,no_subtree_check)' /etc/exports)
 if [ -z "$resultat" ]
 then
@@ -135,10 +140,10 @@ EOF
 fi
 service nfs-kernel-server restart
 
-
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 2-Construction de l environnement $ENVIRONNEMENT pour les clients lourds $DISTRIB											"
+echo " 3-Construction de l environnement $ENVIRONNEMENT pour les clients lourds $DISTRIB											"
 echo "------------------------------------------------------------------------------------------------------------------------------"
+sleep 5
 
 # Le script gutsy est fonctionnel pour construire un environnement xenial
 if [ ! -e "/usr/share/debootstrap/scripts/xenial" ]
@@ -146,7 +151,6 @@ then
 	ln -s /usr/share/debootstrap/scripts/gutsy /usr/share/debootstrap/scripts/xenial
 fi
 
-# Faire : des fichiers de configs afin que cela se resume à un :
 if [ "$DISTRIB" = 'xenial' ]
 then
 	VENDOR=Ubuntu CONFIG_NBD=true ltsp-build-client --arch "$ENVIRONNEMENT" --chroot "$ENVIRONNEMENT" --fat-client-desktop "$BUREAU-desktop" --dist "$DISTRIB" --mirror http://fr.archive.ubuntu.com/ubuntu/ --locale fr_FR.UTF-8 --prompt-rootpass --purge-chroot
@@ -160,14 +164,18 @@ else
 fi
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 3-Creation d'un compte local enseignant dans l'environnement des clients lourds												"
+echo " 4-Creation d'un compte local enseignant dans l'environnement des clients lourds												"
 echo "------------------------------------------------------------------------------------------------------------------------------"
+sleep 5
+
 ltsp-chroot --arch "$ENVIRONNEMENT" adduser enseignant
 ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 700 /home/enseignant
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 4-Configuration de lts.conf afin que les clients lourds démarrent de façon complément autonome 								"
+echo " 5-Configuration de lts.conf afin que les clients lourds démarrent de façon complément autonome 								"
 echo "------------------------------------------------------------------------------------------------------------------------------"
+sleep 5
+
 cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/etc/lts.conf"
 [default]
 LTSP_CONFIG=true
@@ -177,9 +185,11 @@ XKBLAYOUT=fr						# Peut être util sur Ubuntu, pour certains bureaux (lubuntu)
 USE_LOCAL_SWAP=true					# Pour utiliser une éventuelle partition swap présente sur le disque dur local du client lourd
 EOF
 
+echo "------------------------------------------------------------------------------------------------------------------------------"
+echo " 6-Configuration du timezone (paquet tzdata) pour éviter un décalage horaire de 2 heures										"
+echo "------------------------------------------------------------------------------------------------------------------------------"
 sleep 5
 
-echo " 4.5 - Configuration du timezone (paquet tzdata) pour éviter un décalage horaire"
 ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
 tzdata	tzdata/Zones/Etc	select	UTC
 tzdata	tzdata/Zones/Europe	select	Paris
@@ -188,9 +198,12 @@ EOF
 echo 'Europe/Paris' > /etc/timezone
 dpkg-reconfigure tzdata --frontend=noninteractive
 
-sleep 1
+echo "------------------------------------------------------------------------------------------------------------------------------"
+echo " 7-Définir les règles polkit-1 pour désactiver la mise en veille (suspend) et l'hibernation									"
+echo " 	 La désactivation user switching se fera avec dconf																			"
+echo "------------------------------------------------------------------------------------------------------------------------------"
+sleep 5
 
-echo " 4.6 - Définir les règles polkit-1 pour désactiver la mise en veille (suspend) et l'hibernation"
 # Version de polkit sur Stretch ou xenial : 0.105 => possibilité de définir les règles avec des fichiers .pkla dans /etc/polkit-1/localauthority/
 # Desactivation "complète" de l'hibernation
 cat << 'EOF' > "/opt/ltsp/$ENVIRONNEMENT/etc/polkit-1/localauthority/90-mandatory.d/disable-hibernate.pkla"
@@ -233,9 +246,10 @@ ResultActive=no
 EOF
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 5-Paramétrer PAM pour qu il consulte l annuaire LDAP de se3 lors de l identification d un utilisateur sur un client lourd	"
+echo " 8-Paramétrer PAM pour qu il consulte l annuaire LDAP de se3 lors de l identification d un utilisateur sur un client lourd	"
 echo "   et pour qu'il réalise le montage automatique des partages Samba du se3 grace à pam_mount									"
 echo "------------------------------------------------------------------------------------------------------------------------------"
+sleep 5
 
 # Installation des paquets nécessaires à l'identification LDAP avec PAM
 ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
@@ -296,11 +310,10 @@ sed -i '/@include common-session/i \session required pam_mkhomedir.so skel=/etc/
 # Mise des droits sur le skelette des home directory des utilisateurs de clients lourds
 ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 700 /etc/skel
 
+echo "------------------------------------------------------------------------------------------------------------------------------"
+echo " 9-Utilisation de pam_mount pour monter automatiquement les partages Samba du se3 à l ouverture de session d un utilisateur de client lourd "
+echo "------------------------------------------------------------------------------------------------------------------------------"
 sleep 5
-
-echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 6-Utilisation de pam_mount pour monter automatiquement les partages Samba du se3 à l ouverture de session d un utilisateur de client lourd "
-echo "------------------------------------------------------------------------------------------------------------------------------"
 
 # Afin de pouvoir monter des partages webdav
 ltsp-chroot --arch "$ENVIRONNEMENT" debconf-set-selections <<EOF
@@ -396,8 +409,9 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 EOF
 
 echo "--------------------------------------------------------------------------------------"
-echo " 7-Configuration du proxy															"
+echo " 10-Configuration du proxy															"
 echo "--------------------------------------------------------------------------------------"
+sleep 5
 
 masque_reseau=$(($(echo "$se3mask" | grep -o "255" | wc -l)*8))
 ip_proxy="$(echo "$IP_PROXY" | cut -d ':' -f 1)"
@@ -417,7 +431,7 @@ no_proxy="localhost,127.0.0.1,${IP_SE3}/${masque_reseau}"
 EOF
 
 	cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/apt.conf.d/95proxy"
-Acquire::https::proxy "https://$IP_PROXY/";
+Acquire::https::Proxy "http://$IP_PROXY/";
 EOF
 
 	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/wgetrc"
@@ -450,11 +464,10 @@ pref("network.proxy.type", 4);
 EOF
 fi
 
+echo "--------------------------------------------------------------------------------------"
+echo " 11-Configuration de lightdm 															"
+echo "--------------------------------------------------------------------------------------"
 sleep 5
-
-echo "--------------------------------------------------------------------------------------"
-echo " 8-Configuration de lightdm 															"
-echo "--------------------------------------------------------------------------------------"
 
 if [ "$BUREAU" = "ubuntu" ] 
 then
@@ -532,11 +545,10 @@ Exec=/usr/local/bin/logon.sh
 Terminal=false
 EOF
 
+echo "--------------------------------------------------------------------------------------"
+echo " 12-Configuration de l environnement $ENVIRONNEMENT des clients lourds $DISTRIB	 	"
+echo "--------------------------------------------------------------------------------------"
 sleep 5
-
-echo "--------------------------------------------------------------------------------------"
-echo " 9-Configuration de l environnement $ENVIRONNEMENT des clients lourds $DISTRIB	 	"
-echo "--------------------------------------------------------------------------------------"
 
 if [ "$DISTRIB" = "xenial" ]
 then
@@ -588,7 +600,7 @@ ltsp-chroot --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
     ;;
     esac
 
-else 
+else 	# sous Stretch
 # Définitions des dépôts Debian
 cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list"
 deb http://ftp.fr.debian.org/debian stretch main non-free contrib
@@ -685,7 +697,7 @@ EOF
 	# Pour éviter d'installer d'autres paquets de la branche unstable :
 	rm -f "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/sid.list"
 	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
-else
+else   # Sous Xenial ....
 	# Installation de pygame (1.9.2) pour Python 3 mais avec un dépôt non officiel ... A décommenter.
 	#ltsp-chroot --arch "$ENVIRONNEMENT" add-apt-repository -y ppa:thopiekar/pygame
 	#ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update && ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y idle-python3.5 python3-pygame
@@ -835,17 +847,19 @@ fi
 ### Fin de l'installation de scratch 2
 
 echo "--------------------------------------------------------------------------------------"
-echo " 10-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
+echo " 13-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
 echo "--------------------------------------------------------------------------------------"
+sleep 5
 
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/xdg/user-dirs.defaults"
 DESKTOP=Desktop
 EOF
 
+echo "--------------------------------------------------------------------------------------"
+echo " 14-Copie du skel dans le chroot (création des lanceurs)								"
+echo "--------------------------------------------------------------------------------------"
+sleep 5
 
-echo "--------------------------------------------------------------------------------------"
-echo " 11-Copie du skel dans le chroot (création des lanceurs)								"
-echo "--------------------------------------------------------------------------------------"
 #find "/home/netlogon/clients-linux/ltsp/${DISTRIB}/skel/" -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
 # Création des lanceurs dans les menus d'applications :
 
@@ -964,18 +978,18 @@ Categories=Education;Programmation
 EOF
 fi
 
+echo "--------------------------------------------------------------------------------------"
+echo " 15-Extinction de tous les clients lourds à 19h par défaut							"
+echo "--------------------------------------------------------------------------------------"
 sleep 5
 
-echo "--------------------------------------------------------------------------------------"
-echo " 12-Extinction de tous les clients lourds à 19h par défaut							"
-echo "--------------------------------------------------------------------------------------"
 echo '0 19 * * * root /sbin/poweroff' > "/opt/ltsp/$ENVIRONNEMENT/etc/cron.d/extinction_clients_lourds"
 
+echo "--------------------------------------------------------------------------------------"
+echo " 16-Reconstruction de l'image squashfs (pour NBD)					"
+echo "--------------------------------------------------------------------------------------"
 sleep 5
 
-echo "--------------------------------------------------------------------------------------"
-echo " 13-Reconstruction de l'image squashfs (pour NBD)					"
-echo "--------------------------------------------------------------------------------------"
 if [ "$DISTRIB" = "stretch" ]
 then	# Sous ltsp wheezy, pour un chroot debian, c'est nfs qui est utilisé par défaut, il faut utiliser l'option --config-nbd pour configurer nbd
 	ltsp-update-image --config-nbd "$ENVIRONNEMENT"
@@ -985,8 +999,10 @@ fi
 service nbd-server restart
 
 echo "--------------------------------------"
-echo " 14-Sauvegarde du chroot des clients lourds (5 minutes)	    "
+echo " 17-Sauvegarde du chroot des clients lourds (5 minutes)	    "
 echo "--------------------------------------"
+sleep 5
+
 if [ ! -d "/var/se3/ltsp/originale" ]
 then
 	mkdir -p "/var/se3/ltsp/originale"
@@ -994,11 +1010,10 @@ fi
 rm -rf "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
 cp -a "/opt/ltsp/$ENVIRONNEMENT" "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
 
+echo "------------------------------------------------------------------------------------------------------------------------------"
+echo " 18- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd $DISTRIB 	    "
+echo "------------------------------------------------------------------------------------------------------------------------------"
 sleep 5
-
-echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 15- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd $DISTRIB 	    "
-echo "------------------------------------------------------------------------------------------------------------------------------"
 
 # En "production", c'est le service NBD qui est utilisé pour monter l'environnement des clients lourds
 resultat=$(grep "Demarrer le pc en client lourd $DISTRIB $ENVIRONNEMENT avec NBD" "/tftpboot/pxelinux.cfg/default")
@@ -1035,7 +1050,7 @@ sed -i 's/'^###perso###'//' '/tftpboot/pxelinux.cfg/maintenance.menu'
 if [ "$DISTRIB" = "xenial" ]
 then
 echo "-------------------------------------------------------------------------------------------------------"
-echo " 16-Redemarrage dans 5 secondes du serveur pour remettre la local en français (pour Ubuntu uniquement) "
+echo " 19-Redemarrage dans 5 secondes du serveur pour remettre la local en français (pour Ubuntu uniquement) "
 echo "-------------------------------------------------------------------------------------------------------"
 sleep 5	&& reboot
 fi
