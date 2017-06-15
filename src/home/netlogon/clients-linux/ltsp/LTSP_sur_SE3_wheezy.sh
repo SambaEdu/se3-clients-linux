@@ -722,7 +722,7 @@ ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install wireshark
 
 # On utilisera donc sudo pour lancer wireshark : par défaut, seul les membres du groupe admins du se3 pourront le lancer
 # Mais il est possible d'ajouter un groupe classe (ICN/ISN) en ajoutant une ligne au fichier ci-dessous
-echo '%admins	ALL=(root) NOPASSWD: /usr/bin/wireshark' > /etc/sudoers.d/wireshark
+echo '%admins	ALL=(root) NOPASSWD: /usr/bin/wireshark' > "/opt/ltsp/$ENVIRONNEMENT/etc/sudoers.d/wireshark"
 
 # On modifie le lanceur de wireshark pour le lancer avec sudo
 sed -i 's/Exec=wireshark %f/Exec=sudo wireshark %f/' "/opt/ltsp/$ENVIRONNEMENT/usr/share/applications/wireshark.desktop"
