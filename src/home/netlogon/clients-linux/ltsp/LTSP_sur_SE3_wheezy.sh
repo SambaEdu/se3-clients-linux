@@ -739,7 +739,7 @@ EOF
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install wireshark
 
 # Pour désactiver le "warning" qui s'affiche au lancement de wireshark ... 
-# sed -i 's/disable_lua = false/disable_lua = true/' "/opt/ltsp/$ENVIRONNEMENT/usr/share/wireshark/init.lua"
+# sed -i 's/disable_lua = false/disable_lua = true/' "/opt/ltsp/$ENVIRONNEMENT/etc/wireshark/init.lua"
 
 # On utilisera donc sudo pour lancer wireshark : par défaut, seul les membres du groupe admins du se3 pourront le lancer
 # Mais il est possible d'ajouter un groupe classe (ICN/ISN) en ajoutant une ligne au fichier ci-dessous
