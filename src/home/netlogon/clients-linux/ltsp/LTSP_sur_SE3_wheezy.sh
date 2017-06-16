@@ -883,6 +883,10 @@ sleep 5
 #find "/home/netlogon/clients-linux/ltsp/${DISTRIB}/skel/" -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
 # Création des lanceurs dans les menus d'applications :
 
+# copie de dconf/user dans le skel
+ltsp-chroot --arch "$ENVIRONNEMENT" mkdir -p /etc/skel/.config/dconf
+ltsp-chroot --arch "$ENVIRONNEMENT" wget -P /etc/skel/.config/dconf "https://github.com/SambaEdu/se3-clients-linux/blob/master/src/home/netlogon/clients-linux/ltsp/$DISTRIB/skel/.config/dconf/user"
+
 if [ "$DISTRIB" = "stretch" ]
 then # sous debian, c'est le navigateur s'appelle firefox-esr 
 # Pour Blockly Arduino :
