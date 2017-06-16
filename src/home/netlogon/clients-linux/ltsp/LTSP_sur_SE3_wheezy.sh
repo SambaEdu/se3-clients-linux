@@ -519,7 +519,7 @@ set -x
 # Si l'administrateur dépose un repertoire modèle "$REP_NAME" dans /etc/skel2 sur le serveur ltsp (chroot) alors  
 # ce repertoire "/etc/skel2/$REP_NAME" sera utilisé pour initialiser "//Docs/.ltsp/$REP_NAME" de l'utilisateur qui se loggue
 
-function rendre_repertoire_persistant()
+rendre_repertoire_persistant()
 {
 local REP_NAME="$1"
 # On vérifie qu'on peut créer le lien symbolique à savoir :
@@ -535,14 +535,14 @@ then
         then
 			cp -r "/etc/skel2/$REP_NAME" "$REP_DOCS/Docs (sur le reseau)/.ltsp/$REP_NAME"
         else
-			mkdir "$REP_DOCS/Docs (sur le reseau)/.ltsp/.mozilla"
+			mkdir "$REP_DOCS/Docs (sur le reseau)/.ltsp/$REP_NAME"
         fi
 	fi
 	# La commande cp précédente peut prendre du temps, surtout si le repertoire REP_NAME a une taille importante :
 	# il est donc possible que l'utilisateur crée le répertoire REP_NAME dans son HOME avant que le lien symbolique ne soit créé ...
 	# cela peut se produire par exemple si l'utilisateur lance rapidement firefox et que /etc/skel3/.mozilla a une taille importante ...
 	# Si REP_NAME apparaît avant la création du lien, on ne crée pas ce dernier : REP_NAME sera persistant à la prochaine connexion de l'utilisateur.
-    [ ! -d "/home/$USER/$REP_NAME" ] && ln -s "$REP_DOCS/Docs (sur le reseau)/.ltsp/.mozilla" "/home/$USER/$REP_NAME" 
+    [ ! -d "/home/$USER/$REP_NAME" ] && ln -s "$REP_DOCS/Docs (sur le reseau)/.ltsp/$REP_NAME" "/home/$USER/$REP_NAME" 
 fi
 }
 
