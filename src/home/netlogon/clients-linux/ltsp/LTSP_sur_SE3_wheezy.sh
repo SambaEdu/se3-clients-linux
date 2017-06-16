@@ -506,7 +506,7 @@ EOF
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/logon.sh"
 #!/bin/sh
 # Script executé en tant qu utilisateur apres l ouverture de session et qui se charge de créer un profil firefox persistant par utilisateur dans le partage samba Docs/.ltsp/.mozilla
-REP="$FF_MONTAGE"
+REP_DOCS="$FF_MONTAGE"
 EOF
 
 # On crée la partie "fixe" du script:
@@ -514,20 +514,41 @@ cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/logon.sh"
 exec > "/home/$USER/.logon.log" 2>&1
 set -x
 
-if [ ! -d "/home/$USER/.mozilla" ] && [ -d "$REP/Docs (sur le reseau)" ]
+# Cette fonction a pour but de rendre personalisable et persistant certains répertoires présent dans le home de l'utilisateur qui se loggue
+# Si "~/$REP_NAME" n'existe pas, elle crée un lien symbolique de "~/$REP_NAME" vers le partage samba "//Docs/.ltsp/$REP_NAME"
+# Si l'administrateur dépose un repertoire modèle "$REP_NAME" dans /etc/skel2 sur le serveur ltsp (chroot) alors  
+# ce repertoire "/etc/skel2/$REP_NAME" sera utilisé pour initialiser "//Docs/.ltsp/$REP_NAME" de l'utilisateur qui se loggue
+
+function rendre_repertoire_persistant()
+{
+local REP_NAME="$1"
+# On vérifie qu'on peut créer le lien symbolique à savoir :
+# - que le répertoire $REP_NAME n'existe pas dans le home de l'utilisateur
+# - que le partage /homes/Docs est monté dans le home de l'utilisateur qui se loggue
+if [ ! -d "/home/$USER/$REP_NAME" ] && [ -d "$REP_DOCS/Docs (sur le reseau)" ] && [ $(mount | grep '/homes/Docs' | wc -l)  != 0 ]
 then
-        if [ ! -d "$REP/Docs (sur le reseau)/.ltsp/.mozilla" ]
+	# Si la repertoire REP_NAME n'existe pas sur le partage Samba de l'utilisateur, alors on cherche à l'initialiser un éventuelle repertoire du même nom présent dans /etc/skel2
+	if [ ! -d "$REP_DOCS/Docs (sur le reseau)/.ltsp/$REP_NAME" ]
+	then	
+		[ ! -d "$REP_DOCS/Docs (sur le reseau)/.ltsp" ] && mkdir "$REP_DOCS/Docs (sur le reseau)/.ltsp"
+        if [ -d "/etc/skel2/$REP_NAME" ]
         then
-                [ ! -d "$REP/Docs (sur le reseau)/.ltsp" ] && mkdir "$REP/Docs (sur le reseau)/.ltsp"
-                if [ -d '/home/.mozilla' ]
-                then
-                        cp -r "/home/.mozilla" "$REP/Docs (sur le reseau)/.ltsp/.mozilla"
-                else
-						mkdir "$REP/Docs (sur le reseau)/.ltsp/.mozilla"
-                fi
+			cp -r "/etc/skel2/$REP_NAME" "$REP_DOCS/Docs (sur le reseau)/.ltsp/$REP_NAME"
+        else
+			mkdir "$REP_DOCS/Docs (sur le reseau)/.ltsp/.mozilla"
         fi
-        ln -s "$REP/Docs (sur le reseau)/.ltsp/.mozilla" "/home/$USER/.mozilla" 
+	fi
+	# La commande cp précédente peut prendre du temps, surtout si le repertoire REP_NAME a une taille importante :
+	# il est donc possible que l'utilisateur crée le répertoire REP_NAME dans son HOME avant que le lien symbolique ne soit créé ...
+	# cela peut se produire par exemple si l'utilisateur lance rapidement firefox et que /etc/skel3/.mozilla a une taille importante ...
+	# Si REP_NAME apparaît avant la création du lien, on ne crée pas ce dernier : REP_NAME sera persistant à la prochaine connexion de l'utilisateur.
+    [ ! -d "/home/$USER/$REP_NAME" ] && ln -s "$REP_DOCS/Docs (sur le reseau)/.ltsp/.mozilla" "/home/$USER/$REP_NAME" 
 fi
+}
+
+#rendre_repertoire_persistant .mozilla
+#rendre_repertoire_persistant .wine
+
 exit 0
 EOF
 
