@@ -698,7 +698,7 @@ EOF
 	rm -f "/opt/ltsp/$ENVIRONNEMENT/etc/apt/sources.list.d/sid.list"
 	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
 else   # Sous Xenial ....
-	# Installation de pygame (1.9.2) pour Python 3 mais avec un dépôt non officiel ... A décommenter.
+	# Installation de pygame (1.9.2) pour Python 3 mais avec un dépôt non officiel ...
 	#ltsp-chroot --arch "$ENVIRONNEMENT" add-apt-repository -y ppa:thopiekar/pygame
 	#ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update && ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y idle-python3.5 python3-pygame
 	ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y idle-python3.5
@@ -732,14 +732,14 @@ sed -i 's/Exec=wireshark %f/Exec=sudo wireshark %f/' "/opt/ltsp/$ENVIRONNEMENT/u
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install arduino
 
 # On déplace le dossier sketchbook (contenant ardublock) dans le repertoire /opt/arduino/ et on récupère ardublock
-mkdir -p "/opt/ltsp/$ENVIRONNEMENT/opt/arduino/sketchbook/tools/ArduBlockTool/tool" "/opt/ltsp/$ENVIRONNEMENT/opt/arduino/sketchbook/libraries"
-wget -P "/opt/ltsp/$ENVIRONNEMENT/opt/arduino/sketchbook/tools/ArduBlockTool/tool" 'https://github.com/SambaEdu/se3-clients-linux/raw/master/src/home/netlogon/clients-linux/ltsp/stretch/opt/arduino/sketchbook/tools/ArduBlockTool/tool/ardublock-all-20130712.jar'
-chown -R root:root "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
-chmod -R 755 "/opt/ltsp/$ENVIRONNEMENT/opt/arduino"
+ltsp-chroot --arch "$ENVIRONNEMENT" mkdir -p "/opt/arduino/sketchbook/tools/ArduBlockTool/tool" "/opt/arduino/sketchbook/libraries"
+ltsp-chroot --arch "$ENVIRONNEMENT" wget -P "/opt/arduino/sketchbook/tools/ArduBlockTool/tool" 'https://github.com/SambaEdu/se3-clients-linux/raw/master/src/home/netlogon/clients-linux/ltsp/stretch/opt/arduino/sketchbook/tools/ArduBlockTool/tool/ardublock-all-20130712.jar'
+ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root "/opt/arduino"
+ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 755 "/opt/arduino"
 
 # On copie le fichier de de préférence dans le skel :
-mkdir "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.arduino"
-wget -P "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.arduino" 'https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/ltsp/skel/.arduino/preferences.txt'
+ltsp-chroot --arch "$ENVIRONNEMENT" mkdir "/etc/skel/.arduino"
+ltsp-chroot --arch "$ENVIRONNEMENT" wget -P "/etc/skel/.arduino" 'https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/ltsp/skel/.arduino/preferences.txt'
 
 # Utilisation du module pam_group.so pour ajouter les utilisateurs au groupe dialout (nécessaire pour pouvoir communiquer avec la carte arduino)
 sed -i '/pam_mount.so/i \auth	optional	pam_group.so' "/opt/ltsp/$ENVIRONNEMENT/etc/pam.d/common-auth"
@@ -775,31 +775,30 @@ then
 fi
 
 # Nettoyage avant installation
-rm -rf --one-file-system "$archive_processing" "${version_processing}.tgz"
+ltsp-chroot --arch "$ENVIRONNEMENT" rm -rf --one-file-system "$archive_processing" "${version_processing}.tgz"
 
 # Téléchargement de l'archive et désarchivage
-wget -O "${version_processing}.tgz" "http://download.processing.org/${version_processing}.tgz" && tar zxvf "${version_processing}.tgz"
-rm -f "${version_processing}.tgz"
-mv -f "$archive_processing" "/opt/ltsp/$ENVIRONNEMENT/opt/processing"
+ltsp-chroot --arch "$ENVIRONNEMENT" wget -O "${version_processing}.tgz" "http://download.processing.org/${version_processing}.tgz" && ltsp-chroot --arch "$ENVIRONNEMENT" tar zxvf "${version_processing}.tgz"
+ltsp-chroot --arch "$ENVIRONNEMENT" rm -f "${version_processing}.tgz"
+ltsp-chroot --arch "$ENVIRONNEMENT" mv -f "$archive_processing" "/opt/processing"
 # Le repertoire sketchbook est créé dans /opt/processing/
-mkdir -p "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/examples" "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/libraries" 
-mkdir "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/modes" "/opt/ltsp/$ENVIRONNEMENT/opt/processing/sketchbook/tools" 
+ltsp-chroot --arch "$ENVIRONNEMENT" mkdir -p "/opt/processing/sketchbook/examples" "/opt/processing/sketchbook/libraries" 
+ltsp-chroot --arch "$ENVIRONNEMENT" mkdir "/opt/processing/sketchbook/modes" "/opt/processing/sketchbook/tools" 
 ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/processing
 ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 755 /opt/processing
 
 # On copie les fichier de conf de processing dans le skel :
-mkdir -p "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.processing/console" 
+ltsp-chroot --arch "$ENVIRONNEMENT" mkdir -p "/etc/skel/.processing/console" 
 echo 'fr' > "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.processing/language.txt"
-wget -P "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.processing" 'https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/ltsp/skel/.processing/preferences.txt'
-
+ltsp-chroot --arch "$ENVIRONNEMENT" wget -P "/etc/skel/.processing" 'https://raw.githubusercontent.com/SambaEdu/se3-clients-linux/master/src/home/netlogon/clients-linux/ltsp/skel/.processing/preferences.txt'
 ### Fin Processing ###
 
 ### Installation de mBlock pour le robot mbot
 if [ "$ENVIRONNEMENT" = "amd64" ]   # La version 4 de mblock est disponible sous forme d'archive seulement pour une architecture amd64
 then
-	wget -O 'mBlock-4.0.0-linux-4.0.0.tar.gz' 'https://github.com/Makeblock-official/mBlock/releases/download/V4.0.0-Linux/mBlock-4.0.0-linux-4.0.0.tar.gz' && tar zxvf 'mBlock-4.0.0-linux-4.0.0.tar.gz'
-	rm -f 'mBlock-4.0.0-linux-4.0.0.tar.gz'
-	mv -f mBlock "/opt/ltsp/$ENVIRONNEMENT/opt/mBlock"
+	ltsp-chroot --arch "$ENVIRONNEMENT" wget -O 'mBlock-4.0.0-linux-4.0.0.tar.gz' 'https://github.com/Makeblock-official/mBlock/releases/download/V4.0.0-Linux/mBlock-4.0.0-linux-4.0.0.tar.gz' && ltsp-chroot --arch "$ENVIRONNEMENT" tar zxvf 'mBlock-4.0.0-linux-4.0.0.tar.gz'
+	ltsp-chroot --arch "$ENVIRONNEMENT" rm -f 'mBlock-4.0.0-linux-4.0.0.tar.gz'
+	ltsp-chroot --arch "$ENVIRONNEMENT" mv -f mBlock "/opt/mBlock"
 	ltsp-chroot --arch "$ENVIRONNEMENT" mkdir /opt/mBlock/mblock-setting
 	ltsp-chroot --arch "$ENVIRONNEMENT" chown -R root:root /opt/mBlock
 else	 							# Mais un paquet .deb existe tout de même pour les architectures i386
