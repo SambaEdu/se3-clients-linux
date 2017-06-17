@@ -449,11 +449,23 @@ EOF
 
 	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/$PREF_FIREFOX"
 // Define proxy when an IP and PORT are specified
+pref("network.proxy.type", 1);
 pref("network.proxy.share_proxy_settings", true);
+pref("network.proxy.no_proxies_on", "localhost, 127.0.0.1, ${IP_SE3}/${masque_reseau}");
+pref("network.proxy.backup.ftp", "${ip_proxy}");
+pref("network.proxy.backup.ftp_port", ${port_proxy});
+pref("network.proxy.backup.socks", "${ip_proxy}");
+pref("network.proxy.backup.socks_port", ${port_proxy});
+pref("network.proxy.backup.ssl", "${ip_proxy}");
+pref("network.proxy.backup.ssl_port", ${port_proxy});
 pref("network.proxy.http", "${ip_proxy}");
 pref("network.proxy.http_port", ${port_proxy});
-pref("network.proxy.no_proxies_on", "localhost, 127.0.0.1, ${IP_SE3}/${masque_reseau}");
-pref("network.proxy.type", 1);
+pref("network.proxy.ftp", "${ip_proxy}");
+pref("network.proxy.ftp_port", ${port_proxy});
+pref("network.proxy.socks", "${ip_proxy}");
+pref("network.proxy.socks_port", ${port_proxy});
+pref("network.proxy.ssl", "${ip_proxy}");
+pref("network.proxy.ssl_port", ${port_proxy});
 EOF
 else
 # On règle le proxy d'Iceweasel avec l'option "Détection automatique des paramètres proxy pour ce réseau"
