@@ -3,7 +3,11 @@
 # Sous licence GNU
 
 # Choisir l'environnement des clients lourds : lxde, mate, xfce4, gnome, cinnamon
-ENVIRONNEMENT="mate" 
+ENVIRONNEMENT="i386"
+BUREAU="mate"						# Bureau à installer dans le chroot des clients lourds 
+
+# Insertion de toutes les fonctions la librairie lib.sh
+. /home/netlogon/clients-linux/lib.sh
 
 # Récupération de variables spécifiques au se3
 . /etc/se3/config_c.cache.sh
@@ -22,11 +26,12 @@ echo " Tout PC disposant d un boot PXE et d au moins 512 Mo de RAM pourra démar
 echo " Votre se3 n a pas besoin d être très puissant, juste d'une carte reseau 1Gbs													"
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " Ce script va simplement, sur votre se3 :																						"
-echo " - créer un répertoire /opt/ltsp/mate (le chroot) contenant la racine / des clients lourds Jessie								"
-echo " - installer et configurer les services NFS pour distribuer l'environnement (le chroot) des clients lourds 					"
-echo " - créer un répertoire /tftpboot/ltsp contenant l'initrd et le kernel pour le boot PXE des clients lourds	Jessie 				"
-echo " - ajouter une entrée au menu /tftpboot/pxelinux.cfg/default pour pouvoir démarrer un PC PXE en client lourd Jessie 			"
-echo " - configurer le chroot des clients lourds Jessie pour l'identification avec l annuaire ldap et le montage automatique des partages Samba du se3  "
+echo " - créer un répertoire /opt/ltsp/i386 (le chroot) contenant la racine / des clients lourds jessie								"
+echo " - Faire une sauvegarde de ce chroot dans /var/se3/ltsp																		"
+echo " - installer et configurer les services NFS et NBD pour distribuer l'environnement (le chroot) des clients lourds 			"
+echo " - créer un répertoire /tftpboot/ltsp contenant l'initrd et le kernel pour le boot PXE des clients lourds	jessie 				"
+echo " - ajouter une entrée au menu /tftpboot/pxelinux.cfg/default pour pouvoir démarrer un PC PXE en client lourd jessie 			"
+echo " - configurer le chroot des clients lourds jessie pour l'identification avec l annuaire ldap et le montage automatique des partages Samba du se3  "
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " Etes-vous sur de vouloir débuter l installation ? o ou n ? :																				"
 read REPONSE
@@ -78,8 +83,7 @@ service nfs-kernel-server restart
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 3-Construction de l environnement $ENVIRONNEMENT pour les clients lourds Jessie														"
 echo "------------------------------------------------------------------------------------------------------------------------------"
-ltsp-build-client --arch i386 --chroot "$ENVIRONNEMENT" --fat-client-desktop "task-$ENVIRONNEMENT-desktop" --dist jessie --mirror http://ftp.fr.debian.org/debian/ --locale fr_FR.UTF-8 --prompt-rootpass --purge-chroot
-cp -a "/opt/ltsp/$ENVIRONNEMENT" /opt/ltsp/jessie_save
+ltsp-build-client --arch i386 --chroot "$ENVIRONNEMENT" --fat-client-desktop "task-$BUREAU-desktop" --dist jessie --mirror http://ftp.fr.debian.org/debian/ --locale fr_FR.UTF-8 --prompt-rootpass --purge-chroot
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 4-Creation d'un compte local enseignant dans l'environnement des clients lourds												"
@@ -98,20 +102,10 @@ LTSP_CONFIG=true
 DEFAULT_DISPLAY_MANAGER=""          # Lance le gestionnaire d'affichage présent dans l'environnement des clients lourds (lightdm) à la place de LDM
 EOF
 
+sleep 5
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 6- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Jessie 	    "
-echo "------------------------------------------------------------------------------------------------------------------------------"
-cat <<EOF >> "/tftpboot/pxelinux.cfg/default"
-LABEL ltspJessie
-	MENU LABEL ^Demarrer le pc en client lourd Jessie $ENVIRONNEMENT
-	KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
-	APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet ip=dhcp boot=nfs nfsroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT
-	IPAPPEND 2
-EOF
-
-echo "------------------------------------------------------------------------------------------------------------------------------"
-echo " 7-Paramétrer PAM pour qu il consulte l annuaire LDAP de se3 lors de l identification d un utilisateur sur un client lourd	"
+echo " 6-Paramétrer PAM pour qu il consulte l annuaire LDAP de se3 lors de l identification d un utilisateur sur un client lourd	"
 echo "   et pour qu'il réalise le montage automatique des partages Samba du se3 grace à pam_mount									"
 echo "------------------------------------------------------------------------------------------------------------------------------"
 
@@ -165,6 +159,9 @@ sed -i '/@include common-session/i \session required pam_mkhomedir.so skel=/etc/
 # Mise des droits sur le skelette des home directory des utilisateurs de clients lourds
 ltsp-chroot -m --arch "$ENVIRONNEMENT" chmod -R 700 /etc/skel
 
+
+sleep 5
+
 echo "------------------------------------------------------------------------------------------------------------------------------"
 echo " 8-Utilisation de pam_mount pour monter automatiquement les partages Samba du se3 à l ouverture de session d un utilisateur de client lourd "
 echo "------------------------------------------------------------------------------------------------------------------------------"
@@ -176,7 +173,7 @@ echo "--------------------------------------------------------------------------
 #ltsp-chroot -m -a "$ENVIRONNEMENT" apt-get install -y samba
 
 # Configuration des partages Samba "Docs" et "Classes"
-if [ "$ENVIRONNEMENT" = "mate" ]
+if [ "$BUREAU" = "mate" ]
 then
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 <?xml version="1.0" encoding="utf-8" ?>
@@ -196,17 +193,15 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 		<!-- Volume definitions -->
 <volume
 		user="admin"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="netlogon-linux"
-		mountpoint="~/Clients-linux (sur le reseau)"
+		mountpoint="~/Clients-linux"
 		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
 />
 
 <volume
 		user="*"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="homes/Docs"
@@ -216,7 +211,6 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 
 <volume
 		user="*"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="Classes"
@@ -270,17 +264,15 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 		<!-- Volume definitions -->
 <volume
 		user="admin"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="netlogon-linux"
-		mountpoint="~/Bureau/Clients-linux (sur le reseau)"
+		mountpoint="~/Bureau/Clients-linux"
 		options="nobrl,serverino,iocharset=utf8,sec=ntlmv2"
 />
 
 <volume
 		user="*"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="homes/Docs"
@@ -290,7 +282,6 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/security/pam_mount.conf.xml"
 
 <volume
 		user="*"
-		pgrp="lcs-users"
 		fstype="cifs"
 		server="$IP_SE3"
 		path="Classes"
@@ -328,35 +319,84 @@ EOF
 fi
 
 
+#echo "--------------------------------------------------------------------------------------"
+#echo " 9-Configuration pour l'impression avec le serveur CUPS du SE3				 		"
+#echo "--------------------------------------------------------------------------------------"
+
+#mkdir "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.cups"
+
+#cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.cups/client.conf"
+#ServerName $IP_SE3
+#EOF
+
 echo "--------------------------------------------------------------------------------------"
-echo " 9-Configuration pour l'impression avec le serveur CUPS du SE3				 		"
+echo " 9-Configuration du proxy															"
 echo "--------------------------------------------------------------------------------------"
 
-mkdir "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.cups"
+masque_reseau=$(($(echo "$se3mask" | grep -o "255" | wc -l)*8))
+ip_proxy="$(echo "$IP_PROXY" | cut -d ':' -f 1)"
+port_proxy="$(echo "$IP_PROXY" | cut -d ':' -f 2)"
 
-cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.cups/client.conf"
-ServerName $IP_SE3
+# Définition du proxy, si le port du proxy est défini
+if [ "$port_proxy" != "" ]
+then
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.profile"
+export http_proxy="http://$IP_PROXY"
+export https_proxy="http://$IP_PROXY"
+export no_proxy="localhost,127.0.0.1,${IP_SE3}/${masque_reseau}"
 EOF
 
-echo "--------------------------------------------------------------------------------------"
-echo " 10-Configuration du proxy															"
-echo "--------------------------------------------------------------------------------------"
-
-cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.profile"
-export http_proxy="$IP_PROXY"
-export https_proxy="$IP_PROXY"
-export ftp_proxy="$IP_PROXY"
-export no_proxy="localhost,127.0.0.1,$IP_SE3"
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/environment"
+http_proxy="http://$IP_PROXY"
+https_proxy="http://$IP_PROXY"
+no_proxy="localhost,127.0.0.1,${IP_SE3}/${masque_reseau}"
 EOF
 
-cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/environment"
-http_proxy="$IP_PROXY"
-https_proxy="$IP_PROXY"
-ftp_proxy="$IP_PROXY"
-no_proxy="localhost,127.0.0.1,$IP_SE3"
+# On règle le proxy d'Iceweasel avec l'option "Configuration manuelle du proxy" et en cochant "Utilser ce proxy pour tous les protocoles"
+# On évite ainsi les problèmes d'accès aux sites en https, ...
+# Enfin, on désactive le proxy pour l'accès aux postes du réseau pédagogique (en particulier à l'interface web du se3)
+# On peut définir un paramètre de trois façons différentes :
+# - defaultPref : set new default value
+# - pref : set pref, but allow changes in current session
+# - lockPref : lock pref, disallow changes
+
+	cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/etc/firefox-esr/firefox-esr.js"
+
+// Define proxy when an IP and PORT are specified
+lockPref("network.proxy.share_proxy_settings", true);
+lockPref("network.proxy.http", "${ip_proxy}");
+lockPref("network.proxy.http_port", ${port_proxy});
+lockPref("network.proxy.no_proxies_on", "localhost, 127.0.0.1, ${IP_SE3}/${masque_reseau}");
+lockPref("network.proxy.type", 1);
 EOF
 
+else
 
+# On règle le proxy d'Iceweasel avec l'option "Détection automatique des paramètres proxy pour ce réseau"
+# Cette option permet de gérer les réseaux qui n'ont pas de proxy (proxy transparent) ainsi que ceux gérés par un fichier wpad.dat (avec Amon par exemple)
+cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/etc/firefox-esr/firefox-esr.js"
+
+// Define proxy when no IP is specified for proxy
+lockPref("network.proxy.type", 4);
+EOF
+
+fi
+
+sleep 5
+
+echo "--------------------------------------------------------------------------------------"
+echo " 10-Configuration de lightdm 															"
+echo "--------------------------------------------------------------------------------------"
+
+# Activation du verrouillage numérique du clavier
+mv "/opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm.conf" "/opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm_default.conf"
+
+cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/lightdm/lightdm.conf"
+[SeatDefaults]
+greeter-setup-script=/usr/bin/numlockx on
+EOF
+
+sleep 5
 
 echo "--------------------------------------------------------------------------------------"
 echo " 11-Configuration de l environnement $ENVIRONNEMENT des clients lourds Jessie	 		"
@@ -380,10 +420,16 @@ EOF
 
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get update
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade 
-ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano aptitude less firmware-linux wine gstreamer0.10-fluendo-mp3 ttf-mscorefonts-installer vlc iceweasel-l10n-fr system-config-printer
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y nano aptitude less firmware-linux wine gstreamer0.10-fluendo-mp3 ttf-mscorefonts-installer vlc firefox-esr-l10n-fr system-config-printer numlockx
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y flashplugin-nonfree
 ltsp-chroot -m --arch "$ENVIRONNEMENT" update-flashplugin-nonfree --install
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y -t jessie-backports libreoffice libreoffice-l10n-fr
+
+# Ajout du navigateur Chromium et de flash pour Chromium
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y chromium chromium-l10n
+ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonfree
+ltsp-chroot -m --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
+
 
 echo "--------------------------------------------------------------------------------------"
 echo " 12-Modification pour que seul le dossier Bureau apparaisse dans le home utilisateur	"
@@ -393,19 +439,56 @@ cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/etc/xdg/user-dirs.defaults"
 DESKTOP=Desktop
 EOF
 
-echo "--------------------------------------------------------------------------------------"
-echo " 13-Choisir le boot PXE par défaut des PC du réseau									"
-echo "--------------------------------------------------------------------------------------"
-echo " Voulez-vous que tous les PC de votre réseau démarrent en client lourd Jessie ? 		"
-echo " Taper o pour oui 																	"
-read REPONSE
-if [ "$REPONSE" = "o" ]
-then
-	sed -i -e "s/^ONTIMEOUT*/ONTIMEOUT ltspJessie/g" /tftpboot/pxelinux.cfg/default		
-fi
 
 echo "--------------------------------------------------------------------------------------"
-echo " 14-Redémarrage du serveur se3 dans 5 secondes ...										"
+echo " 13-Copie du skel dans le chroot														"
+echo "--------------------------------------------------------------------------------------"
+find /home/netlogon/clients-linux/ltsp/skel/ -mindepth 1 -maxdepth 1 -exec cp -rf {} "/opt/ltsp/$ENVIRONNEMENT/etc/skel/" \;
+
+sleep 5
+
+
+echo "--------------------------------------------------------------------------------------"
+echo " 14-Extinction de tous les clients lourds à 19h par défaut							"
+echo "--------------------------------------------------------------------------------------"
+echo '0 19 * * * root /sbin/poweroff' > "/opt/ltsp/$ENVIRONNEMENT/etc/cron.d/extinction_clients_lourds"
+
+sleep 5
+
+echo "--------------------------------------"
+echo " 15-Sauvegarde du chroot des clients lourds (5 minutes)	    "
+echo "--------------------------------------"
+if [ ! -d "/var/se3/ltsp/originale" ]
+then
+	mkdir -p "/var/se3/ltsp/originale"
+fi
+rm -rf "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
+cp -a "/opt/ltsp/$ENVIRONNEMENT" "/var/se3/ltsp/originale/$ENVIRONNEMENT-originale"
+
+sleep 5
+
+echo "------------------------------------------------------------------------------------------------------------------------------"
+echo " 16- Configuration du menu PXE du se3 afin d ajouter une entrée pour pouvoir démarrer un PC PXE en client lourd Jessie 	    "
+echo "------------------------------------------------------------------------------------------------------------------------------"
+
+resultat=$(grep "Demarrer le pc en client lourd Jessie $BUREAU" "/tftpboot/pxelinux.cfg/default")
+
+if [ "$resultat" = "" ]
+then
+cat <<EOF >> "/tftpboot/pxelinux.cfg/default"
+LABEL ltspJessie
+	MENU LABEL ^Demarrer le pc en client lourd Jessie $ENVIRONNEMENT
+	KERNEL tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/vmlinuz
+	APPEND ro initrd=tftp://$IP_SE3/ltsp/$ENVIRONNEMENT/initrd.img init=/sbin/init-ltsp quiet ip=dhcp boot=nfs nfsroot=$IP_SE3:/opt/ltsp/$ENVIRONNEMENT
+	IPAPPEND 2
+EOF
+fi
+
+sleep 5
+
+echo "--------------------------------------------------------------------------------------"
+echo " 17-Redémarrage du serveur se3 dans 5 secondes ...										"
 echo "--------------------------------------------------------------------------------------"
 sleep 5
+
 reboot
