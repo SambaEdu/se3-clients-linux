@@ -5,7 +5,7 @@
 
 # Ce script est paramétrable via les deux variables suivantes :
 ENVIRONNEMENT="i386"				# i386 ou amd64
-DISTRIB="xenial"				# xenial ou stretch
+DISTRIB="stretch"					# xenial ou stretch
 
 if [ "$DISTRIB" = "xenial" ]
 then
@@ -511,14 +511,15 @@ EOF
 # Création d'un lanceur qui va se charger de créer un profil firefox persistant dans le partage Docs de l'utilisateur qui se loggue
 # La logique est la suivante :
 # Si un répertoire .mozilla est présent dans le "~" alors on ne fait rien car cela signifie que l'administrateur a déposé un .mozilla modèle sur le serveur ltsp dans /etc/skel/.mozilla afin de le rendre non persistant
-# Sinon, on créé un profil .mozilla persistant dans le partage Docs/.ltsp/.mozilla en copiant, s'il existe, un éventuel modèle mis par l'administrateur dans /home/.mozilla sur le serveur ltsp.
+# Sinon, on créé un profil .mozilla persistant dans le partage Docs/.${ARCH}/.mozilla en copiant, s'il existe, un éventuel modèle mis par l'administrateur dans /home/.mozilla sur le serveur ltsp.
 # Restera à voir comment gérer les maj des profils firefox persistants ...
 
-# On crée la partie "variable" du script (FF_MONTAGE vaut ~ ou ~/Bureau selon le bureau installé dans le chroot)
+# On crée la partie "variable" du script (ARCH vaut i386 ou amd64 et FF_MONTAGE vaut ~ ou ~/Bureau selon le bureau installé dans le chroot)
 cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/logon.sh"
 #!/bin/sh
-# Script executé en tant qu utilisateur apres l ouverture de session et qui se charge de créer un profil firefox persistant par utilisateur dans le partage samba Docs/.ltsp/.mozilla
+# Script executé en tant qu utilisateur apres l ouverture de session et qui se charge de créer un profil firefox persistant par utilisateur dans le partage samba Docs/.${ARCH}/.mozilla
 REP_DOCS="$FF_MONTAGE"
+ARCH="$ENVIRONNEMENT"
 EOF
 
 # On crée la partie "fixe" du script:
@@ -527,39 +528,55 @@ exec > "/home/$USER/.logon.log" 2>&1
 set -x
 
 # Cette fonction a pour but de rendre personalisable et persistant certains répertoires présent dans le home de l'utilisateur qui se loggue
-# Si "~/$REP_NAME" n'existe pas, elle crée un lien symbolique de "~/$REP_NAME" vers le partage samba "//Docs/.ltsp/$REP_NAME"
+# Si "~/$REP_NAME" n'existe pas, elle crée un lien symbolique de "~/$REP_NAME" vers le partage samba "//Docs/.${ARCH}/$REP_NAME"
 # Si l'administrateur dépose un repertoire modèle "$REP_NAME" dans /etc/skel2 sur le serveur ltsp (chroot) alors  
-# ce repertoire "/etc/skel2/$REP_NAME" sera utilisé pour initialiser "//Docs/.ltsp/$REP_NAME" de l'utilisateur qui se loggue
+# ce repertoire "/etc/skel2/$REP_NAME" sera utilisé pour initialiser "//Docs/.${ARCH}/$REP_NAME" de l'utilisateur qui se loggue
 
 rendre_repertoire_persistant()
 {
-local REP_NAME="$1"
+local CHEMIN_REP="$1"
+local CHEMIN=$(echo $CHEMIN_REP | cut -d '/' -f 1-3)		# Le chemin vers le répertoire ou fichier à rendre permanent, en principe /etc/skel2
+local REP_NAME=$(echo $CHEMIN_REP | cut -d '/' -f 4)		# Le nom du répertoire ou fichier à rendre permanent, par exemple .mozilla
+
+# On vérifie que le paramatre fourni à la fonction est correct
+if [ "$CHEMIN" != '/etc/skel2' ] || [ -z "$REP_NAME" ]
+then
+echo 'Erreur dans le chemin du répertoire à déployer passé en paramètre à la fonction rendre_repertoire_persistant'
+exit 1
+fi 
+
 # On vérifie qu'on peut créer le lien symbolique à savoir :
 # - que le répertoire $REP_NAME n'existe pas dans le home de l'utilisateur
 # - que le partage /homes/Docs est monté dans le home de l'utilisateur qui se loggue
 if [ ! -d "/home/$USER/$REP_NAME" ] && [ -d "$REP_DOCS/Docs (sur le reseau)" ] && [ $(mount | grep '/homes/Docs' | wc -l)  != 0 ]
 then
 	# Si la repertoire REP_NAME n'existe pas sur le partage Samba de l'utilisateur, alors on cherche à l'initialiser un éventuelle repertoire du même nom présent dans /etc/skel2
-	if [ ! -d "$REP_DOCS/Docs (sur le reseau)/.ltsp/$REP_NAME" ]
+	if [ ! -d "$REP_DOCS/Docs (sur le reseau)/.${ARCH}/$REP_NAME" ]
 	then	
-		[ ! -d "$REP_DOCS/Docs (sur le reseau)/.ltsp" ] && mkdir "$REP_DOCS/Docs (sur le reseau)/.ltsp"
+		[ ! -d "$REP_DOCS/Docs (sur le reseau)/.${ARCH}" ] && mkdir "$REP_DOCS/Docs (sur le reseau)/.${ARCH}"
         if [ -d "/etc/skel2/$REP_NAME" ]
         then
-			cp -r "/etc/skel2/$REP_NAME" "$REP_DOCS/Docs (sur le reseau)/.ltsp/$REP_NAME"
+			cp -r "/etc/skel2/$REP_NAME" "$REP_DOCS/Docs (sur le reseau)/.${ARCH}/$REP_NAME"
         else
-			mkdir "$REP_DOCS/Docs (sur le reseau)/.ltsp/$REP_NAME"
+			mkdir "$REP_DOCS/Docs (sur le reseau)/.${ARCH}/$REP_NAME"
         fi
 	fi
 	# La commande cp précédente peut prendre du temps, surtout si le repertoire REP_NAME a une taille importante :
 	# il est donc possible que l'utilisateur crée le répertoire REP_NAME dans son HOME avant que le lien symbolique ne soit créé ...
-	# cela peut se produire par exemple si l'utilisateur lance rapidement firefox et que /etc/skel3/.mozilla a une taille importante ...
+	# cela peut se produire par exemple si l'utilisateur lance rapidement firefox et que /etc/skel2/.mozilla a une taille importante ...
 	# Si REP_NAME apparaît avant la création du lien, on ne crée pas ce dernier : REP_NAME sera persistant à la prochaine connexion de l'utilisateur.
-    [ ! -d "/home/$USER/$REP_NAME" ] && ln -s "$REP_DOCS/Docs (sur le reseau)/.ltsp/$REP_NAME" "/home/$USER/$REP_NAME" 
+    [ ! -d "/home/$USER/$REP_NAME" ] && ln -s "$REP_DOCS/Docs (sur le reseau)/.${ARCH}/$REP_NAME" "/home/$USER/$REP_NAME" 
 fi
 }
 
-#rendre_repertoire_persistant .mozilla
-#rendre_repertoire_persistant .wine
+# Répertoire ou fichier à syncrhoniser en priorité par rapport aux deux commandes find ci-dessous
+#rendre_repertoire_persistant /etc/skel2/.mozilla
+
+# On rend persistant tous les repertoires présents dans le répertoire /etc/skel2 du chroot
+find /etc/skel2 -mindepth 1 -maxdepth 1 -type d -exec rendre_repertoire_persistant {}
+
+# On rend persistant tous les fichiers présents dans le répertoire /etc/skel2 du chroot
+find /etc/skel2 -mindepth 1 -maxdepth 1 -type f -exec rendre_repertoire_persistant {}
 
 exit 0
 EOF
@@ -898,6 +915,10 @@ sleep 5
 # copie de dconf/user dans le skel
 ltsp-chroot --arch "$ENVIRONNEMENT" mkdir -p /etc/skel/.config/dconf
 ltsp-chroot --arch "$ENVIRONNEMENT" wget -P /etc/skel/.config/dconf "https://github.com/SambaEdu/se3-clients-linux/blob/master/src/home/netlogon/clients-linux/ltsp/$DISTRIB/skel/.config/dconf/user"
+
+# Création de /etc/skel2 qui contiendra les éventuels repertoires/fichiers utilisateurs à rendre persistants
+ltsp-chroot --arch "$ENVIRONNEMENT" mkdir /etc/skel2
+ltsp-chroot --arch "$ENVIRONNEMENT" chmod 755 /etc/skel2
 
 if [ "$DISTRIB" = "stretch" ]
 then # sous debian, c'est le navigateur s'appelle firefox-esr 
