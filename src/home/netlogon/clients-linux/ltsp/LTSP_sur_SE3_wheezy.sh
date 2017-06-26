@@ -522,7 +522,7 @@ ARCH="$ENVIRONNEMENT"
 EOF
 
 # On crée la partie "fixe" du script:
-cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/rendre_repertoire_persistant"
+cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/rendre_repertoire_persistant"
 # Ce script a pour but de rendre personalisable et persistant certains répertoires présent dans le home de l'utilisateur qui se loggue
 # Si "~/$REP_NAME" n'existe pas, il crée un lien symbolique de "~/$REP_NAME" vers le partage samba "//Docs/.${ARCH}/$REP_NAME"
 # Si l'administrateur dépose un repertoire modèle "$REP_NAME" dans /etc/skel2 sur le serveur ltsp (chroot) alors  
@@ -575,10 +575,10 @@ set -x
 #rendre_repertoire_persistant /etc/skel2/.mozilla
 
 # On rend persistant tous les repertoires présents dans le répertoire /etc/skel2 du chroot
-find /etc/skel2 -mindepth 1 -maxdepth 1 -type d -exec rendre_repertoire_persistant {}
+find /etc/skel2 -mindepth 1 -maxdepth 1 -type d -exec rendre_repertoire_persistant {} \;
 
 # On rend persistant tous les fichiers présents dans le répertoire /etc/skel2 du chroot
-find /etc/skel2 -mindepth 1 -maxdepth 1 -type f -exec rendre_repertoire_persistant {}
+find /etc/skel2 -mindepth 1 -maxdepth 1 -type f -exec rendre_repertoire_persistant {} \;
 
 exit 0
 EOF
