@@ -567,18 +567,15 @@ EOF
 cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/logon.sh"
 #!/bin/sh
 # Script executé en tant qu utilisateur apres l ouverture de session et qui se charge de créer un profil firefox persistant par utilisateur dans le partage samba Docs/.${ARCH}/.mozilla
-# Il utilise le script rendre_repertoire_persistant de /usr/local/bin afin de rendre persistant dans le partage //Docs de l'utilisateur les fichiers/répertoires présent dans /etc/skel2
+# Il utilise le script rendre_repertoire_persistant de /usr/local/bin afin de rendre persistant dans le partage //Docs de l'utilisateur les répertoires présentq dans /etc/skel2
 exec > "/home/$USER/.logon.log" 2>&1
 set -x
 
-# Répertoire ou fichier à syncrhoniser en priorité par rapport aux deux commandes find ci-dessous
+# Répertoires à syncrhoniser en priorité par rapport aux deux commandes find ci-dessous
 #rendre_repertoire_persistant /etc/skel2/.mozilla
 
 # On rend persistant tous les repertoires présents dans le répertoire /etc/skel2 du chroot
 find /etc/skel2 -mindepth 1 -maxdepth 1 -type d -exec rendre_repertoire_persistant {} \;
-
-# On rend persistant tous les fichiers présents dans le répertoire /etc/skel2 du chroot
-find /etc/skel2 -mindepth 1 -maxdepth 1 -type f -exec rendre_repertoire_persistant {} \;
 
 exit 0
 EOF
