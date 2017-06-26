@@ -916,7 +916,7 @@ sleep 5
 
 # copie de dconf/user dans le skel
 ltsp-chroot --arch "$ENVIRONNEMENT" mkdir -p /etc/skel/.config/dconf
-ltsp-chroot --arch "$ENVIRONNEMENT" wget -P /etc/skel/.config/dconf "https://github.com/SambaEdu/se3-clients-linux/blob/master/src/home/netlogon/clients-linux/ltsp/$DISTRIB/skel/.config/dconf/user"
+ltsp-chroot --arch "$ENVIRONNEMENT" wget -P /etc/skel/.config/dconf "https://github.com/SambaEdu/se3-clients-linux/raw/master/src/home/netlogon/clients-linux/ltsp/$DISTRIB/skel/.config/dconf/user"
 
 # Création de /etc/skel2 qui contiendra les éventuels repertoires/fichiers utilisateurs à rendre persistants
 ltsp-chroot --arch "$ENVIRONNEMENT" mkdir /etc/skel2
