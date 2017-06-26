@@ -515,28 +515,22 @@ EOF
 # Restera à voir comment gérer les maj des profils firefox persistants ...
 
 # On crée la partie "variable" du script (ARCH vaut i386 ou amd64 et FF_MONTAGE vaut ~ ou ~/Bureau selon le bureau installé dans le chroot)
-cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/logon.sh"
+cat <<EOF > "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/rendre_repertoire_persistant"
 #!/bin/sh
-# Script executé en tant qu utilisateur apres l ouverture de session et qui se charge de créer un profil firefox persistant par utilisateur dans le partage samba Docs/.${ARCH}/.mozilla
 REP_DOCS="$FF_MONTAGE"
 ARCH="$ENVIRONNEMENT"
 EOF
 
 # On crée la partie "fixe" du script:
-cat <<'EOF' >> "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/logon.sh"
-exec > "/home/$USER/.logon.log" 2>&1
-set -x
-
-# Cette fonction a pour but de rendre personalisable et persistant certains répertoires présent dans le home de l'utilisateur qui se loggue
-# Si "~/$REP_NAME" n'existe pas, elle crée un lien symbolique de "~/$REP_NAME" vers le partage samba "//Docs/.${ARCH}/$REP_NAME"
+cat <<EOF >> "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/rendre_repertoire_persistant"
+# Ce script a pour but de rendre personalisable et persistant certains répertoires présent dans le home de l'utilisateur qui se loggue
+# Si "~/$REP_NAME" n'existe pas, il crée un lien symbolique de "~/$REP_NAME" vers le partage samba "//Docs/.${ARCH}/$REP_NAME"
 # Si l'administrateur dépose un repertoire modèle "$REP_NAME" dans /etc/skel2 sur le serveur ltsp (chroot) alors  
 # ce repertoire "/etc/skel2/$REP_NAME" sera utilisé pour initialiser "//Docs/.${ARCH}/$REP_NAME" de l'utilisateur qui se loggue
 
-rendre_repertoire_persistant()
-{
-local CHEMIN_REP="$1"
-local CHEMIN=$(echo $CHEMIN_REP | cut -d '/' -f 1-3)		# Le chemin vers le répertoire ou fichier à rendre permanent, en principe /etc/skel2
-local REP_NAME=$(echo $CHEMIN_REP | cut -d '/' -f 4)		# Le nom du répertoire ou fichier à rendre permanent, par exemple .mozilla
+CHEMIN_REP="$1"
+CHEMIN=$(echo $CHEMIN_REP | cut -d '/' -f 1-3)		# Le chemin vers le répertoire ou fichier à rendre permanent, en principe /etc/skel2
+REP_NAME=$(echo $CHEMIN_REP | cut -d '/' -f 4)		# Le nom du répertoire ou fichier à rendre permanent, par exemple .mozilla
 
 # On vérifie que le paramatre fourni à la fonction est correct
 if [ "$CHEMIN" != '/etc/skel2' ] || [ -z "$REP_NAME" ]
@@ -567,7 +561,15 @@ then
 	# Si REP_NAME apparaît avant la création du lien, on ne crée pas ce dernier : REP_NAME sera persistant à la prochaine connexion de l'utilisateur.
     [ ! -d "/home/$USER/$REP_NAME" ] && ln -s "$REP_DOCS/Docs (sur le reseau)/.${ARCH}/$REP_NAME" "/home/$USER/$REP_NAME" 
 fi
-}
+EOF
+
+# On créé le script de logon
+cat <<'EOF' > "/opt/ltsp/$ENVIRONNEMENT/usr/local/bin/logon.sh"
+#!/bin/sh
+# Script executé en tant qu utilisateur apres l ouverture de session et qui se charge de créer un profil firefox persistant par utilisateur dans le partage samba Docs/.${ARCH}/.mozilla
+# Il utilise le script rendre_repertoire_persistant de /usr/local/bin afin de rendre persistant dans le partage //Docs de l'utilisateur les fichiers/répertoires présent dans /etc/skel2
+exec > "/home/$USER/.logon.log" 2>&1
+set -x
 
 # Répertoire ou fichier à syncrhoniser en priorité par rapport aux deux commandes find ci-dessous
 #rendre_repertoire_persistant /etc/skel2/.mozilla
@@ -581,7 +583,7 @@ find /etc/skel2 -mindepth 1 -maxdepth 1 -type f -exec rendre_repertoire_persista
 exit 0
 EOF
 
-ltsp-chroot --arch "$ENVIRONNEMENT" chmod 755 /usr/local/bin/logon.sh
+ltsp-chroot --arch "$ENVIRONNEMENT" chmod -R 755 /usr/local/bin
 
 # Création du lanceur .desktop qui se chargera d'exécuter le script précédent à l'ouverture de session
 rm -rf "/opt/ltsp/$ENVIRONNEMENT/etc/skel/.config/autostart"
