@@ -621,7 +621,7 @@ EOF
 
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
 #ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade
-ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y -f nano unzip aptitude less flashplugin-installer firefox-locale-fr xterm shutter numlockx
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y -f nano unzip aptitude less flashplugin-installer firefox-locale-fr xterm shutter numlockx rsync
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y chromium-browser chromium-browser-l10n
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y pepperflashplugin-nonfree
 ltsp-chroot --arch "$ENVIRONNEMENT" update-pepperflashplugin-nonfree --install
@@ -669,7 +669,7 @@ deb-src http://ftp.fr.debian.org/debian stretch-backports main non-free contrib
 EOF
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get update
 #ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y dist-upgrade 
-ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y nano unzip aptitude less firmware-linux ttf-mscorefonts-installer firefox-esr-l10n-fr numlockx system-config-printer
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y nano unzip aptitude less firmware-linux ttf-mscorefonts-installer firefox-esr-l10n-fr numlockx system-config-printer rsync
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y flashplugin-nonfree
 ltsp-chroot --arch "$ENVIRONNEMENT" update-flashplugin-nonfree --install				# Ne semble plus fonctionnelle sous Stretch ...
 ltsp-chroot --arch "$ENVIRONNEMENT" apt-get install -y chromium chromium-l10n
