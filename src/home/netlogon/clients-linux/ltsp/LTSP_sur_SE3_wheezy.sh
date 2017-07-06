@@ -732,8 +732,8 @@ ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get install -y algobox scilab geogebr
 # Logiciels graphisme:
 ltsp-chroot -m --arch "$ENVIRONNEMENT" apt-get -y install inkscape xia blender sweethome3d mypaint pinta 
 
-# Logiciels pour ICN/ISN (à compléter):
-ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install scratch ghex geany rurple-ng
+# Logiciels pour ICN/ISN :
+ltsp-chroot --arch "$ENVIRONNEMENT" apt-get -y install scratch ghex geany rurple-ng codeblocks pyzo
 
 if [ "$DISTRIB" = "stretch" ]
 then
